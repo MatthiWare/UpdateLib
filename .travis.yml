@@ -1,2 +1,2 @@
 language: csharp
-solution: UpdateLib.sln
+solution: UpdateLib/UpdateLib.sln
