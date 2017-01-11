@@ -1,49 +1,97 @@
-﻿using MatthiWare.UpdateLib.Files;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
+using MatthiWare.UpdateLib.Files;
+using System.Net;
+using MatthiWare.UpdateLib.Encoders;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Xml.Serialization;
 
 namespace MatthiWare.UpdateLib
 {
-    public class Updater
+    public class Updater : Component
     {
-        private String m_url;
-        private IUpdateFile m_updateFile;
-        private String m_temp;
-        private Assembly m_asm;
+        public String UpdateURL { get; set; }
+        private String m_localUpdateFile;
 
-        public Updater(String url)
+        public Updater()
         {
-            m_url = url;
-            m_asm = Assembly.GetEntryAssembly();
-            m_temp = String.Concat(Path.GetTempPath(), m_asm.FullName, "/Updater/");
+
         }
 
 
-
-        public async Task<bool> CheckForUpdates()
+        /// <summary>
+        /// Starting the update process
+        /// </summary>
+        public void CheckForUpdates()
         {
-            
-            return true;
+            CleanUp();
+
+            if (String.IsNullOrEmpty(UpdateURL))
+                throw new ArgumentException("You need to specifify a update url", "UpdateURL");
+
+            m_localUpdateFile = String.Concat("./", GetFileNameFromUrl(UpdateURL));
+
+            WebClient wc = new WebClient();
+            wc.DownloadFileCompleted += UpdateFile_DownloadCompleted;
+            wc.DownloadFileAsync(new Uri(UpdateURL), m_localUpdateFile);
         }
 
-        private async Task<IUpdateFile> GetUpdateFileFromUrl(String url)
+        private void UpdateFile_DownloadCompleted(object sender, AsyncCompletedEventArgs e)
         {
-            WebClient client = new WebClient();
-            return null;
+            WebClient download_client = (WebClient)sender;
+            download_client.Dispose();
+
+            // the update process got cancelled. 
+            if (e.Cancelled)
+                return;
+
+            // error reporting
+            if (e.Error != null)
+            {
+
+
+                return;   
+            }
+
+            UpdateInfoFile updateFile = LoadUpdateFile();
+
+            Version localVersion = GetCurrentVersion();
+            Version onlineVersion = new Version(updateFile.VersionString);
+
+            // check if there is a new version
+            if (onlineVersion > localVersion)
+            {
+
+            }
+        }
+
+        private UpdateInfoFile LoadUpdateFile()
+        {
+            XmlSerializer serializer = new XmlSerializer(typeof(UpdateInfoFile));
+
+            using (Stream s = File.Open(m_localUpdateFile, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+            {
+                return (UpdateInfoFile)serializer.Deserialize(s);
+            }
+        }
+
+        private String GetFileNameFromUrl(String url)
+        {
+            String[] tokens = url.Split('/');
+            return tokens[tokens.Length - 1];
         }
 
         private Version GetCurrentVersion()
         {
-            return new Version(m_asm.ImageRuntimeVersion);
+            return Assembly.GetEntryAssembly().GetName().Version;
         }
 
-        public void StartUpdate()
+        private void CleanUp()
         {
 
         }
