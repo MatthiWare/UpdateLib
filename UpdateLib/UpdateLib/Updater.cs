@@ -10,17 +10,25 @@ using MatthiWare.UpdateLib.Encoders;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Xml.Serialization;
+using System.Windows.Forms;
 
 namespace MatthiWare.UpdateLib
 {
     public class Updater : Component
     {
-        public String UpdateURL { get; set; }
-        private String m_localUpdateFile;
+        public string UpdateURL { get; set; }
+        private string m_localUpdateFile;
 
+        public bool ShowUpdateMessage { get; set; }
+        public bool ShowMessageOnNoUpdate { get; set; }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="Updater"/> with the default settings. 
+        /// </summary>
         public Updater()
         {
-
+            ShowUpdateMessage = true;
+            ShowMessageOnNoUpdate = false;
         }
 
 
@@ -53,7 +61,7 @@ namespace MatthiWare.UpdateLib
             // error reporting
             if (e.Error != null)
             {
-
+                Debug.WriteLine(String.Concat(e.Error.Message, "\n", e.Error.StackTrace));
 
                 return;   
             }
@@ -63,11 +71,25 @@ namespace MatthiWare.UpdateLib
             Version localVersion = GetCurrentVersion();
             Version onlineVersion = new Version(updateFile.VersionString);
 
-            // check if there is a new version
-            if (onlineVersion > localVersion)
+            // check if there is a no new version
+            if (onlineVersion <= localVersion)
             {
+                if (ShowMessageOnNoUpdate)
+                    MessageBox.Show("You already have the latest version.", "Updater");
 
+                return;
             }
+
+            DialogResult result = DialogResult.OK;
+            if (ShowUpdateMessage)
+                result = MessageBox.Show(String.Format("Version {0} available, update now?"), "Update available");
+
+            if (result != DialogResult.OK)
+                return;
+
+            // start actual updateform
+
+
         }
 
         private UpdateInfoFile LoadUpdateFile()
