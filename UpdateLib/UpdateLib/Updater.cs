@@ -11,6 +11,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Xml.Serialization;
 using System.Windows.Forms;
+using MatthiWare.UpdateLib.UI;
 
 namespace MatthiWare.UpdateLib
 {
@@ -82,7 +83,7 @@ namespace MatthiWare.UpdateLib
 
             DialogResult result = DialogResult.OK;
             if (ShowUpdateMessage)
-                result = MessageBox.Show(String.Format("Version {0} available, update now?"), "Update available");
+                result = new MessageDialog("Update available!", "")
 
             if (result != DialogResult.OK)
                 return;
