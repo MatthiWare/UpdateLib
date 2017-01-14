@@ -40,12 +40,16 @@
             this.clmnExtra = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.imgList = new System.Windows.Forms.ImageList(this.components);
             this.label1 = new System.Windows.Forms.Label();
+            this.lblPoweredBy = new System.Windows.Forms.Label();
+            this.lblUpdateLibLink = new System.Windows.Forms.LinkLabel();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.panel1.Controls.Add(this.lblUpdateLibLink);
+            this.panel1.Controls.Add(this.lblPoweredBy);
             this.panel1.Controls.Add(this.btnUpdateCancel);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel1.Location = new System.Drawing.Point(0, 299);
@@ -56,6 +60,7 @@
             // btnUpdateCancel
             // 
             this.btnUpdateCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnUpdateCancel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnUpdateCancel.Location = new System.Drawing.Point(394, 14);
             this.btnUpdateCancel.Name = "btnUpdateCancel";
             this.btnUpdateCancel.Size = new System.Drawing.Size(75, 23);
@@ -86,7 +91,7 @@
             // clmnImg
             // 
             this.clmnImg.Text = "";
-            this.clmnImg.Width = 22;
+            this.clmnImg.Width = 28;
             // 
             // clmnName
             // 
@@ -96,7 +101,7 @@
             // clmnStatus
             // 
             this.clmnStatus.Text = "Status";
-            this.clmnStatus.Width = 84;
+            this.clmnStatus.Width = 122;
             // 
             // clmnProgress
             // 
@@ -126,6 +131,28 @@
             this.label1.TabIndex = 2;
             this.label1.Text = "Files to update";
             // 
+            // lblPoweredBy
+            // 
+            this.lblPoweredBy.AutoSize = true;
+            this.lblPoweredBy.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblPoweredBy.Location = new System.Drawing.Point(12, 18);
+            this.lblPoweredBy.Name = "lblPoweredBy";
+            this.lblPoweredBy.Size = new System.Drawing.Size(75, 15);
+            this.lblPoweredBy.TabIndex = 1;
+            this.lblPoweredBy.Text = "Powered by: ";
+            // 
+            // lblUpdateLibLink
+            // 
+            this.lblUpdateLibLink.AutoSize = true;
+            this.lblUpdateLibLink.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblUpdateLibLink.Location = new System.Drawing.Point(86, 18);
+            this.lblUpdateLibLink.Name = "lblUpdateLibLink";
+            this.lblUpdateLibLink.Size = new System.Drawing.Size(61, 15);
+            this.lblUpdateLibLink.TabIndex = 2;
+            this.lblUpdateLibLink.TabStop = true;
+            this.lblUpdateLibLink.Text = "UpdateLib";
+            this.lblUpdateLibLink.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lblUpdateLibLink_LinkClicked);
+            // 
             // UpdaterForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -139,6 +166,7 @@
             this.Name = "UpdaterForm";
             this.Text = "Updater";
             this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -156,5 +184,7 @@
         private System.Windows.Forms.ColumnHeader clmnExtra;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ImageList imgList;
+        private System.Windows.Forms.LinkLabel lblUpdateLibLink;
+        private System.Windows.Forms.Label lblPoweredBy;
     }
 }

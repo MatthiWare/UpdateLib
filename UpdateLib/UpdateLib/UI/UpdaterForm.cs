@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -16,21 +17,19 @@ namespace MatthiWare.UpdateLib.UI
     {
         private UpdateInfoFile updateInfoFile;
 
+        private int amountOfDownloadsToGo;
+        private bool errorOccured = false;
+
         public UpdaterForm()
         {
-            InitializeComponent();
-
-            lvItems.SmallImageList.Images.Add("status_done", Resources.status_done);
-            lvItems.SmallImageList.Images.Add("status_download", Resources.status_download);
-            lvItems.SmallImageList.Images.Add("status_error", Resources.status_error);
-
-            
+            InitializeComponent();           
         }
 
         public UpdaterForm(UpdateInfoFile updateFile)
            : this()
         {
             updateInfoFile = updateFile;
+            amountOfDownloadsToGo = updateFile.Files.Count;
             FillList();
         }
 
@@ -47,11 +46,18 @@ namespace MatthiWare.UpdateLib.UI
 
         private void btnUpdateCancel_Click(object sender, EventArgs e)
         {
+            List<WaitHandle> waithandles = new List<WaitHandle>(lvItems.Items.Count);
+
+            btnUpdateCancel.Enabled = false;
+
             foreach(ListViewItem lvItem in lvItems.Items)
             {
                 Action<ListViewItem> a = new Action<ListViewItem>(Test);
-                a.BeginInvoke(lvItem, null, null);
+                waithandles.Add(a.BeginInvoke(lvItem, null, null).AsyncWaitHandle);
+                
             }
+
+            btnUpdateCancel.Enabled = true;
         }
 
         Random rnd = new Random();
@@ -76,6 +82,48 @@ namespace MatthiWare.UpdateLib.UI
             SetSubItemText(item.SubItems[2], val? "Done":"Error");
 
             SetImageKey(item, val ? "status_done" : "status_error");
+
+            if (!val)
+                errorOccured = true;
+
+            int amountLeft = Interlocked.Decrement(ref amountOfDownloadsToGo);
+
+            if (amountLeft != 0)
+                return;
+
+            if (errorOccured)
+            {
+                SetErrored();
+                return;
+            }
+
+            SetDone();
+                
+        }
+
+        private void SetErrored()
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new MethodInvoker(SetErrored));
+                return;
+            }
+
+            btnUpdateCancel.Enabled = true;
+            btnUpdateCancel.Text = "Error";
+
+        }
+
+        private void SetDone()
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new MethodInvoker(SetDone));
+                return;
+            }
+
+            btnUpdateCancel.Enabled = true;
+            btnUpdateCancel.Text = "Finish";
         }
 
         private delegate void SetImageKeyInvoker(ListViewItem item, string key);
@@ -99,6 +147,11 @@ namespace MatthiWare.UpdateLib.UI
             }
 
             item.Text = key;
+        }
+
+        private void lblUpdateLibLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            Process.Start("https://github.com/MatthiWare/UpdateLib");
         }
     }
 }
