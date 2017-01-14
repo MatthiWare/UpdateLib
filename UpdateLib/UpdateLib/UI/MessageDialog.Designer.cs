@@ -30,11 +30,11 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MessageDialog));
             this.panel1 = new System.Windows.Forms.Panel();
+            this.btnYes = new System.Windows.Forms.Button();
+            this.btnNo = new System.Windows.Forms.Button();
             this.pbIcon = new System.Windows.Forms.PictureBox();
             this.lblHeader = new System.Windows.Forms.Label();
             this.lblDesc = new System.Windows.Forms.Label();
-            this.btnNo = new System.Windows.Forms.Button();
-            this.btnYes = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbIcon)).BeginInit();
             this.SuspendLayout();
@@ -45,10 +45,33 @@
             this.panel1.Controls.Add(this.btnYes);
             this.panel1.Controls.Add(this.btnNo);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel1.Location = new System.Drawing.Point(0, 124);
+            this.panel1.Location = new System.Drawing.Point(0, 100);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(487, 53);
+            this.panel1.Size = new System.Drawing.Size(394, 46);
             this.panel1.TabIndex = 0;
+            // 
+            // btnYes
+            // 
+            this.btnYes.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnYes.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.btnYes.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.btnYes.Location = new System.Drawing.Point(220, 11);
+            this.btnYes.Name = "btnYes";
+            this.btnYes.Size = new System.Drawing.Size(75, 23);
+            this.btnYes.TabIndex = 0;
+            this.btnYes.Text = "Yes";
+            this.btnYes.UseVisualStyleBackColor = false;
+            // 
+            // btnNo
+            // 
+            this.btnNo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnNo.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.btnNo.Location = new System.Drawing.Point(301, 11);
+            this.btnNo.Name = "btnNo";
+            this.btnNo.Size = new System.Drawing.Size(75, 23);
+            this.btnNo.TabIndex = 1;
+            this.btnNo.Text = "No";
+            this.btnNo.UseVisualStyleBackColor = true;
             // 
             // pbIcon
             // 
@@ -74,38 +97,17 @@
             // 
             this.lblDesc.AutoSize = true;
             this.lblDesc.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblDesc.Location = new System.Drawing.Point(78, 50);
+            this.lblDesc.Location = new System.Drawing.Point(78, 46);
             this.lblDesc.Name = "lblDesc";
             this.lblDesc.Size = new System.Drawing.Size(218, 34);
             this.lblDesc.TabIndex = 3;
             this.lblDesc.Text = "Update now?\r\nPress yes to update or no to cancel.";
             // 
-            // btnNo
-            // 
-            this.btnNo.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnNo.Location = new System.Drawing.Point(400, 15);
-            this.btnNo.Name = "btnNo";
-            this.btnNo.Size = new System.Drawing.Size(75, 23);
-            this.btnNo.TabIndex = 0;
-            this.btnNo.Text = "button1";
-            this.btnNo.UseVisualStyleBackColor = true;
-            // 
-            // btnYes
-            // 
-            this.btnYes.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.btnYes.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.btnYes.Location = new System.Drawing.Point(319, 15);
-            this.btnYes.Name = "btnYes";
-            this.btnYes.Size = new System.Drawing.Size(75, 23);
-            this.btnYes.TabIndex = 1;
-            this.btnYes.Text = "Yes";
-            this.btnYes.UseVisualStyleBackColor = false;
-            // 
             // MessageDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(487, 177);
+            this.ClientSize = new System.Drawing.Size(394, 146);
             this.Controls.Add(this.lblDesc);
             this.Controls.Add(this.lblHeader);
             this.Controls.Add(this.pbIcon);
@@ -113,6 +115,8 @@
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "MessageDialog";
             this.ShowIcon = false;
             this.Text = "Message Dialog";
