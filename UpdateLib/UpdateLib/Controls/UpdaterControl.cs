@@ -14,9 +14,7 @@ namespace MatthiWare.UpdateLib.Controls
     [ToolboxBitmap(typeof(UpdaterControl), "UpdaterControl.bmp")]
     public partial class UpdaterControl : UserControl
     {
-        private Bitmap bmpInfo, bmpError, bmpDone, bmpUpdate;
-
-        private const int ICON_SIZE = 24;
+        private const int ICON_SIZE = 16;
         private const int XY_OFFSET = 2;
 
         private Brush brush;
@@ -25,9 +23,48 @@ namespace MatthiWare.UpdateLib.Controls
         private const string CHECK_FOR_UPDATES = "Please check for updates";
 
         private Point oldLocation;
+        private ToolTip tooltip = new ToolTip();
 
         private Dictionary<string, SizeF> cachedMeasure = new Dictionary<string, SizeF>();
-        private string text = CHECK_FOR_UPDATES;
+        private string _text = CHECK_FOR_UPDATES;
+        public override string Text
+        {
+            get { return _text; }
+            set
+            {
+                if (_text != value)
+                {
+                    _text = value;
+                    Invalidate();
+                }
+                
+            }
+        }
+
+        private Dictionary<UpdaterIcon, Bitmap> cachedImages = new Dictionary<UpdaterIcon, Bitmap>();
+
+        private UpdaterIcon _icon = UpdaterIcon.Info;
+        private UpdaterIcon Icon
+        {
+            get { return _icon; }
+            set
+            {
+                if (_icon != value)
+                {
+                    _icon = value;
+                    Invalidate();
+                }
+                
+            }
+        }
+
+        public enum UpdaterIcon : byte
+        {
+            Info = 0,
+            Error = 1,
+            Done = 2,
+            Update = 3
+        }
 
         public UpdaterControl()
         {
@@ -37,7 +74,7 @@ namespace MatthiWare.UpdateLib.Controls
             SetStyle(ControlStyles.ContainerControl, false);
 
             Size = new Size(XY_OFFSET * 2 + ICON_SIZE, XY_OFFSET * 2 + ICON_SIZE);
-            
+
             // caching
             LoadImages();
             MakeBrushFromForeColor();
@@ -73,15 +110,15 @@ namespace MatthiWare.UpdateLib.Controls
 
         private SizeF GetAndCacheSize()
         {
-            if (!cachedMeasure.ContainsKey(text))
+            if (!cachedMeasure.ContainsKey(Text))
             {
-                Graphics g = Graphics.FromImage(new Bitmap(100, 100));
-                SizeF size = g.MeasureString(text, base.Font);
+                Graphics g = Graphics.FromImage(new Bitmap(1,1));
+                SizeF size = g.MeasureString(Text, base.Font);
 
-                cachedMeasure.Add(text, size);
+                cachedMeasure.Add(Text, size);
             }
 
-            return cachedMeasure[text];
+            return cachedMeasure[Text];
         }
 
         public override Color ForeColor
@@ -105,12 +142,12 @@ namespace MatthiWare.UpdateLib.Controls
 
         private void LoadImages()
         {
-            bmpInfo = Resources.status_info;
-            bmpError = Resources.status_error;
-            bmpDone = Resources.status_done;
-            
-            bmpUpdate = Resources.status_download;
-            bmpUpdate.RotateFlip(RotateFlipType.RotateNoneFlipY);
+            Resources.status_download.RotateFlip(RotateFlipType.RotateNoneFlipY);
+            cachedImages.Add(UpdaterIcon.Info, Resources.status_info);
+            cachedImages.Add(UpdaterIcon.Error, Resources.status_error);
+            cachedImages.Add(UpdaterIcon.Done, Resources.status_done);
+            cachedImages.Add(UpdaterIcon.Update, Resources.status_download);
+           
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -123,12 +160,12 @@ namespace MatthiWare.UpdateLib.Controls
 
         private void DrawIcon(Graphics g)
         {
-            g.DrawImage(bmpInfo, XY_OFFSET, XY_OFFSET, ICON_SIZE, ICON_SIZE);
+            g.DrawImage(cachedImages[Icon], XY_OFFSET, XY_OFFSET, ICON_SIZE, ICON_SIZE);
         }
 
         private void DrawText(Graphics g)
         {
-            g.DrawString(text, Font, brush, x_text, y_text);
+            g.DrawString(Text, Font, brush, x_text, y_text);
         }
 
         protected override void OnMouseEnter(EventArgs e)
@@ -154,17 +191,39 @@ namespace MatthiWare.UpdateLib.Controls
 
             Location = oldLocation;
             Width = XY_OFFSET * 2 + ICON_SIZE;
+
+            tooltip.Active = false;
         }
 
         protected override void OnMouseHover(EventArgs e)
         {
             base.OnMouseHover(e);
 
-            ToolTip tooltip = new ToolTip();
+            
             tooltip.ToolTipIcon = ToolTipIcon.Info;
-            tooltip.ToolTipTitle = text;
+            tooltip.ToolTipTitle = Text;
             tooltip.UseAnimation = true;
-            tooltip.Show("Please click here to start checking for updates", this);
+            tooltip.Active = true;
+            tooltip.Show("Please click here to start checking for updates", Parent, Location.X + Width + (ICON_SIZE), Location.Y + Height);
+
+        }
+
+        protected override void OnClick(EventArgs e)
+        {
+            base.OnClick(e);
+
+            Text = "Checking for updates..";
+            Icon = UpdaterIcon.Update;
+
+            int currWidth = Width;
+            int newWidth = CalcNewWidth();
+
+            int offset = currWidth - newWidth;
+            Point x = Location;
+            x.X += offset;
+            Location = x;
+            Width = newWidth;
+
 
         }
 
