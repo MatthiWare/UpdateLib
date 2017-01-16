@@ -75,7 +75,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\UpdateLib\UpdateLib.csproj">
-      <Project>{4394BE57-95E2-45B1-A968-1404B0590B35}</Project>
+      <Project>{4394be57-95e2-45b1-a968-1404b0590b35}</Project>
       <Name>UpdateLib</Name>
     </ProjectReference>
   </ItemGroup>

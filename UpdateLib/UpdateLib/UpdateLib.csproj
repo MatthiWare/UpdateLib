@@ -46,6 +46,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\UpdaterControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\UpdaterControl.Designer.cs">
+      <DependentUpon>UpdaterControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Encoders\IEncoder.cs" />
     <Compile Include="Files\IFile.cs" />
     <Compile Include="Files\IUpdateFile.cs" />
@@ -74,6 +80,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="UpdaterControl.bmp" />
     <None Include="Resources\status_info.png" />
     <None Include="Resources\status_error.png" />
     <None Include="Resources\status_download.png" />
@@ -81,6 +88,9 @@
     <Content Include="updater.ico" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Controls\UpdaterControl.resx">
+      <DependentUpon>UpdaterControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
