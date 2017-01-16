@@ -164,7 +164,7 @@ namespace MatthiWare.UpdateLib.Controls
             tooltip.ToolTipIcon = ToolTipIcon.Info;
             tooltip.ToolTipTitle = text;
             tooltip.UseAnimation = true;
-            //tooltip.Show("Please click here to start checking for updates", 
+            tooltip.Show("Please click here to start checking for updates", this);
 
         }
 
