@@ -22,9 +22,12 @@ namespace MatthiWare.UpdateLib.Controls
         private Brush brush;
         private float x_text, y_text;
 
-        private const string CHECK_FOR_UPDATES = "Check for updates";
+        private const string CHECK_FOR_UPDATES = "Please check for updates";
 
+        private Point oldLocation;
 
+        private Dictionary<string, SizeF> cachedMeasure = new Dictionary<string, SizeF>();
+        private string text = CHECK_FOR_UPDATES;
 
         public UpdaterControl()
         {
@@ -34,7 +37,7 @@ namespace MatthiWare.UpdateLib.Controls
             SetStyle(ControlStyles.ContainerControl, false);
 
             Size = new Size(XY_OFFSET * 2 + ICON_SIZE, XY_OFFSET * 2 + ICON_SIZE);
-
+            
             // caching
             LoadImages();
             MakeBrushFromForeColor();
@@ -52,18 +55,33 @@ namespace MatthiWare.UpdateLib.Controls
             set
             {
                 base.Font = value;
+                // invalidate the cache
+                cachedMeasure.Clear(); 
                 CalcFont();
             }
         }
 
         private void CalcFont()
         {
-            Graphics g = Graphics.FromImage(new Bitmap(50,50));
+            SizeF size = GetAndCacheSize();
+            
             int height = XY_OFFSET * 2 + ICON_SIZE;
-            SizeF size = g.MeasureString(CHECK_FOR_UPDATES, base.Font);
-
+            
             x_text = XY_OFFSET * 2 + ICON_SIZE;
             y_text = (height / 2) - (size.Height / 2);
+        }
+
+        private SizeF GetAndCacheSize()
+        {
+            if (!cachedMeasure.ContainsKey(text))
+            {
+                Graphics g = Graphics.FromImage(new Bitmap(100, 100));
+                SizeF size = g.MeasureString(text, base.Font);
+
+                cachedMeasure.Add(text, size);
+            }
+
+            return cachedMeasure[text];
         }
 
         public override Color ForeColor
@@ -110,9 +128,51 @@ namespace MatthiWare.UpdateLib.Controls
 
         private void DrawText(Graphics g)
         {
-            g.DrawString("Please check for updates", Font, brush, x_text, y_text);
+            g.DrawString(text, Font, brush, x_text, y_text);
         }
 
-        
+        protected override void OnMouseEnter(EventArgs e)
+        {
+            base.OnMouseEnter(e);
+
+            oldLocation = Location;
+            int newWidth = CalcNewWidth();
+            Width = newWidth;
+
+            if (Location.X + newWidth > ParentForm.Width)
+            {
+                int amountToRemove = ParentForm.Width - (Location.X + newWidth) - (XY_OFFSET * 2 + ICON_SIZE);
+                Point x = Location;
+                x.X += amountToRemove;
+                Location = x;
+            }
+        }
+
+        protected override void OnMouseLeave(EventArgs e)
+        {
+            base.OnMouseLeave(e);
+
+            Location = oldLocation;
+            Width = XY_OFFSET * 2 + ICON_SIZE;
+        }
+
+        protected override void OnMouseHover(EventArgs e)
+        {
+            base.OnMouseHover(e);
+
+            ToolTip tooltip = new ToolTip();
+            tooltip.ToolTipIcon = ToolTipIcon.Info;
+            tooltip.ToolTipTitle = text;
+            tooltip.UseAnimation = true;
+            //tooltip.Show("Please click here to start checking for updates", 
+
+        }
+
+        private int CalcNewWidth()
+        {
+            SizeF size = GetAndCacheSize();
+            return (int)size.Width + (XY_OFFSET * 2 + ICON_SIZE);
+        }
+
     }
 }
