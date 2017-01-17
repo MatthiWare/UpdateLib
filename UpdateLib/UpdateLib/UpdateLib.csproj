@@ -80,6 +80,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\status_working.png" />
     <Content Include="UpdaterControl.bmp" />
     <None Include="Resources\status_info.png" />
     <None Include="Resources\status_error.png" />
