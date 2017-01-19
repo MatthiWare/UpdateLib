@@ -62,6 +62,30 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="UI\Components\ChangelogPart.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\Components\ChangelogPart.Designer.cs">
+      <DependentUpon>ChangelogPart.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Components\FinishPart.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\Components\FinishPart.Designer.cs">
+      <DependentUpon>FinishPart.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Components\IntroPart.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\Components\IntroPart.Designer.cs">
+      <DependentUpon>IntroPart.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Components\UpdatePart.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\Components\UpdatePart.Designer.cs">
+      <DependentUpon>UpdatePart.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\MessageDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -95,6 +119,9 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\Components\IntroPart.resx">
+      <DependentUpon>IntroPart.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\MessageDialog.resx">
       <DependentUpon>MessageDialog.cs</DependentUpon>
