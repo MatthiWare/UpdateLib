@@ -120,6 +120,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="UI\Components\FinishPart.resx">
+      <DependentUpon>FinishPart.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\Components\IntroPart.resx">
       <DependentUpon>IntroPart.cs</DependentUpon>
     </EmbeddedResource>
