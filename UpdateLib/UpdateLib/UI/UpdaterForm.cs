@@ -39,6 +39,7 @@ namespace MatthiWare.UpdateLib.UI
             {
                 string[] data = new string[] { "", file.Name, "Ready to download", "0%"};
                 ListViewItem lvItem = new ListViewItem(data);
+                lvItem.Tag = file;
 
                 lvItems.Items.Add(lvItem);
             }

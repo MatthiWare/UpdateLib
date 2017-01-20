@@ -28,10 +28,34 @@
         /// </summary>
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
+            this.txtTitle = new System.Windows.Forms.Label();
+            this.SuspendLayout();
+            // 
+            // txtTitle
+            // 
+            this.txtTitle.AutoSize = true;
+            this.txtTitle.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtTitle.ForeColor = System.Drawing.Color.CornflowerBlue;
+            this.txtTitle.Location = new System.Drawing.Point(14, 14);
+            this.txtTitle.Name = "txtTitle";
+            this.txtTitle.Size = new System.Drawing.Size(108, 25);
+            this.txtTitle.TabIndex = 1;
+            this.txtTitle.Text = "Changelog";
+            // 
+            // ChangelogPart
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.txtTitle);
+            this.Name = "ChangelogPart";
+            this.Size = new System.Drawing.Size(549, 327);
+            this.ResumeLayout(false);
+            this.PerformLayout();
+
         }
 
         #endregion
+
+        private System.Windows.Forms.Label txtTitle;
     }
 }

@@ -57,11 +57,14 @@
     <Compile Include="Files\IUpdateFile.cs" />
     <Compile Include="Files\UpdateFile.cs" />
     <Compile Include="Files\UpdateInfoFile.cs" />
+    <Compile Include="Tasks\DownloadTask.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Tasks\ITaskable.cs" />
+    <Compile Include="Tasks\TaskEventArgs.cs" />
     <Compile Include="UI\Components\ChangelogPart.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -120,11 +123,17 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="UI\Components\ChangelogPart.resx">
+      <DependentUpon>ChangelogPart.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\Components\FinishPart.resx">
       <DependentUpon>FinishPart.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\Components\IntroPart.resx">
       <DependentUpon>IntroPart.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\Components\UpdatePart.resx">
+      <DependentUpon>UpdatePart.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\MessageDialog.resx">
       <DependentUpon>MessageDialog.cs</DependentUpon>
