@@ -54,7 +54,7 @@
             // lblSubheader
             // 
             this.lblSubheader.AutoSize = true;
-            this.lblSubheader.Location = new System.Drawing.Point(16, 49);
+            this.lblSubheader.Location = new System.Drawing.Point(14, 52);
             this.lblSubheader.Name = "lblSubheader";
             this.lblSubheader.Size = new System.Drawing.Size(252, 17);
             this.lblSubheader.TabIndex = 1;
@@ -71,9 +71,9 @@
             this.clmnStatus,
             this.clmnProgress,
             this.clmnExtra});
-            this.lvItems.Location = new System.Drawing.Point(19, 69);
+            this.lvItems.Location = new System.Drawing.Point(17, 72);
             this.lvItems.Name = "lvItems";
-            this.lvItems.Size = new System.Drawing.Size(499, 252);
+            this.lvItems.Size = new System.Drawing.Size(505, 255);
             this.lvItems.TabIndex = 2;
             this.lvItems.UseCompatibleStateImageBehavior = false;
             this.lvItems.View = System.Windows.Forms.View.Details;
