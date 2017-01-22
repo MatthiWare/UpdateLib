@@ -1,6 +1,6 @@
 ﻿namespace MatthiWare.UpdateLib.UI.Components
 {
-    partial class IntroPart
+    partial class IntroPage
     {
         /// <summary> 
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(IntroPart));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(IntroPage));
             this.txtWelcome = new System.Windows.Forms.Label();
             this.txtDesc = new System.Windows.Forms.Label();
             this.SuspendLayout();
@@ -53,15 +53,16 @@
             this.txtDesc.TabIndex = 1;
             this.txtDesc.Text = resources.GetString("txtDesc.Text");
             // 
-            // IntroPart
+            // IntroPage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.Window;
             this.Controls.Add(this.txtDesc);
             this.Controls.Add(this.txtWelcome);
             this.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.Name = "IntroPart";
+            this.Name = "IntroPage";
             this.Size = new System.Drawing.Size(515, 232);
             this.ResumeLayout(false);
             this.PerformLayout();

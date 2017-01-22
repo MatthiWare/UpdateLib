@@ -9,23 +9,44 @@ using System.Windows.Forms;
 using MatthiWare.UpdateLib.Files;
 using System.Net;
 using System.Threading;
+using MatthiWare.UpdateLib.Properties;
 
 namespace MatthiWare.UpdateLib.UI.Components
 {
-    public partial class UpdatePart : UserControl
+    public partial class UpdatePage : UserControl, IWizardPage
     {
 
         public UpdateInfoFile UpdateFile { get; set; }
 
+        public event EventHandler PageUpdate;
+
         private int amountToDownload;
 
-        public UpdatePart(UpdateInfoFile uif)
+        public UpdatePage(UpdaterForm parent)
         {
             InitializeComponent();
 
-            UpdateFile = uif;
+            _updaterForm = parent;
+
+            UpdateFile = parent.updateInfoFile;
+
+            ImageList ilItems = MakeImageList();
+            lvItems.SmallImageList = ilItems;
 
             FillListView();
+        }
+
+        private ImageList MakeImageList()
+        {
+            ImageList imgList = new ImageList();
+
+            imgList.Images.Add("status_download", Resources.status_download);
+            imgList.Images.Add("status_done", Resources.status_done);
+            imgList.Images.Add("status_error", Resources.status_error);
+            imgList.Images.Add("status_info", Resources.status_info);
+            imgList.Images.Add("status_update", Resources.status_update);
+
+            return imgList;
         }
 
         private void FillListView()
@@ -59,11 +80,14 @@ namespace MatthiWare.UpdateLib.UI.Components
         private void StartDownloadItem(ListViewItem item)
         {
 
-
+            Test(item);
 
         }
 
         Random rnd = new Random();
+
+        
+
         private void Test(ListViewItem item)
         {
 
@@ -117,6 +141,73 @@ namespace MatthiWare.UpdateLib.UI.Components
             }
 
             item.Text = key;
+        }
+
+        public void Cancel()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Execute()
+        {
+            throw new NotImplementedException();
+        }
+
+        private UpdaterForm _updaterForm;
+        public UpdaterForm UpdaterForm
+        {
+            get
+            {
+                return _updaterForm;
+            }
+        }
+
+        public UserControl Conent
+        {
+            get
+            {
+                return this;
+            }
+        }
+
+        public bool NeedsCancel
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public bool NeedsExecution
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public bool IsBusy
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        public bool IsDone
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        public string Title
+        {
+            get
+            {
+                return lblHeader.Text;
+            }
         }
     }
 }

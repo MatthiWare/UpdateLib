@@ -195,7 +195,7 @@ and its function "the change log".
 
 ### Changed
 - Refer to a "change log" instead of a "CHANGELOG" throughout the site
-to differentiate between the file and the purpose of the file — the
+to differentiate between the file and the purpose of the file - the
 logging of changes.
 
 ### Removed

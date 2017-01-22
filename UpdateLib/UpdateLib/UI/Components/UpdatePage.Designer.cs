@@ -1,6 +1,6 @@
 ﻿namespace MatthiWare.UpdateLib.UI.Components
 {
-    partial class UpdatePart
+    partial class UpdatePage
     {
         /// <summary> 
         /// Required designer variable.
@@ -32,12 +32,12 @@
             this.lblHeader = new System.Windows.Forms.Label();
             this.lblSubheader = new System.Windows.Forms.Label();
             this.lvItems = new System.Windows.Forms.ListView();
+            this.ilIcons = new System.Windows.Forms.ImageList(this.components);
             this.clmnImg = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.clmnName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.clmnStatus = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.clmnProgress = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.clmnExtra = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.ilIcons = new System.Windows.Forms.ImageList(this.components);
             this.SuspendLayout();
             // 
             // lblHeader
@@ -78,46 +78,48 @@
             this.lvItems.UseCompatibleStateImageBehavior = false;
             this.lvItems.View = System.Windows.Forms.View.Details;
             // 
-            // clmnImg
-            // 
-            this.clmnImg.Text = "";
-            this.clmnImg.Width = 28;
-            // 
-            // clmnName
-            // 
-            this.clmnName.Text = "File name";
-            this.clmnName.Width = 113;
-            // 
-            // clmnStatus
-            // 
-            this.clmnStatus.Text = "Status";
-            this.clmnStatus.Width = 122;
-            // 
-            // clmnProgress
-            // 
-            this.clmnProgress.Text = "Progress";
-            // 
-            // clmnExtra
-            // 
-            this.clmnExtra.Text = "Extra options";
-            this.clmnExtra.Width = 84;
-            // 
             // ilIcons
             // 
             this.ilIcons.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
             this.ilIcons.ImageSize = new System.Drawing.Size(16, 16);
             this.ilIcons.TransparentColor = System.Drawing.Color.Transparent;
             // 
-            // UpdatePart
+            // clmnImg
+            // 
+            this.clmnImg.Text = "";
+            this.clmnImg.Width = 25;
+            // 
+            // clmnName
+            // 
+            this.clmnName.Text = "File name";
+            this.clmnName.Width = 107;
+            // 
+            // clmnStatus
+            // 
+            this.clmnStatus.Text = "Status";
+            this.clmnStatus.Width = 131;
+            // 
+            // clmnProgress
+            // 
+            this.clmnProgress.Text = "Progress";
+            this.clmnProgress.Width = 85;
+            // 
+            // clmnExtra
+            // 
+            this.clmnExtra.Text = "Extra options";
+            this.clmnExtra.Width = 103;
+            // 
+            // UpdatePage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.Window;
             this.Controls.Add(this.lvItems);
             this.Controls.Add(this.lblSubheader);
             this.Controls.Add(this.lblHeader);
             this.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.Name = "UpdatePart";
+            this.Name = "UpdatePage";
             this.Size = new System.Drawing.Size(538, 341);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -129,11 +131,11 @@
         private System.Windows.Forms.Label lblHeader;
         private System.Windows.Forms.Label lblSubheader;
         private System.Windows.Forms.ListView lvItems;
+        private System.Windows.Forms.ImageList ilIcons;
         private System.Windows.Forms.ColumnHeader clmnImg;
         private System.Windows.Forms.ColumnHeader clmnName;
         private System.Windows.Forms.ColumnHeader clmnStatus;
         private System.Windows.Forms.ColumnHeader clmnProgress;
         private System.Windows.Forms.ColumnHeader clmnExtra;
-        private System.Windows.Forms.ImageList ilIcons;
     }
 }

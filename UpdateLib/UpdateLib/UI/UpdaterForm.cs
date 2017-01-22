@@ -1,5 +1,6 @@
 ﻿using MatthiWare.UpdateLib.Files;
 using MatthiWare.UpdateLib.Properties;
+using MatthiWare.UpdateLib.UI.Components;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,144 +16,72 @@ namespace MatthiWare.UpdateLib.UI
 {
     public partial class UpdaterForm : Form
     {
-        private UpdateInfoFile updateInfoFile;
-
-        private int amountOfDownloadsToGo;
-        private bool errorOccured = false;
-
-        public UpdaterForm()
-        {
-            InitializeComponent();           
-        }
+        internal UpdateInfoFile updateInfoFile;
+        
+        private WizardPageCollection pages;
 
         public UpdaterForm(UpdateInfoFile updateFile)
-           : this()
         {
+            InitializeComponent();
+
             updateInfoFile = updateFile;
-            amountOfDownloadsToGo = updateFile.Files.Count;
-            FillList();
-        }
 
-        private void FillList()
-        {
-            foreach (UpdateFile file in updateInfoFile.Files)
-            {
-                string[] data = new string[] { "", file.Name, "Ready to download", "0%"};
-                ListViewItem lvItem = new ListViewItem(data);
-                lvItem.Tag = file;
+            pages = new WizardPageCollection();
+            AddPage(new IntroPage(this));
+            AddPage(new ChangelogPage(this));
+            AddPage(new UpdatePage(this));
+            AddPage(new FinishPage(this));
 
-                lvItems.Items.Add(lvItem);
-            }
-        }
-
-        private void btnUpdateCancel_Click(object sender, EventArgs e)
-        {
-            List<WaitHandle> waithandles = new List<WaitHandle>(lvItems.Items.Count);
-
-            btnUpdateCancel.Enabled = false;
-
-            foreach(ListViewItem lvItem in lvItems.Items)
-            {
-                Action<ListViewItem> a = new Action<ListViewItem>(Test);
-                waithandles.Add(a.BeginInvoke(lvItem, null, null).AsyncWaitHandle);
-                
-            }
-
-            btnUpdateCancel.Enabled = true;
-        }
-
-        Random rnd = new Random();
-        private void Test(ListViewItem item)
-        {
+            SetContentPage(pages.FirstPage);
             
-            int wait = rnd.Next(2000);
-
-            Thread.Sleep(wait);
-
-            SetImageKey(item, "status_download");
-            SetSubItemText(item.SubItems[2], "Downloading..");
-
-            wait = rnd.Next(100);
-            for (int i = 0; i <= 100; i++)
-            {
-                SetSubItemText(item.SubItems[3], String.Format("{0}%", i ));
-                Thread.Sleep(wait);
-            }
-
-            bool val = rnd.Next(0, 2) == 0 ? false : true;
-            SetSubItemText(item.SubItems[2], val? "Done":"Error");
-
-            SetImageKey(item, val ? "status_done" : "status_error");
-
-            if (!val)
-                errorOccured = true;
-
-            int amountLeft = Interlocked.Decrement(ref amountOfDownloadsToGo);
-
-            if (amountLeft != 0)
-                return;
-
-            if (errorOccured)
-            {
-                SetErrored();
-                return;
-            }
-
-            SetDone();
-                
         }
 
-        private void SetErrored()
+        private void SetContentPage(IWizardPage page)
         {
-            if (InvokeRequired)
+            for (int i = pnlContent.Controls.Count -1; i >= 0; i--)
             {
-                Invoke(new MethodInvoker(SetErrored));
-                return;
+                IWizardPage item = pnlContent.Controls[i] as IWizardPage;
+                if (item == null)
+                    continue;
+
+                pnlContent.Controls.RemoveAt(i);
             }
 
-            btnUpdateCancel.Enabled = true;
-            btnUpdateCancel.Text = "Error";
-
+            pnlContent.Controls.Add(page.Conent);
         }
 
-        private void SetDone()
+        private void AddPage(IWizardPage page)
         {
-            if (InvokeRequired)
-            {
-                Invoke(new MethodInvoker(SetDone));
+            page.PageUpdate += Page_PageUpdate;
+            pages.Add(page);
+        }
+
+        private void Page_PageUpdate(object sender, EventArgs e)
+        {
+            IWizardPage page = (IWizardPage)sender;
+        }
+
+        private void btnPrevious_Click(object sender, EventArgs e)
+        {
+            IWizardPage page = pages.Previous();
+            if (page == null)
                 return;
-            }
 
-            btnUpdateCancel.Enabled = true;
-            btnUpdateCancel.Text = "Finish";
+            if (page == pages.FirstPage)
+                btnPrevious.Enabled = false;
+
+            SetContentPage(page);
         }
 
-        private delegate void SetImageKeyInvoker(ListViewItem item, string key);
-        private void SetImageKey(ListViewItem item, string key)
+        private void btnNext_Click(object sender, EventArgs e)
         {
-            if (InvokeRequired)
-            {
-                Invoke(new SetImageKeyInvoker(SetImageKey), item, key);
+            IWizardPage page = pages.Next();
+            if (page == null)
                 return;
-            }
-            item.ImageKey = key;
-        }
 
-        private delegate void SetSubItemTextInvoker(ListViewItem.ListViewSubItem item, string key);
-        private void SetSubItemText(ListViewItem.ListViewSubItem item, string key)
-        {
-            if (InvokeRequired)
-            {
-                Invoke(new SetSubItemTextInvoker(SetSubItemText),item, key);
-                return;
-            }
+            btnPrevious.Enabled = true;
 
-            item.Text = key;
-        }
-
-        private void lblUpdateLibLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-            Process.Start("https://github.com/MatthiWare/UpdateLib");
+            SetContentPage(page);
         }
     }
 }

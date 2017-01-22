@@ -1,6 +1,6 @@
 ﻿namespace MatthiWare.UpdateLib.UI.Components
 {
-    partial class FinishPart
+    partial class FinishPage
     {
         /// <summary> 
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FinishPart));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FinishPage));
             this.txtFinished = new System.Windows.Forms.Label();
             this.txtDescription = new System.Windows.Forms.Label();
             this.cbRestart = new System.Windows.Forms.CheckBox();
@@ -57,7 +57,7 @@
             // 
             // cbRestart
             // 
-            this.cbRestart.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.cbRestart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.cbRestart.AutoSize = true;
             this.cbRestart.Checked = true;
             this.cbRestart.CheckState = System.Windows.Forms.CheckState.Checked;
@@ -70,16 +70,17 @@
             this.cbRestart.Text = "Restart application";
             this.cbRestart.UseVisualStyleBackColor = true;
             // 
-            // FinishPart
+            // FinishPage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.Window;
             this.Controls.Add(this.cbRestart);
             this.Controls.Add(this.txtDescription);
             this.Controls.Add(this.txtFinished);
             this.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.Name = "FinishPart";
+            this.Name = "FinishPage";
             this.Size = new System.Drawing.Size(701, 245);
             this.ResumeLayout(false);
             this.PerformLayout();

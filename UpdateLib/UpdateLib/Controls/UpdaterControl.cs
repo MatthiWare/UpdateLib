@@ -173,7 +173,7 @@ namespace MatthiWare.UpdateLib.Controls
             cachedImages.Add(UpdaterIcon.Info, Resources.status_info);
             cachedImages.Add(UpdaterIcon.Error, Resources.status_error);
             cachedImages.Add(UpdaterIcon.Done, Resources.status_done);
-            cachedImages.Add(UpdaterIcon.Update, Resources.status_download);
+            cachedImages.Add(UpdaterIcon.Update, Resources.status_update);
 
             Bitmap spritesheet = Resources.status_working;
             

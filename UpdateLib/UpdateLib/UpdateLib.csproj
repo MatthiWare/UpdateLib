@@ -65,30 +65,31 @@
     </Compile>
     <Compile Include="Tasks\ITaskable.cs" />
     <Compile Include="Tasks\TaskEventArgs.cs" />
-    <Compile Include="UI\Components\ChangelogPart.cs">
+    <Compile Include="UI\Components\ChangelogPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="UI\Components\ChangelogPart.Designer.cs">
-      <DependentUpon>ChangelogPart.cs</DependentUpon>
+    <Compile Include="UI\Components\ChangelogPage.Designer.cs">
+      <DependentUpon>ChangelogPage.cs</DependentUpon>
     </Compile>
-    <Compile Include="UI\Components\FinishPart.cs">
+    <Compile Include="UI\Components\FinishPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="UI\Components\FinishPart.Designer.cs">
-      <DependentUpon>FinishPart.cs</DependentUpon>
+    <Compile Include="UI\Components\FinishPage.Designer.cs">
+      <DependentUpon>FinishPage.cs</DependentUpon>
     </Compile>
-    <Compile Include="UI\Components\IntroPart.cs">
+    <Compile Include="UI\Components\IntroPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="UI\Components\IntroPart.Designer.cs">
-      <DependentUpon>IntroPart.cs</DependentUpon>
+    <Compile Include="UI\Components\IntroPage.Designer.cs">
+      <DependentUpon>IntroPage.cs</DependentUpon>
     </Compile>
-    <Compile Include="UI\Components\UpdatePart.cs">
+    <Compile Include="UI\Components\UpdatePage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="UI\Components\UpdatePart.Designer.cs">
-      <DependentUpon>UpdatePart.cs</DependentUpon>
+    <Compile Include="UI\Components\UpdatePage.Designer.cs">
+      <DependentUpon>UpdatePage.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\IWizardPage.cs" />
     <Compile Include="UI\MessageDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -101,6 +102,7 @@
     <Compile Include="UI\UpdaterForm.Designer.cs">
       <DependentUpon>UpdaterForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\WizardPageCollection.cs" />
     <Compile Include="Updater.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -108,6 +110,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\status_working.png" />
+    <None Include="Resources\status_update.png" />
     <Content Include="UpdaterControl.bmp" />
     <None Include="Resources\status_info.png" />
     <None Include="Resources\status_error.png" />
@@ -123,17 +126,17 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\Components\ChangelogPart.resx">
-      <DependentUpon>ChangelogPart.cs</DependentUpon>
+    <EmbeddedResource Include="UI\Components\ChangelogPage.resx">
+      <DependentUpon>ChangelogPage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\Components\FinishPart.resx">
-      <DependentUpon>FinishPart.cs</DependentUpon>
+    <EmbeddedResource Include="UI\Components\FinishPage.resx">
+      <DependentUpon>FinishPage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\Components\IntroPart.resx">
-      <DependentUpon>IntroPart.cs</DependentUpon>
+    <EmbeddedResource Include="UI\Components\IntroPage.resx">
+      <DependentUpon>IntroPage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\Components\UpdatePart.resx">
-      <DependentUpon>UpdatePart.cs</DependentUpon>
+    <EmbeddedResource Include="UI\Components\UpdatePage.resx">
+      <DependentUpon>UpdatePage.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\MessageDialog.resx">
       <DependentUpon>MessageDialog.cs</DependentUpon>
