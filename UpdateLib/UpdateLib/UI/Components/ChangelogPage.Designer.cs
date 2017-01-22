@@ -37,7 +37,7 @@
             // 
             this.txtTitle.AutoSize = true;
             this.txtTitle.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtTitle.ForeColor = System.Drawing.Color.CornflowerBlue;
+            this.txtTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(43)))), ((int)(((byte)(129)))), ((int)(((byte)(181)))));
             this.txtTitle.Location = new System.Drawing.Point(12, 12);
             this.txtTitle.Name = "txtTitle";
             this.txtTitle.Size = new System.Drawing.Size(224, 25);

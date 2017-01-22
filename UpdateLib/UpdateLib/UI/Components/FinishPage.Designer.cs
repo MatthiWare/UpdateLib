@@ -38,7 +38,7 @@
             // 
             this.txtFinished.AutoSize = true;
             this.txtFinished.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtFinished.ForeColor = System.Drawing.Color.CornflowerBlue;
+            this.txtFinished.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(43)))), ((int)(((byte)(129)))), ((int)(((byte)(181)))));
             this.txtFinished.Location = new System.Drawing.Point(12, 12);
             this.txtFinished.Name = "txtFinished";
             this.txtFinished.Size = new System.Drawing.Size(85, 25);

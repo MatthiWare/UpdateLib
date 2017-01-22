@@ -150,7 +150,7 @@ namespace MatthiWare.UpdateLib.UI.Components
 
         public void Execute()
         {
-            throw new NotImplementedException();
+            StartUpdate();
         }
 
         private UpdaterForm _updaterForm;

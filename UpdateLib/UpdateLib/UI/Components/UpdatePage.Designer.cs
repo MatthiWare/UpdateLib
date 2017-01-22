@@ -32,19 +32,19 @@
             this.lblHeader = new System.Windows.Forms.Label();
             this.lblSubheader = new System.Windows.Forms.Label();
             this.lvItems = new System.Windows.Forms.ListView();
-            this.ilIcons = new System.Windows.Forms.ImageList(this.components);
             this.clmnImg = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.clmnName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.clmnStatus = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.clmnProgress = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.clmnExtra = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.ilIcons = new System.Windows.Forms.ImageList(this.components);
             this.SuspendLayout();
             // 
             // lblHeader
             // 
             this.lblHeader.AutoSize = true;
             this.lblHeader.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblHeader.ForeColor = System.Drawing.Color.CornflowerBlue;
+            this.lblHeader.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(43)))), ((int)(((byte)(129)))), ((int)(((byte)(181)))));
             this.lblHeader.Location = new System.Drawing.Point(14, 14);
             this.lblHeader.Name = "lblHeader";
             this.lblHeader.Size = new System.Drawing.Size(140, 25);
@@ -78,12 +78,6 @@
             this.lvItems.UseCompatibleStateImageBehavior = false;
             this.lvItems.View = System.Windows.Forms.View.Details;
             // 
-            // ilIcons
-            // 
-            this.ilIcons.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
-            this.ilIcons.ImageSize = new System.Drawing.Size(16, 16);
-            this.ilIcons.TransparentColor = System.Drawing.Color.Transparent;
-            // 
             // clmnImg
             // 
             this.clmnImg.Text = "";
@@ -108,6 +102,12 @@
             // 
             this.clmnExtra.Text = "Extra options";
             this.clmnExtra.Width = 103;
+            // 
+            // ilIcons
+            // 
+            this.ilIcons.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
+            this.ilIcons.ImageSize = new System.Drawing.Size(16, 16);
+            this.ilIcons.TransparentColor = System.Drawing.Color.Transparent;
             // 
             // UpdatePage
             // 

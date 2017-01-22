@@ -17,8 +17,11 @@ namespace MatthiWare.UpdateLib.UI
     public partial class UpdaterForm : Form
     {
         internal UpdateInfoFile updateInfoFile;
-        
+
         private WizardPageCollection pages;
+
+        private ButtonState stateNext = ButtonState.Next;
+        private ButtonState stateCancel = ButtonState.Cancel;
 
         public UpdaterForm(UpdateInfoFile updateFile)
         {
@@ -33,12 +36,12 @@ namespace MatthiWare.UpdateLib.UI
             AddPage(new FinishPage(this));
 
             SetContentPage(pages.FirstPage);
-            
+
         }
 
         private void SetContentPage(IWizardPage page)
         {
-            for (int i = pnlContent.Controls.Count -1; i >= 0; i--)
+            for (int i = pnlContent.Controls.Count - 1; i >= 0; i--)
             {
                 IWizardPage item = pnlContent.Controls[i] as IWizardPage;
                 if (item == null)
@@ -75,13 +78,32 @@ namespace MatthiWare.UpdateLib.UI
 
         private void btnNext_Click(object sender, EventArgs e)
         {
+            if (pages.CurrentPage.NeedsExecution)
+            {
+                pages.CurrentPage.Execute();
+                return;
+            }
+
             IWizardPage page = pages.Next();
             if (page == null)
                 return;
 
-            btnPrevious.Enabled = true;
+            if (!btnPrevious.Enabled)
+                btnPrevious.Enabled = true;
+
+            if (page.NeedsExecution)
+                btnNext.Text = "Update";
 
             SetContentPage(page);
+
         }
+    }
+
+    public enum ButtonState
+    {
+        Next,
+        Execute,
+        Cancel,
+        Finish
     }
 }

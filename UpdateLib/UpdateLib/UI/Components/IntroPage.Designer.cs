@@ -37,7 +37,7 @@
             // 
             this.txtWelcome.AutoSize = true;
             this.txtWelcome.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtWelcome.ForeColor = System.Drawing.Color.CornflowerBlue;
+            this.txtWelcome.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(43)))), ((int)(((byte)(129)))), ((int)(((byte)(181)))));
             this.txtWelcome.Location = new System.Drawing.Point(12, 12);
             this.txtWelcome.Name = "txtWelcome";
             this.txtWelcome.Size = new System.Drawing.Size(360, 25);
