@@ -105,6 +105,7 @@
             this.btnCancel.TabIndex = 2;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
             // pnlContent
             // 
@@ -127,6 +128,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "UpdaterForm";
             this.Text = "Updater";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.UpdaterForm_FormClosing);
             this.pnlSide.ResumeLayout(false);
             this.pnlSide.PerformLayout();
             this.pnlBottom.ResumeLayout(false);

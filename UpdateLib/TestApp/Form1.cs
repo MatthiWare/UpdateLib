@@ -32,7 +32,7 @@ namespace TestApp
                 updateFile.Files.Add(new UpdateFile("Updater.exe"));
                 updateFile.Files.Add(new UpdateFile("App.exe"));
 
-                UpdaterForm updateForm = new UpdaterForm(updateFile);
+                UpdaterForm updateForm = UpdaterForm.GetCached(updateFile);
                 updateForm.ShowDialog(this);
             }
         }
@@ -44,7 +44,7 @@ namespace TestApp
             updateFile.Files.Add(new UpdateFile("Updater.exe"));
             updateFile.Files.Add(new UpdateFile("App.exe"));
 
-            UpdaterForm updateForm = new UpdaterForm(updateFile);
+            UpdaterForm updateForm = UpdaterForm.GetCached(updateFile);
             updateForm.ShowDialog(this);
         }
     }

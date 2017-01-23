@@ -21,7 +21,16 @@ namespace MatthiWare.UpdateLib.UI
 
         private WizardPageCollection pages;
 
-        public UpdaterForm(UpdateInfoFile updateFile)
+        private static Dictionary<UpdateInfoFile, UpdaterForm> cachedForms = new Dictionary<UpdateInfoFile, UpdaterForm>();
+        public static UpdaterForm GetCached(UpdateInfoFile file)
+        {
+            if (!cachedForms.ContainsKey(file))
+                cachedForms.Add(file, new UpdaterForm(file));
+            
+            return cachedForms[file];
+        }
+
+        private UpdaterForm(UpdateInfoFile updateFile)
         {
             InitializeComponent();
 
@@ -34,11 +43,12 @@ namespace MatthiWare.UpdateLib.UI
             AddPage(new FinishPage(this));
 
             SetContentPage(pages.FirstPage);
-
         }
 
         private void SetContentPage(IWizardPage page)
         {
+            page.PageEntered();
+
             for (int i = pnlContent.Controls.Count - 1; i >= 0; i--)
             {
                 IWizardPage item = pnlContent.Controls[i] as IWizardPage;
@@ -141,22 +151,52 @@ namespace MatthiWare.UpdateLib.UI
         {
             if (NeedsRestart)
             {
-                Process current = Process.GetCurrentProcess();
-                Process[] processes = Process.GetProcessesByName(current.ProcessName);
-                foreach(Process p in processes)
-                {
-                    if (current != p)
-                        p.Kill();
-                }
+                //Process current = Process.GetCurrentProcess();
+                //Process[] processes = Process.GetProcessesByName(current.ProcessName);
+                //foreach(Process p in processes)
+                //{
+                //    if (current != p)
+                //        p.Kill();
+                //}
 
                 Application.Restart();
             }
             else
             {
+                pages.Clear();
+                pages.Add(new FinishPage(this));
+                SetContentPage(pages.CurrentPage);
+                btnPrevious.Enabled = false;
                 this.Close();
             }
            
 
+        }
+
+        private void btnCancel_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private bool Cancel()
+        {
+            MessageDialog dlg = new MessageDialog(
+                "Cancel",
+                "Cancel updating?",
+                "Press Yes to cancel the updating process.\nPress no to keep updating.",
+                SystemIcons.Exclamation);
+
+            return dlg.ShowDialog(this) == DialogResult.OK;
+        }
+
+        private void UpdaterForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (!pages.AllDone())
+            {
+                bool cancel = Cancel();
+                if (!cancel)
+                    e.Cancel = true;
+            }
         }
     }
 }

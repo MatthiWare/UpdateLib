@@ -26,20 +26,37 @@ namespace MatthiWare.UpdateLib.UI.Components
             }
         }
 
+        private bool _isbusy;
         public bool IsBusy
         {
             get
             {
-                return false;
+                return _isbusy;
+            }
+
+            set
+            {
+                _isbusy = value;
             }
         }
 
+        private bool _isdone;
         public bool IsDone
         {
             get
             {
-                return true;
+                return _isdone;
             }
+
+            set
+            {
+                _isdone = value;
+            }
+        }
+
+        public void PageEntered()
+        {
+            IsDone = true;
         }
 
         public bool NeedsCancel

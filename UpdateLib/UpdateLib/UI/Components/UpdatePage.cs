@@ -64,7 +64,7 @@ namespace MatthiWare.UpdateLib.UI.Components
 
         public void StartUpdate()
         {
-            _isbusy = true;
+            IsBusy = true;
             PageUpdate?.Invoke(this, new EventArgs());
             foreach (ListViewItem item in lvItems.Items)
             {
@@ -118,8 +118,8 @@ namespace MatthiWare.UpdateLib.UI.Components
             if (amountLeft != 0)
                 return;
 
-            _isbusy = false;
-            _isdone = true;
+            IsBusy = false;
+            IsDone = true;
 
             PageUpdate?.Invoke(this, new EventArgs());
         }
@@ -191,13 +191,23 @@ namespace MatthiWare.UpdateLib.UI.Components
             }
         }
 
-        private bool _isbusy = false;
+        private bool _isbusy;
         public bool IsBusy
         {
             get
             {
                 return _isbusy;
             }
+
+            set
+            {
+                _isbusy = value;
+            }
+        }
+
+        public void PageEntered()
+        {
+
         }
 
         private bool _isdone;
@@ -206,6 +216,11 @@ namespace MatthiWare.UpdateLib.UI.Components
             get
             {
                 return _isdone;
+            }
+
+            set
+            {
+                _isdone = value;
             }
         }
 

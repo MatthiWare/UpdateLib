@@ -40,7 +40,7 @@ namespace MatthiWare.UpdateLib.UI
 
             if (CurrentPage.IsBusy || !CurrentPage.IsDone)
                 return null;
-
+            
             index++;
             return CurrentPage;
         }
@@ -55,6 +55,16 @@ namespace MatthiWare.UpdateLib.UI
 
             index--;
             return CurrentPage;
+        }
+
+        public bool AllDone()
+        {
+            foreach (IWizardPage page in store)
+            {
+                if (!page.IsDone)
+                    return false;
+            }
+            return true;
         }
 
         #region IList<IWizardPage> Implementation
@@ -111,6 +121,7 @@ namespace MatthiWare.UpdateLib.UI
 
         public void Clear()
         {
+            index = 0;
             store.Clear();
         }
 

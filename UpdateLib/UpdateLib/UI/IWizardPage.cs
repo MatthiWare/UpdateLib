@@ -15,8 +15,9 @@ namespace MatthiWare.UpdateLib.UI
         UserControl Conent { get; }
         bool NeedsCancel { get; }
         bool NeedsExecution { get; }
-        bool IsBusy { get; }
-        bool IsDone { get; }
+        bool IsBusy { get; set; }
+        bool IsDone { get; set; }
         string Title { get; }
+        void PageEntered();
     }
 }

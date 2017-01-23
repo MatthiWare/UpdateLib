@@ -26,21 +26,7 @@ namespace MatthiWare.UpdateLib.UI.Components
             }
         }
 
-        public bool IsBusy
-        {
-            get
-            {
-                return false;
-            }
-        }
-
-        public bool IsDone
-        {
-            get
-            {
-                return true;
-            }
-        }
+        
 
         public bool NeedsCancel
         {
@@ -73,6 +59,39 @@ namespace MatthiWare.UpdateLib.UI.Components
             {
                 return _updaterForm;
             }
+        }
+
+        private bool _isbusy;
+        public bool IsBusy
+        {
+            get
+            {
+                return _isbusy;
+            }
+
+            set
+            {
+                _isbusy = value;
+            }
+        }
+
+        private bool _isdone;
+        public bool IsDone
+        {
+            get
+            {
+                return _isdone;
+            }
+
+            set
+            {
+                _isdone = value;
+            }
+        }
+
+        public void PageEntered()
+        {
+            IsDone = true;
         }
 
         public event EventHandler PageUpdate;
