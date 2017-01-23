@@ -117,23 +117,15 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="status_done" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\status_done.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="status_download" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\status_download.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="status_error" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\status_error.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="status_info" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\status_info.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="status_update" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\status_update.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="status_working" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\status_working.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="txtDescription.Text" xml:space="preserve">
+    <value>%AppName% has been succesfully updated to version %version%.
+
+The application need to restart for the changes to take effect.
+
+If you do not want this you can uncheck the Restart application checkbox.
+
+Press Finish to close this wizard.
+
+</value>
   </data>
 </root>

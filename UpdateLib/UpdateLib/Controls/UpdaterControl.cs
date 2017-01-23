@@ -5,7 +5,6 @@ using System.Drawing;
 using System.Data;
 using System.Linq;
 using System.Text;
-using System.Timers;
 using System.Windows.Forms;
 using MatthiWare.UpdateLib.Properties;
 
@@ -16,6 +15,7 @@ namespace MatthiWare.UpdateLib.Controls
     {
         private const int ICON_SIZE = 16;
         private const int XY_OFFSET = 2;
+        private const int PROGRESS_SPEED = 200;
 
         private Brush brush;
         private float x_text, y_text;
@@ -41,7 +41,12 @@ namespace MatthiWare.UpdateLib.Controls
             }
         }
 
+        private int progressIndex = 0;
+        private Bitmap[] progressImages = new Bitmap[50];
+
         private Dictionary<UpdaterIcon, Bitmap> cachedImages = new Dictionary<UpdaterIcon, Bitmap>();
+
+        private Timer timer;
 
         private UpdaterIcon _icon = UpdaterIcon.Info;
         private UpdaterIcon Icon
@@ -63,7 +68,8 @@ namespace MatthiWare.UpdateLib.Controls
             Info = 0,
             Error = 1,
             Done = 2,
-            Update = 3
+            Update = 3,
+            Progress = 4
         }
 
         public UpdaterControl()
@@ -74,12 +80,33 @@ namespace MatthiWare.UpdateLib.Controls
             SetStyle(ControlStyles.ContainerControl, false);
 
             Size = new Size(XY_OFFSET * 2 + ICON_SIZE, XY_OFFSET * 2 + ICON_SIZE);
+            timer = new Timer();
+            timer.Interval = PROGRESS_SPEED;
+            timer.Tick += update_progress;
 
             // caching
             LoadImages();
             MakeBrushFromForeColor();
             CalcFont();
            
+        }
+
+        private void update_progress(object sender, EventArgs e)
+        {
+            Invalidate();
+            if (++progressIndex >= progressImages.Length)
+                progressIndex = 0;
+        }
+
+        private void StartProgress()
+        {
+            progressIndex = 0;
+            timer.Start();
+        }
+
+        private void StopProgress()
+        {
+            timer.Stop();
         }
 
         public override Font Font
@@ -146,8 +173,29 @@ namespace MatthiWare.UpdateLib.Controls
             cachedImages.Add(UpdaterIcon.Info, Resources.status_info);
             cachedImages.Add(UpdaterIcon.Error, Resources.status_error);
             cachedImages.Add(UpdaterIcon.Done, Resources.status_done);
-            cachedImages.Add(UpdaterIcon.Update, Resources.status_download);
-           
+            cachedImages.Add(UpdaterIcon.Update, Resources.status_update);
+
+            Bitmap spritesheet = Resources.status_working;
+            
+            int i = 0;
+            for (int x = 0; x < 10; x++)
+            {
+                for (int y = 0; y < 5; y++)
+                {
+                    Bitmap bmp = new Bitmap(16, 16);
+                    Graphics g = Graphics.FromImage(bmp);
+
+                    Rectangle dest = new Rectangle(0, 0, 16, 16);
+                    Rectangle src = new Rectangle(x * 16, y * 16, 16, 16);
+
+                    g.DrawImage(spritesheet, dest, src, GraphicsUnit.Pixel);
+
+                    g.Dispose();
+
+                    progressImages[i++] = bmp;
+                }
+            }
+
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -160,7 +208,11 @@ namespace MatthiWare.UpdateLib.Controls
 
         private void DrawIcon(Graphics g)
         {
-            g.DrawImage(cachedImages[Icon], XY_OFFSET, XY_OFFSET, ICON_SIZE, ICON_SIZE);
+            g.DrawImage((Icon == UpdaterIcon.Progress) ? progressImages[progressIndex] : cachedImages[Icon], 
+                XY_OFFSET, 
+                XY_OFFSET, 
+                ICON_SIZE, 
+                ICON_SIZE);
         }
 
         private void DrawText(Graphics g)
@@ -213,7 +265,7 @@ namespace MatthiWare.UpdateLib.Controls
             base.OnClick(e);
 
             Text = "Checking for updates..";
-            Icon = UpdaterIcon.Update;
+            Icon = UpdaterIcon.Progress;
 
             int currWidth = Width;
             int newWidth = CalcNewWidth();
@@ -223,6 +275,8 @@ namespace MatthiWare.UpdateLib.Controls
             x.X += offset;
             Location = x;
             Width = newWidth;
+
+            StartProgress();
 
 
         }

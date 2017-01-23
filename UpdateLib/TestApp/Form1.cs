@@ -32,9 +32,20 @@ namespace TestApp
                 updateFile.Files.Add(new UpdateFile("Updater.exe"));
                 updateFile.Files.Add(new UpdateFile("App.exe"));
 
-                UpdaterForm updateForm = new UpdaterForm(updateFile);
+                UpdaterForm updateForm = UpdaterForm.GetCached(updateFile);
                 updateForm.ShowDialog(this);
             }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            UpdateInfoFile updateFile = new UpdateInfoFile("1.0.0.0");
+            updateFile.Files.Add(new UpdateFile("test"));
+            updateFile.Files.Add(new UpdateFile("Updater.exe"));
+            updateFile.Files.Add(new UpdateFile("App.exe"));
+
+            UpdaterForm updateForm = UpdaterForm.GetCached(updateFile);
+            updateForm.ShowDialog(this);
         }
     }
 }

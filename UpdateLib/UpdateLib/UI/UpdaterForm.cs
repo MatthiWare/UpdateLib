@@ -1,5 +1,6 @@
 ﻿using MatthiWare.UpdateLib.Files;
 using MatthiWare.UpdateLib.Properties;
+using MatthiWare.UpdateLib.UI.Components;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,143 +16,187 @@ namespace MatthiWare.UpdateLib.UI
 {
     public partial class UpdaterForm : Form
     {
-        private UpdateInfoFile updateInfoFile;
+        internal UpdateInfoFile updateInfoFile;
+        internal bool NeedsRestart = true;
 
-        private int amountOfDownloadsToGo;
-        private bool errorOccured = false;
+        private WizardPageCollection pages;
 
-        public UpdaterForm()
+        private static Dictionary<UpdateInfoFile, UpdaterForm> cachedForms = new Dictionary<UpdateInfoFile, UpdaterForm>();
+        public static UpdaterForm GetCached(UpdateInfoFile file)
         {
-            InitializeComponent();           
-        }
-
-        public UpdaterForm(UpdateInfoFile updateFile)
-           : this()
-        {
-            updateInfoFile = updateFile;
-            amountOfDownloadsToGo = updateFile.Files.Count;
-            FillList();
-        }
-
-        private void FillList()
-        {
-            foreach (UpdateFile file in updateInfoFile.Files)
-            {
-                string[] data = new string[] { "", file.Name, "Ready to download", "0%"};
-                ListViewItem lvItem = new ListViewItem(data);
-
-                lvItems.Items.Add(lvItem);
-            }
-        }
-
-        private void btnUpdateCancel_Click(object sender, EventArgs e)
-        {
-            List<WaitHandle> waithandles = new List<WaitHandle>(lvItems.Items.Count);
-
-            btnUpdateCancel.Enabled = false;
-
-            foreach(ListViewItem lvItem in lvItems.Items)
-            {
-                Action<ListViewItem> a = new Action<ListViewItem>(Test);
-                waithandles.Add(a.BeginInvoke(lvItem, null, null).AsyncWaitHandle);
-                
-            }
-
-            btnUpdateCancel.Enabled = true;
-        }
-
-        Random rnd = new Random();
-        private void Test(ListViewItem item)
-        {
+            if (!cachedForms.ContainsKey(file))
+                cachedForms.Add(file, new UpdaterForm(file));
             
-            int wait = rnd.Next(2000);
-
-            Thread.Sleep(wait);
-
-            SetImageKey(item, "status_download");
-            SetSubItemText(item.SubItems[2], "Downloading..");
-
-            wait = rnd.Next(100);
-            for (int i = 0; i <= 100; i++)
-            {
-                SetSubItemText(item.SubItems[3], String.Format("{0}%", i ));
-                Thread.Sleep(wait);
-            }
-
-            bool val = rnd.Next(0, 2) == 0 ? false : true;
-            SetSubItemText(item.SubItems[2], val? "Done":"Error");
-
-            SetImageKey(item, val ? "status_done" : "status_error");
-
-            if (!val)
-                errorOccured = true;
-
-            int amountLeft = Interlocked.Decrement(ref amountOfDownloadsToGo);
-
-            if (amountLeft != 0)
-                return;
-
-            if (errorOccured)
-            {
-                SetErrored();
-                return;
-            }
-
-            SetDone();
-                
+            return cachedForms[file];
         }
 
-        private void SetErrored()
+        private UpdaterForm(UpdateInfoFile updateFile)
         {
-            if (InvokeRequired)
+            InitializeComponent();
+
+            updateInfoFile = updateFile;
+
+            pages = new WizardPageCollection();
+            AddPage(new IntroPage(this));
+            AddPage(new ChangelogPage(this));
+            AddPage(new UpdatePage(this));
+            AddPage(new FinishPage(this));
+
+            SetContentPage(pages.FirstPage);
+        }
+
+        private void SetContentPage(IWizardPage page)
+        {
+            page.PageEntered();
+
+            for (int i = pnlContent.Controls.Count - 1; i >= 0; i--)
             {
-                Invoke(new MethodInvoker(SetErrored));
+                IWizardPage item = pnlContent.Controls[i] as IWizardPage;
+                if (item == null)
+                    continue;
+
+                pnlContent.Controls.RemoveAt(i);
+            }
+
+            pnlContent.Controls.Add(page.Conent);
+        }
+
+        private void AddPage(IWizardPage page)
+        {
+            page.PageUpdate += Page_PageUpdate;
+            pages.Add(page);
+        }
+
+        private void Page_PageUpdate(object sender, EventArgs e)
+        {
+
+            IWizardPage page = (IWizardPage)sender;
+            OnPageUpdate(page);
+        }
+
+        delegate void _OnPageUpdate(IWizardPage page);
+        private void OnPageUpdate(IWizardPage page)
+        {
+            if (this.InvokeRequired)
+            {
+                Invoke(new _OnPageUpdate(OnPageUpdate),page);
+                return;
+            }
+            
+            if (page.IsDone && !page.IsBusy)
+            {
+                btnNext.Enabled = true;
+                if (page == pages.CurrentPage)
+                    btnNext.Focus();
+                if (page.NeedsExecution)
+                    btnNext.Text = "Next >";
+            }
+        }
+
+        private void btnPrevious_Click(object sender, EventArgs e)
+        {
+            IWizardPage currentPage = pages.CurrentPage;
+            IWizardPage page = pages.Previous();
+            if (page == null)
+                return;
+
+            if (!btnNext.Enabled)
+                btnNext.Enabled = true;
+
+            if (currentPage.NeedsExecution)
+                btnNext.Text = "Next >";
+
+            if (page == pages.FirstPage)
+                btnPrevious.Enabled = false;
+
+            SetContentPage(page);
+        }
+
+        private void btnNext_Click(object sender, EventArgs e)
+        {
+            if (pages.CurrentPage.NeedsExecution && !pages.CurrentPage.IsDone)
+            {
+                pages.CurrentPage.Execute();
+                btnNext.Enabled = false;
                 return;
             }
 
-            btnUpdateCancel.Enabled = true;
-            btnUpdateCancel.Text = "Error";
-
-        }
-
-        private void SetDone()
-        {
-            if (InvokeRequired)
+            if (pages.CurrentPage == pages.LastPage && pages.CurrentPage.IsDone)
             {
-                Invoke(new MethodInvoker(SetDone));
+                ExitUpdater();
                 return;
             }
 
-            btnUpdateCancel.Enabled = true;
-            btnUpdateCancel.Text = "Finish";
-        }
-
-        private delegate void SetImageKeyInvoker(ListViewItem item, string key);
-        private void SetImageKey(ListViewItem item, string key)
-        {
-            if (InvokeRequired)
-            {
-                Invoke(new SetImageKeyInvoker(SetImageKey), item, key);
+            IWizardPage page = pages.Next();
+            if (page == null)
                 return;
-            }
-            item.ImageKey = key;
+
+            if (!btnPrevious.Enabled)
+                btnPrevious.Enabled = true;
+
+            if (page.NeedsExecution && !page.IsDone)
+                btnNext.Text = "Update";
+
+            if (page.NeedsExecution && !page.IsDone && page.IsBusy)
+                btnNext.Enabled = false;
+
+            if (page == pages.LastPage)
+                btnNext.Text = "Finish";
+
+            SetContentPage(page);
+
         }
 
-        private delegate void SetSubItemTextInvoker(ListViewItem.ListViewSubItem item, string key);
-        private void SetSubItemText(ListViewItem.ListViewSubItem item, string key)
+        private void ExitUpdater()
         {
-            if (InvokeRequired)
+            if (NeedsRestart)
             {
-                Invoke(new SetSubItemTextInvoker(SetSubItemText),item, key);
-                return;
-            }
+                //Process current = Process.GetCurrentProcess();
+                //Process[] processes = Process.GetProcessesByName(current.ProcessName);
+                //foreach(Process p in processes)
+                //{
+                //    if (current != p)
+                //        p.Kill();
+                //}
 
-            item.Text = key;
+                Application.Restart();
+            }
+            else
+            {
+                pages.Clear();
+                pages.Add(new FinishPage(this));
+                SetContentPage(pages.CurrentPage);
+                btnPrevious.Enabled = false;
+                this.Close();
+            }
+           
+
         }
 
-        private void lblUpdateLibLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        private void btnCancel_Click(object sender, EventArgs e)
         {
-            Process.Start("https://github.com/MatthiWare/UpdateLib");
+            this.Close();
+        }
+
+        private bool Cancel()
+        {
+            MessageDialog dlg = new MessageDialog(
+                "Cancel",
+                "Cancel updating?",
+                "Press Yes to cancel the updating process.\nPress no to keep updating.",
+                SystemIcons.Exclamation);
+
+            return dlg.ShowDialog(this) == DialogResult.OK;
+        }
+
+        private void UpdaterForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (!pages.AllDone())
+            {
+                bool cancel = Cancel();
+                if (!cancel)
+                    e.Cancel = true;
+            }
         }
     }
 }

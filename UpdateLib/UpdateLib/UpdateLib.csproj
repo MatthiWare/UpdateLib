@@ -11,7 +11,8 @@
     <AssemblyName>UpdateLib</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -57,11 +58,39 @@
     <Compile Include="Files\IUpdateFile.cs" />
     <Compile Include="Files\UpdateFile.cs" />
     <Compile Include="Files\UpdateInfoFile.cs" />
+    <Compile Include="Tasks\DownloadTask.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Tasks\ITaskable.cs" />
+    <Compile Include="Tasks\TaskEventArgs.cs" />
+    <Compile Include="UI\Components\ChangelogPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\Components\ChangelogPage.Designer.cs">
+      <DependentUpon>ChangelogPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Components\FinishPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\Components\FinishPage.Designer.cs">
+      <DependentUpon>FinishPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Components\IntroPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\Components\IntroPage.Designer.cs">
+      <DependentUpon>IntroPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Components\UpdatePage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\Components\UpdatePage.Designer.cs">
+      <DependentUpon>UpdatePage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\IWizardPage.cs" />
     <Compile Include="UI\MessageDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -74,12 +103,15 @@
     <Compile Include="UI\UpdaterForm.Designer.cs">
       <DependentUpon>UpdaterForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\WizardPageCollection.cs" />
     <Compile Include="Updater.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\status_working.png" />
+    <None Include="Resources\status_update.png" />
     <Content Include="UpdaterControl.bmp" />
     <None Include="Resources\status_info.png" />
     <None Include="Resources\status_error.png" />
@@ -94,6 +126,18 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\Components\ChangelogPage.resx">
+      <DependentUpon>ChangelogPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\Components\FinishPage.resx">
+      <DependentUpon>FinishPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\Components\IntroPage.resx">
+      <DependentUpon>IntroPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\Components\UpdatePage.resx">
+      <DependentUpon>UpdatePage.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\MessageDialog.resx">
       <DependentUpon>MessageDialog.cs</DependentUpon>
