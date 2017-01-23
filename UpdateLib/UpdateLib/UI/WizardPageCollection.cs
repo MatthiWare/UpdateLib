@@ -50,8 +50,8 @@ namespace MatthiWare.UpdateLib.UI
             if (CurrentPage == FirstPage)
                 return null;
 
-            if (CurrentPage.IsBusy || !CurrentPage.IsDone)
-                return null;
+            //if (CurrentPage.IsBusy || !CurrentPage.IsDone)
+            //    return null;
 
             index--;
             return CurrentPage;

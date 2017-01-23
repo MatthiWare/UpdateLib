@@ -64,6 +64,8 @@ namespace MatthiWare.UpdateLib.UI.Components
 
         public void StartUpdate()
         {
+            _isbusy = true;
+            PageUpdate?.Invoke(this, new EventArgs());
             foreach (ListViewItem item in lvItems.Items)
             {
                 Action<ListViewItem> downloadAction = new Action<ListViewItem>(StartDownloadItem);
@@ -115,8 +117,11 @@ namespace MatthiWare.UpdateLib.UI.Components
 
             if (amountLeft != 0)
                 return;
-            
 
+            _isbusy = false;
+            _isdone = true;
+
+            PageUpdate?.Invoke(this, new EventArgs());
         }
 
 
@@ -186,19 +191,21 @@ namespace MatthiWare.UpdateLib.UI.Components
             }
         }
 
+        private bool _isbusy = false;
         public bool IsBusy
         {
             get
             {
-                return false;
+                return _isbusy;
             }
         }
 
+        private bool _isdone;
         public bool IsDone
         {
             get
             {
-                return false;
+                return _isdone;
             }
         }
 

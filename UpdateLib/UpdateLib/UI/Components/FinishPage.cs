@@ -86,5 +86,10 @@ namespace MatthiWare.UpdateLib.UI.Components
         {
             throw new NotImplementedException();
         }
+
+        private void cbRestart_CheckedChanged(object sender, EventArgs e)
+        {
+            UpdaterForm.NeedsRestart = cbRestart.Checked;
+        }
     }
 }

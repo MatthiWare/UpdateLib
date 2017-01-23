@@ -69,6 +69,7 @@
             this.cbRestart.TabIndex = 2;
             this.cbRestart.Text = "Restart application";
             this.cbRestart.UseVisualStyleBackColor = true;
+            this.cbRestart.CheckedChanged += new System.EventHandler(this.cbRestart_CheckedChanged);
             // 
             // FinishPage
             // 

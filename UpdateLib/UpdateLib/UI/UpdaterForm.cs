@@ -17,11 +17,9 @@ namespace MatthiWare.UpdateLib.UI
     public partial class UpdaterForm : Form
     {
         internal UpdateInfoFile updateInfoFile;
+        internal bool NeedsRestart = true;
 
         private WizardPageCollection pages;
-
-        private ButtonState stateNext = ButtonState.Next;
-        private ButtonState stateCancel = ButtonState.Cancel;
 
         public UpdaterForm(UpdateInfoFile updateFile)
         {
@@ -61,14 +59,42 @@ namespace MatthiWare.UpdateLib.UI
 
         private void Page_PageUpdate(object sender, EventArgs e)
         {
+
             IWizardPage page = (IWizardPage)sender;
+            OnPageUpdate(page);
+        }
+
+        delegate void _OnPageUpdate(IWizardPage page);
+        private void OnPageUpdate(IWizardPage page)
+        {
+            if (this.InvokeRequired)
+            {
+                Invoke(new _OnPageUpdate(OnPageUpdate),page);
+                return;
+            }
+            
+            if (page.IsDone && !page.IsBusy)
+            {
+                btnNext.Enabled = true;
+                if (page == pages.CurrentPage)
+                    btnNext.Focus();
+                if (page.NeedsExecution)
+                    btnNext.Text = "Next >";
+            }
         }
 
         private void btnPrevious_Click(object sender, EventArgs e)
         {
+            IWizardPage currentPage = pages.CurrentPage;
             IWizardPage page = pages.Previous();
             if (page == null)
                 return;
+
+            if (!btnNext.Enabled)
+                btnNext.Enabled = true;
+
+            if (currentPage.NeedsExecution)
+                btnNext.Text = "Next >";
 
             if (page == pages.FirstPage)
                 btnPrevious.Enabled = false;
@@ -78,9 +104,16 @@ namespace MatthiWare.UpdateLib.UI
 
         private void btnNext_Click(object sender, EventArgs e)
         {
-            if (pages.CurrentPage.NeedsExecution)
+            if (pages.CurrentPage.NeedsExecution && !pages.CurrentPage.IsDone)
             {
                 pages.CurrentPage.Execute();
+                btnNext.Enabled = false;
+                return;
+            }
+
+            if (pages.CurrentPage == pages.LastPage && pages.CurrentPage.IsDone)
+            {
+                ExitUpdater();
                 return;
             }
 
@@ -91,19 +124,39 @@ namespace MatthiWare.UpdateLib.UI
             if (!btnPrevious.Enabled)
                 btnPrevious.Enabled = true;
 
-            if (page.NeedsExecution)
+            if (page.NeedsExecution && !page.IsDone)
                 btnNext.Text = "Update";
+
+            if (page.NeedsExecution && !page.IsDone && page.IsBusy)
+                btnNext.Enabled = false;
+
+            if (page == pages.LastPage)
+                btnNext.Text = "Finish";
 
             SetContentPage(page);
 
         }
-    }
 
-    public enum ButtonState
-    {
-        Next,
-        Execute,
-        Cancel,
-        Finish
+        private void ExitUpdater()
+        {
+            if (NeedsRestart)
+            {
+                Process current = Process.GetCurrentProcess();
+                Process[] processes = Process.GetProcessesByName(current.ProcessName);
+                foreach(Process p in processes)
+                {
+                    if (current != p)
+                        p.Kill();
+                }
+
+                Application.Restart();
+            }
+            else
+            {
+                this.Close();
+            }
+           
+
+        }
     }
 }
