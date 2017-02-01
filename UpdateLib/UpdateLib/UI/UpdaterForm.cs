@@ -26,7 +26,7 @@ namespace MatthiWare.UpdateLib.UI
         {
             if (!cachedForms.ContainsKey(file))
                 cachedForms.Add(file, new UpdaterForm(file));
-            
+
             return cachedForms[file];
         }
 
@@ -79,10 +79,10 @@ namespace MatthiWare.UpdateLib.UI
         {
             if (this.InvokeRequired)
             {
-                Invoke(new _OnPageUpdate(OnPageUpdate),page);
+                Invoke(new _OnPageUpdate(OnPageUpdate), page);
                 return;
             }
-            
+
             if (page.IsDone && !page.IsBusy)
             {
                 btnNext.Enabled = true;
@@ -169,7 +169,7 @@ namespace MatthiWare.UpdateLib.UI
                 btnPrevious.Enabled = false;
                 this.Close();
             }
-           
+
 
         }
 
