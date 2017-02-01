@@ -24,13 +24,25 @@ namespace UpdateLib.Tests.UI
         [Test]
         public void CorrectPageCount()
         {
-            TestPage page1 = new TestPage();
-            TestPage page2 = new TestPage();
-            TestPage page3 = new TestPage();
+            Mock<IWizardPage> page1 = new Mock<IWizardPage>();
+            page1.SetupGet<bool>(p => p.IsBusy).Returns(false);
+            page1.SetupGet<bool>(p => p.IsDone).Returns(true);
+            page1.SetupGet<UserControl>(p => p.Conent).Returns(new UserControl());
+
+            Mock<IWizardPage> page2 = new Mock<IWizardPage>();
+            page2.SetupGet<bool>(p => p.IsBusy).Returns(false);
+            page2.SetupGet<bool>(p => p.IsDone).Returns(true);
+            page2.SetupGet<UserControl>(p => p.Conent).Returns(new UserControl());
+
+            Mock<IWizardPage> page3 = new Mock<IWizardPage>();
+            page3.SetupGet<bool>(p => p.IsBusy).Returns(false);
+            page3.SetupGet<bool>(p => p.IsDone).Returns(true);
+            page3.SetupGet<UserControl>(p => p.Conent).Returns(new UserControl());
+
+            wizard.Add(page1.Object);
+            wizard.Add(page2.Object);
+            wizard.Add(page3.Object);
             
-            wizard.Add(page1);
-            wizard.Add(page2);
-            wizard.Add(page3);
 
             Assert.AreEqual(3, wizard.Count);
         }
@@ -38,16 +50,27 @@ namespace UpdateLib.Tests.UI
         [Test]
         public void CorrectFirstPageAndLastPage()
         {
-            TestPage page1 = new TestPage();
-            TestPage page2 = new TestPage();
-            TestPage page3 = new TestPage();
+            Mock<IWizardPage> page1 = new Mock<IWizardPage>();
+            page1.SetupGet<bool>(p => p.IsBusy).Returns(false);
+            page1.SetupGet<bool>(p => p.IsDone).Returns(true);
+            page1.SetupGet<UserControl>(p => p.Conent).Returns(new UserControl());
 
-            wizard.Add(page1);
-            wizard.Add(page2);
-            wizard.Add(page3);
+            Mock<IWizardPage> page2 = new Mock<IWizardPage>();
+            page2.SetupGet<bool>(p => p.IsBusy).Returns(false);
+            page2.SetupGet<bool>(p => p.IsDone).Returns(true);
+            page2.SetupGet<UserControl>(p => p.Conent).Returns(new UserControl());
 
-            Assert.AreEqual(page1, wizard.FirstPage);
-            Assert.AreEqual(page3, wizard.LastPage);
+            Mock<IWizardPage> page3 = new Mock<IWizardPage>();
+            page3.SetupGet<bool>(p => p.IsBusy).Returns(false);
+            page3.SetupGet<bool>(p => p.IsDone).Returns(true);
+            page3.SetupGet<UserControl>(p => p.Conent).Returns(new UserControl());
+
+            wizard.Add(page1.Object);
+            wizard.Add(page2.Object);
+            wizard.Add(page3.Object);
+
+            Assert.AreEqual(page1.Object, wizard.FirstPage);
+            Assert.AreEqual(page3.Object, wizard.LastPage);
         }
 
         [Test]
@@ -59,13 +82,24 @@ namespace UpdateLib.Tests.UI
         [Test]
         public void ClearingTheWizardShouldReturnCountOfZero()
         {
-            TestPage page1 = new TestPage();
-            TestPage page2 = new TestPage();
-            TestPage page3 = new TestPage();
+            Mock<IWizardPage> page1 = new Mock<IWizardPage>();
+            page1.SetupGet<bool>(p => p.IsBusy).Returns(false);
+            page1.SetupGet<bool>(p => p.IsDone).Returns(true);
+            page1.SetupGet<UserControl>(p => p.Conent).Returns(new UserControl());
 
-            wizard.Add(page1);
-            wizard.Add(page2);
-            wizard.Add(page3);
+            Mock<IWizardPage> page2 = new Mock<IWizardPage>();
+            page2.SetupGet<bool>(p => p.IsBusy).Returns(false);
+            page2.SetupGet<bool>(p => p.IsDone).Returns(true);
+            page2.SetupGet<UserControl>(p => p.Conent).Returns(new UserControl());
+
+            Mock<IWizardPage> page3 = new Mock<IWizardPage>();
+            page3.SetupGet<bool>(p => p.IsBusy).Returns(false);
+            page3.SetupGet<bool>(p => p.IsDone).Returns(true);
+            page3.SetupGet<UserControl>(p => p.Conent).Returns(new UserControl());
+
+            wizard.Add(page1.Object);
+            wizard.Add(page2.Object);
+            wizard.Add(page3.Object);
 
             wizard.Clear();
 
@@ -107,92 +141,37 @@ namespace UpdateLib.Tests.UI
 
         }
 
-
-        private class TestPage : IWizardPage
+        public void PreviousShouldReturnTheCorrectPage()
         {
-            private UserControl control = new UserControl();
-            public UserControl Conent
-            {
-                get
-                {
-                    return control;
-                }
-            }
+            Mock<IWizardPage> page1 = new Mock<IWizardPage>();
+            page1.SetupGet<bool>(p => p.IsBusy).Returns(false);
+            page1.SetupGet<bool>(p => p.IsDone).Returns(true);
+            page1.SetupGet<UserControl>(p => p.Conent).Returns(new UserControl());
 
-            public bool IsBusy
-            {
-                get
-                {
-                    throw new NotImplementedException();
-                }
+            Mock<IWizardPage> page2 = new Mock<IWizardPage>();
+            page2.SetupGet<bool>(p => p.IsBusy).Returns(false);
+            page2.SetupGet<bool>(p => p.IsDone).Returns(true);
+            page2.SetupGet<UserControl>(p => p.Conent).Returns(new UserControl());
 
-                set
-                {
-                    throw new NotImplementedException();
-                }
-            }
+            Mock<IWizardPage> page3 = new Mock<IWizardPage>();
+            page3.SetupGet<bool>(p => p.IsBusy).Returns(false);
+            page3.SetupGet<bool>(p => p.IsDone).Returns(true);
+            page3.SetupGet<UserControl>(p => p.Conent).Returns(new UserControl());
 
-            public bool IsDone
-            {
-                get
-                {
-                    throw new NotImplementedException();
-                }
+            wizard.Add(page1.Object);
+            wizard.Add(page2.Object);
+            wizard.Add(page3.Object);
 
-                set
-                {
-                    throw new NotImplementedException();
-                }
-            }
+            Assert.AreEqual(wizard.FirstPage, wizard.CurrentPage);
 
-            public bool NeedsCancel
-            {
-                get
-                {
-                    throw new NotImplementedException();
-                }
-            }
+            IWizardPage page = wizard.Next();
 
-            public bool NeedsExecution
-            {
-                get
-                {
-                    throw new NotImplementedException();
-                }
-            }
+            Assert.AreEqual(page2.Object, page);
 
-            public string Title
-            {
-                get
-                {
-                    throw new NotImplementedException();
-                }
-            }
+            page = wizard.Next();
 
-            public UpdaterForm UpdaterForm
-            {
-                get
-                {
-                    throw new NotImplementedException();
-                }
-            }
-
-            public event EventHandler PageUpdate;
-
-            public void Cancel()
-            {
-                throw new NotImplementedException();
-            }
-
-            public void Execute()
-            {
-                throw new NotImplementedException();
-            }
-
-            public void PageEntered()
-            {
-                throw new NotImplementedException();
-            }
+            Assert.AreEqual(page3.Object, page);
+            Assert.AreEqual(wizard.LastPage, page);
         }
 
     }
