@@ -1,0 +1,28 @@
+version: 0.1.{build}
+skip_tags: true
+configuration: Release
+assembly_info:
+  patch: true
+  file: '**\AssemblyInfo.*'
+  assembly_version: '{version}'
+  assembly_file_version: '{version}'
+  assembly_informational_version: '{version}'
+environment:
+  COVERALLS_REPO_TOKEN:
+    secure: k6gJwhivEaPBnNT7CKZEks2q1yreyDbVqkZMt46mN32tgRhHhChvMLgTqrtGoG6R
+before_build:
+  - nuget restore ".\UpdateLib\UpdateLib.sln"
+build:
+  project: .\UpdateLib\UpdateLib.sln
+  verbosity: minimal
+test_script:
+- ps: >-
+    $opencover = (Resolve-Path "C:/projects/updatelib/UpdateLib/packages/OpenCover.4.6.519/tools/OpenCover.Console.exe").ToString()
+    
+    $opencover -target:nunit-console.exe "-targetargs:""UpdateLib\UpdateLib.Tests\bin\$env:CONFIGURATION\UpdateLib.Tests.dll"" /noshadow" -filter:"+[UpdateLib*]*" -output:opencoverCoverage.xml
+
+    $coveralls = (Resolve-Path "C:/projects/updatelib/UpdateLib/packages/coveralls.net.0.7.0/tools/csmacnz.coveralls.exe").ToString()
+    
+    $env:APPVEYOR_BUILD_NUMBER
+    
+    & $coveralls --opencover -i opencoverCoverage.xml --repoToken $env:COVERALLS_REPO_TOKEN --useRelativePaths --commitId $env:APPVEYOR_REPO_COMMIT --commitBranch $env:APPVEYOR_REPO_BRANCH --commitAuthor $env:APPVEYOR_REPO_COMMIT_AUTHOR --commitEmail $env:APPVEYOR_REPO_COMMIT_AUTHOR_EMAIL --commitMessage $env:APPVEYOR_REPO_COMMIT_MESSAGE --jobId $env:APPVEYOR_BUILD_NUMBER --serviceName appveyor
