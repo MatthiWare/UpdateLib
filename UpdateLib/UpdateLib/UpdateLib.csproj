@@ -58,6 +58,7 @@
     <Compile Include="Files\IUpdateFile.cs" />
     <Compile Include="Files\UpdateFile.cs" />
     <Compile Include="Files\UpdateInfoFile.cs" />
+    <Compile Include="Security\HashUtil.cs" />
     <Compile Include="Tasks\DownloadTask.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
