@@ -115,6 +115,9 @@ namespace MatthiWare.UpdateLib.UI
 
         public void Add(IWizardPage item)
         {
+            if (item == null)
+                throw new ArgumentNullException("item");
+
             item.Conent.Dock = System.Windows.Forms.DockStyle.Fill;
             store.Add(item);
         }
