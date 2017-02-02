@@ -19,7 +19,7 @@ test_script:
 - ps: >-
     $opencover = (Resolve-Path "UpdateLib/packages/OpenCover.4.6.519/tools/OpenCover.Console.exe").ToString()
     
-    $opencover -register:user -target:nunit-console.exe "-targetargs:""UpdateLib\UpdateLib.Tests\bin\$env:CONFIGURATION\UpdateLib.Tests.dll"" /noshadow" -filter:"+[UpdateLib*]*" -output:opencoverCoverage.xml
+    $opencover -target:nunit-console.exe "-targetargs:""UpdateLib\UpdateLib.Tests\bin\$env:CONFIGURATION\UpdateLib.Tests.dll"" /noshadow" -filter:"+[UpdateLib*]*" -output:opencoverCoverage.xml
 
     $coveralls = (Resolve-Path "UpdateLib/packages/coveralls.net.0.7.0/tools/csmacnz.coveralls.exe").ToString()
     
