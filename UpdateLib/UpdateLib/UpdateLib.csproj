@@ -54,6 +54,8 @@
       <DependentUpon>UpdaterControl.cs</DependentUpon>
     </Compile>
     <Compile Include="Encoders\IEncoder.cs" />
+    <Compile Include="Files\HashCacheEntry.cs" />
+    <Compile Include="Files\HashCacheFile.cs" />
     <Compile Include="Files\IFile.cs" />
     <Compile Include="Files\IUpdateFile.cs" />
     <Compile Include="Files\UpdateFile.cs" />

@@ -16,6 +16,9 @@ namespace TestApp
         public Form1()
         {
             InitializeComponent();
+
+            HashCacheFile file = new HashCacheFile();
+            file.Save();
         }
 
         private void button1_Click(object sender, EventArgs e)
