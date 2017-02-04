@@ -8,16 +8,16 @@ namespace MatthiWare.UpdateLib.Files
     [Serializable]
     public class UpdateFile
     {
-
-        public string Name { get; set; }
-
-        public UpdateFile()
-        { }
-
-        public UpdateFile(string name)
+        public UpdateFile(string version)
         {
-            Name = name;
+            Files = new List<FileEntry>();
+            
+            VersionString = version;
         }
+
+        public string VersionString { get; set; }
+
+        public List<FileEntry> Files { get; set; }
 
         public override bool Equals(object obj)
         {
@@ -25,13 +25,41 @@ namespace MatthiWare.UpdateLib.Files
             if (file == null)
                 return false;
 
-            return this.Name == file.Name;
+            if (!file.VersionString.Equals(this.VersionString))
+                return false;
+
+            foreach (FileEntry other in file.Files)
+            {
+                bool same = false;
+                foreach (FileEntry src in Files)
+                {
+                    if (other.Equals(src))
+                    {
+                        same = true;
+                        break;
+                    }
+                        
+                }
+
+                if (!same)
+                    return false;
+            }
+
+            return true;
+
         }
 
         public override int GetHashCode()
         {
-            int hash = 13;
-            hash = (hash * 7) + Name.GetHashCode();
+            int hash = 7;
+
+            hash = (hash * 7) + VersionString.GetHashCode();
+
+            foreach (FileEntry file in Files)
+            {
+                hash += file.GetHashCode();
+            }
+
             return hash;
         }
     }

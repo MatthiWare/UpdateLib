@@ -68,7 +68,7 @@ namespace MatthiWare.UpdateLib
                 return;   
             }
 
-            UpdateInfoFile updateFile = LoadUpdateFile();
+            UpdateFile updateFile = LoadUpdateFile();
 
             Version localVersion = GetCurrentVersion();
             Version onlineVersion = new Version(updateFile.VersionString);
@@ -98,13 +98,13 @@ namespace MatthiWare.UpdateLib
 
         }
 
-        private UpdateInfoFile LoadUpdateFile()
+        private UpdateFile LoadUpdateFile()
         {
-            XmlSerializer serializer = new XmlSerializer(typeof(UpdateInfoFile));
+            XmlSerializer serializer = new XmlSerializer(typeof(UpdateFile));
 
             using (Stream s = File.Open(m_localUpdateFile, FileMode.OpenOrCreate, FileAccess.ReadWrite))
             {
-                return (UpdateInfoFile)serializer.Deserialize(s);
+                return (UpdateFile)serializer.Deserialize(s);
             }
         }
 

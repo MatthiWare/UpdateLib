@@ -16,13 +16,13 @@ namespace MatthiWare.UpdateLib.UI
 {
     public partial class UpdaterForm : Form
     {
-        internal UpdateInfoFile updateInfoFile;
+        internal UpdateFile updateInfoFile;
         internal bool NeedsRestart = true;
 
         private WizardPageCollection pages;
 
-        private static Dictionary<UpdateInfoFile, UpdaterForm> cachedForms = new Dictionary<UpdateInfoFile, UpdaterForm>();
-        public static UpdaterForm GetCached(UpdateInfoFile file)
+        private static Dictionary<UpdateFile, UpdaterForm> cachedForms = new Dictionary<UpdateFile, UpdaterForm>();
+        public static UpdaterForm GetCached(UpdateFile file)
         {
             if (!cachedForms.ContainsKey(file))
                 cachedForms.Add(file, new UpdaterForm(file));
@@ -30,7 +30,7 @@ namespace MatthiWare.UpdateLib.UI
             return cachedForms[file];
         }
 
-        private UpdaterForm(UpdateInfoFile updateFile)
+        private UpdaterForm(UpdateFile updateFile)
         {
             InitializeComponent();
 

@@ -54,12 +54,11 @@
       <DependentUpon>UpdaterControl.cs</DependentUpon>
     </Compile>
     <Compile Include="Encoders\IEncoder.cs" />
+    <Compile Include="Files\DirectoryEntry.cs" />
     <Compile Include="Files\HashCacheEntry.cs" />
     <Compile Include="Files\HashCacheFile.cs" />
-    <Compile Include="Files\IFile.cs" />
-    <Compile Include="Files\IUpdateFile.cs" />
+    <Compile Include="Files\FileEntry.cs" />
     <Compile Include="Files\UpdateFile.cs" />
-    <Compile Include="Files\UpdateInfoFile.cs" />
     <Compile Include="Security\HashUtil.cs" />
     <Compile Include="Tasks\DownloadTask.cs" />
     <Compile Include="Properties\Resources.Designer.cs">

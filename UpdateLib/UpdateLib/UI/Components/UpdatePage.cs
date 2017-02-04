@@ -16,7 +16,7 @@ namespace MatthiWare.UpdateLib.UI.Components
     public partial class UpdatePage : UserControl, IWizardPage
     {
 
-        public UpdateInfoFile UpdateFile { get; set; }
+        public UpdateFile UpdateFile { get; set; }
 
         public event EventHandler PageUpdate;
 
@@ -53,7 +53,7 @@ namespace MatthiWare.UpdateLib.UI.Components
         {
             amountToDownload = UpdateFile.Files.Count;
 
-            foreach (UpdateFile file in UpdateFile.Files)
+            foreach (FileEntry file in UpdateFile.Files)
             {
                 ListViewItem lvItem = new ListViewItem(new string[] { "", file.Name, "Ready to download", "0%" });
                 lvItem.Tag = file;

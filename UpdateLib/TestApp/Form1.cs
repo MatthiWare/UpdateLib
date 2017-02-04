@@ -30,10 +30,10 @@ namespace TestApp
 
             if (result == DialogResult.OK)
             {
-                UpdateInfoFile updateFile = new UpdateInfoFile("1.0.0.0");
-                updateFile.Files.Add(new UpdateFile("test"));
-                updateFile.Files.Add(new UpdateFile("Updater.exe"));
-                updateFile.Files.Add(new UpdateFile("App.exe"));
+                UpdateFile updateFile = new UpdateFile("1.0.0.0");
+                updateFile.Files.Add(new FileEntry("test"));
+                updateFile.Files.Add(new FileEntry("Updater.exe"));
+                updateFile.Files.Add(new FileEntry("App.exe"));
 
                 UpdaterForm updateForm = UpdaterForm.GetCached(updateFile);
                 updateForm.ShowDialog(this);
@@ -42,10 +42,10 @@ namespace TestApp
 
         private void button2_Click(object sender, EventArgs e)
         {
-            UpdateInfoFile updateFile = new UpdateInfoFile("1.0.0.0");
-            updateFile.Files.Add(new UpdateFile("test"));
-            updateFile.Files.Add(new UpdateFile("Updater.exe"));
-            updateFile.Files.Add(new UpdateFile("App.exe"));
+            UpdateFile updateFile = new UpdateFile("1.0.0.0");
+            updateFile.Files.Add(new FileEntry("test"));
+            updateFile.Files.Add(new FileEntry("Updater.exe"));
+            updateFile.Files.Add(new FileEntry("App.exe"));
 
             UpdaterForm updateForm = UpdaterForm.GetCached(updateFile);
             updateForm.ShowDialog(this);
