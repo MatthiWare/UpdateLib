@@ -10,11 +10,13 @@ namespace MatthiWare.UpdateLib.Files
     [Serializable]
     public class HashCacheEntry
     {
-        public string Hash { get; private set; }
+        public string Hash { get; set; }
 
-        public string FilePath { get; private set; }
+        public string FilePath { get;  set; }
 
-        public long Ticks { get; private set; }
+        public long Ticks { get;  set; }
+
+        public HashCacheEntry() { }
 
         public HashCacheEntry(string file)
         {

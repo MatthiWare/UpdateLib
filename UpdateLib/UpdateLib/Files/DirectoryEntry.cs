@@ -18,6 +18,22 @@ namespace MatthiWare.UpdateLib.Files
         public string Name { get; set; }
 
         /// <summary>
+        /// Gets how many files there are in this directory and its subdirectories. 
+        /// </summary>
+        public int Count
+        {
+            get
+            {
+                int _count = Files.Count;
+
+                foreach(DirectoryEntry di in Directories)
+                    _count += di.Count;
+
+                return _count;
+            }
+        }
+
+        /// <summary>
         /// Gets the list of <see cref="DirectoryEntry">subdirectories</see>.
         /// </summary>
         public List<DirectoryEntry> Directories { get; private set; }

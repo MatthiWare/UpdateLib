@@ -20,17 +20,8 @@ namespace MatthiWare.UpdateLib.UI
         internal bool NeedsRestart = true;
 
         private WizardPageCollection pages;
-
-        private static Dictionary<UpdateFile, UpdaterForm> cachedForms = new Dictionary<UpdateFile, UpdaterForm>();
-        public static UpdaterForm GetCached(UpdateFile file)
-        {
-            if (!cachedForms.ContainsKey(file))
-                cachedForms.Add(file, new UpdaterForm(file));
-
-            return cachedForms[file];
-        }
-
-        private UpdaterForm(UpdateFile updateFile)
+        
+        public UpdaterForm(UpdateFile updateFile)
         {
             InitializeComponent();
 

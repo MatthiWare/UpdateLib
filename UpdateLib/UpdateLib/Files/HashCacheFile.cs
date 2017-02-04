@@ -12,13 +12,13 @@ namespace MatthiWare.UpdateLib.Files
     [Serializable]
     public class HashCacheFile : IList<HashCacheEntry>
     {
-        private List<HashCacheEntry> items;
+        public List<HashCacheEntry> Items { get; set; }
         
         private static string storagePath;
         
         public HashCacheFile()
         {
-            items = new List<HashCacheEntry>();
+            Items = new List<HashCacheEntry>();
         }
 
         #region Save/Load
@@ -38,7 +38,7 @@ namespace MatthiWare.UpdateLib.Files
             if (!File.Exists(GetStoragePath()))
                 return null;
 
-            using (Stream stream = File.Open(GetStoragePath(), FileMode.Open, FileAccess.Read))
+            using (Stream stream = File.Open(GetStoragePath(), FileMode.Open, FileAccess.ReadWrite))
             {
                 XmlSerializer serializer = new XmlSerializer(typeof(HashCacheFile));
                 return (HashCacheFile)serializer.Deserialize(stream);
@@ -47,7 +47,12 @@ namespace MatthiWare.UpdateLib.Files
 
         public void Save()
         {
-            using (Stream stream = File.Open(GetStoragePath(), FileMode.OpenOrCreate, FileAccess.Write))
+            FileInfo fi = new FileInfo(GetStoragePath());
+
+            if (!fi.Directory.Exists)
+                fi.Directory.Create();
+
+            using (Stream stream = fi.Open(FileMode.OpenOrCreate, FileAccess.Write))
             {
                 XmlSerializer serializer = new XmlSerializer(typeof(HashCacheFile));
                 serializer.Serialize(stream, this);
@@ -56,64 +61,64 @@ namespace MatthiWare.UpdateLib.Files
         #endregion
 
         #region IList interface implementation
-        public int Count { get { return items.Count; } }
+        public int Count { get { return Items.Count; } }
 
         public bool IsReadOnly { get { return false; } }
 
         public HashCacheEntry this[int index]
         {
-            get { return items[index]; }
-            set { items[index] = value; }
+            get { return Items[index]; }
+            set { Items[index] = value; }
         }
 
         public int IndexOf(HashCacheEntry item)
         {
-            return items.IndexOf(item);
+            return Items.IndexOf(item);
         }
 
         public void Insert(int index, HashCacheEntry item)
         {
-            items.Insert(index, item);
+            Items.Insert(index, item);
         }
 
         public void RemoveAt(int index)
         {
-            items.RemoveAt(index);
+            Items.RemoveAt(index);
         }
 
         public void Add(HashCacheEntry item)
         {
-            items.Add(item);
+            Items.Add(item);
         }
 
         public void Clear()
         {
-            items.Clear();
+            Items.Clear();
         }
 
         public bool Contains(HashCacheEntry item)
         {
-            return items.Contains(item);
+            return Items.Contains(item);
         }
 
         public void CopyTo(HashCacheEntry[] array, int arrayIndex)
         {
-            items.CopyTo(array, arrayIndex);
+            Items.CopyTo(array, arrayIndex);
         }
 
         public bool Remove(HashCacheEntry item)
         {
-           return items.Remove(item);
+           return Items.Remove(item);
         }
 
         public IEnumerator<HashCacheEntry> GetEnumerator()
         {
-            return items.GetEnumerator();
+            return Items.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return items.GetEnumerator();
+            return Items.GetEnumerator();
         }
         #endregion
 

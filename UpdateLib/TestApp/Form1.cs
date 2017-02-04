@@ -30,24 +30,26 @@ namespace TestApp
 
             if (result == DialogResult.OK)
             {
-                UpdateFile updateFile = new UpdateFile("1.0.0.0");
-                updateFile.Files.Add(new FileEntry("test"));
-                updateFile.Files.Add(new FileEntry("Updater.exe"));
-                updateFile.Files.Add(new FileEntry("App.exe"));
+                UpdateFile updateFile = new UpdateFile();
+                updateFile.VersionString = "1.0.0.0";
+                updateFile.ApplicationDirectory.Files.Add(new FileEntry("test"));
+                updateFile.ApplicationDirectory.Files.Add(new FileEntry("Updater.exe"));
+                updateFile.ApplicationDirectory.Files.Add(new FileEntry("App.exe"));
 
-                UpdaterForm updateForm = UpdaterForm.GetCached(updateFile);
+                UpdaterForm updateForm = new UpdaterForm(updateFile);
                 updateForm.ShowDialog(this);
             }
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            UpdateFile updateFile = new UpdateFile("1.0.0.0");
-            updateFile.Files.Add(new FileEntry("test"));
-            updateFile.Files.Add(new FileEntry("Updater.exe"));
-            updateFile.Files.Add(new FileEntry("App.exe"));
+            UpdateFile updateFile = new UpdateFile();
+            updateFile.VersionString = "1.0.0.0";
+            updateFile.ApplicationDirectory.Files.Add(new FileEntry("test"));
+            updateFile.ApplicationDirectory.Files.Add(new FileEntry("Updater.exe"));
+            updateFile.ApplicationDirectory.Files.Add(new FileEntry("App.exe"));
 
-            UpdaterForm updateForm = UpdaterForm.GetCached(updateFile);
+            UpdaterForm updateForm = new UpdaterForm(updateFile);
             updateForm.ShowDialog(this);
         }
     }

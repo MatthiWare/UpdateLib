@@ -5,19 +5,36 @@ using System.Text;
 
 namespace MatthiWare.UpdateLib.Files
 {
+    /// <summary>
+    /// The UpdateFile 
+    /// </summary>
     [Serializable]
     public class UpdateFile
     {
-        public UpdateFile(string version)
-        {
-            Files = new List<FileEntry>();
-            
-            VersionString = version;
-        }
-
+        /// <summary>
+        /// Gets or sets the version of the current  update.
+        /// The versionstring should be parsable by the <see cref="Version"/> to be valid. 
+        /// </summary>
         public string VersionString { get; set; }
 
-        public List<FileEntry> Files { get; set; }
+        /// <summary>
+        /// Gets the root folder of the application
+        /// </summary>
+        public DirectoryEntry ApplicationDirectory { get; private set; }
+        /// <summary>
+        /// Gets the root folder for other files related elsewhere on the filesystem
+        /// </summary>
+        public DirectoryEntry OtherDirectory { get; private set; }
+
+        /// <summary>
+        /// Gets the count of all the files in the <see cref="ApplicationDirectory"/>, <see cref="OtherDirectory"/>
+        /// and their subdirectories.
+        /// </summary>
+        public int Count { get { return ApplicationDirectory.Count + OtherDirectory.Count; } }
+
+        public UpdateFile()
+        {
+        }
 
         public override bool Equals(object obj)
         {
@@ -27,23 +44,8 @@ namespace MatthiWare.UpdateLib.Files
 
             if (!file.VersionString.Equals(this.VersionString))
                 return false;
+            
 
-            foreach (FileEntry other in file.Files)
-            {
-                bool same = false;
-                foreach (FileEntry src in Files)
-                {
-                    if (other.Equals(src))
-                    {
-                        same = true;
-                        break;
-                    }
-                        
-                }
-
-                if (!same)
-                    return false;
-            }
 
             return true;
 
@@ -54,12 +56,7 @@ namespace MatthiWare.UpdateLib.Files
             int hash = 7;
 
             hash = (hash * 7) + VersionString.GetHashCode();
-
-            foreach (FileEntry file in Files)
-            {
-                hash += file.GetHashCode();
-            }
-
+            
             return hash;
         }
     }

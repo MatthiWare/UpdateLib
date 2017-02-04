@@ -51,15 +51,24 @@ namespace MatthiWare.UpdateLib.UI.Components
 
         private void FillListView()
         {
-            amountToDownload = UpdateFile.Files.Count;
+            amountToDownload = UpdateFile.Count;
 
-            foreach (FileEntry file in UpdateFile.Files)
+            AddDirectoryToListView(UpdateFile.ApplicationDirectory);
+            AddDirectoryToListView(UpdateFile.OtherDirectory);
+        }
+
+        private void AddDirectoryToListView(DirectoryEntry dir)
+        {
+            foreach(FileEntry file in dir.Files)
             {
                 ListViewItem lvItem = new ListViewItem(new string[] { "", file.Name, "Ready to download", "0%" });
                 lvItem.Tag = file;
 
                 lvItems.Items.Add(lvItem);
             }
+
+            foreach (DirectoryEntry subDir in dir.Directories)
+                AddDirectoryToListView(subDir);
         }
 
         public void StartUpdate()
