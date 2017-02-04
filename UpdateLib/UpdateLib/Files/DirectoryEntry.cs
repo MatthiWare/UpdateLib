@@ -13,6 +13,11 @@ namespace MatthiWare.UpdateLib.Files
     public class DirectoryEntry
     {
         /// <summary>
+        /// Gets or sets the name of the <see cref="DirectoryEntry">directory</see>. 
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
         /// Gets the list of <see cref="DirectoryEntry">subdirectories</see>.
         /// </summary>
         public List<DirectoryEntry> Directories { get; private set; }
@@ -24,8 +29,9 @@ namespace MatthiWare.UpdateLib.Files
         /// <summary>
         /// .ctor of <see cref="DirectoryEntry"/>
         /// </summary>
-        public DirectoryEntry()
+        public DirectoryEntry(string name)
         {
+            this.Name = name;
             Files = new List<FileEntry>();
             Directories = new List<DirectoryEntry>();
         }

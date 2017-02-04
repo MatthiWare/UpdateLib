@@ -11,6 +11,12 @@ namespace MatthiWare.UpdateLib.Files
 
         public string Name { get; set; }
 
+        public string Description { get; set; }
+
+        public string SourceLocation { get; set; }
+        public string DestinationLocation { get; set; }
+        public string Hash { get; set; }
+
         public FileEntry()
         { }
 
