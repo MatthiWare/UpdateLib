@@ -10,8 +10,10 @@ using System.Xml.Serialization;
 namespace MatthiWare.UpdateLib.Files
 {
     [Serializable]
-    public class HashCacheFile : IList<HashCacheEntry>
+    public class HashCacheFile
     {
+        [XmlArray("Items")]
+        [XmlArrayItem("Entry")]
         public List<HashCacheEntry> Items { get; set; }
         
         private static string storagePath;
@@ -57,68 +59,6 @@ namespace MatthiWare.UpdateLib.Files
                 XmlSerializer serializer = new XmlSerializer(typeof(HashCacheFile));
                 serializer.Serialize(stream, this);
             }
-        }
-        #endregion
-
-        #region IList interface implementation
-        public int Count { get { return Items.Count; } }
-
-        public bool IsReadOnly { get { return false; } }
-
-        public HashCacheEntry this[int index]
-        {
-            get { return Items[index]; }
-            set { Items[index] = value; }
-        }
-
-        public int IndexOf(HashCacheEntry item)
-        {
-            return Items.IndexOf(item);
-        }
-
-        public void Insert(int index, HashCacheEntry item)
-        {
-            Items.Insert(index, item);
-        }
-
-        public void RemoveAt(int index)
-        {
-            Items.RemoveAt(index);
-        }
-
-        public void Add(HashCacheEntry item)
-        {
-            Items.Add(item);
-        }
-
-        public void Clear()
-        {
-            Items.Clear();
-        }
-
-        public bool Contains(HashCacheEntry item)
-        {
-            return Items.Contains(item);
-        }
-
-        public void CopyTo(HashCacheEntry[] array, int arrayIndex)
-        {
-            Items.CopyTo(array, arrayIndex);
-        }
-
-        public bool Remove(HashCacheEntry item)
-        {
-           return Items.Remove(item);
-        }
-
-        public IEnumerator<HashCacheEntry> GetEnumerator()
-        {
-            return Items.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return Items.GetEnumerator();
         }
         #endregion
 

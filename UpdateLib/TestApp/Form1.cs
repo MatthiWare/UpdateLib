@@ -18,7 +18,29 @@ namespace TestApp
             InitializeComponent();
 
             HashCacheFile file = new HashCacheFile();
+
+            HashCacheEntry entry = new HashCacheEntry("UpdateLib.dll");
+            HashCacheEntry entry2 = new HashCacheEntry("TestApp.vshost.exe");
+            HashCacheEntry entry3 = new HashCacheEntry("TestApp.pdb");
+            HashCacheEntry entry4 = new HashCacheEntry("TestApp.exe");
+
+            file.Items.Add(entry);
+            file.Items.Add(entry2);
+            file.Items.Add(entry3);
+            file.Items.Add(entry4);
             file.Save();
+
+            HashCacheFile returnFile = HashCacheFile.Load();
+            Console.WriteLine(">>> HashCacheFile <<<");
+            foreach (HashCacheEntry e in returnFile.Items)
+            {
+                Console.WriteLine("--- HashCacheEntry ---");
+                Console.WriteLine("Hash: {0}", e.Hash);
+                Console.WriteLine("FilePath: {0}", e.FilePath);
+                Console.WriteLine("Time: {0}", DateTime.FromBinary(e.Ticks));
+                Console.WriteLine("---------------------");
+            }
+            Console.WriteLine(">>>>>>>> EOF <<<<<<<<");
         }
 
         private void button1_Click(object sender, EventArgs e)
