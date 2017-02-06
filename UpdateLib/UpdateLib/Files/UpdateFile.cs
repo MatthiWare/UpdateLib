@@ -20,11 +20,11 @@ namespace MatthiWare.UpdateLib.Files
         /// <summary>
         /// Gets the root folder of the application
         /// </summary>
-        public DirectoryEntry ApplicationDirectory { get; private set; } = new DirectoryEntry("%AppDir%");
+        public DirectoryEntry ApplicationDirectory { get; private set; } = new DirectoryEntry("%appdir%");
         /// <summary>
         /// Gets the root folder for other files related elsewhere on the filesystem
         /// </summary>
-        public DirectoryEntry OtherDirectory { get; private set; } = new DirectoryEntry("%OtherDir%");
+        public DirectoryEntry OtherDirectory { get; private set; } = new DirectoryEntry("%otherdir%");
 
         /// <summary>
         /// Gets the count of all the files in the <see cref="ApplicationDirectory"/>, <see cref="OtherDirectory"/>

@@ -60,6 +60,7 @@
     <Compile Include="Files\HashCacheEntry.cs" />
     <Compile Include="Files\HashCacheFile.cs" />
     <Compile Include="Files\FileEntry.cs" />
+    <Compile Include="Files\PathVariableConverter.cs" />
     <Compile Include="Files\UpdateFile.cs" />
     <Compile Include="Security\HashUtil.cs" />
     <Compile Include="Tasks\DownloadTask.cs" />
