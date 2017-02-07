@@ -16,21 +16,48 @@ using System.Drawing;
 
 namespace MatthiWare.UpdateLib
 {
-    public class Updater : Component
+    public class Updater
     {
+        #region Singleton
+        private static volatile Updater instance = null;
+        private static readonly object synclock = new object();
+
+        /// <summary>
+        /// Gets a thread safe instance of <see cref="Updater"/> 
+        /// </summary>
+        public static Updater Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    lock (synclock)
+                    {
+                        instance = new Updater();
+                    }
+                }
+                return instance;
+            }
+        }
+        #endregion
+
+
         public string UpdateURL { get; set; }
         private string m_localUpdateFile;
 
         public bool ShowUpdateMessage { get; set; }
         public bool ShowMessageOnNoUpdate { get; set; }
 
+        public PathVariableConverter Converter { get; private set; }
+
         /// <summary>
         /// Initializes a new instance of <see cref="Updater"/> with the default settings. 
         /// </summary>
-        public Updater()
+        private Updater()
         {
             ShowUpdateMessage = true;
             ShowMessageOnNoUpdate = false;
+            Converter = new PathVariableConverter();
         }
 
 

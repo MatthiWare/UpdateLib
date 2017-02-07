@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -9,14 +10,15 @@ namespace MatthiWare.UpdateLib.Files
     /// <summary>
     /// This will convert specified path variables to their actual path
     /// </summary>
-    public static class PathVariableConverter
+    public class PathVariableConverter
     {
+        private Dictionary<string, string> variables;
 
-        private static Dictionary<string, string> variables = new Dictionary<string, string>();
+        public PathVariableConverter()
+        { 
+            variables = new Dictionary<string, string>();
 
-        static PathVariableConverter()
-        {
-            variables.Add("appdir", Assembly.GetEntryAssembly().Location);
+            //variables.Add("appdir", Assembly.GetEntryAssembly().Location);
             variables.Add("appdata", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
             variables.Add("temp", Path.GetTempPath());
             variables.Add("otherdir", "");
@@ -27,15 +29,32 @@ namespace MatthiWare.UpdateLib.Files
         /// </summary>
         /// <param name="key">The variable name</param>
         /// <returns>The full path of the variable as a <see cref="string"/> </returns>
-        public static string Get(string key)
+        public string this[string key]
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(key))
+                    throw new ArgumentNullException("key");
+
+                if (!variables.ContainsKey(key.ToLower()))
+                    return null;
+
+                return variables[key.ToLower()];
+            }
+        }
+
+        public void Add(string key, string val)
         {
             if (string.IsNullOrEmpty(key))
                 throw new ArgumentNullException("key");
 
-            if (!variables.ContainsKey(key.ToLower()))
-                return null;
+            if (string.IsNullOrEmpty(val))
+                throw new ArgumentNullException("val");
 
-            return variables[key.ToLower()];
+            if (variables.ContainsKey(key.ToLower()))
+                throw new ArgumentException("Duplicate key entry", "key");
+
+            variables.Add(key.ToLower(), val);
         }
 
         /// <summary>
@@ -43,7 +62,7 @@ namespace MatthiWare.UpdateLib.Files
         /// </summary>
         /// <param name="key">The variable name</param>
         /// <returns>True if the converter contains the key and False if not</returns>
-        public static bool Contains(string key)
+        public bool Contains(string key)
         {
             if (string.IsNullOrEmpty(key))
                 throw new ArgumentNullException("key");
@@ -56,7 +75,7 @@ namespace MatthiWare.UpdateLib.Files
         /// </summary>
         /// <param name="key">The variable name</param>
         /// <returns>True if the converter removed the key and False if not</returns>
-        public static bool Remove(string key)
+        public bool Remove(string key)
         {
             if (string.IsNullOrEmpty(key))
                 throw new ArgumentNullException("key");
@@ -67,13 +86,13 @@ namespace MatthiWare.UpdateLib.Files
             return variables.Remove(key.ToLower());
         }
 
-        public static string Replace(string input)
+        public string Replace(string input)
         {
             string[] tokens = input.Split('%');
             StringBuilder sb = new StringBuilder();
 
             foreach (string i in tokens)
-                sb.Append(Contains(i) ? Get(i) : i);
+                sb.Append(Contains(i) ? this[i] : i);
 
             return sb.ToString();
         }
