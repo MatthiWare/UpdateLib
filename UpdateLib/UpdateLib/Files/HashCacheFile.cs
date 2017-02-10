@@ -15,9 +15,9 @@ namespace MatthiWare.UpdateLib.Files
         [XmlArray("Items")]
         [XmlArrayItem("Entry")]
         public List<HashCacheEntry> Items { get; set; }
-        
+
         private static string storagePath;
-        
+
         public HashCacheFile()
         {
             Items = new List<HashCacheEntry>();
@@ -53,6 +53,10 @@ namespace MatthiWare.UpdateLib.Files
 
             if (!fi.Directory.Exists)
                 fi.Directory.Create();
+
+            if (fi.Exists)
+                fi.Delete();
+
 
             using (Stream stream = fi.Open(FileMode.OpenOrCreate, FileAccess.Write))
             {

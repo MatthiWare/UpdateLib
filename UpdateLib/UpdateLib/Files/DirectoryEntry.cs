@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml.Serialization;
 
 namespace MatthiWare.UpdateLib.Files
 {
@@ -15,6 +16,7 @@ namespace MatthiWare.UpdateLib.Files
         /// <summary>
         /// Gets or sets the name of the <see cref="DirectoryEntry">directory</see>. 
         /// </summary>
+        [XmlAttribute]
         public string Name { get; set; }
 
         /// <summary>
@@ -36,11 +38,21 @@ namespace MatthiWare.UpdateLib.Files
         /// <summary>
         /// Gets the list of <see cref="DirectoryEntry">subdirectories</see>.
         /// </summary>
-        public List<DirectoryEntry> Directories { get; private set; }
+        [XmlArray("Directories"), XmlArrayItem("Directory")]
+        public List<DirectoryEntry> Directories { get;  set; }
         /// <summary>
         /// Gets the list of <see cref="FileEntry">files</see> in this directory.
         /// </summary>
-        public List<FileEntry> Files { get; private set; }
+
+        [XmlArray("Files"), XmlArrayItem("File")]
+        public List<FileEntry> Files { get;  set; }
+
+
+        public DirectoryEntry()
+        {
+            Files = new List<FileEntry>();
+            Directories = new List<DirectoryEntry>();
+        }
 
         /// <summary>
         /// .ctor of <see cref="DirectoryEntry"/>

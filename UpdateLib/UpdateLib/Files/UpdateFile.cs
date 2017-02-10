@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml.Serialization;
 
 namespace MatthiWare.UpdateLib.Files
 {
@@ -15,16 +16,17 @@ namespace MatthiWare.UpdateLib.Files
         /// Gets or sets the version of the current  update.
         /// The versionstring should be parsable by the <see cref="Version"/> to be valid. 
         /// </summary>
-        public string VersionString { get; set; }
+        [XmlAttribute]
+        public string VersionString { get; set; } = "0.1.0.0";
 
         /// <summary>
         /// Gets the root folder of the application
         /// </summary>
-        public DirectoryEntry ApplicationDirectory { get; private set; } = new DirectoryEntry("%appdir%");
+        public DirectoryEntry ApplicationDirectory { get; set; } = new DirectoryEntry("%appdir%");
         /// <summary>
         /// Gets the root folder for other files related elsewhere on the filesystem
         /// </summary>
-        public DirectoryEntry OtherDirectory { get; private set; } = new DirectoryEntry("%otherdir%");
+        public DirectoryEntry OtherDirectory { get; set; } = new DirectoryEntry("%otherdir%");
 
         /// <summary>
         /// Gets the count of all the files in the <see cref="ApplicationDirectory"/>, <see cref="OtherDirectory"/>

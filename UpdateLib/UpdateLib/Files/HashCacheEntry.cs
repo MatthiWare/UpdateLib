@@ -4,16 +4,20 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Xml.Serialization;
 
 namespace MatthiWare.UpdateLib.Files
 {
     [Serializable]
     public class HashCacheEntry
     {
+        [XmlAttribute]
         public string Hash { get; set; }
 
+        [XmlElement("Path")]
         public string FilePath { get;  set; }
 
+        [XmlAttribute("Time")]
         public long Ticks { get;  set; }
 
         public HashCacheEntry() { }

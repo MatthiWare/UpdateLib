@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml.Serialization;
 
 namespace MatthiWare.UpdateLib.Files
 {
@@ -9,12 +10,14 @@ namespace MatthiWare.UpdateLib.Files
     public class FileEntry
     {
 
+        [XmlAttribute]
         public string Name { get; set; }
 
         public string Description { get; set; }
 
         public string SourceLocation { get; set; }
         public string DestinationLocation { get; set; }
+        [XmlAttribute]
         public string Hash { get; set; }
 
         public FileEntry()

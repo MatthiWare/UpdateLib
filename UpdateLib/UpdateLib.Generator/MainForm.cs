@@ -46,10 +46,22 @@ namespace UpdateLib.Generator
             generator.AddDirectory(applicationFolder);
             UpdateFile file = generator.Build();
 
-            using (Stream s = File.Open(string.Concat(outputFolder.FullName, "\\", "updatefile.xml"), FileMode.OpenOrCreate, FileAccess.Write))
+            string filePath = string.Concat(outputFolder.FullName, "\\", "updatefile.xml");
+            if (File.Exists(filePath))
+                File.Delete(filePath);
+
+            using (Stream s = File.Open(filePath, FileMode.OpenOrCreate, FileAccess.Write))
             {
-                XmlSerializer xml = new XmlSerializer(typeof(UpdateFile));
-                xml.Serialize(s, file);
+                try
+                {
+                    XmlSerializer xml = new XmlSerializer(typeof(UpdateFile));
+                    xml.Serialize(s, file);
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
+                
             }
         }
 
