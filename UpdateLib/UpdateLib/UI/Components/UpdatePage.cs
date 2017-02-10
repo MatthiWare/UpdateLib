@@ -61,6 +61,7 @@ namespace MatthiWare.UpdateLib.UI.Components
         {
             foreach(FileEntry file in dir.Files)
             {
+                
                 ListViewItem lvItem = new ListViewItem(new string[] { "", file.Name, "Ready to download", "0%" });
                 lvItem.Tag = file;
 
