@@ -8,7 +8,5 @@ namespace MatthiWare.UpdateLib.Encoders
 {
     public interface IEncoder
     {
-        IUpdateFile Decode();
-        void Encode(IUpdateFile file);
     }
 }

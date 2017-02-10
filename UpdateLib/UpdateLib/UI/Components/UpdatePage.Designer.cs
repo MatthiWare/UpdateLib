@@ -36,7 +36,7 @@
             this.clmnName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.clmnStatus = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.clmnProgress = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.clmnExtra = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.clmnPath = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ilIcons = new System.Windows.Forms.ImageList(this.components);
             this.SuspendLayout();
             // 
@@ -70,7 +70,7 @@
             this.clmnName,
             this.clmnStatus,
             this.clmnProgress,
-            this.clmnExtra});
+            this.clmnPath});
             this.lvItems.Location = new System.Drawing.Point(17, 72);
             this.lvItems.Name = "lvItems";
             this.lvItems.Size = new System.Drawing.Size(505, 255);
@@ -98,10 +98,10 @@
             this.clmnProgress.Text = "Progress";
             this.clmnProgress.Width = 85;
             // 
-            // clmnExtra
+            // clmnPath
             // 
-            this.clmnExtra.Text = "Extra options";
-            this.clmnExtra.Width = 103;
+            this.clmnPath.Text = "Path";
+            this.clmnPath.Width = 148;
             // 
             // ilIcons
             // 
@@ -136,6 +136,6 @@
         private System.Windows.Forms.ColumnHeader clmnName;
         private System.Windows.Forms.ColumnHeader clmnStatus;
         private System.Windows.Forms.ColumnHeader clmnProgress;
-        private System.Windows.Forms.ColumnHeader clmnExtra;
+        private System.Windows.Forms.ColumnHeader clmnPath;
     }
 }

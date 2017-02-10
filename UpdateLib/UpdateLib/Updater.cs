@@ -16,21 +16,48 @@ using System.Drawing;
 
 namespace MatthiWare.UpdateLib
 {
-    public class Updater : Component
+    public class Updater
     {
+        #region Singleton
+        private static volatile Updater instance = null;
+        private static readonly object synclock = new object();
+
+        /// <summary>
+        /// Gets a thread safe instance of <see cref="Updater"/> 
+        /// </summary>
+        public static Updater Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    lock (synclock)
+                    {
+                        instance = new Updater();
+                    }
+                }
+                return instance;
+            }
+        }
+        #endregion
+
+
         public string UpdateURL { get; set; }
         private string m_localUpdateFile;
 
         public bool ShowUpdateMessage { get; set; }
         public bool ShowMessageOnNoUpdate { get; set; }
 
+        public PathVariableConverter Converter { get; private set; }
+
         /// <summary>
         /// Initializes a new instance of <see cref="Updater"/> with the default settings. 
         /// </summary>
-        public Updater()
+        private Updater()
         {
             ShowUpdateMessage = true;
             ShowMessageOnNoUpdate = false;
+            Converter = new PathVariableConverter();
         }
 
 
@@ -68,7 +95,7 @@ namespace MatthiWare.UpdateLib
                 return;   
             }
 
-            UpdateInfoFile updateFile = LoadUpdateFile();
+            UpdateFile updateFile = LoadUpdateFile();
 
             Version localVersion = GetCurrentVersion();
             Version onlineVersion = new Version(updateFile.VersionString);
@@ -98,13 +125,13 @@ namespace MatthiWare.UpdateLib
 
         }
 
-        private UpdateInfoFile LoadUpdateFile()
+        private UpdateFile LoadUpdateFile()
         {
-            XmlSerializer serializer = new XmlSerializer(typeof(UpdateInfoFile));
+            XmlSerializer serializer = new XmlSerializer(typeof(UpdateFile));
 
             using (Stream s = File.Open(m_localUpdateFile, FileMode.OpenOrCreate, FileAccess.ReadWrite))
             {
-                return (UpdateInfoFile)serializer.Deserialize(s);
+                return (UpdateFile)serializer.Deserialize(s);
             }
         }
 
