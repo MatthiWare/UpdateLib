@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Xml;
 using System.Xml.Serialization;
 
 namespace MatthiWare.UpdateLib.Files
@@ -14,6 +15,12 @@ namespace MatthiWare.UpdateLib.Files
     [Serializable]
     public class UpdateFile
     {
+        /// <summary>
+        /// Gets or sets the name of the application
+        /// </summary>
+        [XmlAttribute]
+        public string ApplicationName { get; set; } = "UpdateLib";
+
         /// <summary>
         /// Gets or sets the version of the current  update.
         /// The versionstring should be parsable by the <see cref="Version"/> to be valid. 

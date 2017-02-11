@@ -24,6 +24,9 @@ namespace MatthiWare.UpdateLib.Files
 
                 Stack<string> items = new Stack<string>();
 
+                items.Push(Name);
+                items.Push(@"\");
+
                 DirectoryEntry dir = Parent;
                 while (true)
                 {
@@ -33,7 +36,7 @@ namespace MatthiWare.UpdateLib.Files
                     if (dir == null)
                         break;
                     else
-                        items.Push("/");
+                        items.Push(@"\");
                 }
 
                 while (items.Count > 0)

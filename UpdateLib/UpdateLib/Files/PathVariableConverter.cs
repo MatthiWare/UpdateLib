@@ -18,7 +18,7 @@ namespace MatthiWare.UpdateLib.Files
         { 
             variables = new Dictionary<string, string>();
 
-            //variables.Add("appdir", Assembly.GetEntryAssembly().Location);
+            variables.Add("appdir", Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
             variables.Add("appdata", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
             variables.Add("temp", Path.GetTempPath());
             variables.Add("otherdir", "");
@@ -65,7 +65,7 @@ namespace MatthiWare.UpdateLib.Files
         public bool Contains(string key)
         {
             if (string.IsNullOrEmpty(key))
-                throw new ArgumentNullException("key");
+                return false;
 
             return variables.ContainsKey(key.ToLower());
         }

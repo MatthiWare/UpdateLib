@@ -10,6 +10,7 @@ using MatthiWare.UpdateLib.Files;
 using System.Net;
 using System.Threading;
 using MatthiWare.UpdateLib.Properties;
+using System.Diagnostics;
 
 namespace MatthiWare.UpdateLib.UI.Components
 {
@@ -21,6 +22,7 @@ namespace MatthiWare.UpdateLib.UI.Components
         public event EventHandler PageUpdate;
 
         private int amountToDownload;
+        private PathVariableConverter converter; 
 
         public UpdatePage(UpdaterForm parent)
         {
@@ -33,7 +35,11 @@ namespace MatthiWare.UpdateLib.UI.Components
             ImageList ilItems = MakeImageList();
             lvItems.SmallImageList = ilItems;
 
+            converter = new PathVariableConverter();
+
             FillListView();
+
+
         }
 
         private ImageList MakeImageList()
@@ -55,6 +61,9 @@ namespace MatthiWare.UpdateLib.UI.Components
 
             AddDirectoryToListView(UpdateFile.ApplicationDirectory);
             AddDirectoryToListView(UpdateFile.OtherDirectory);
+
+            lvItems.Columns[5].Width = -1;
+            lvItems.Columns[1].Width = -1;
         }
 
         private void AddDirectoryToListView(DirectoryEntry dir)
@@ -62,7 +71,7 @@ namespace MatthiWare.UpdateLib.UI.Components
             foreach(FileEntry file in dir.Files)
             {
                 
-                ListViewItem lvItem = new ListViewItem(new string[] { "", file.Name, "Ready to download", "0%" });
+                ListViewItem lvItem = new ListViewItem(new string[] { "", file.Name, "Ready to download", "0%", file.Description, converter.Replace(file.DestinationLocation) });
                 lvItem.Tag = file;
 
                 lvItems.Items.Add(lvItem);
@@ -79,7 +88,7 @@ namespace MatthiWare.UpdateLib.UI.Components
             foreach (ListViewItem item in lvItems.Items)
             {
                 Action<ListViewItem> downloadAction = new Action<ListViewItem>(StartDownloadItem);
-                downloadAction.BeginInvoke(item, null, null);
+                downloadAction.BeginInvoke(item, new AsyncCallback(r=>downloadAction.EndInvoke(r)), null);
                 
             }
         }
