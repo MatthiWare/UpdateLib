@@ -62,6 +62,7 @@
     <Compile Include="Files\FileEntry.cs" />
     <Compile Include="Files\PathVariableConverter.cs" />
     <Compile Include="Files\UpdateFile.cs" />
+    <Compile Include="Files\UpdateFilePostProcessor.cs" />
     <Compile Include="Security\HashUtil.cs" />
     <Compile Include="Tasks\DownloadTask.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -109,9 +110,7 @@
       <DependentUpon>UpdaterForm.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\WizardPageCollection.cs" />
-    <Compile Include="Updater.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="Updater.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

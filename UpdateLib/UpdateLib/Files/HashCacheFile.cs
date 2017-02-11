@@ -40,7 +40,7 @@ namespace MatthiWare.UpdateLib.Files
             if (!File.Exists(GetStoragePath()))
                 return null;
 
-            using (Stream stream = File.Open(GetStoragePath(), FileMode.Open, FileAccess.ReadWrite))
+            using (Stream stream = File.Open(GetStoragePath(), FileMode.Open, FileAccess.Read))
             {
                 XmlSerializer serializer = new XmlSerializer(typeof(HashCacheFile));
                 return (HashCacheFile)serializer.Deserialize(stream);

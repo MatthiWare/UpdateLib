@@ -46,6 +46,8 @@ namespace UpdateLib.Generator
                     wh = waitQueue.Dequeue();
 
                 wh.WaitOne();
+                wh.Close();
+
             }
 
             sw.Stop();
@@ -71,10 +73,11 @@ namespace UpdateLib.Generator
                 DirectoryEntry newEntry = new DirectoryEntry(newDir.Name);
                 entry.Directories.Add(newEntry);
 
-                AddDirRecursiveDelegate call = new AddDirRecursiveDelegate(AddDirRecursive);
+                AddDirRecursiveDelegate caller = new AddDirRecursiveDelegate(AddDirRecursive);
                 lock (sync)
-                    waitQueue.Enqueue(call.BeginInvoke(newDir, newEntry, null, null).AsyncWaitHandle);
+                    waitQueue.Enqueue(caller.BeginInvoke(newDir, newEntry, new AsyncCallback(r => caller.EndInvoke(r)), null).AsyncWaitHandle);
             }
+
         }
 
 

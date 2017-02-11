@@ -74,5 +74,12 @@ namespace TestApp
             UpdaterForm updateForm = new UpdaterForm(updateFile);
             updateForm.ShowDialog(this);
         }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            UpdateFile file = UpdateFile.Load("../../../UpdateLib.Generator/bin/Debug/Output/updatefile.xml");
+            UpdaterForm updaterForm = new UpdaterForm(file);
+            updaterForm.ShowDialog(this);
+        }
     }
 }
