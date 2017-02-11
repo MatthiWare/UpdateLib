@@ -36,6 +36,7 @@
             this.btnNext = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.pnlContent = new System.Windows.Forms.Panel();
+            this.linkSite = new System.Windows.Forms.LinkLabel();
             this.pnlSide.SuspendLayout();
             this.pnlBottom.SuspendLayout();
             this.SuspendLayout();
@@ -64,6 +65,7 @@
             // pnlBottom
             // 
             this.pnlBottom.BackColor = System.Drawing.SystemColors.Control;
+            this.pnlBottom.Controls.Add(this.linkSite);
             this.pnlBottom.Controls.Add(this.btnPrevious);
             this.pnlBottom.Controls.Add(this.btnNext);
             this.pnlBottom.Controls.Add(this.btnCancel);
@@ -115,6 +117,20 @@
             this.pnlContent.Size = new System.Drawing.Size(536, 329);
             this.pnlContent.TabIndex = 2;
             // 
+            // linkSite
+            // 
+            this.linkSite.AutoSize = true;
+            this.linkSite.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.linkSite.LinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(43)))), ((int)(((byte)(129)))), ((int)(((byte)(181)))));
+            this.linkSite.Location = new System.Drawing.Point(6, 17);
+            this.linkSite.Name = "linkSite";
+            this.linkSite.Size = new System.Drawing.Size(126, 15);
+            this.linkSite.TabIndex = 3;
+            this.linkSite.TabStop = true;
+            this.linkSite.Text = "Powered by UpdateLib";
+            this.linkSite.VisitedLinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(43)))), ((int)(((byte)(129)))), ((int)(((byte)(181)))));
+            this.linkSite.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkSite_LinkClicked);
+            // 
             // UpdaterForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -132,6 +148,7 @@
             this.pnlSide.ResumeLayout(false);
             this.pnlSide.PerformLayout();
             this.pnlBottom.ResumeLayout(false);
+            this.pnlBottom.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -145,5 +162,6 @@
         private System.Windows.Forms.Button btnNext;
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Panel pnlContent;
+        private System.Windows.Forms.LinkLabel linkSite;
     }
 }

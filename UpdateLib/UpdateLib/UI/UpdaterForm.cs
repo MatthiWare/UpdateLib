@@ -189,5 +189,10 @@ namespace MatthiWare.UpdateLib.UI
                     e.Cancel = true;
             }
         }
+
+        private void linkSite_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            Process.Start("https://github.com/MatthiWare/UpdateLib");
+        }
     }
 }
