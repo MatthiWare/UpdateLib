@@ -1,4 +1,5 @@
-﻿using MatthiWare.UpdateLib.Files;
+﻿using MatthiWare.UpdateLib;
+using MatthiWare.UpdateLib.Files;
 using MatthiWare.UpdateLib.UI;
 using System;
 using System.Collections.Generic;
@@ -13,9 +14,14 @@ namespace TestApp
 {
     public partial class Form1 : Form
     {
+        private Updater updater;
+
         public Form1()
         {
             InitializeComponent();
+
+            updater = Updater.Instance;
+            updater.UpdateURL= "https://dl.dropboxusercontent.com/u/30635736/UpdateLib/Dev/updatefile.xml";
 
             HashCacheFile file = new HashCacheFile();
 
@@ -80,6 +86,11 @@ namespace TestApp
             UpdateFile file = UpdateFile.Load("../../../UpdateLib.Generator/bin/Debug/Output/updatefile.xml");
             UpdaterForm updaterForm = new UpdaterForm(file);
             updaterForm.ShowDialog(this);
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            updater.CheckForUpdates();
         }
     }
 }

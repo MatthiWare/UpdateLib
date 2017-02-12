@@ -13,6 +13,8 @@ using System.Xml.Serialization;
 using System.Windows.Forms;
 using MatthiWare.UpdateLib.UI;
 using System.Drawing;
+using System.Threading;
+using MatthiWare.UpdateLib.Tasks;
 
 namespace MatthiWare.UpdateLib
 {
@@ -41,7 +43,6 @@ namespace MatthiWare.UpdateLib
         }
         #endregion
 
-
         public string UpdateURL { get; set; }
         private string m_localUpdateFile;
 
@@ -49,6 +50,8 @@ namespace MatthiWare.UpdateLib
         public bool ShowMessageOnNoUpdate { get; set; }
 
         public PathVariableConverter Converter { get; private set; }
+
+        private CleanUpTask cleanUpTask;
 
         /// <summary>
         /// Initializes a new instance of <see cref="Updater"/> with the default settings. 
@@ -66,7 +69,8 @@ namespace MatthiWare.UpdateLib
         /// </summary>
         public void CheckForUpdates()
         {
-            CleanUp();
+            cleanUpTask = new CleanUpTask(".");
+            cleanUpTask.Start();
 
             if (String.IsNullOrEmpty(UpdateURL))
                 throw new ArgumentException("You need to specifify a update url", "UpdateURL");
@@ -92,33 +96,37 @@ namespace MatthiWare.UpdateLib
             {
                 Debug.WriteLine(String.Concat(e.Error.Message, "\n", e.Error.StackTrace));
 
-                return;   
+                return;
             }
 
             UpdateFile updateFile = LoadUpdateFile();
 
-            Version localVersion = GetCurrentVersion();
-            Version onlineVersion = new Version(updateFile.VersionString);
+
 
             // check if there is a no new version
-            if (onlineVersion <= localVersion)
-            {
-                if (ShowMessageOnNoUpdate)
-                    MessageBox.Show("You already have the latest version.", "Updater");
+            //if (onlineVersion <= localVersion)
+            //{
+            //    if (ShowMessageOnNoUpdate)
+            //        MessageBox.Show("You already have the latest version.", "Updater");
 
-                return;
-            }
+            //    return;
+            //}
 
             DialogResult result = DialogResult.OK;
             if (ShowUpdateMessage)
                 result = new MessageDialog(
                     "Update available",
-                    String.Format("Version {0} available", onlineVersion),
-                    "Update now?\nPress yes to update or no to cancel.", 
+                    String.Format("Version {0} available", updateFile.VersionString),
+                    "Update now?\nPress yes to update or no to cancel.",
                     SystemIcons.Question).ShowDialog();
 
             if (result != DialogResult.OK)
                 return;
+
+
+            // Wait for clean up task to complete if needed.
+            cleanUpTask.AwaitTask();
+
 
             // start actual updateform
 
@@ -127,28 +135,13 @@ namespace MatthiWare.UpdateLib
 
         private UpdateFile LoadUpdateFile()
         {
-            XmlSerializer serializer = new XmlSerializer(typeof(UpdateFile));
-
-            using (Stream s = File.Open(m_localUpdateFile, FileMode.OpenOrCreate, FileAccess.ReadWrite))
-            {
-                return (UpdateFile)serializer.Deserialize(s);
-            }
+            return UpdateFile.Load(m_localUpdateFile);
         }
 
         private String GetFileNameFromUrl(String url)
         {
             String[] tokens = url.Split('/');
             return tokens[tokens.Length - 1];
-        }
-
-        private Version GetCurrentVersion()
-        {
-            return Assembly.GetEntryAssembly().GetName().Version;
-        }
-
-        private void CleanUp()
-        {
-
         }
 
     }

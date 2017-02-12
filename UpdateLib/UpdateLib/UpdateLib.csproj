@@ -24,7 +24,8 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
-    <DocumentationFile>bin\Debug\UpdateLib.xml</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -64,6 +65,7 @@
     <Compile Include="Files\UpdateFile.cs" />
     <Compile Include="Files\UpdateFilePostProcessor.cs" />
     <Compile Include="Security\HashUtil.cs" />
+    <Compile Include="Tasks\CleanUpTask.cs" />
     <Compile Include="Tasks\DownloadTask.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
