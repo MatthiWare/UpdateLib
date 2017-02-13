@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -12,7 +13,6 @@ namespace MatthiWare.UpdateLib.Tasks
 
         private Queue<WaitHandle> whQueue;
         private readonly object sync = new object();
-        private Queue<FileInfo> cleanupQueue;
 
         public string PathToClean { get; set; }
         public string SearchPattern { get; set; }
@@ -20,7 +20,6 @@ namespace MatthiWare.UpdateLib.Tasks
 
         public CleanUpTask(string pathToCleanUp, string searchPattern = "*.old.tmp", bool includeSubDirs = true)
         {
-            cleanupQueue = new Queue<FileInfo>();
             whQueue = new Queue<WaitHandle>();
 
             PathToClean = pathToCleanUp;
@@ -30,18 +29,39 @@ namespace MatthiWare.UpdateLib.Tasks
 
         public void Start()
         {
-            DirectoryInfo dir = new DirectoryInfo(PathToClean);
-            Console.WriteLine(dir.FullName);
-
-            dir.GetFiles(SearchPattern, IncludeSubDirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
-
             Action caller = new Action(Worker);
-            caller.BeginInvoke(new AsyncCallback(r => caller.EndInvoke(r)), null);
+            whQueue.Enqueue(caller.BeginInvoke(new AsyncCallback(r => caller.EndInvoke(r)), null).AsyncWaitHandle);
         }
 
         private void Worker()
         {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
 
+            DirectoryInfo dir = new DirectoryInfo(PathToClean);
+            FileInfo[] files = dir.GetFiles(SearchPattern, IncludeSubDirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+
+            sw.Reset();
+
+            Console.WriteLine("[INFO]: Get files to update took {0}ms.", sw.ElapsedMilliseconds);
+
+            sw.Start();
+
+            foreach (FileInfo file in files)
+            {
+                try
+                {
+                    file.Delete();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("[ERROR]: Unable to delete file {0} -> {1}.", file.FullName, e.Message);
+                }
+            }
+
+            sw.Stop();
+
+            Console.WriteLine("[INFO]: Deleting files took {0}ms.", sw.ElapsedMilliseconds);
         }
 
         public void AwaitTask()

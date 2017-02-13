@@ -1,11 +1,13 @@
 ﻿using MatthiWare.UpdateLib;
 using MatthiWare.UpdateLib.Files;
+using MatthiWare.UpdateLib.Tasks;
 using MatthiWare.UpdateLib.UI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -23,30 +25,7 @@ namespace TestApp
             updater = Updater.Instance;
             updater.UpdateURL= "https://dl.dropboxusercontent.com/u/30635736/UpdateLib/Dev/updatefile.xml";
 
-            HashCacheFile file = new HashCacheFile();
-
-            HashCacheEntry entry = new HashCacheEntry("UpdateLib.dll");
-            HashCacheEntry entry2 = new HashCacheEntry("TestApp.vshost.exe");
-            HashCacheEntry entry3 = new HashCacheEntry("TestApp.pdb");
-            HashCacheEntry entry4 = new HashCacheEntry("TestApp.exe");
-
-            file.Items.Add(entry);
-            file.Items.Add(entry2);
-            file.Items.Add(entry3);
-            file.Items.Add(entry4);
-            file.Save();
-
-            HashCacheFile returnFile = HashCacheFile.Load();
-            Console.WriteLine(">>> HashCacheFile <<<");
-            foreach (HashCacheEntry e in returnFile.Items)
-            {
-                Console.WriteLine("--- HashCacheEntry ---");
-                Console.WriteLine("Hash: {0}", e.Hash);
-                Console.WriteLine("FilePath: {0}", e.FilePath);
-                Console.WriteLine("Time: {0}", DateTime.FromBinary(e.Ticks));
-                Console.WriteLine("---------------------");
-            }
-            Console.WriteLine(">>>>>>>> EOF <<<<<<<<");
+            updater.Initialize();
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -91,6 +70,13 @@ namespace TestApp
         private void button4_Click(object sender, EventArgs e)
         {
             updater.CheckForUpdates();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            Console.WriteLine("Testfile1: {0}", File.ReadAllText("./data/testfile1.txt"));
+            Console.WriteLine("Testfile2: {0}", File.ReadAllText("./data/testfile2.txt"));
+            Console.WriteLine("Testfile3: {0}", File.ReadAllText("./data/testfile3.txt"));
         }
     }
 }

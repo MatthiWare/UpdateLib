@@ -31,10 +31,10 @@
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
-            this.updaterControl2 = new MatthiWare.UpdateLib.Controls.UpdaterControl();
-            this.updaterControl1 = new MatthiWare.UpdateLib.Controls.UpdaterControl();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.button4 = new System.Windows.Forms.Button();
+            this.updaterControl2 = new MatthiWare.UpdateLib.Controls.UpdaterControl();
+            this.updaterControl1 = new MatthiWare.UpdateLib.Controls.UpdaterControl();
             this.SuspendLayout();
             // 
             // button1
@@ -67,26 +67,6 @@
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
-            // updaterControl2
-            // 
-            this.updaterControl2.BackColor = System.Drawing.Color.Transparent;
-            this.updaterControl2.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.updaterControl2.Location = new System.Drawing.Point(454, 12);
-            this.updaterControl2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.updaterControl2.Name = "updaterControl2";
-            this.updaterControl2.Size = new System.Drawing.Size(20, 20);
-            this.updaterControl2.TabIndex = 2;
-            // 
-            // updaterControl1
-            // 
-            this.updaterControl1.BackColor = System.Drawing.Color.Transparent;
-            this.updaterControl1.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.updaterControl1.Location = new System.Drawing.Point(12, 228);
-            this.updaterControl1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.updaterControl1.Name = "updaterControl1";
-            this.updaterControl1.Size = new System.Drawing.Size(20, 20);
-            this.updaterControl1.TabIndex = 1;
-            // 
             // propertyGrid1
             // 
             this.propertyGrid1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -107,6 +87,26 @@
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
+            // updaterControl2
+            // 
+            this.updaterControl2.BackColor = System.Drawing.Color.Transparent;
+            this.updaterControl2.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.updaterControl2.Location = new System.Drawing.Point(454, 12);
+            this.updaterControl2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.updaterControl2.Name = "updaterControl2";
+            this.updaterControl2.Size = new System.Drawing.Size(20, 20);
+            this.updaterControl2.TabIndex = 2;
+            // 
+            // updaterControl1
+            // 
+            this.updaterControl1.BackColor = System.Drawing.Color.Transparent;
+            this.updaterControl1.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.updaterControl1.Location = new System.Drawing.Point(12, 228);
+            this.updaterControl1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.updaterControl1.Name = "updaterControl1";
+            this.updaterControl1.Size = new System.Drawing.Size(20, 20);
+            this.updaterControl1.TabIndex = 1;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -121,6 +121,7 @@
             this.Controls.Add(this.button1);
             this.Name = "Form1";
             this.Text = "Test app";
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
 
         }

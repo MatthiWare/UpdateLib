@@ -52,6 +52,9 @@ namespace MatthiWare.UpdateLib
         public PathVariableConverter Converter { get; private set; }
 
         private CleanUpTask cleanUpTask;
+        private UpdateCacheTask updateCacheTask;
+
+        private bool initialized = false;
 
         /// <summary>
         /// Initializes a new instance of <see cref="Updater"/> with the default settings. 
@@ -63,14 +66,24 @@ namespace MatthiWare.UpdateLib
             Converter = new PathVariableConverter();
         }
 
+        public void Initialize()
+        {
+            cleanUpTask = new CleanUpTask(".");
+            cleanUpTask.Start();
+
+            updateCacheTask = new UpdateCacheTask();
+            updateCacheTask.Start();
+
+            initialized = true;
+        }
 
         /// <summary>
         /// Starting the update process
         /// </summary>
         public void CheckForUpdates()
         {
-            cleanUpTask = new CleanUpTask(".");
-            cleanUpTask.Start();
+            if (!initialized)
+                throw new InvalidOperationException("The updater needs to be initialized first.");
 
             if (String.IsNullOrEmpty(UpdateURL))
                 throw new ArgumentException("You need to specifify a update url", "UpdateURL");
@@ -86,7 +99,7 @@ namespace MatthiWare.UpdateLib
         {
             WebClient download_client = (WebClient)sender;
             download_client.Dispose();
-
+            
             // the update process got cancelled. 
             if (e.Cancelled)
                 return;
@@ -99,18 +112,22 @@ namespace MatthiWare.UpdateLib
                 return;
             }
 
+            Action caller = new Action(CheckForUpdatesTask);
+            caller.BeginInvoke(new AsyncCallback(r => caller.EndInvoke(r)), null);
+        }
+
+        private void CheckForUpdatesTask()
+        {
             UpdateFile updateFile = LoadUpdateFile();
 
+            HashCacheFile cache = updateCacheTask.AwaitTask();
+            cleanUpTask.AwaitTask();
 
+            CheckForUpdatedFilesTask checkForUpdatesTask = new CheckForUpdatedFilesTask(updateFile, cache, Converter);
+            checkForUpdatesTask.Start();
 
-            // check if there is a no new version
-            //if (onlineVersion <= localVersion)
-            //{
-            //    if (ShowMessageOnNoUpdate)
-            //        MessageBox.Show("You already have the latest version.", "Updater");
-
-            //    return;
-            //}
+            bool needsUpdating = checkForUpdatesTask.AwaitTask();
+            Console.WriteLine("[INFO]: CheckForUpdatesTask: {0}", (needsUpdating) ? "New version available!" : "Latest version!");
 
             DialogResult result = DialogResult.OK;
             if (ShowUpdateMessage)
@@ -123,14 +140,9 @@ namespace MatthiWare.UpdateLib
             if (result != DialogResult.OK)
                 return;
 
-
-            // Wait for clean up task to complete if needed.
-            cleanUpTask.AwaitTask();
-
-
             // start actual updateform
-
-
+            UpdaterForm updateForm = new UpdaterForm(updateFile);
+            updateForm.ShowDialog();
         }
 
         private UpdateFile LoadUpdateFile()
