@@ -46,6 +46,8 @@ namespace MatthiWare.UpdateLib.Tasks
             {
                 Console.WriteLine("[INFO]: UpdateCacheFile doesn't exist. Creating..");
 
+                file = new HashCacheFile();
+
                 foreach (FileInfo f in files)
                     file.Items.Add(new HashCacheEntry(f.FullName));
 
