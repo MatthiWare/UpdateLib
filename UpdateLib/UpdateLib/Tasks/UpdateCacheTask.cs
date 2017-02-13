@@ -79,7 +79,7 @@ namespace MatthiWare.UpdateLib.Tasks
 
         public HashCacheFile AwaitTask()
         {
-            if (whQueue.Count > 0)
+            while(whQueue.Count > 0)
             {
                 WaitHandle wh = null;
 

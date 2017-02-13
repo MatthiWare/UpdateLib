@@ -11,6 +11,7 @@ using System.Net;
 using System.Threading;
 using MatthiWare.UpdateLib.Properties;
 using System.Diagnostics;
+using MatthiWare.UpdateLib.Tasks;
 
 namespace MatthiWare.UpdateLib.UI.Components
 {
@@ -22,7 +23,6 @@ namespace MatthiWare.UpdateLib.UI.Components
         public event EventHandler PageUpdate;
 
         private int amountToDownload;
-        private PathVariableConverter converter; 
 
         public UpdatePage(UpdaterForm parent)
         {
@@ -34,8 +34,7 @@ namespace MatthiWare.UpdateLib.UI.Components
 
             ImageList ilItems = MakeImageList();
             lvItems.SmallImageList = ilItems;
-
-            converter = new PathVariableConverter();
+            
 
             FillListView();
 
@@ -51,6 +50,7 @@ namespace MatthiWare.UpdateLib.UI.Components
             imgList.Images.Add("status_error", Resources.status_error);
             imgList.Images.Add("status_info", Resources.status_info);
             imgList.Images.Add("status_update", Resources.status_update);
+            imgList.Images.Add("status_warning", Resources.status_warning);
 
             return imgList;
         }
@@ -71,7 +71,7 @@ namespace MatthiWare.UpdateLib.UI.Components
             foreach(FileEntry file in dir.Files)
             {
                 
-                ListViewItem lvItem = new ListViewItem(new string[] { "", file.Name, "Ready to download", "0%", file.Description, converter.Replace(file.DestinationLocation) });
+                ListViewItem lvItem = new ListViewItem(new string[] { "", file.Name, "Ready to download", "0%", file.Description, Updater.Instance.Converter.Replace(file.DestinationLocation) });
                 lvItem.Tag = file;
 
                 lvItems.Items.Add(lvItem);
@@ -87,10 +87,63 @@ namespace MatthiWare.UpdateLib.UI.Components
             PageUpdate?.Invoke(this, new EventArgs());
             foreach (ListViewItem item in lvItems.Items)
             {
-                Action<ListViewItem> downloadAction = new Action<ListViewItem>(StartDownloadItem);
-                downloadAction.BeginInvoke(item, new AsyncCallback(r=>downloadAction.EndInvoke(r)), null);
-                
+                Console.WriteLine("UpdatePage thread: {0}", Thread.CurrentThread.ManagedThreadId);
+                DownloadTask task = new DownloadTask(item);
+                task.TaskProgressChanged += Task_TaskProgressChanged;
+                task.TaskCompleted += Task_TaskCompleted;
+                task.Start();
+
+                SetImageKey(item, "status_download");
+                SetSubItemText(item.SubItems[2], "Downloading..");
             }
+        }
+
+        private void Task_TaskCompleted(object sender, AsyncCompletedEventArgs e)
+        {
+            DownloadTask task = (DownloadTask)sender;
+            Console.WriteLine("UpdatePage thread: {0}", Thread.CurrentThread.ManagedThreadId);
+
+            int amountLeft = Interlocked.Decrement(ref amountToDownload);
+
+            if (amountLeft == 0)
+            {
+                IsBusy = false;
+                IsDone = true;
+                PageUpdate?.Invoke(this, new EventArgs());
+            }
+
+            if (e.Cancelled)
+            {
+                Console.WriteLine("[INFO][DownloadTask]: Cancelled -> '{0}' ", task.Entry.Name);
+
+                SetSubItemText(task.Item.SubItems[2],  "Cancelled");
+
+                SetImageKey(task.Item,"status_warning");
+
+                return;
+            }
+
+            if (e.Error != null)
+            {
+                Console.WriteLine("[ERROR][DownloadTask]: {0}\n{1}", e.Error.Message, e.Error.StackTrace);
+
+                SetSubItemText(task.Item.SubItems[2], "Error");
+
+                SetImageKey(task.Item, "status_error");
+
+                return;
+            }
+
+            SetSubItemText(task.Item.SubItems[2], "Done");
+
+            SetImageKey(task.Item, "status_done");
+        }
+
+        private void Task_TaskProgressChanged(object sender, DownloadProgressChangedEventArgs e)
+        {
+            DownloadTask task = (DownloadTask)sender;
+
+            SetSubItemText(task.Item.SubItems[3], string.Format("{0}%", e.ProgressPercentage));
         }
 
         public void CancelUpdate()
@@ -100,8 +153,8 @@ namespace MatthiWare.UpdateLib.UI.Components
 
         private void StartDownloadItem(ListViewItem item)
         {
-
-            Test(item);
+            
+            //Test(item);
 
         }
 
@@ -122,7 +175,7 @@ namespace MatthiWare.UpdateLib.UI.Components
             wait = rnd.Next(100);
             for (int i = 0; i <= 100; i++)
             {
-                SetSubItemText(item.SubItems[3], String.Format("{0}%", i));
+                
                 Thread.Sleep(wait);
             }
 
@@ -147,22 +200,22 @@ namespace MatthiWare.UpdateLib.UI.Components
         private delegate void SetImageKeyInvoker(ListViewItem item, string key);
         private void SetImageKey(ListViewItem item, string key)
         {
-            if (InvokeRequired)
-            {
-                Invoke(new SetImageKeyInvoker(SetImageKey), item, key);
-                return;
-            }
+            //if (InvokeRequired)
+            //{
+            //    Invoke(new SetImageKeyInvoker(SetImageKey), item, key);
+            //    return;
+            //}
             item.ImageKey = key;
         }
 
         private delegate void SetSubItemTextInvoker(ListViewItem.ListViewSubItem item, string key);
         private void SetSubItemText(ListViewItem.ListViewSubItem item, string key)
         {
-            if (InvokeRequired)
-            {
-                Invoke(new SetSubItemTextInvoker(SetSubItemText), item, key);
-                return;
-            }
+            //if (InvokeRequired)
+            //{
+            //    Invoke(new SetSubItemTextInvoker(SetSubItemText), item, key);
+            //    return;
+            //}
 
             item.Text = key;
         }

@@ -120,6 +120,7 @@
   <ItemGroup>
     <None Include="Resources\status_working.png" />
     <None Include="Resources\status_update.png" />
+    <None Include="Resources\status_warning.png" />
     <Content Include="UpdaterControl.bmp" />
     <None Include="Resources\status_info.png" />
     <None Include="Resources\status_error.png" />

@@ -44,12 +44,14 @@ namespace MatthiWare.UpdateLib.Tasks
                 HashCacheEntry cacheEntry = cacheFile.Items.Find(hash => hash.FilePath.Equals(convertedPath));
                 if (cacheEntry == null)
                     return false;
-                return !fe.Hash.Equals(cacheEntry.Hash);
+                bool val = fe.Hash.Equals(cacheEntry.Hash);
+                return val;
             });
 
-            Action<DirectoryEntry> call = new Action<DirectoryEntry>(RecursiveCheck);
+            
             foreach (DirectoryEntry de in dir.Directories)
             {
+                Action<DirectoryEntry> call = new Action<DirectoryEntry>(RecursiveCheck);
                 lock (sync)
                     whQueue.Enqueue(call.BeginInvoke(de, new AsyncCallback(r => call.EndInvoke(r)), null).AsyncWaitHandle);
             }
@@ -57,7 +59,7 @@ namespace MatthiWare.UpdateLib.Tasks
 
         public bool AwaitTask()
         {
-            if (whQueue.Count > 0)
+            while (whQueue.Count > 0)
             {
                 WaitHandle wh = null;
                 lock (sync)

@@ -15,7 +15,40 @@ namespace MatthiWare.UpdateLib.Files
 
         public string Description { get; set; }
 
-        public string SourceLocation { get; set; }
+        public string SourceLocation
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+
+                Stack<string> items = new Stack<string>();
+
+                items.Push(Name);
+                items.Push(@"/");
+
+                DirectoryEntry dir = Parent;
+                while (true)
+                {
+                    items.Push(dir.Name);
+
+                    dir = dir.Parent;
+                    if (dir == null)
+                    {
+                        items.Pop();
+                        break;
+                    }
+                    else
+                        items.Push(@"/");
+                }
+
+                items.Pop();
+
+                while (items.Count > 0)
+                    sb.Append(items.Pop());
+
+                return sb.ToString();
+            }
+        }
         public string DestinationLocation
         {
             get

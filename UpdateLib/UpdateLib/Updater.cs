@@ -43,7 +43,17 @@ namespace MatthiWare.UpdateLib
         }
         #endregion
 
-        public string UpdateURL { get; set; }
+        private string m_updateUrl = "";
+        public string UpdateURL
+        {
+            get { return m_updateUrl; }
+            set
+            {
+                m_updateUrl = value;
+                m_localUpdateFile = GetFileNameFromUrl();
+                RemoteBasePath = GetRemoteBasePath();
+            }
+        }
         private string m_localUpdateFile;
 
         public bool ShowUpdateMessage { get; set; }
@@ -55,6 +65,8 @@ namespace MatthiWare.UpdateLib
         private UpdateCacheTask updateCacheTask;
 
         private bool initialized = false;
+
+        internal string RemoteBasePath { get; set; }
 
         /// <summary>
         /// Initializes a new instance of <see cref="Updater"/> with the default settings. 
@@ -88,7 +100,7 @@ namespace MatthiWare.UpdateLib
             if (String.IsNullOrEmpty(UpdateURL))
                 throw new ArgumentException("You need to specifify a update url", "UpdateURL");
 
-            m_localUpdateFile = String.Concat("./", GetFileNameFromUrl(UpdateURL));
+            
 
             WebClient wc = new WebClient();
             wc.DownloadFileCompleted += UpdateFile_DownloadCompleted;
@@ -129,6 +141,9 @@ namespace MatthiWare.UpdateLib
             bool needsUpdating = checkForUpdatesTask.AwaitTask();
             Console.WriteLine("[INFO]: CheckForUpdatesTask: {0}", (needsUpdating) ? "New version available!" : "Latest version!");
 
+            if (!needsUpdating)
+                return;
+
             DialogResult result = DialogResult.OK;
             if (ShowUpdateMessage)
                 result = new MessageDialog(
@@ -150,10 +165,24 @@ namespace MatthiWare.UpdateLib
             return UpdateFile.Load(m_localUpdateFile);
         }
 
-        private String GetFileNameFromUrl(String url)
+        private string GetFileNameFromUrl()
         {
-            String[] tokens = url.Split('/');
-            return tokens[tokens.Length - 1];
+            string[] tokens = UpdateURL.Split('/');
+            return string.Concat("./", tokens[tokens.Length - 1]);
+        }
+
+        private string GetRemoteBasePath()
+        {
+            string[] tokens = UpdateURL.Split('/');
+            StringBuilder builder = new StringBuilder();
+
+            for (int i = 0; i < tokens.Length - 1; i++)
+            {
+                builder.Append(tokens[i]);
+                builder.Append('/');
+            }
+
+            return builder.ToString();
         }
 
     }
