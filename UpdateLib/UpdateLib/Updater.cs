@@ -56,9 +56,9 @@ namespace MatthiWare.UpdateLib
         }
         private string m_localUpdateFile;
 
-        public bool ShowUpdateMessage { get; set; }
-        public bool ShowMessageOnNoUpdate { get; set; }
-
+        public bool ShowUpdateMessage { get; set; } = true;
+        public bool ShowMessageOnNoUpdate { get; set; } = true;
+        public bool ShowErrorMessage { get; set; } = true;
         public PathVariableConverter Converter { get; private set; }
 
         private CleanUpTask cleanUpTask;
@@ -120,6 +120,13 @@ namespace MatthiWare.UpdateLib
             if (e.Error != null)
             {
                 Debug.WriteLine(String.Concat(e.Error.Message, "\n", e.Error.StackTrace));
+
+                if (ShowErrorMessage)
+                    new MessageDialog(
+                        "Error", 
+                        "Unable to get the update information", 
+                        "There has been a problem getting the needed update information\nPlease contact customer support!", 
+                        SystemIcons.Error).ShowDialog();
 
                 return;
             }

@@ -47,7 +47,7 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel1.Location = new System.Drawing.Point(0, 100);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(394, 46);
+            this.panel1.Size = new System.Drawing.Size(401, 46);
             this.panel1.TabIndex = 0;
             // 
             // btnYes
@@ -55,7 +55,7 @@
             this.btnYes.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnYes.BackColor = System.Drawing.SystemColors.ControlLight;
             this.btnYes.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.btnYes.Location = new System.Drawing.Point(220, 11);
+            this.btnYes.Location = new System.Drawing.Point(227, 11);
             this.btnYes.Name = "btnYes";
             this.btnYes.Size = new System.Drawing.Size(75, 23);
             this.btnYes.TabIndex = 0;
@@ -66,7 +66,7 @@
             // 
             this.btnNo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnNo.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnNo.Location = new System.Drawing.Point(301, 11);
+            this.btnNo.Location = new System.Drawing.Point(308, 11);
             this.btnNo.Name = "btnNo";
             this.btnNo.Size = new System.Drawing.Size(75, 23);
             this.btnNo.TabIndex = 1;
@@ -87,7 +87,7 @@
             this.lblHeader.AutoSize = true;
             this.lblHeader.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblHeader.ForeColor = System.Drawing.Color.MidnightBlue;
-            this.lblHeader.Location = new System.Drawing.Point(76, 12);
+            this.lblHeader.Location = new System.Drawing.Point(65, 12);
             this.lblHeader.Name = "lblHeader";
             this.lblHeader.Size = new System.Drawing.Size(212, 25);
             this.lblHeader.TabIndex = 2;
@@ -97,7 +97,7 @@
             // 
             this.lblDesc.AutoSize = true;
             this.lblDesc.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblDesc.Location = new System.Drawing.Point(78, 46);
+            this.lblDesc.Location = new System.Drawing.Point(67, 46);
             this.lblDesc.Name = "lblDesc";
             this.lblDesc.Size = new System.Drawing.Size(218, 34);
             this.lblDesc.TabIndex = 3;
@@ -107,8 +107,9 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoSize = true;
             this.BackColor = System.Drawing.SystemColors.Window;
-            this.ClientSize = new System.Drawing.Size(394, 146);
+            this.ClientSize = new System.Drawing.Size(401, 146);
             this.Controls.Add(this.lblDesc);
             this.Controls.Add(this.lblHeader);
             this.Controls.Add(this.pbIcon);
