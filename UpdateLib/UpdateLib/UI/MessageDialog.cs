@@ -34,7 +34,13 @@ namespace MatthiWare.UpdateLib.UI
         }
 
         public MessageDialog(String title, String header, String desc, Icon icon)
-            :this()
+            :   this(title, header, desc, icon, MessageBoxButtons.YesNo)
+        {
+            
+        }
+
+        public MessageDialog(String title, String header, String desc, Icon icon, MessageBoxButtons btns)
+            : this()
         {
             Header = header;
             Description = desc;

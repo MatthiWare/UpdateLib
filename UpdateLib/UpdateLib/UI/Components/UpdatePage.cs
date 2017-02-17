@@ -12,6 +12,7 @@ using System.Threading;
 using MatthiWare.UpdateLib.Properties;
 using System.Diagnostics;
 using MatthiWare.UpdateLib.Tasks;
+using MatthiWare.UpdateLib.Security;
 
 namespace MatthiWare.UpdateLib.UI.Components
 {
@@ -134,9 +135,30 @@ namespace MatthiWare.UpdateLib.UI.Components
                 return;
             }
 
+            // Everything went good lets just check the MD5 hash again to be a bit more secure against attacks
+            if (!VerifyDownloadedFileSignature(task))
+            {
+                Console.WriteLine("[ERROR][DownloadTask]: Signature match fail for file: {0}", task.Entry.Name);
+
+                SetSubItemText(task.Item.SubItems[2], "Error");
+
+                SetImageKey(task.Item, "status_error");
+
+                return;
+            }
+            
+
             SetSubItemText(task.Item.SubItems[2], "Done");
 
             SetImageKey(task.Item, "status_done");
+        }
+
+        private bool VerifyDownloadedFileSignature(DownloadTask task)
+        {
+            string localFile = Updater.Instance.Converter.Replace(task.Entry.DestinationLocation);
+            string md5local = HashUtil.GetHash(localFile);
+
+            return md5local.Equals(task.Entry.Hash);
         }
 
         private void Task_TaskProgressChanged(object sender, DownloadProgressChangedEventArgs e)

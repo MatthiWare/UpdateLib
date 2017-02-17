@@ -23,7 +23,7 @@ namespace TestApp
             InitializeComponent();
 
             updater = Updater.Instance;
-            updater.UpdateURL= "https://dl.dropboxusercontent.com/u/30635736/UpdateLib/Dev/updatefile.xml1";
+            updater.UpdateURL= "https://dl.dropboxusercontent.com/u/30635736/UpdateLib/Dev/updatefile.xml";
 
             updater.Initialize();
         }

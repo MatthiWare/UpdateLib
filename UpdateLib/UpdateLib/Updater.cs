@@ -139,7 +139,7 @@ namespace MatthiWare.UpdateLib
         {
             UpdateFile updateFile = LoadUpdateFile();
 
-            HashCacheFile cache = updateCacheTask.AwaitTask();
+            HashCacheFile cache = GetCache();
             cleanUpTask.AwaitTask();
 
             CheckForUpdatedFilesTask checkForUpdatesTask = new CheckForUpdatedFilesTask(updateFile, cache, Converter);
@@ -165,6 +165,11 @@ namespace MatthiWare.UpdateLib
             // start actual updateform
             UpdaterForm updateForm = new UpdaterForm(updateFile);
             updateForm.ShowDialog();
+        }
+
+        public HashCacheFile GetCache()
+        {
+            return updateCacheTask.AwaitTask();
         }
 
         private UpdateFile LoadUpdateFile()
