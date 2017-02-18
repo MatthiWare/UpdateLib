@@ -18,7 +18,7 @@ namespace UpdateLib.Generator
         private DirectoryInfo applicationFolder = new DirectoryInfo("./ApplicationFolder");
         private DirectoryInfo outputFolder = new DirectoryInfo("./Output");
 
-        
+
 
         public MainForm()
         {
@@ -47,31 +47,17 @@ namespace UpdateLib.Generator
             UpdateFile file = generator.Build();
 
             string filePath = string.Concat(outputFolder.FullName, "\\", "updatefile.xml");
-            if (File.Exists(filePath))
-                File.Delete(filePath);
-
-            using (Stream s = File.Open(filePath, FileMode.OpenOrCreate, FileAccess.Write))
-            {
-                try
-                {
-                    XmlSerializer xml = new XmlSerializer(typeof(UpdateFile));
-                    xml.Serialize(s, file);
-                }
-                catch (Exception e)
-                {
-                    throw e;
-                }
-                
-            }
+            file.Save(filePath);
         }
 
         private void GenerateCallback(IAsyncResult result)
         {
-            Console.WriteLine("Completed: " + result.IsCompleted);
+
+            //Console.WriteLine("Completed: " + result.IsCompleted);
             this.UseWaitCursor = false;
 
-            MessageBox.Show("File generated, look in the output directory!");
+            //MessageBox.Show("File generated, look in the output directory!");
         }
-        
+
     }
 }

@@ -177,7 +177,7 @@ namespace MatthiWare.UpdateLib.UI
                 "Press Yes to cancel the updating process.\nPress no to keep updating.",
                 SystemIcons.Exclamation);
 
-            return dlg.ShowDialog(this) == DialogResult.OK;
+            return dlg.ShowDialog(this) == DialogResult.Yes;
         }
 
         private void UpdaterForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -188,6 +188,11 @@ namespace MatthiWare.UpdateLib.UI
                 if (!cancel)
                     e.Cancel = true;
             }
+        }
+
+        private void linkSite_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            Process.Start("https://github.com/MatthiWare/UpdateLib");
         }
     }
 }

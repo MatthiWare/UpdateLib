@@ -37,5 +37,16 @@ namespace MatthiWare.UpdateLib.Files
             Ticks = File.GetLastWriteTime(FilePath).Ticks;
         }
 
+        public void Recalculate(long tick)
+        {
+            if (tick != Ticks)
+            {
+                Hash = HashUtil.GetHash(FilePath);
+                Ticks = tick;
+
+                Console.WriteLine("[HashCacheEntry] Recalculated\nTime: {1}\nName: {0}\nHash{2}\n", FilePath, DateTime.FromBinary(Ticks).ToString(), Hash);
+            }
+        }
+
     }
 }

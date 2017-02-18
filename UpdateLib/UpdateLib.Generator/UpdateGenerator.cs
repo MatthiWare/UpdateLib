@@ -2,19 +2,27 @@
 using MatthiWare.UpdateLib.Security;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Threading;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
 
 namespace UpdateLib.Generator
 {
     public class UpdateGenerator
     {
         private UpdateFile updateFile;
+        private Queue<WaitHandle> waitQueue;
+        private readonly object sync = new object();
+
+        private delegate void AddDirRecursiveDelegate(DirectoryInfo dir, DirectoryEntry entry);
 
         public UpdateGenerator()
         {
             updateFile = new UpdateFile();
+            waitQueue = new Queue<WaitHandle>();
         }
 
         public void AddDirectory(DirectoryInfo dir)
@@ -25,14 +33,33 @@ namespace UpdateLib.Generator
             if (!dir.Exists)
                 throw new DirectoryNotFoundException(string.Format("The directory '{0}' does not exist.", dir.FullName));
 
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
             AddDirRecursive(dir, updateFile.ApplicationDirectory);
+
+            while (waitQueue.Count > 0)
+            {
+                WaitHandle wh = null;
+
+                lock (sync)
+                    wh = waitQueue.Dequeue();
+
+                wh.WaitOne();
+                wh.Close();
+
+            }
+
+            sw.Stop();
+
+            Console.WriteLine("The generation has taken: {0}ms", sw.ElapsedMilliseconds);
         }
 
         private void AddDirRecursive(DirectoryInfo dir, DirectoryEntry entry)
         {
             foreach (FileInfo fi in dir.GetFiles())
             {
-                Console.WriteLine("Adding: {0}", fi.FullName);
+                //Console.WriteLine("Adding: {0}", fi.FullName);
 
                 FileEntry newEntry = new FileEntry(fi.Name);
                 newEntry.Hash = HashUtil.GetHash(fi.FullName);
@@ -40,12 +67,17 @@ namespace UpdateLib.Generator
                 entry.Files.Add(newEntry);
             }
 
-            foreach(DirectoryInfo newDir in dir.GetDirectories())
+
+            foreach (DirectoryInfo newDir in dir.GetDirectories())
             {
                 DirectoryEntry newEntry = new DirectoryEntry(newDir.Name);
                 entry.Directories.Add(newEntry);
-                AddDirRecursive(newDir, newEntry);
+
+                AddDirRecursiveDelegate caller = new AddDirRecursiveDelegate(AddDirRecursive);
+                lock (sync)
+                    waitQueue.Enqueue(caller.BeginInvoke(newDir, newEntry, new AsyncCallback(r => caller.EndInvoke(r)), null).AsyncWaitHandle);
             }
+
         }
 
 

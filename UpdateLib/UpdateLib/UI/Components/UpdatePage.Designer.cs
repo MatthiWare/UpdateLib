@@ -38,6 +38,7 @@
             this.clmnProgress = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.clmnPath = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ilIcons = new System.Windows.Forms.ImageList(this.components);
+            this.clmnDescription = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SuspendLayout();
             // 
             // lblHeader
@@ -70,6 +71,7 @@
             this.clmnName,
             this.clmnStatus,
             this.clmnProgress,
+            this.clmnDescription,
             this.clmnPath});
             this.lvItems.Location = new System.Drawing.Point(17, 72);
             this.lvItems.Name = "lvItems";
@@ -101,13 +103,18 @@
             // clmnPath
             // 
             this.clmnPath.Text = "Path";
-            this.clmnPath.Width = 148;
+            this.clmnPath.Width = 350;
             // 
             // ilIcons
             // 
             this.ilIcons.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
             this.ilIcons.ImageSize = new System.Drawing.Size(16, 16);
             this.ilIcons.TransparentColor = System.Drawing.Color.Transparent;
+            // 
+            // clmnDescription
+            // 
+            this.clmnDescription.Text = "Description";
+            this.clmnDescription.Width = 100;
             // 
             // UpdatePage
             // 
@@ -137,5 +144,6 @@
         private System.Windows.Forms.ColumnHeader clmnStatus;
         private System.Windows.Forms.ColumnHeader clmnProgress;
         private System.Windows.Forms.ColumnHeader clmnPath;
+        private System.Windows.Forms.ColumnHeader clmnDescription;
     }
 }

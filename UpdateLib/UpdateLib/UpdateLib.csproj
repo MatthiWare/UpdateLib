@@ -24,7 +24,8 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
-    <DocumentationFile>bin\Debug\UpdateLib.xml</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -62,7 +63,10 @@
     <Compile Include="Files\FileEntry.cs" />
     <Compile Include="Files\PathVariableConverter.cs" />
     <Compile Include="Files\UpdateFile.cs" />
+    <Compile Include="Files\UpdateFilePostProcessor.cs" />
     <Compile Include="Security\HashUtil.cs" />
+    <Compile Include="Tasks\CheckForUpdatedFilesTask.cs" />
+    <Compile Include="Tasks\CleanUpTask.cs" />
     <Compile Include="Tasks\DownloadTask.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -71,6 +75,7 @@
     </Compile>
     <Compile Include="Tasks\ITaskable.cs" />
     <Compile Include="Tasks\TaskEventArgs.cs" />
+    <Compile Include="Tasks\UpdateCacheTask.cs" />
     <Compile Include="UI\Components\ChangelogPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -109,14 +114,13 @@
       <DependentUpon>UpdaterForm.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\WizardPageCollection.cs" />
-    <Compile Include="Updater.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="Updater.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\status_working.png" />
     <None Include="Resources\status_update.png" />
+    <None Include="Resources\status_warning.png" />
     <Content Include="UpdaterControl.bmp" />
     <None Include="Resources\status_info.png" />
     <None Include="Resources\status_error.png" />

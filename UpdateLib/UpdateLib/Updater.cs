@@ -13,6 +13,8 @@ using System.Xml.Serialization;
 using System.Windows.Forms;
 using MatthiWare.UpdateLib.UI;
 using System.Drawing;
+using System.Threading;
+using MatthiWare.UpdateLib.Tasks;
 
 namespace MatthiWare.UpdateLib
 {
@@ -41,14 +43,30 @@ namespace MatthiWare.UpdateLib
         }
         #endregion
 
-
-        public string UpdateURL { get; set; }
+        private string m_updateUrl = "";
+        public string UpdateURL
+        {
+            get { return m_updateUrl; }
+            set
+            {
+                m_updateUrl = value;
+                m_localUpdateFile = GetFileNameFromUrl();
+                RemoteBasePath = GetRemoteBasePath();
+            }
+        }
         private string m_localUpdateFile;
 
-        public bool ShowUpdateMessage { get; set; }
-        public bool ShowMessageOnNoUpdate { get; set; }
-
+        public bool ShowUpdateMessage { get; set; } = true;
+        public bool ShowMessageOnNoUpdate { get; set; } = true;
+        public bool ShowErrorMessage { get; set; } = true;
         public PathVariableConverter Converter { get; private set; }
+
+        private CleanUpTask cleanUpTask;
+        private UpdateCacheTask updateCacheTask;
+
+        private bool initialized = false;
+
+        internal string RemoteBasePath { get; set; }
 
         /// <summary>
         /// Initializes a new instance of <see cref="Updater"/> with the default settings. 
@@ -60,18 +78,29 @@ namespace MatthiWare.UpdateLib
             Converter = new PathVariableConverter();
         }
 
+        public void Initialize()
+        {
+            cleanUpTask = new CleanUpTask(".");
+            cleanUpTask.Start();
+
+            updateCacheTask = new UpdateCacheTask();
+            updateCacheTask.Start();
+
+            initialized = true;
+        }
 
         /// <summary>
         /// Starting the update process
         /// </summary>
         public void CheckForUpdates()
         {
-            CleanUp();
+            if (!initialized)
+                throw new InvalidOperationException("The updater needs to be initialized first.");
 
             if (String.IsNullOrEmpty(UpdateURL))
                 throw new ArgumentException("You need to specifify a update url", "UpdateURL");
 
-            m_localUpdateFile = String.Concat("./", GetFileNameFromUrl(UpdateURL));
+            
 
             WebClient wc = new WebClient();
             wc.DownloadFileCompleted += UpdateFile_DownloadCompleted;
@@ -82,7 +111,7 @@ namespace MatthiWare.UpdateLib
         {
             WebClient download_client = (WebClient)sender;
             download_client.Dispose();
-
+            
             // the update process got cancelled. 
             if (e.Cancelled)
                 return;
@@ -92,63 +121,80 @@ namespace MatthiWare.UpdateLib
             {
                 Debug.WriteLine(String.Concat(e.Error.Message, "\n", e.Error.StackTrace));
 
-                return;   
-            }
-
-            UpdateFile updateFile = LoadUpdateFile();
-
-            Version localVersion = GetCurrentVersion();
-            Version onlineVersion = new Version(updateFile.VersionString);
-
-            // check if there is a no new version
-            if (onlineVersion <= localVersion)
-            {
-                if (ShowMessageOnNoUpdate)
-                    MessageBox.Show("You already have the latest version.", "Updater");
+                if (ShowErrorMessage)
+                    new MessageDialog(
+                        "Error", 
+                        "Unable to get the update information", 
+                        "There has been a problem getting the needed update information\nPlease contact customer support!", 
+                        SystemIcons.Error).ShowDialog();
 
                 return;
             }
 
-            DialogResult result = DialogResult.OK;
+            Action caller = new Action(CheckForUpdatesTask);
+            caller.BeginInvoke(new AsyncCallback(r => caller.EndInvoke(r)), null);
+        }
+
+        private void CheckForUpdatesTask()
+        {
+            UpdateFile updateFile = LoadUpdateFile();
+
+            HashCacheFile cache = GetCache();
+            cleanUpTask.AwaitTask();
+
+            CheckForUpdatedFilesTask checkForUpdatesTask = new CheckForUpdatedFilesTask(updateFile, cache, Converter);
+            checkForUpdatesTask.Start();
+
+            bool needsUpdating = checkForUpdatesTask.AwaitTask();
+            Console.WriteLine("[INFO]: CheckForUpdatesTask: {0}", (needsUpdating) ? "New version available!" : "Latest version!");
+
+            if (!needsUpdating)
+                return;
+
+            DialogResult result = DialogResult.Yes;
             if (ShowUpdateMessage)
                 result = new MessageDialog(
                     "Update available",
-                    String.Format("Version {0} available", onlineVersion),
-                    "Update now?\nPress yes to update or no to cancel.", 
+                    String.Format("Version {0} available", updateFile.VersionString),
+                    "Update now?\nPress yes to update or no to cancel.",
                     SystemIcons.Question).ShowDialog();
 
-            if (result != DialogResult.OK)
+            if (result != DialogResult.Yes)
                 return;
 
             // start actual updateform
+            UpdaterForm updateForm = new UpdaterForm(updateFile);
+            updateForm.ShowDialog();
+        }
 
-
+        public HashCacheFile GetCache()
+        {
+            return updateCacheTask.AwaitTask();
         }
 
         private UpdateFile LoadUpdateFile()
         {
-            XmlSerializer serializer = new XmlSerializer(typeof(UpdateFile));
+            return UpdateFile.Load(m_localUpdateFile);
+        }
 
-            using (Stream s = File.Open(m_localUpdateFile, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+        private string GetFileNameFromUrl()
+        {
+            string[] tokens = UpdateURL.Split('/');
+            return string.Concat("./", tokens[tokens.Length - 1]);
+        }
+
+        private string GetRemoteBasePath()
+        {
+            string[] tokens = UpdateURL.Split('/');
+            StringBuilder builder = new StringBuilder();
+
+            for (int i = 0; i < tokens.Length - 1; i++)
             {
-                return (UpdateFile)serializer.Deserialize(s);
+                builder.Append(tokens[i]);
+                builder.Append('/');
             }
-        }
 
-        private String GetFileNameFromUrl(String url)
-        {
-            String[] tokens = url.Split('/');
-            return tokens[tokens.Length - 1];
-        }
-
-        private Version GetCurrentVersion()
-        {
-            return Assembly.GetEntryAssembly().GetName().Version;
-        }
-
-        private void CleanUp()
-        {
-
+            return builder.ToString();
         }
 
     }

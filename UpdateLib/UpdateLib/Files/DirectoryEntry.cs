@@ -40,13 +40,18 @@ namespace MatthiWare.UpdateLib.Files
         /// </summary>
         [XmlArray("Directories"), XmlArrayItem("Directory")]
         public List<DirectoryEntry> Directories { get;  set; }
+
         /// <summary>
         /// Gets the list of <see cref="FileEntry">files</see> in this directory.
         /// </summary>
-
         [XmlArray("Files"), XmlArrayItem("File")]
         public List<FileEntry> Files { get;  set; }
 
+        /// <summary>
+        /// Gets or Sets the Parent of this Directory
+        /// </summary>
+        [XmlIgnore]
+        public DirectoryEntry Parent { get; set; }
 
         public DirectoryEntry()
         {
