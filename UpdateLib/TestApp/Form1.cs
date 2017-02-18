@@ -33,9 +33,9 @@ namespace TestApp
             DialogResult result = new MessageDialog(
                 "Test title",
                 "Version 1.0.0.0 available",
-                "Download update now?\nPress yes to download or no to cancel.", SystemIcons.Question).ShowDialog(this);
+                "Download update now?\nPress yes to download or no to cancel.", SystemIcons.Question, MessageBoxButtons.YesNoCancel).ShowDialog(this);
 
-            if (result == DialogResult.OK)
+            if (result == DialogResult.Yes)
             {
                 UpdateFile updateFile = new UpdateFile();
                 updateFile.VersionString = "1.0.0.0";

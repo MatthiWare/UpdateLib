@@ -151,7 +151,7 @@ namespace MatthiWare.UpdateLib
             if (!needsUpdating)
                 return;
 
-            DialogResult result = DialogResult.OK;
+            DialogResult result = DialogResult.Yes;
             if (ShowUpdateMessage)
                 result = new MessageDialog(
                     "Update available",
@@ -159,7 +159,7 @@ namespace MatthiWare.UpdateLib
                     "Update now?\nPress yes to update or no to cancel.",
                     SystemIcons.Question).ShowDialog();
 
-            if (result != DialogResult.OK)
+            if (result != DialogResult.Yes)
                 return;
 
             // start actual updateform

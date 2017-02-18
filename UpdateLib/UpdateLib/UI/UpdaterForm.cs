@@ -177,7 +177,7 @@ namespace MatthiWare.UpdateLib.UI
                 "Press Yes to cancel the updating process.\nPress no to keep updating.",
                 SystemIcons.Exclamation);
 
-            return dlg.ShowDialog(this) == DialogResult.OK;
+            return dlg.ShowDialog(this) == DialogResult.Yes;
         }
 
         private void UpdaterForm_FormClosing(object sender, FormClosingEventArgs e)
