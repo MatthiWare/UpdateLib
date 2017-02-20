@@ -8,7 +8,7 @@ using System.Threading;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
-    public class CleanUpTask
+    public class CleanUpTask : AsyncTask
     {
 
         private Queue<WaitHandle> whQueue;
@@ -27,25 +27,10 @@ namespace MatthiWare.UpdateLib.Tasks
             IncludeSubDirectories = includeSubDirs;
         }
 
-        public void Start()
-        {
-            Action caller = new Action(Worker);
-            whQueue.Enqueue(caller.BeginInvoke(new AsyncCallback(r => caller.EndInvoke(r)), null).AsyncWaitHandle);
-        }
-
         private void Worker()
         {
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-
             DirectoryInfo dir = new DirectoryInfo(PathToClean);
             FileInfo[] files = dir.GetFiles(SearchPattern, IncludeSubDirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
-
-            sw.Reset();
-
-            Console.WriteLine("[INFO]: Get files to update took {0}ms.", sw.ElapsedMilliseconds);
-
-            sw.Start();
 
             foreach (FileInfo file in files)
             {
@@ -58,23 +43,12 @@ namespace MatthiWare.UpdateLib.Tasks
                     Console.WriteLine("[ERROR]: Unable to delete file {0} -> {1}.", file.FullName, e.Message);
                 }
             }
-
-            sw.Stop();
-
-            Console.WriteLine("[INFO]: Deleting files took {0}ms.", sw.ElapsedMilliseconds);
         }
 
-        public void AwaitTask()
+        public override void DoWork()
         {
-            while (whQueue.Count > 0)
-            {
-                WaitHandle wh = null;
-                lock (sync)
-                    wh = whQueue.Dequeue();
-
-                wh.WaitOne();
-                wh.Close();
-            }
+            Action caller = new Action(Worker);
+            Enqueue(caller.BeginInvoke(new AsyncCallback(r => caller.EndInvoke(r)), null).AsyncWaitHandle);
         }
     }
 }

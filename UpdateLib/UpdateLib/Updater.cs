@@ -144,11 +144,11 @@ namespace MatthiWare.UpdateLib
 
             CheckForUpdatedFilesTask checkForUpdatesTask = new CheckForUpdatedFilesTask(updateFile, cache, Converter);
             checkForUpdatesTask.Start();
+            checkForUpdatesTask.AwaitTask();
 
-            bool needsUpdating = checkForUpdatesTask.AwaitTask();
-            Console.WriteLine("[INFO]: CheckForUpdatesTask: {0}", (needsUpdating) ? "New version available!" : "Latest version!");
+            Console.WriteLine("[INFO]: CheckForUpdatesTask: {0}", (checkForUpdatesTask.Result) ? "New version available!" : "Latest version!");
 
-            if (!needsUpdating)
+            if (!checkForUpdatesTask.Result)
                 return;
 
             DialogResult result = DialogResult.Yes;
@@ -169,7 +169,8 @@ namespace MatthiWare.UpdateLib
 
         public HashCacheFile GetCache()
         {
-            return updateCacheTask.AwaitTask();
+            updateCacheTask.AwaitTask();
+            return updateCacheTask.Result;
         }
 
         private UpdateFile LoadUpdateFile()

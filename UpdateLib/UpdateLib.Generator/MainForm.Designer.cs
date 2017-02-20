@@ -29,13 +29,13 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("General Information");
-            System.Windows.Forms.TreeNode treeNode6 = new System.Windows.Forms.TreeNode("Files");
-            System.Windows.Forms.TreeNode treeNode7 = new System.Windows.Forms.TreeNode("Registry");
-            System.Windows.Forms.TreeNode treeNode8 = new System.Windows.Forms.TreeNode("Project", new System.Windows.Forms.TreeNode[] {
-            treeNode5,
-            treeNode6,
-            treeNode7});
+            System.Windows.Forms.TreeNode treeNode9 = new System.Windows.Forms.TreeNode("General Information");
+            System.Windows.Forms.TreeNode treeNode10 = new System.Windows.Forms.TreeNode("Files");
+            System.Windows.Forms.TreeNode treeNode11 = new System.Windows.Forms.TreeNode("Registry");
+            System.Windows.Forms.TreeNode treeNode12 = new System.Windows.Forms.TreeNode("Project", new System.Windows.Forms.TreeNode[] {
+            treeNode9,
+            treeNode10,
+            treeNode11});
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.menuStrip = new System.Windows.Forms.MenuStrip();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
@@ -214,16 +214,16 @@
             this.tvProject.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tvProject.Location = new System.Drawing.Point(0, 0);
             this.tvProject.Name = "tvProject";
-            treeNode5.Name = "nodeInfo";
-            treeNode5.Text = "General Information";
-            treeNode6.Name = "nodeFiles";
-            treeNode6.Text = "Files";
-            treeNode7.Name = "nodeRegistry";
-            treeNode7.Text = "Registry";
-            treeNode8.Name = "root";
-            treeNode8.Text = "Project";
+            treeNode9.Name = "nodeInfo";
+            treeNode9.Text = "General Information";
+            treeNode10.Name = "nodeFiles";
+            treeNode10.Text = "Files";
+            treeNode11.Name = "nodeRegistry";
+            treeNode11.Text = "Registry";
+            treeNode12.Name = "root";
+            treeNode12.Text = "Project";
             this.tvProject.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode8});
+            treeNode12});
             this.tvProject.Size = new System.Drawing.Size(228, 315);
             this.tvProject.TabIndex = 0;
             this.tvProject.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tvProject_AfterSelect);
@@ -233,7 +233,6 @@
             this.progressBar.Maximum = 110;
             this.progressBar.Name = "progressBar";
             this.progressBar.Size = new System.Drawing.Size(100, 16);
-            this.progressBar.Visible = false;
             // 
             // MainForm
             // 

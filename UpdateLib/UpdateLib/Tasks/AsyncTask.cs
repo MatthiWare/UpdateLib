@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -12,6 +13,9 @@ namespace MatthiWare.UpdateLib.Tasks
     /// </summary>
     public abstract class AsyncTask
     {
+#if DEBUG
+        public Stopwatch m_sw = new Stopwatch();
+#endif
 
         private readonly Queue<WaitHandle> waitQueue = new Queue<WaitHandle>();
         private readonly object sync = new object();
@@ -30,8 +34,14 @@ namespace MatthiWare.UpdateLib.Tasks
         /// </summary>
         public void Start()
         {
-            Action a = new Action(() => {
+            Action a = new Action(() =>
+            {
                 Exception taskException = null;
+
+#if DEBUG
+                m_sw.Reset();
+                m_sw.Start();
+#endif
 
                 try
                 {
@@ -44,9 +54,14 @@ namespace MatthiWare.UpdateLib.Tasks
                 }
 
                 OnTaskCompleted(taskException);
+
+#if DEBUG
+                m_sw.Stop();
+                Console.WriteLine("[{0}]: Completed in {1}ms", GetType().FullName, m_sw.ElapsedMilliseconds);
+#endif
             });
 
-            a.BeginInvoke(new AsyncCallback(r => a.EndInvoke(r)), null);
+            Enqueue(a.BeginInvoke(new AsyncCallback(r => a.EndInvoke(r)), null).AsyncWaitHandle);
         }
 
         /// <summary>
@@ -92,13 +107,40 @@ namespace MatthiWare.UpdateLib.Tasks
         }
 
         /// <summary>
+        /// Raises the <see cref="TaskProgressChanged"/> event.  
+        /// </summary>
+        /// <param name="percent">The percentage of work that is done.</param>
+        protected virtual void OnTaskProgressChanged(int percent)
+        {
+            TaskProgressChanged?.Invoke(this, new ProgressChangedEventArgs(percent, null));
+        }
+
+        /// <summary>
+        /// Raises the <see cref="TaskProgressChanged"/> event.  
+        /// </summary>
+        /// <param name="e">The <see cref="ProgressChangedEventArgs"/> event.</param>
+        protected virtual void OnTaskProgressChanged(ProgressChangedEventArgs e)
+        {
+            TaskProgressChanged?.Invoke(this, e);
+        }
+
+        /// <summary>
         /// Raises the <see cref="TaskCompleted"/> event. 
         /// </summary>
         /// <param name="e">If an <see cref="Exception"/> occured pass the <see cref="Exception"/> object.</param>
         /// <param name="cancelled">Indicates whether the <see cref="AsyncTask"/> got cancelled.</param>
-        protected virtual void OnTaskCompleted(Exception e, bool cancelled=false)
+        protected virtual void OnTaskCompleted(Exception e, bool cancelled = false)
         {
             TaskCompleted?.Invoke(this, new AsyncCompletedEventArgs(e, cancelled, null));
+        }
+
+        /// <summary>
+        /// Raises the <see cref="TaskCompleted"/> event. 
+        /// </summary>
+        /// <param name="e">The <see cref="AsyncCompletedEventArgs"/> event.</param>
+        protected virtual void OnTaskCompleted(AsyncCompletedEventArgs e)
+        {
+            TaskCompleted?.Invoke(this, e);
         }
     }
 
@@ -106,7 +148,7 @@ namespace MatthiWare.UpdateLib.Tasks
     /// Base class for all Tasks that need to be run Async
     /// </summary>
     /// <typeparam name="T">The type of the Result object</typeparam>
-    public abstract class AsyncTask<T> : AsyncTask where T : class
+    public abstract class AsyncTask<T> : AsyncTask
     {
         /// <summary>
         /// The result <see cref="T"/> 

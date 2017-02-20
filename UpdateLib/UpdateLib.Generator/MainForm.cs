@@ -44,6 +44,8 @@ namespace UpdateLib.Generator
             SetProgressBarVisible(true);
             SetWaitCursor(true);
 
+            SetStatusMessage("Generating...");
+
             generator.Start();
         }
 
@@ -80,6 +82,17 @@ namespace UpdateLib.Generator
             progressBar.Value = val;
         }
 
+        private void SetStatusMessage(string msg)
+        {
+            if (statusStrip.InvokeRequired)
+            {
+                statusStrip.Invoke(new Action<string>(SetStatusMessage), msg);
+                return;
+            }
+
+            lblStatus.Text = msg;
+        }
+
         private void Generator_TaskProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             Console.WriteLine("{0}%", e.ProgressPercentage);
@@ -98,6 +111,7 @@ namespace UpdateLib.Generator
             SetProgressBarValue(110);
 
             Console.WriteLine("110% -- DONE");
+            SetStatusMessage("Build completed");
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -129,7 +143,7 @@ namespace UpdateLib.Generator
             
             generateAction.BeginInvoke(new AsyncCallback(r => {
                 SetWaitCursor(false);
-                SetProgressBarVisible(false);
+                //SetProgressBarVisible(false);
                 generateAction.EndInvoke(r);
             }), null);
         }

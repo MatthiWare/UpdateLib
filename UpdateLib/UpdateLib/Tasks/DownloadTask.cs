@@ -11,11 +11,8 @@ using System.Windows.Forms;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
-    public class DownloadTask : IDisposable
+    public class DownloadTask : AsyncTask
     {
-        public event EventHandler<AsyncCompletedEventArgs> TaskCompleted;
-        public event EventHandler<DownloadProgressChangedEventArgs> TaskProgressChanged; 
-
         private WebClient webClient;
         public ListViewItem Item { get; private set; }
         public FileEntry Entry { get; private set; }
@@ -28,11 +25,11 @@ namespace MatthiWare.UpdateLib.Tasks
             Entry = (FileEntry)Item.Tag;
 
             webClient = new WebClient();
-            webClient.DownloadProgressChanged += WebClient_DownloadProgressChanged;
-            webClient.DownloadFileCompleted += WebClient_DownloadFileCompleted;
+            webClient.DownloadProgressChanged += (o, e)=> { OnTaskProgressChanged(e); };
+            webClient.DownloadFileCompleted += (o, e) => { wait.Set(); OnTaskCompleted(e); };
         }
 
-        public void Start()
+        public override void DoWork()
         {
             wait = new ManualResetEvent(false);
 
@@ -47,51 +44,5 @@ namespace MatthiWare.UpdateLib.Tasks
 
             webClient.DownloadFileAsync(new Uri(remoteFile), localFile);
         }
-
-        private void WebClient_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
-        {
-            wait.Set();
-            TaskCompleted?.Invoke(this, e);
-        }
-
-        private void WebClient_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
-        {
-            TaskProgressChanged?.Invoke(this, e);
-        }
-
-        public void AwaitTask()
-        {
-            if (wait == null)
-                throw new InvalidOperationException("The task needs to be started first");
-
-            wait.WaitOne();
-            wait.Close();
-        }
-
-        #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    webClient.Dispose();
-
-                    if (wait != null)
-                        wait.Close();
-                }
-
-                disposedValue = true;
-            }
-        }
-        
-        public void Dispose()
-        {
-            Dispose(true);
-        }
-        #endregion
-
     }
 }

@@ -161,7 +161,7 @@ namespace MatthiWare.UpdateLib.UI.Components
             return md5local.Equals(task.Entry.Hash);
         }
 
-        private void Task_TaskProgressChanged(object sender, DownloadProgressChangedEventArgs e)
+        private void Task_TaskProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             DownloadTask task = (DownloadTask)sender;
 
@@ -217,27 +217,24 @@ namespace MatthiWare.UpdateLib.UI.Components
 
             PageUpdate?.Invoke(this, new EventArgs());
         }
-
-
-        private delegate void SetImageKeyInvoker(ListViewItem item, string key);
+        
         private void SetImageKey(ListViewItem item, string key)
         {
-            //if (InvokeRequired)
-            //{
-            //    Invoke(new SetImageKeyInvoker(SetImageKey), item, key);
-            //    return;
-            //}
+            if (InvokeRequired)
+            {
+                Invoke(new Action<ListViewItem, string>(SetImageKey), item, key);
+                return;
+            }
             item.ImageKey = key;
         }
-
-        private delegate void SetSubItemTextInvoker(ListViewItem.ListViewSubItem item, string key);
+        
         private void SetSubItemText(ListViewItem.ListViewSubItem item, string key)
         {
-            //if (InvokeRequired)
-            //{
-            //    Invoke(new SetSubItemTextInvoker(SetSubItemText), item, key);
-            //    return;
-            //}
+            if (InvokeRequired)
+            {
+                Invoke(new Action<ListViewItem.ListViewSubItem, string>(SetSubItemText), item, key);
+                return;
+            }
 
             item.Text = key;
         }
