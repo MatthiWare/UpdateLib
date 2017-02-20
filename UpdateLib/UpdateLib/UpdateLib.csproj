@@ -65,6 +65,7 @@
     <Compile Include="Files\UpdateFile.cs" />
     <Compile Include="Files\UpdateFilePostProcessor.cs" />
     <Compile Include="Security\HashUtil.cs" />
+    <Compile Include="Tasks\AsyncTask.cs" />
     <Compile Include="Tasks\CheckForUpdatedFilesTask.cs" />
     <Compile Include="Tasks\CleanUpTask.cs" />
     <Compile Include="Tasks\DownloadTask.cs" />
@@ -73,8 +74,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Tasks\ITaskable.cs" />
-    <Compile Include="Tasks\TaskEventArgs.cs" />
     <Compile Include="Tasks\UpdateCacheTask.cs" />
     <Compile Include="UI\Components\ChangelogPage.cs">
       <SubType>UserControl</SubType>

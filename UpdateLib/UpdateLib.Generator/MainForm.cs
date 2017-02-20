@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using UpdateLib.Generator.Tasks;
 
 namespace UpdateLib.Generator
 {
@@ -31,33 +32,106 @@ namespace UpdateLib.Generator
                 outputFolder.Create();
         }
 
-        private void btnGenerate_Click(object sender, EventArgs e)
-        {
-            Action generateAction = new Action(Generate);
-
-            this.UseWaitCursor = true;
-
-            generateAction.BeginInvoke(new AsyncCallback(GenerateCallback), null);
-        }
-
         private void Generate()
         {
-            UpdateGenerator generator = new UpdateGenerator();
-            generator.AddDirectory(applicationFolder);
-            UpdateFile file = generator.Build();
 
-            string filePath = string.Concat(outputFolder.FullName, "\\", "updatefile.xml");
-            file.Save(filePath);
+            UpdateGenerator generator = new UpdateGenerator(applicationFolder);
+            
+            generator.TaskCompleted += Generator_TaskCompleted;
+            generator.TaskProgressChanged += Generator_TaskProgressChanged;
+
+            SetProgressBarValue(0);
+            SetProgressBarVisible(true);
+            SetWaitCursor(true);
+
+            generator.Start();
         }
 
-        private void GenerateCallback(IAsyncResult result)
+        private void SetWaitCursor(bool val)
         {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action<bool>(SetWaitCursor), val);
+                return;
+            }
 
-            //Console.WriteLine("Completed: " + result.IsCompleted);
-            this.UseWaitCursor = false;
-
-            //MessageBox.Show("File generated, look in the output directory!");
+            UseWaitCursor = val;
         }
 
+        private void SetProgressBarVisible(bool val)
+        {
+            if (statusStrip.InvokeRequired)
+            {
+                statusStrip.Invoke(new Action<bool>(SetProgressBarVisible), val);
+                return;
+            }
+
+            progressBar.Visible = val;
+        }
+
+        private void SetProgressBarValue(int val)
+        {
+            if (statusStrip.InvokeRequired)
+            {
+                statusStrip.Invoke(new Action<int>(SetProgressBarValue), val);
+                return;
+            }
+
+            progressBar.Value = val;
+        }
+
+        private void Generator_TaskProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            Console.WriteLine("{0}%", e.ProgressPercentage);
+            SetProgressBarValue(e.ProgressPercentage);
+        }
+
+        private void Generator_TaskCompleted(object sender, AsyncCompletedEventArgs e)
+        {
+            string filePath = string.Concat(outputFolder.FullName, "\\", "updatefile.xml");
+
+            UpdateGenerator gen = (UpdateGenerator)sender;
+            gen.AwaitTask();
+
+            gen.Result.Save(filePath);
+
+            SetProgressBarValue(110);
+
+            Console.WriteLine("110% -- DONE");
+        }
+
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+           tvProject.ExpandAll();
+            tvProject.SelectedNode = tvProject.Nodes["root"].Nodes["nodeInfo"];
+        }
+
+        private void tvProject_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            switch (e.Node.Name)
+            {
+                case "nodeInfo":
+                default:
+
+                    break;
+                case "nodeFiles":
+
+                    break;
+                case "nodeRegistry":
+
+                    break;
+            }
+        }
+
+        private void buildToolStripButton_Click(object sender, EventArgs e)
+        {
+            Action generateAction = new Action(Generate);
+            
+            generateAction.BeginInvoke(new AsyncCallback(r => {
+                SetWaitCursor(false);
+                SetProgressBarVisible(false);
+                generateAction.EndInvoke(r);
+            }), null);
+        }
     }
 }
