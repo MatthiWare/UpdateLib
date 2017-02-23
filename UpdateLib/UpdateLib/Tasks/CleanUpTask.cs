@@ -8,7 +8,7 @@ using System.Threading;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
-    public class CleanUpTask : AsyncTask
+    public class CleanUpTask : AsyncTaskBase
     {
 
         private Queue<WaitHandle> whQueue;

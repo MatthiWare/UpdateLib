@@ -104,7 +104,6 @@ namespace UpdateLib.Generator
             string filePath = string.Concat(outputFolder.FullName, "\\", "updatefile.xml");
 
             UpdateGenerator gen = (UpdateGenerator)sender;
-            gen.AwaitTask();
 
             gen.Result.Save(filePath);
 

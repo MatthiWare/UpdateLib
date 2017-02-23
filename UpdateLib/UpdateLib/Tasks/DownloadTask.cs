@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
-    public class DownloadTask : AsyncTask
+    public class DownloadTask : AsyncTaskBase
     {
         private WebClient webClient;
         public ListViewItem Item { get; private set; }

@@ -11,21 +11,22 @@ namespace MatthiWare.UpdateLib.Tasks
     /// <summary>
     /// Base class for all Tasks that need to be run Async
     /// </summary>
-    public abstract class AsyncTask
+    public abstract class AsyncTaskBase
     {
 #if DEBUG
         public Stopwatch m_sw = new Stopwatch();
 #endif
 
         private readonly Queue<WaitHandle> waitQueue = new Queue<WaitHandle>();
+        private WaitHandle mainWait;
         private readonly object sync = new object();
 
         /// <summary>
-        /// Raises when this <see cref="AsyncTask"/> is completed. 
+        /// Raises when this <see cref="AsyncTaskBase"/> is completed. 
         /// </summary>
         public event EventHandler<AsyncCompletedEventArgs> TaskCompleted;
         /// <summary>
-        /// Raises when the <see cref="AsyncTask"/> progress changed. 
+        /// Raises when the <see cref="AsyncTaskBase"/> progress changed. 
         /// </summary>
         public event EventHandler<ProgressChangedEventArgs> TaskProgressChanged;
 
@@ -46,10 +47,11 @@ namespace MatthiWare.UpdateLib.Tasks
                 try
                 {
                     DoWork();
-                    AwaitTask();
+                    AwaitWorker();
                 }
                 catch (Exception e)
                 {
+                    Console.Error.WriteLine($"[ERROR][AsyncTask]: {e.Message}\n{e.StackTrace}");
                     taskException = e;
                 }
 
@@ -61,7 +63,7 @@ namespace MatthiWare.UpdateLib.Tasks
 #endif
             });
 
-            Enqueue(a.BeginInvoke(new AsyncCallback(r => a.EndInvoke(r)), null).AsyncWaitHandle);
+            mainWait = a.BeginInvoke(new AsyncCallback(r => a.EndInvoke(r)), null).AsyncWaitHandle;
         }
 
         /// <summary>
@@ -83,6 +85,12 @@ namespace MatthiWare.UpdateLib.Tasks
         /// Blocks the calling thread untill the task is done
         /// </summary>
         public void AwaitTask()
+        {
+            mainWait.WaitOne();
+            mainWait.Close();
+        }
+
+        private void AwaitWorker()
         {
             while (waitQueue.Count > 0)
             {
@@ -128,7 +136,7 @@ namespace MatthiWare.UpdateLib.Tasks
         /// Raises the <see cref="TaskCompleted"/> event. 
         /// </summary>
         /// <param name="e">If an <see cref="Exception"/> occured pass the <see cref="Exception"/> object.</param>
-        /// <param name="cancelled">Indicates whether the <see cref="AsyncTask"/> got cancelled.</param>
+        /// <param name="cancelled">Indicates whether the <see cref="AsyncTaskBase"/> got cancelled.</param>
         protected virtual void OnTaskCompleted(Exception e, bool cancelled = false)
         {
             TaskCompleted?.Invoke(this, new AsyncCompletedEventArgs(e, cancelled, null));
@@ -148,7 +156,7 @@ namespace MatthiWare.UpdateLib.Tasks
     /// Base class for all Tasks that need to be run Async
     /// </summary>
     /// <typeparam name="T">The type of the Result object</typeparam>
-    public abstract class AsyncTask<T> : AsyncTask
+    public abstract class AsyncTask<T> : AsyncTaskBase
     {
         /// <summary>
         /// The result <see cref="T"/> 
