@@ -7,11 +7,12 @@ using System.Threading;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
-    public class CheckForUpdatedFilesTask : AsyncTask<bool>
+    public class CheckForUpdatedFilesTask : AsyncTaskBase<bool>
     {
         private UpdateFile updateFile;
         private HashCacheFile cacheFile;
         private PathVariableConverter converter;
+        
 
         public CheckForUpdatedFilesTask(UpdateFile update, HashCacheFile cache, PathVariableConverter converter)
         {
@@ -50,9 +51,9 @@ namespace MatthiWare.UpdateLib.Tasks
 
             Enqueue(call.BeginInvoke(updateFile.OtherDirectory, new AsyncCallback(r => call.EndInvoke(r)), null).AsyncWaitHandle);
 
-            AwaitTask();
+            AwaitWorkers();
 
-            Result = (updateFile.Count > 0);
+            Result = updateFile.Count > 0;
         }
     }
 }

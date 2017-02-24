@@ -10,7 +10,7 @@ using System.Threading;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
-    public class UpdateCacheTask : AsyncTask<HashCacheFile>
+    public class UpdateCacheTask : AsyncTaskBase<HashCacheFile>
     {
         public override void DoWork()
         {

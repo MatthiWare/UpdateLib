@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
 
 namespace MatthiWare.UpdateLib.Tasks
@@ -21,6 +19,8 @@ namespace MatthiWare.UpdateLib.Tasks
         private WaitHandle mainWait;
         private readonly object sync = new object();
 
+        private int _workerThreadId;
+
         /// <summary>
         /// Raises when this <see cref="AsyncTaskBase"/> is completed. 
         /// </summary>
@@ -37,6 +37,8 @@ namespace MatthiWare.UpdateLib.Tasks
         {
             Action a = new Action(() =>
             {
+                _workerThreadId = Thread.CurrentThread.ManagedThreadId;
+
                 Exception taskException = null;
 
 #if DEBUG
@@ -47,11 +49,11 @@ namespace MatthiWare.UpdateLib.Tasks
                 try
                 {
                     DoWork();
-                    AwaitWorker();
+                    AwaitWorkers();
                 }
                 catch (Exception e)
                 {
-                    Console.Error.WriteLine($"[ERROR][AsyncTask]: {e.Message}\n{e.StackTrace}");
+                    Console.WriteLine($"[{e.GetBaseException().GetType().Name}][{GetType().Name}]: {e.Message}\n{e.StackTrace}");
                     taskException = e;
                 }
 
@@ -59,7 +61,7 @@ namespace MatthiWare.UpdateLib.Tasks
 
 #if DEBUG
                 m_sw.Stop();
-                Console.WriteLine("[{0}]: Completed in {1}ms", GetType().FullName, m_sw.ElapsedMilliseconds);
+                Console.WriteLine($"[{GetType().Name}]: Completed in {m_sw.ElapsedMilliseconds}ms");
 #endif
             });
 
@@ -82,15 +84,22 @@ namespace MatthiWare.UpdateLib.Tasks
         }
 
         /// <summary>
-        /// Blocks the calling thread untill the task is done
+        /// Blocks the calling thread until the complete task is done.
+        /// DO NOT call this in the worker method use <see cref="AwaitWorkers"/> method instead. 
         /// </summary>
         public void AwaitTask()
         {
+            if (_workerThreadId == Thread.CurrentThread.ManagedThreadId)
+                throw new ThreadStateException($"The {GetType().Name} entered a infinite wait state. Try using {nameof(AwaitWorkers)} instead.");
+
             mainWait.WaitOne();
             mainWait.Close();
         }
 
-        private void AwaitWorker()
+        /// <summary>
+        /// Blocks the calling thread until all the workers are done.
+        /// </summary>
+        protected void AwaitWorkers()
         {
             while (waitQueue.Count > 0)
             {
@@ -156,11 +165,11 @@ namespace MatthiWare.UpdateLib.Tasks
     /// Base class for all Tasks that need to be run Async
     /// </summary>
     /// <typeparam name="T">The type of the Result object</typeparam>
-    public abstract class AsyncTask<T> : AsyncTaskBase
+    public abstract class AsyncTaskBase<T> : AsyncTaskBase
     {
         /// <summary>
         /// The result <see cref="T"/> 
         /// </summary>
-        public T Result { get; set; }
+        public virtual T Result { get; set; }
     }
 }

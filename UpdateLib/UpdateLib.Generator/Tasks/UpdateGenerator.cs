@@ -7,7 +7,7 @@ using MatthiWare.UpdateLib.Tasks;
 
 namespace UpdateLib.Generator.Tasks
 {
-    public class UpdateGenerator : AsyncTask<UpdateFile>
+    public class UpdateGenerator : AsyncTaskBase<UpdateFile>
     {
         private delegate void AddDirRecursiveDelegate(DirectoryInfo dir, DirectoryEntry entry);
 
