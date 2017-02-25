@@ -43,7 +43,7 @@ namespace UpdateLib.Generator.Tasks
             foreach (FileInfo fi in files)
             {
                 FileEntry newEntry = new FileEntry(fi.Name);
-                newEntry.Hash = HashUtil.GetHash<SHA256>(fi.FullName);
+                newEntry.Hash = HashUtil.GetHash(fi.FullName);
 
                 entry.Files.Add(newEntry);
 

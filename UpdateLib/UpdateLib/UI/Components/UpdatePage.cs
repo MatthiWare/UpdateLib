@@ -161,7 +161,7 @@ namespace MatthiWare.UpdateLib.UI.Components
         private bool VerifyDownloadedFileSignature(DownloadTask task)
         {
             string localFile = Updater.Instance.Converter.Replace(task.Entry.DestinationLocation);
-            string md5local = HashUtil.GetHash<SHA256>(localFile);
+            string md5local = HashUtil.GetHash(localFile);
 
             return md5local.Equals(task.Entry.Hash);
         }

@@ -33,7 +33,7 @@ namespace MatthiWare.UpdateLib.Files
             if (!File.Exists(FilePath))
                 throw new FileNotFoundException("Unable to find file", FilePath);
 
-            Hash = HashUtil.GetHash< SHA256>(FilePath);
+            Hash = HashUtil.GetHash(FilePath);
 
             Ticks = File.GetLastWriteTime(FilePath).Ticks;
         }
@@ -42,7 +42,7 @@ namespace MatthiWare.UpdateLib.Files
         {
             if (tick != Ticks)
             {
-                Hash = HashUtil.GetHash<SHA256>(FilePath);
+                Hash = HashUtil.GetHash(FilePath);
                 Ticks = tick;
 
                 Console.WriteLine("[HashCacheEntry] Recalculated\nTime: {1}\nName: {0}\nHash{2}\n", FilePath, DateTime.FromBinary(Ticks).ToString(), Hash);

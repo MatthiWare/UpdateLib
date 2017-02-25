@@ -8,6 +8,17 @@ namespace MatthiWare.UpdateLib.Security
     public class HashUtil
     {
         /// <summary>
+        /// Get the hash from a file using the default hashing algorithm.
+        /// default algorithm is <see cref="SHA256"/>. 
+        /// </summary>
+        /// <param name="file">The input file to hash</param>
+        /// <returns>The hashed string</returns>
+        public static string GetHash(string file)
+        {
+            return GetHash<SHA256>(file);
+        }
+
+        /// <summary>
         /// Gets the hash from file using the given hashing algorithm.
         /// </summary>
         /// <typeparam name="T">The hashing algorithm should be a type of <see cref="HashAlgorithm"/> </typeparam>
