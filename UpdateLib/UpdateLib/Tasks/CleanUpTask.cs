@@ -26,8 +26,7 @@ namespace MatthiWare.UpdateLib.Tasks
             SearchPattern = searchPattern;
             IncludeSubDirectories = includeSubDirs;
         }
-
-        private void Worker()
+        public override void DoWork()
         {
             DirectoryInfo dir = new DirectoryInfo(PathToClean);
             FileInfo[] files = dir.GetFiles(SearchPattern, IncludeSubDirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
@@ -43,12 +42,6 @@ namespace MatthiWare.UpdateLib.Tasks
                     Console.WriteLine("[ERROR]: Unable to delete file {0} -> {1}.", file.FullName, e.Message);
                 }
             }
-        }
-
-        public override void DoWork()
-        {
-            Action caller = new Action(Worker);
-            Enqueue(caller.BeginInvoke(new AsyncCallback(r => caller.EndInvoke(r)), null).AsyncWaitHandle);
         }
     }
 }

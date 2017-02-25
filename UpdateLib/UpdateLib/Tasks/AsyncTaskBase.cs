@@ -11,6 +11,7 @@ namespace MatthiWare.UpdateLib.Tasks
     /// </summary>
     public abstract class AsyncTaskBase
     {
+
 #if DEBUG
         public Stopwatch m_sw = new Stopwatch();
 #endif
@@ -19,7 +20,9 @@ namespace MatthiWare.UpdateLib.Tasks
         private WaitHandle mainWait;
         private readonly object sync = new object();
 
-        private int _workerThreadId;
+        private Thread _workerThread;
+
+        private bool cancelled = false;
 
         /// <summary>
         /// Raises when this <see cref="AsyncTaskBase"/> is completed. 
@@ -31,47 +34,84 @@ namespace MatthiWare.UpdateLib.Tasks
         public event EventHandler<ProgressChangedEventArgs> TaskProgressChanged;
 
         /// <summary>
+        /// Gets if the current <see cref="AsyncTaskBase"/> is cancelled. 
+        /// </summary>
+        public bool IsCancelled
+        {
+            get
+            {
+                lock (sync)
+                    return cancelled;
+            }
+        }
+
+        /// <summary>
         /// Starts the task
         /// </summary>
         public void Start()
         {
-            Action a = new Action(() =>
+            Action worker = new Action(() =>
             {
-                _workerThreadId = Thread.CurrentThread.ManagedThreadId;
-
-                Exception taskException = null;
-
-#if DEBUG
-                m_sw.Reset();
-                m_sw.Start();
-#endif
-
                 try
                 {
                     DoWork();
-                    AwaitWorkers();
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"[{e.GetBaseException().GetType().Name}][{GetType().Name}]: {e.Message}\n{e.StackTrace}");
-                    taskException = e;
+                    throw e;
                 }
+                finally
+                {
+                    AwaitWorkers();
+                }
+            });
 
-                OnTaskCompleted(taskException);
+#if DEBUG
+            m_sw.Reset();
+            m_sw.Start();
+#endif
+
+            mainWait = worker.BeginInvoke(new AsyncCallback((IAsyncResult r) =>
+            {
 
 #if DEBUG
                 m_sw.Stop();
-                Console.WriteLine($"[{GetType().Name}]: Completed in {m_sw.ElapsedMilliseconds}ms");
 #endif
-            });
 
-            mainWait = a.BeginInvoke(new AsyncCallback(r => a.EndInvoke(r)), null).AsyncWaitHandle;
+                Exception error = null;
+                try
+                {
+                    worker.EndInvoke(r);
+
+#if DEBUG
+                    Console.WriteLine($"[{GetType().Name}]: Completed in {m_sw.ElapsedMilliseconds}ms");
+#endif
+                }
+                catch (Exception e)
+                {
+                    error = e;
+                    Console.WriteLine($"[{e.GetBaseException().GetType().Name}][{GetType().Name}]: {e.Message}\n{e.StackTrace}");
+                }
+
+                OnTaskCompleted(error, IsCancelled);
+
+            }), null).AsyncWaitHandle;
         }
 
         /// <summary>
         /// The worker method.
         /// </summary>
         public abstract void DoWork();
+
+        /// <summary>
+        /// Cancels the current <see cref="AsyncTaskBase"/>
+        /// Check <see cref="IsCancelled"/> in the worker code to see if the <see cref="AsyncTaskBase"/> got cancelled.  
+        /// </summary>
+        public void Cancel()
+        {
+            lock (sync)
+                cancelled = true;
+        }
 
         /// <summary>
         /// Adds a new wait object to the queue
@@ -89,11 +129,12 @@ namespace MatthiWare.UpdateLib.Tasks
         /// </summary>
         public void AwaitTask()
         {
-            if (_workerThreadId == Thread.CurrentThread.ManagedThreadId)
-                throw new ThreadStateException($"The {GetType().Name} entered a infinite wait state. Try using {nameof(AwaitWorkers)} instead.");
+            if (mainWait == null)
+                return;
 
             mainWait.WaitOne();
             mainWait.Close();
+            mainWait = null;
         }
 
         /// <summary>

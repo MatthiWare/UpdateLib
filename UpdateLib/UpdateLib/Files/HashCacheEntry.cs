@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Xml.Serialization;
 
@@ -32,7 +33,7 @@ namespace MatthiWare.UpdateLib.Files
             if (!File.Exists(FilePath))
                 throw new FileNotFoundException("Unable to find file", FilePath);
 
-            Hash = HashUtil.GetHash(FilePath);
+            Hash = HashUtil.GetHash< SHA256>(FilePath);
 
             Ticks = File.GetLastWriteTime(FilePath).Ticks;
         }
@@ -41,7 +42,7 @@ namespace MatthiWare.UpdateLib.Files
         {
             if (tick != Ticks)
             {
-                Hash = HashUtil.GetHash(FilePath);
+                Hash = HashUtil.GetHash<SHA256>(FilePath);
                 Ticks = tick;
 
                 Console.WriteLine("[HashCacheEntry] Recalculated\nTime: {1}\nName: {0}\nHash{2}\n", FilePath, DateTime.FromBinary(Ticks).ToString(), Hash);

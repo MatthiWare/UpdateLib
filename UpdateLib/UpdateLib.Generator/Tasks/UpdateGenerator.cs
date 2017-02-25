@@ -4,6 +4,7 @@ using System;
 using System.Threading;
 using System.IO;
 using MatthiWare.UpdateLib.Tasks;
+using System.Security.Cryptography;
 
 namespace UpdateLib.Generator.Tasks
 {
@@ -42,7 +43,7 @@ namespace UpdateLib.Generator.Tasks
             foreach (FileInfo fi in files)
             {
                 FileEntry newEntry = new FileEntry(fi.Name);
-                newEntry.Hash = HashUtil.GetHash(fi.FullName);
+                newEntry.Hash = HashUtil.GetHash<SHA256>(fi.FullName);
 
                 entry.Files.Add(newEntry);
 

@@ -19,7 +19,7 @@ namespace UpdateLib.Generator
         private DirectoryInfo applicationFolder = new DirectoryInfo("./ApplicationFolder");
         private DirectoryInfo outputFolder = new DirectoryInfo("./Output");
 
-
+        private ImageList iconList;
 
         public MainForm()
         {
@@ -30,6 +30,19 @@ namespace UpdateLib.Generator
 
             if (!outputFolder.Exists)
                 outputFolder.Create();
+
+            iconList = new ImageList();
+            lvItems.SmallImageList = iconList;
+
+            
+        }
+
+        private void LoadFolder(string path)
+        {
+            if (string.IsNullOrEmpty(path)) throw new ArgumentNullException(nameof(path));
+            if (!Directory.Exists(path)) throw new DirectoryNotFoundException($"The directory '{path}' was not found.");
+
+
         }
 
         private void Generate()
@@ -95,7 +108,7 @@ namespace UpdateLib.Generator
 
         private void Generator_TaskProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            Console.WriteLine("{0}%", e.ProgressPercentage);
+            SetStatusMessage($"Generating {e.ProgressPercentage}%");
             SetProgressBarValue(e.ProgressPercentage);
         }
 
@@ -109,7 +122,6 @@ namespace UpdateLib.Generator
 
             SetProgressBarValue(110);
 
-            Console.WriteLine("110% -- DONE");
             SetStatusMessage("Build completed");
         }
 

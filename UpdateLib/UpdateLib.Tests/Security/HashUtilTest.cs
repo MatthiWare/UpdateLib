@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,7 +19,7 @@ namespace UpdateLib.Tests.Security
         public void Before()
         {
             temp_file = Path.GetTempPath() + Guid.NewGuid().ToString() + "hash_util_test.tmp";
-            using (StreamWriter sw = new StreamWriter(File.Open(temp_file, FileMode.OpenOrCreate, FileAccess.Write),Encoding.UTF8))
+            using (StreamWriter sw = new StreamWriter(File.Open(temp_file, FileMode.OpenOrCreate, FileAccess.Write),Encoding.Default))
             {
                 sw.WriteLine("This is a test");
             }
@@ -27,7 +28,7 @@ namespace UpdateLib.Tests.Security
         [Test]
         public void GetHashFromNullShouldThrowNullArgumentException()
         {
-            Assert.Throws<ArgumentNullException>(() => HashUtil.GetHash(null));
+            Assert.Throws<ArgumentNullException>(() => HashUtil.GetHash<SHA256>(null));
         }
 
         [Test]
@@ -36,14 +37,14 @@ namespace UpdateLib.Tests.Security
             if (File.Exists(temp_file))
                 File.Delete(temp_file);
 
-            Assert.Throws<FileNotFoundException>(() => HashUtil.GetHash(temp_file));
+            Assert.Throws<FileNotFoundException>(() => HashUtil.GetHash<SHA256>(temp_file));
         }
 
         [Test]
         public void GetHashShouldReturnTheCorrectHash()
         {
-            string hash = HashUtil.GetHash(temp_file);
-            Assert.AreEqual("41CA5D124F0D02EB9A7AED0332D0965C", hash);
+            string hash = HashUtil.GetHash<SHA256>(temp_file);
+            Assert.AreEqual("07849dc26fcbb2f3bd5f57bdf214bae374575f1bd4e6816482324799417cb379".ToUpper(), hash);
         }
 
         [TearDown]

@@ -7,15 +7,15 @@ namespace MatthiWare.UpdateLib.Security
 {
     public class HashUtil
     {
-
         /// <summary>
-        /// Gets the MD5 hash from a given file
+        /// Gets the hash from file using the given hashing algorithm.
         /// </summary>
-        /// <param name="file">The file to hash</param>
-        /// <returns></returns>
-        public static string GetHash(string file)
+        /// <typeparam name="T">The hashing algorithm should be a type of <see cref="HashAlgorithm"/> </typeparam>
+        /// <param name="file">The input file to hash</param>
+        /// <returns>The hashed string</returns>
+        public static string GetHash<T>(string file) where T : HashAlgorithm
         {
-            if (String.IsNullOrEmpty(file))
+            if (string.IsNullOrEmpty(file))
                 throw new ArgumentNullException(file);
 
             if (!File.Exists(file))
@@ -23,9 +23,9 @@ namespace MatthiWare.UpdateLib.Security
 
             using (Stream stream = File.OpenRead(file))
             {
-                using (MD5 md5 = MD5.Create())
+                using (HashAlgorithm algo = HashAlgorithm.Create(typeof(T).FullName))
                 {
-                    byte[] hash = md5.ComputeHash(stream);
+                    byte[] hash = algo.ComputeHash(stream);
                     return BitConverter.ToString(hash).Replace("-", string.Empty);
                 }
             }

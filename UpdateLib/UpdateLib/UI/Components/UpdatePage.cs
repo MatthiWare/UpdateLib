@@ -13,6 +13,7 @@ using MatthiWare.UpdateLib.Properties;
 using System.Diagnostics;
 using MatthiWare.UpdateLib.Tasks;
 using MatthiWare.UpdateLib.Security;
+using System.Security.Cryptography;
 
 namespace MatthiWare.UpdateLib.UI.Components
 {
@@ -60,11 +61,15 @@ namespace MatthiWare.UpdateLib.UI.Components
         {
             amountToDownload = UpdateFile.Count;
 
+            lvItems.BeginUpdate();
+
             AddDirectoryToListView(UpdateFile.ApplicationDirectory);
             AddDirectoryToListView(UpdateFile.OtherDirectory);
 
             lvItems.Columns[5].Width = -1;
             lvItems.Columns[1].Width = -1;
+
+            lvItems.EndUpdate();
         }
 
         private void AddDirectoryToListView(DirectoryEntry dir)
@@ -88,7 +93,7 @@ namespace MatthiWare.UpdateLib.UI.Components
             PageUpdate?.Invoke(this, new EventArgs());
             foreach (ListViewItem item in lvItems.Items)
             {
-                Console.WriteLine("UpdatePage thread: {0}", Thread.CurrentThread.ManagedThreadId);
+                Console.WriteLine("UpdatePage thread start: {0}", Thread.CurrentThread.ManagedThreadId);
                 DownloadTask task = new DownloadTask(item);
                 task.TaskProgressChanged += Task_TaskProgressChanged;
                 task.TaskCompleted += Task_TaskCompleted;
@@ -102,7 +107,7 @@ namespace MatthiWare.UpdateLib.UI.Components
         private void Task_TaskCompleted(object sender, AsyncCompletedEventArgs e)
         {
             DownloadTask task = (DownloadTask)sender;
-            Console.WriteLine("UpdatePage thread: {0}", Thread.CurrentThread.ManagedThreadId);
+            Console.WriteLine("UpdatePage thread completed: {0}", Thread.CurrentThread.ManagedThreadId);
 
             int amountLeft = Interlocked.Decrement(ref amountToDownload);
 
@@ -146,7 +151,7 @@ namespace MatthiWare.UpdateLib.UI.Components
 
                 return;
             }
-            
+
 
             SetSubItemText(task.Item.SubItems[2], "Done");
 
@@ -156,7 +161,7 @@ namespace MatthiWare.UpdateLib.UI.Components
         private bool VerifyDownloadedFileSignature(DownloadTask task)
         {
             string localFile = Updater.Instance.Converter.Replace(task.Entry.DestinationLocation);
-            string md5local = HashUtil.GetHash(localFile);
+            string md5local = HashUtil.GetHash<SHA256>(localFile);
 
             return md5local.Equals(task.Entry.Hash);
         }
