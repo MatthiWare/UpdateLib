@@ -154,6 +154,8 @@ namespace MatthiWare.UpdateLib.UI
             }
             else
             {
+               Updater.Instance.Initialize();
+
                 pages.Clear();
                 pages.Add(new FinishPage(this));
                 SetContentPage(pages.CurrentPage);
