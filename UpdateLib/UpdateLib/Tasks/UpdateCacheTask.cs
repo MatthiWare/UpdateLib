@@ -10,61 +10,38 @@ using System.Threading;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
-    public class UpdateCacheTask
+    public class UpdateCacheTask : AsyncTaskBase<HashCacheFile>
     {
-
-        private Queue<WaitHandle> whQueue;
-        private HashCacheFile file;
-        private readonly object sync = new object();
-
-        public UpdateCacheTask()
+        public override void DoWork()
         {
-            whQueue = new Queue<WaitHandle>();
-        }
-
-        public void Start()
-        {
-            Action caller = new Action(Worker);
-            lock (sync)
-                whQueue.Enqueue(caller.BeginInvoke(new AsyncCallback(r => caller.EndInvoke(r)), null).AsyncWaitHandle);
-        }
-
-        private void Worker()
-        {
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-
             // first of lets load the file
-            file = HashCacheFile.Load();
+            Result = HashCacheFile.Load();
 
             DirectoryInfo dir = new DirectoryInfo(".");
             IEnumerable<FileInfo> files = dir.GetFiles("*", SearchOption.AllDirectories).Where(f => !f.FullName.Contains(".old.tmp"));
 
             Console.WriteLine("[INFO]: UpdateCacheFile found {0} files to recheck.", files.Count());
 
-            if (file == null) // The file doesn't exist yet
+            if (Result == null) // The file doesn't exist yet
             {
                 Console.WriteLine("[INFO]: UpdateCacheFile doesn't exist. Creating..");
 
-                file = new HashCacheFile();
+                Result = new HashCacheFile();
 
                 foreach (FileInfo f in files)
-                    file.Items.Add(new HashCacheEntry(f.FullName));
+                    Result.Items.Add(new HashCacheEntry(f.FullName));
 
-                file.Save();
-
-                sw.Stop();
-                Console.WriteLine("[INFO]: UpdateCacheTask took {0}ms.", sw.ElapsedMilliseconds);
+                Result.Save();
 
                 return;
             }
 
             foreach (FileInfo f in files)
             {
-                HashCacheEntry entry = file.Items.Find(match => match.FilePath == f.FullName);
+                HashCacheEntry entry = Result.Items.Find(match => match.FilePath == f.FullName);
                 if (entry == null)
                 {
-                    file.Items.Add(new HashCacheEntry(f.FullName));
+                    Result.Items.Add(new HashCacheEntry(f.FullName));
                     continue;
                 }
 
@@ -72,28 +49,7 @@ namespace MatthiWare.UpdateLib.Tasks
                 entry.Recalculate(f.LastWriteTime.Ticks);
             }
 
-            file.Save();
-
-            sw.Stop();
-            Console.WriteLine("[INFO]: UpdateCacheTask took {0}ms.", sw.ElapsedMilliseconds);
-
+            Result.Save();
         }
-
-        public HashCacheFile AwaitTask()
-        {
-            while(whQueue.Count > 0)
-            {
-                WaitHandle wh = null;
-
-                lock (sync)
-                    wh = whQueue.Dequeue();
-
-                wh.WaitOne();
-                wh.Close();
-            }
-
-            return file;
-        }
-
     }
 }
