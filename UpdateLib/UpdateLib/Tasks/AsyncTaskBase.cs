@@ -90,7 +90,7 @@ namespace MatthiWare.UpdateLib.Tasks
                 catch (Exception e)
                 {
                     error = e;
-                    Console.WriteLine($"[{e.GetBaseException().GetType().Name}][{GetType().Name}]: {e.Message}\n{e.StackTrace}");
+                    Console.WriteLine($"[{e.GetBaseException().GetType().Name}][{GetType().Name}]: {e.Message}{e.StackTrace}");
                 }
 
                 OnTaskCompleted(error, IsCancelled);

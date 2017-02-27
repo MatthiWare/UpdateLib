@@ -32,17 +32,21 @@ namespace UpdateLib.Generator
                 outputFolder.Create();
 
             iconList = new ImageList();
+            iconList.ImageSize = new Size(24, 24);
             lvItems.SmallImageList = iconList;
 
-            
+            LoadFolder(applicationFolder);
         }
 
-        private void LoadFolder(string path)
+        private LoadDirectoryTask LoadFolder(DirectoryInfo path)
         {
-            if (string.IsNullOrEmpty(path)) throw new ArgumentNullException(nameof(path));
-            if (!Directory.Exists(path)) throw new DirectoryNotFoundException($"The directory '{path}' was not found.");
+            if (path == null) throw new ArgumentNullException(nameof(path));
+            if (!path.Exists) throw new DirectoryNotFoundException($"The directory '{path.FullName}' was not found.");
 
+            LoadDirectoryTask task = new LoadDirectoryTask(lvItems, iconList, path);
+            task.Start();
 
+            return task;
         }
 
         private void Generate()
@@ -157,6 +161,21 @@ namespace UpdateLib.Generator
                 //SetProgressBarVisible(false);
                 generateAction.EndInvoke(r);
             }), null);
+        }
+
+        private void lvItems_DoubleClick(object sender, EventArgs e)
+        {
+            if (lvItems.SelectedItems.Count == 0)
+                return;
+
+            ListViewItem item = lvItems.SelectedItems[0];
+
+            DirectoryInfo dir = item.Tag as DirectoryInfo;
+
+            if (dir == null)
+                return;
+
+            LoadFolder(dir);
         }
     }
 }

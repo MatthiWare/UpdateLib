@@ -28,16 +28,18 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("General Information");
-            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Files");
-            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Registry");
-            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Project", new System.Windows.Forms.TreeNode[] {
-            treeNode1,
-            treeNode2,
-            treeNode3});
+            System.Windows.Forms.TreeNode treeNode9 = new System.Windows.Forms.TreeNode("General Information");
+            System.Windows.Forms.TreeNode treeNode10 = new System.Windows.Forms.TreeNode("Files");
+            System.Windows.Forms.TreeNode treeNode11 = new System.Windows.Forms.TreeNode("Registry");
+            System.Windows.Forms.TreeNode treeNode12 = new System.Windows.Forms.TreeNode("Project", new System.Windows.Forms.TreeNode[] {
+            treeNode9,
+            treeNode10,
+            treeNode11});
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.tvProject = new System.Windows.Forms.TreeView();
+            this.lvItems = new System.Windows.Forms.ListView();
+            this.clmnName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.menuStrip = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -55,8 +57,8 @@
             this.saveToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator = new System.Windows.Forms.ToolStripSeparator();
             this.buildToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this.lvItems = new System.Windows.Forms.ListView();
-            this.clmnName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.clmnDate = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.clmnPath = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
             this.splitContainer.SuspendLayout();
@@ -89,19 +91,41 @@
             this.tvProject.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tvProject.Location = new System.Drawing.Point(0, 0);
             this.tvProject.Name = "tvProject";
-            treeNode1.Name = "nodeInfo";
-            treeNode1.Text = "General Information";
-            treeNode2.Name = "nodeFiles";
-            treeNode2.Text = "Files";
-            treeNode3.Name = "nodeRegistry";
-            treeNode3.Text = "Registry";
-            treeNode4.Name = "root";
-            treeNode4.Text = "Project";
+            treeNode9.Name = "nodeInfo";
+            treeNode9.Text = "General Information";
+            treeNode10.Name = "nodeFiles";
+            treeNode10.Text = "Files";
+            treeNode11.Name = "nodeRegistry";
+            treeNode11.Text = "Registry";
+            treeNode12.Name = "root";
+            treeNode12.Text = "Project";
             this.tvProject.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode4});
+            treeNode12});
             this.tvProject.Size = new System.Drawing.Size(228, 315);
             this.tvProject.TabIndex = 0;
             this.tvProject.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tvProject_AfterSelect);
+            // 
+            // lvItems
+            // 
+            this.lvItems.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.clmnName,
+            this.clmnDate,
+            this.clmnPath});
+            this.lvItems.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lvItems.FullRowSelect = true;
+            this.lvItems.Location = new System.Drawing.Point(0, 0);
+            this.lvItems.MultiSelect = false;
+            this.lvItems.Name = "lvItems";
+            this.lvItems.Size = new System.Drawing.Size(394, 315);
+            this.lvItems.TabIndex = 0;
+            this.lvItems.UseCompatibleStateImageBehavior = false;
+            this.lvItems.View = System.Windows.Forms.View.Details;
+            this.lvItems.DoubleClick += new System.EventHandler(this.lvItems_DoubleClick);
+            // 
+            // clmnName
+            // 
+            this.clmnName.Text = "Name";
+            this.clmnName.Width = 139;
             // 
             // menuStrip
             // 
@@ -243,21 +267,9 @@
             this.buildToolStripButton.Text = "C&ut";
             this.buildToolStripButton.Click += new System.EventHandler(this.buildToolStripButton_Click);
             // 
-            // lvItems
+            // clmnPath
             // 
-            this.lvItems.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.clmnName});
-            this.lvItems.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lvItems.Location = new System.Drawing.Point(0, 0);
-            this.lvItems.Name = "lvItems";
-            this.lvItems.Size = new System.Drawing.Size(394, 315);
-            this.lvItems.TabIndex = 0;
-            this.lvItems.UseCompatibleStateImageBehavior = false;
-            this.lvItems.View = System.Windows.Forms.View.Details;
-            // 
-            // clmnName
-            // 
-            this.clmnName.Width = 104;
+            this.clmnPath.Text = "Path";
             // 
             // MainForm
             // 
@@ -311,6 +323,8 @@
         private System.Windows.Forms.ToolStripProgressBar progressBar;
         private System.Windows.Forms.ListView lvItems;
         private System.Windows.Forms.ColumnHeader clmnName;
+        private System.Windows.Forms.ColumnHeader clmnDate;
+        private System.Windows.Forms.ColumnHeader clmnPath;
     }
 }
 

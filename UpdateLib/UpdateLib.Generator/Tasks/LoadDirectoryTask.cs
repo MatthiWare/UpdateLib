@@ -13,14 +13,14 @@ namespace UpdateLib.Generator.Tasks
     {
         public ListView ItemsListView { get; set; }
         public ImageList IconList { get; set; }
-        public string DirectoryPath { get; set; }
+        public DirectoryInfo DirectoryPath { get; set; }
 
-        public LoadDirectoryTask(ListView lv, ImageList iconCache, string dirPath)
+        public LoadDirectoryTask(ListView lv, ImageList iconCache, DirectoryInfo dirPath)
         {
             if (lv == null) throw new ArgumentNullException(nameof(lv));
             if (iconCache == null) throw new ArgumentNullException(nameof(iconCache));
-            if (string.IsNullOrEmpty(dirPath)) throw new ArgumentNullException(nameof(dirPath));
-            if (!Directory.Exists(dirPath)) throw new DirectoryNotFoundException($"The directory '{dirPath}' was not found.");
+            if (dirPath == null) throw new ArgumentNullException(nameof(dirPath));
+            if (!dirPath.Exists) throw new DirectoryNotFoundException($"The directory '{dirPath.FullName}' was not found.");
 
             ItemsListView = lv;
             IconList = iconCache;
@@ -29,24 +29,22 @@ namespace UpdateLib.Generator.Tasks
 
         public override void DoWork()
         {
-            DirectoryInfo dir = new DirectoryInfo(DirectoryPath);
+            BeginUpdate();
 
-            ItemsListView.BeginUpdate();
+            Clear();
 
-            ItemsListView.Clear();
-
-            foreach (DirectoryInfo subDir in dir.GetDirectories())
+            foreach (DirectoryInfo subDir in DirectoryPath.GetDirectories())
             {
-                ListViewItem item = new ListViewItem(subDir.Name);
+                ListViewItem item = new ListViewItem(new string[] { subDir.Name, subDir.LastWriteTimeUtc.ToString(), subDir.FullName });
                 item.Tag = subDir;
                 item.ImageKey = "folder";
 
-                ItemsListView.Items.Add(item);
+                AddItem(item);
             }
 
-            foreach (FileInfo file in dir.GetFiles())
+            foreach (FileInfo file in DirectoryPath.GetFiles())
             {
-                ListViewItem item = new ListViewItem(file.Name);
+                ListViewItem item = new ListViewItem(new string[] { file.Name, file.LastWriteTimeUtc.ToString(), file.FullName });
                 item.Tag = file;
 
                 if (!IconList.Images.ContainsKey(file.Extension))
@@ -54,10 +52,70 @@ namespace UpdateLib.Generator.Tasks
 
                 item.ImageKey = file.Extension;
 
-                ItemsListView.Items.Add(item);
+                AddItem(item);
+            }
+
+            SetColumnAutoSize(0);
+            SetColumnAutoSize(1);
+            SetColumnAutoSize(2);
+
+            EndUpdate();
+            
+        }
+
+        private void SetColumnAutoSize(int clmn)
+        {
+            if (ItemsListView.InvokeRequired)
+            {
+                ItemsListView.Invoke(new Action<int>(SetColumnAutoSize), clmn);
+                return;
+            }
+
+            ItemsListView.Columns[clmn].Width = -1;
+        }
+
+        private void EndUpdate()
+        {
+            if (ItemsListView.InvokeRequired)
+            {
+                ItemsListView.Invoke(new Action(EndUpdate));
+                return;
             }
 
             ItemsListView.EndUpdate();
+        }
+
+        private void BeginUpdate()
+        {
+            if (ItemsListView.InvokeRequired)
+            {
+                ItemsListView.Invoke(new Action(BeginUpdate));
+                return;
+            }
+
+            ItemsListView.BeginUpdate();
+        }
+
+        private void Clear()
+        {
+            if (ItemsListView.InvokeRequired)
+            {
+                ItemsListView.Invoke(new Action(Clear));
+                return;
+            }
+
+            ItemsListView.Items.Clear();
+        }
+
+        private void AddItem(ListViewItem item)
+        {
+            if (ItemsListView.InvokeRequired)
+            {
+                ItemsListView.Invoke(new Action<ListViewItem>(AddItem), item);
+                return;
+            }
+
+            ItemsListView.Items.Add(item);
         }
     }
 }
