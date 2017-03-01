@@ -8,7 +8,7 @@ using System.Security.Cryptography;
 
 namespace UpdateLib.Generator.Tasks
 {
-    public class UpdateGenerator : AsyncTaskBase<UpdateFile>
+    public class UpdateGeneratorTask : AsyncTaskBase<UpdateFile>
     {
         private delegate void AddDirRecursiveDelegate(DirectoryInfo dir, DirectoryEntry entry);
 
@@ -17,7 +17,7 @@ namespace UpdateLib.Generator.Tasks
         private int total;
         private int done = 0;
 
-        public UpdateGenerator(DirectoryInfo dir)
+        public UpdateGeneratorTask(DirectoryInfo dir)
         {
             if (dir == null)
                 throw new ArgumentNullException("dir", "The directory cannot be null");
@@ -32,7 +32,7 @@ namespace UpdateLib.Generator.Tasks
             total = dir.GetFiles("*", SearchOption.AllDirectories).Length;
         }
 
-        public override void DoWork()
+        protected override void DoWork()
         {
             AddDirRecursive(baseDir, Result.ApplicationDirectory);
         }

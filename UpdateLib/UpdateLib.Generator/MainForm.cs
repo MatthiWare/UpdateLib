@@ -52,7 +52,7 @@ namespace UpdateLib.Generator
         private void Generate()
         {
 
-            UpdateGenerator generator = new UpdateGenerator(applicationFolder);
+            UpdateGeneratorTask generator = new UpdateGeneratorTask(applicationFolder);
             
             generator.TaskCompleted += Generator_TaskCompleted;
             generator.TaskProgressChanged += Generator_TaskProgressChanged;
@@ -120,7 +120,7 @@ namespace UpdateLib.Generator
         {
             string filePath = string.Concat(outputFolder.FullName, "\\", "updatefile.xml");
 
-            UpdateGenerator gen = (UpdateGenerator)sender;
+            UpdateGeneratorTask gen = (UpdateGeneratorTask)sender;
 
             gen.Result.Save(filePath);
 

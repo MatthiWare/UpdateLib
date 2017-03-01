@@ -45,7 +45,7 @@ namespace MatthiWare.UpdateLib.Files
                 Hash = HashUtil.GetHash(FilePath);
                 Ticks = tick;
 
-                Console.WriteLine("[HashCacheEntry] Recalculated\nTime: {1}\nName: {0}\nHash{2}\n", FilePath, DateTime.FromBinary(Ticks).ToString(), Hash);
+                Console.WriteLine($"[{GetType().Name}] Recalculated\nTime: {DateTime.FromBinary(Ticks).ToString()}\nName: {FilePath}\nHash: {Hash}");
             }
         }
 

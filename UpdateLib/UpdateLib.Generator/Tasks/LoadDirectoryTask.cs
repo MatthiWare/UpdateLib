@@ -27,7 +27,7 @@ namespace UpdateLib.Generator.Tasks
             DirectoryPath = dirPath;
         }
 
-        public override void DoWork()
+        protected override void DoWork()
         {
             BeginUpdate();
 

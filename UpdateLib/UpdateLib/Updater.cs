@@ -50,19 +50,17 @@ namespace MatthiWare.UpdateLib
             set
             {
                 m_updateUrl = value;
-                m_localUpdateFile = GetFileNameFromUrl();
                 RemoteBasePath = GetRemoteBasePath();
             }
         }
-        private string m_localUpdateFile;
 
         public bool ShowUpdateMessage { get; set; } = true;
         public bool ShowMessageOnNoUpdate { get; set; } = true;
         public bool ShowErrorMessage { get; set; } = true;
         public PathVariableConverter Converter { get; private set; }
 
-        private CleanUpTask cleanUpTask;
-        private UpdateCacheTask updateCacheTask;
+        public CleanUpTask CleanUpTask { get; private set; }
+        public UpdateCacheTask UpdateCacheTask { get; private set; }
 
         private bool initialized = false;
 
@@ -80,11 +78,11 @@ namespace MatthiWare.UpdateLib
 
         public void Initialize()
         {
-            cleanUpTask = new CleanUpTask(".");
-            cleanUpTask.Start();
+            CleanUpTask = new CleanUpTask(".");
+            CleanUpTask.Start();
 
-            updateCacheTask = new UpdateCacheTask();
-            updateCacheTask.Start();
+            UpdateCacheTask = new UpdateCacheTask();
+            UpdateCacheTask.Start();
 
             initialized = true;
         }
@@ -99,9 +97,7 @@ namespace MatthiWare.UpdateLib
 
             if (String.IsNullOrEmpty(UpdateURL))
                 throw new ArgumentException("You need to specifify a update url", "UpdateURL");
-
             
-
             WebClient wc = new WebClient();
             wc.DownloadFileCompleted += UpdateFile_DownloadCompleted;
             wc.DownloadFileAsync(new Uri(UpdateURL), m_localUpdateFile);
@@ -125,8 +121,8 @@ namespace MatthiWare.UpdateLib
                     new MessageDialog(
                         "Error", 
                         "Unable to get the update information", 
-                        "There has been a problem getting the needed update information\nPlease contact customer support!", 
-                        SystemIcons.Error).ShowDialog();
+                        "There has been a problem getting the needed update information  \nPlease contact customer support!", 
+                        SystemIcons.Error, MessageBoxButtons.OK).ShowDialog();
 
                 return;
             }
@@ -140,7 +136,7 @@ namespace MatthiWare.UpdateLib
             UpdateFile updateFile = LoadUpdateFile();
 
             HashCacheFile cache = GetCache();
-            cleanUpTask.AwaitTask();
+            CleanUpTask.AwaitTask();
 
             CheckForUpdatedFilesTask checkForUpdatesTask = new CheckForUpdatedFilesTask(updateFile, cache, Converter);
             checkForUpdatesTask.Start();
@@ -169,8 +165,8 @@ namespace MatthiWare.UpdateLib
 
         public HashCacheFile GetCache()
         {
-            updateCacheTask.AwaitTask();
-            return updateCacheTask.Result;
+            UpdateCacheTask.AwaitTask();
+            return UpdateCacheTask.Result;
         }
 
         private UpdateFile LoadUpdateFile()
@@ -178,11 +174,7 @@ namespace MatthiWare.UpdateLib
             return UpdateFile.Load(m_localUpdateFile);
         }
 
-        private string GetFileNameFromUrl()
-        {
-            string[] tokens = UpdateURL.Split('/');
-            return string.Concat("./", tokens[tokens.Length - 1]);
-        }
+        
 
         private string GetRemoteBasePath()
         {

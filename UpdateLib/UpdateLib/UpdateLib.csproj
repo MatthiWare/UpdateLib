@@ -63,7 +63,8 @@
     <Compile Include="Files\FileEntry.cs" />
     <Compile Include="Files\PathVariableConverter.cs" />
     <Compile Include="Files\UpdateFile.cs" />
-    <Compile Include="Files\UpdateFilePostProcessor.cs" />
+    <Compile Include="Tasks\CheckForUpdatesTask.cs" />
+    <Compile Include="Tasks\UpdateFileProcessorTask.cs" />
     <Compile Include="Security\HashUtil.cs" />
     <Compile Include="Tasks\AsyncTaskBase.cs" />
     <Compile Include="Tasks\CheckForUpdatedFilesTask.cs" />

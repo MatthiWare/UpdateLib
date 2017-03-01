@@ -29,15 +29,15 @@ namespace MatthiWare.UpdateLib.Tasks
             webClient.DownloadFileCompleted += (o, e) => { wait.Set(); };
         }
 
-        public override void DoWork()
+        protected override void DoWork()
         {
             wait = new ManualResetEvent(false);
 
             string localFile = Updater.Instance.Converter.Replace(Entry.DestinationLocation);
             string remoteFile = string.Concat(Updater.Instance.RemoteBasePath, Entry.SourceLocation);
 
-            Console.WriteLine("[INFO]: DownloadTask: LocalFile => {0}", localFile);
-            Console.WriteLine("[INFO]: DownloadTask: RemoteFile => {0}", remoteFile);
+            Console.WriteLine($"[{GetType().Name}]: LocalFile => {localFile}");
+            Console.WriteLine($"[{GetType().Name}]: RemoteFile => {remoteFile}");
 
             if (File.Exists(localFile))
                 File.Move(localFile, string.Concat(localFile, ".old.tmp"));

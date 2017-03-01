@@ -101,7 +101,7 @@ namespace MatthiWare.UpdateLib.Tasks
         /// <summary>
         /// The worker method.
         /// </summary>
-        public abstract void DoWork();
+        protected abstract void DoWork();
 
         /// <summary>
         /// Cancels the current <see cref="AsyncTaskBase"/>

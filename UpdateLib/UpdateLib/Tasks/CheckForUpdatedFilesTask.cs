@@ -13,7 +13,6 @@ namespace MatthiWare.UpdateLib.Tasks
         private HashCacheFile cacheFile;
         private PathVariableConverter converter;
         
-
         public CheckForUpdatedFilesTask(UpdateFile update, HashCacheFile cache, PathVariableConverter converter)
         {
             updateFile = update;
@@ -35,15 +34,13 @@ namespace MatthiWare.UpdateLib.Tasks
                 return val;
             });
 
+            Action<DirectoryEntry> call = new Action<DirectoryEntry>(RecursiveCheck);
 
             foreach (DirectoryEntry de in dir.Directories)
-            {
-                Action<DirectoryEntry> call = new Action<DirectoryEntry>(RecursiveCheck);
                 Enqueue(call.BeginInvoke(de, new AsyncCallback(r => call.EndInvoke(r)), null).AsyncWaitHandle);
-            }
         }
 
-        public override void DoWork()
+        protected override void DoWork()
         {
             Action<DirectoryEntry> call = new Action<DirectoryEntry>(RecursiveCheck);
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MatthiWare.UpdateLib.Tasks;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -26,7 +27,7 @@ namespace MatthiWare.UpdateLib.Files
         /// The versionstring should be parsable by the <see cref="Version"/> to be valid. 
         /// </summary>
         [XmlAttribute]
-        public string VersionString { get; set; } = "0.1.0.0";
+        public string VersionString { get; set; } = "1.0.0.0";
 
         /// <summary>
         /// Gets the root folder of the application
@@ -118,25 +119,14 @@ namespace MatthiWare.UpdateLib.Files
             if (!input.CanRead)
                 throw new ArgumentException("Stream is not readable", "input");
 
-            Stopwatch sw = new Stopwatch();
-
             XmlSerializer xml = new XmlSerializer(typeof(UpdateFile));
-
-            Console.WriteLine("Loading UpdateFile..");
-            sw.Start();
 
             UpdateFile file = (UpdateFile)xml.Deserialize(input);
 
-            Console.WriteLine("[INFO]: Deserializing completed in {0}ms", sw.ElapsedMilliseconds);
+            UpdateFileProcessorTask processor = new UpdateFileProcessorTask(file);
+            processor.Start();
 
-            sw.Reset();
-            sw.Start();
-
-            new UpdateFilePostProcessor(file).PostProcess();
-
-            Console.WriteLine("[INFO]: Postprocessing completed in {0}ms", sw.ElapsedMilliseconds);
-
-            sw.Stop();
+            processor.AwaitTask();
 
             return file;
         }

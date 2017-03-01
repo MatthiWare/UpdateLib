@@ -12,7 +12,7 @@ namespace MatthiWare.UpdateLib.Tasks
 {
     public class UpdateCacheTask : AsyncTaskBase<HashCacheFile>
     {
-        public override void DoWork()
+        protected override void DoWork()
         {
             // first of lets load the file
             Result = HashCacheFile.Load();
@@ -20,11 +20,11 @@ namespace MatthiWare.UpdateLib.Tasks
             DirectoryInfo dir = new DirectoryInfo(".");
             IEnumerable<FileInfo> files = dir.GetFiles("*", SearchOption.AllDirectories).Where(f => !f.FullName.Contains(".old.tmp"));
 
-            Console.WriteLine("[INFO]: UpdateCacheFile found {0} files to recheck.", files.Count());
+            Console.WriteLine($"[{GetType().Name}] found {files.Count()} files to recheck.");
 
             if (Result == null) // The file doesn't exist yet
             {
-                Console.WriteLine("[INFO]: UpdateCacheFile doesn't exist. Creating..");
+                Console.WriteLine($"[{GetType().Name}]: File doesn't exist. Creating..");
 
                 Result = new HashCacheFile();
 
