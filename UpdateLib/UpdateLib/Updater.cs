@@ -95,86 +95,105 @@ namespace MatthiWare.UpdateLib
             if (!initialized)
                 throw new InvalidOperationException("The updater needs to be initialized first.");
 
-            if (String.IsNullOrEmpty(UpdateURL))
+            if (string.IsNullOrEmpty(UpdateURL))
                 throw new ArgumentException("You need to specifify a update url", "UpdateURL");
+
+            //WebClient wc = new WebClient();
+            //wc.DownloadFileCompleted += UpdateFile_DownloadCompleted;
+            //wc.DownloadFileAsync(new Uri(UpdateURL), m_localUpdateFile);
+
+            CheckForUpdatesTask task = new CheckForUpdatesTask(UpdateURL);
+            task.TaskCompleted += Task_TaskCompleted;
+            task.Start();
             
-            WebClient wc = new WebClient();
-            wc.DownloadFileCompleted += UpdateFile_DownloadCompleted;
-            wc.DownloadFileAsync(new Uri(UpdateURL), m_localUpdateFile);
         }
 
-        private void UpdateFile_DownloadCompleted(object sender, AsyncCompletedEventArgs e)
+        private void Task_TaskCompleted(object sender, AsyncCompletedEventArgs e)
         {
-            WebClient download_client = (WebClient)sender;
-            download_client.Dispose();
-            
-            // the update process got cancelled. 
-            if (e.Cancelled)
-                return;
-
-            // error reporting
             if (e.Error != null)
             {
-                Debug.WriteLine(String.Concat(e.Error.Message, "\n", e.Error.StackTrace));
+                MessageDialog msgError = new MessageDialog(
+                    "Error", 
+                    "Unable to get the update information", 
+                    "There has been a problem getting the needed update information \nPlease contact customer support!",
+                    SystemIcons.Error, MessageBoxButtons.OK);
 
-                if (ShowErrorMessage)
-                    new MessageDialog(
-                        "Error", 
-                        "Unable to get the update information", 
-                        "There has been a problem getting the needed update information  \nPlease contact customer support!", 
-                        SystemIcons.Error, MessageBoxButtons.OK).ShowDialog();
+                msgError.ShowDialog();
 
                 return;
             }
 
-            Action caller = new Action(CheckForUpdatesTask);
-            caller.BeginInvoke(new AsyncCallback(r => caller.EndInvoke(r)), null);
-        }
-
-        private void CheckForUpdatesTask()
-        {
-            UpdateFile updateFile = LoadUpdateFile();
-
-            HashCacheFile cache = GetCache();
-            CleanUpTask.AwaitTask();
-
-            CheckForUpdatedFilesTask checkForUpdatesTask = new CheckForUpdatedFilesTask(updateFile, cache, Converter);
-            checkForUpdatesTask.Start();
-            checkForUpdatesTask.AwaitTask();
-
-            Console.WriteLine("[INFO]: CheckForUpdatesTask: {0}", (checkForUpdatesTask.Result) ? "New version available!" : "Latest version!");
-
-            if (!checkForUpdatesTask.Result)
+            if (e.Cancelled)
                 return;
 
-            DialogResult result = DialogResult.Yes;
-            if (ShowUpdateMessage)
-                result = new MessageDialog(
-                    "Update available",
-                    String.Format("Version {0} available", updateFile.VersionString),
-                    "Update now?\nPress yes to update or no to cancel.",
-                    SystemIcons.Question).ShowDialog();
 
-            if (result != DialogResult.Yes)
-                return;
-
-            // start actual updateform
-            UpdaterForm updateForm = new UpdaterForm(updateFile);
-            updateForm.ShowDialog();
         }
+
+        //private void UpdateFile_DownloadCompleted(object sender, AsyncCompletedEventArgs e)
+        //{
+        //    WebClient download_client = (WebClient)sender;
+        //    download_client.Dispose();
+
+        //    // the update process got cancelled. 
+        //    if (e.Cancelled)
+        //        return;
+
+        //    // error reporting
+        //    if (e.Error != null)
+        //    {
+        //        Debug.WriteLine(String.Concat(e.Error.Message, "\n", e.Error.StackTrace));
+
+        //        if (ShowErrorMessage)
+        //            new MessageDialog(
+        //                "Error", 
+        //                "Unable to get the update information", 
+        //                "There has been a problem getting the needed update information  \nPlease contact customer support!", 
+        //                SystemIcons.Error, MessageBoxButtons.OK).ShowDialog();
+
+        //        return;
+        //    }
+
+        //    Action caller = new Action(CheckForUpdatesTask);
+        //    caller.BeginInvoke(new AsyncCallback(r => caller.EndInvoke(r)), null);
+        //}
+
+        //private void CheckForUpdatesTask()
+        //{
+        //    UpdateFile updateFile = LoadUpdateFile();
+
+        //    HashCacheFile cache = GetCache();
+        //    CleanUpTask.AwaitTask();
+
+        //    CheckForUpdatedFilesTask checkForUpdatesTask = new CheckForUpdatedFilesTask(updateFile, cache, Converter);
+        //    checkForUpdatesTask.Start();
+        //    checkForUpdatesTask.AwaitTask();
+
+        //    Console.WriteLine("[INFO]: CheckForUpdatesTask: {0}", (checkForUpdatesTask.Result) ? "New version available!" : "Latest version!");
+
+        //    if (!checkForUpdatesTask.Result)
+        //        return;
+
+        //    DialogResult result = DialogResult.Yes;
+        //    if (ShowUpdateMessage)
+        //        result = new MessageDialog(
+        //            "Update available",
+        //            String.Format("Version {0} available", updateFile.VersionString),
+        //            "Update now?\nPress yes to update or no to cancel.",
+        //            SystemIcons.Question).ShowDialog();
+
+        //    if (result != DialogResult.Yes)
+        //        return;
+
+        //    // start actual updateform
+        //    UpdaterForm updateForm = new UpdaterForm(updateFile);
+        //    updateForm.ShowDialog();
+        //}
 
         public HashCacheFile GetCache()
         {
             UpdateCacheTask.AwaitTask();
             return UpdateCacheTask.Result;
         }
-
-        private UpdateFile LoadUpdateFile()
-        {
-            return UpdateFile.Load(m_localUpdateFile);
-        }
-
-        
 
         private string GetRemoteBasePath()
         {
