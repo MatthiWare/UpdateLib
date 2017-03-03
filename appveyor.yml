@@ -10,19 +10,16 @@ assembly_info:
 environment:
   COVERALLS_REPO_TOKEN:
     secure: k6gJwhivEaPBnNT7CKZEks2q1yreyDbVqkZMt46mN32tgRhHhChvMLgTqrtGoG6R
+  CODECOV_TOKEN:
+    secure: N+vJ8JrMwPFYRWXqX3OB2IE59laOOvt/OotFeFzOjQfApFFHVl1AxsPESs7Lcte2    
 before_build:
   - nuget restore ".\UpdateLib\UpdateLib.sln"
 build:
   project: .\UpdateLib\UpdateLib.sln
   verbosity: minimal
 test_script:
-- ps: >-
-    $opencover = (Resolve-Path "C:/projects/updatelib/UpdateLib/packages/OpenCover.4.6.519/tools/OpenCover.Console.exe").ToString()
-    
-    & $opencover -register:user -target:nunit3-console.exe -targetargs:"UpdateLib\UpdateLib.Tests\bin\$env:CONFIGURATION\UpdateLib.Tests.dll" -filter:"+[UpdateLib*]*" -output:opencoverCoverage.xml
-
-    $coveralls = (Resolve-Path "C:/projects/updatelib/UpdateLib/packages/coveralls.net.0.7.0/tools/csmacnz.coveralls.exe").ToString()
-    
-    $env:APPVEYOR_BUILD_NUMBER
-    
-    & $coveralls --opencover -i opencoverCoverage.xml --repoToken $env:COVERALLS_REPO_TOKEN --useRelativePaths --commitId $env:APPVEYOR_REPO_COMMIT --commitBranch $env:APPVEYOR_REPO_BRANCH --commitAuthor $env:APPVEYOR_REPO_COMMIT_AUTHOR --commitEmail $env:APPVEYOR_REPO_COMMIT_AUTHOR_EMAIL --commitMessage $env:APPVEYOR_REPO_COMMIT_MESSAGE --jobId $env:APPVEYOR_BUILD_NUMBER --serviceName appveyor
+  - "SET opencover=C:\\projects\\updatelib\\UpdateLib\\packages\\OpenCover.4.6.519\\tools\\OpenCover.Console.exe"
+  - %opencover% -register:user -target:nunit3-console.exe -targetargs:"UpdateLib\UpdateLib.Tests\bin\$env:CONFIGURATION\UpdateLib.Tests.dll" -filter:"+[UpdateLib*]*" -output:opencoverCoverage.xml
+  - "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
+  - pip install codecov
+  - codecov -f "opencoverCoverage.xml"
