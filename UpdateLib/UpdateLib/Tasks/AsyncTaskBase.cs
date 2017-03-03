@@ -56,9 +56,9 @@ namespace MatthiWare.UpdateLib.Tasks
                 {
                     DoWork();
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    throw e;
+                    throw ex;
                 }
                 finally
                 {

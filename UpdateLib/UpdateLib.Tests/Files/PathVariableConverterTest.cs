@@ -20,6 +20,7 @@ namespace UpdateLib.Tests.Files
             converter = new PathVariableConverter();
         }
 
+        [Ignore("not supported")]
         [Test]
         public void GettingAVariableReturnsTheCorrectPath()
         {
@@ -30,6 +31,7 @@ namespace UpdateLib.Tests.Files
             Assert.AreEqual(appdata, converter["appdata"]);
         }
 
+        [Ignore("not supported")]
         [Test]
         public void AddingAnItemReturnsCorrectResult()
         {
