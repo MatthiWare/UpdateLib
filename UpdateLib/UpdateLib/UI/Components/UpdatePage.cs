@@ -1,19 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using MatthiWare.UpdateLib.Files;
-using System.Net;
 using System.Threading;
 using MatthiWare.UpdateLib.Properties;
-using System.Diagnostics;
 using MatthiWare.UpdateLib.Tasks;
 using MatthiWare.UpdateLib.Security;
-using System.Security.Cryptography;
+using MatthiWare.UpdateLib.Logging;
 
 namespace MatthiWare.UpdateLib.UI.Components
 {
@@ -93,7 +86,6 @@ namespace MatthiWare.UpdateLib.UI.Components
             PageUpdate?.Invoke(this, new EventArgs());
             foreach (ListViewItem item in lvItems.Items)
             {
-                Console.WriteLine("UpdatePage thread start: {0}", Thread.CurrentThread.ManagedThreadId);
                 DownloadTask task = new DownloadTask(item);
                 task.TaskProgressChanged += Task_TaskProgressChanged;
                 task.TaskCompleted += Task_TaskCompleted;
@@ -107,7 +99,6 @@ namespace MatthiWare.UpdateLib.UI.Components
         private void Task_TaskCompleted(object sender, AsyncCompletedEventArgs e)
         {
             DownloadTask task = (DownloadTask)sender;
-            Console.WriteLine("UpdatePage thread completed: {0}", Thread.CurrentThread.ManagedThreadId);
 
             int amountLeft = Interlocked.Decrement(ref amountToDownload);
 
@@ -120,7 +111,7 @@ namespace MatthiWare.UpdateLib.UI.Components
 
             if (e.Cancelled)
             {
-                Console.WriteLine("[INFO][DownloadTask]: Cancelled -> '{0}' ", task.Entry.Name);
+                Logger.Info(nameof(DownloadTask), $"Cancelled -> '{task.Entry.Name}'");
 
                 SetSubItemText(task.Item.SubItems[2],  "Cancelled");
 
@@ -131,7 +122,7 @@ namespace MatthiWare.UpdateLib.UI.Components
 
             if (e.Error != null)
             {
-                Console.WriteLine("[ERROR][DownloadTask]: {0}\n{1}", e.Error.Message, e.Error.StackTrace);
+                Logger.Error(nameof(DownloadTask), e.Error);
 
                 SetSubItemText(task.Item.SubItems[2], "Error");
 
@@ -143,7 +134,7 @@ namespace MatthiWare.UpdateLib.UI.Components
             // Everything went good lets just check the MD5 hash again to be a bit more secure against attacks
             if (!VerifyDownloadedFileSignature(task))
             {
-                Console.WriteLine("[ERROR][DownloadTask]: Signature match fail for file: {0}", task.Entry.Name);
+                Logger.Error(nameof(DownloadTask), $"Signature match fail for file: {task.Entry.Name}");
 
                 SetSubItemText(task.Item.SubItems[2], "Error");
 
@@ -170,7 +161,7 @@ namespace MatthiWare.UpdateLib.UI.Components
         {
             DownloadTask task = (DownloadTask)sender;
 
-            SetSubItemText(task.Item.SubItems[3], string.Format("{0}%", e.ProgressPercentage));
+            SetSubItemText(task.Item.SubItems[3], $"{e.ProgressPercentage}%");
         }
 
         public void CancelUpdate()

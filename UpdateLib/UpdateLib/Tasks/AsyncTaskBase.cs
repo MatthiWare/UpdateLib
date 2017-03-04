@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MatthiWare.UpdateLib.Logging;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -84,13 +85,13 @@ namespace MatthiWare.UpdateLib.Tasks
                     worker.EndInvoke(r);
 
 #if DEBUG
-                    Console.WriteLine($"[{GetType().Name}]: Completed in {m_sw.ElapsedMilliseconds}ms");
+                    Logger.Debug(GetType().Name, $"Completed in {m_sw.ElapsedMilliseconds}ms");
 #endif
                 }
                 catch (Exception e)
                 {
                     error = e;
-                    Console.WriteLine($"[{e.GetBaseException().GetType().Name}][{GetType().Name}]: {e.Message}{e.StackTrace}");
+                    Logger.Error(GetType().Name, e);
                 }
 
                 OnTaskCompleted(error, IsCancelled);

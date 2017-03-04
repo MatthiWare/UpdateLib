@@ -4,7 +4,6 @@ using System;
 using System.Threading;
 using System.IO;
 using MatthiWare.UpdateLib.Tasks;
-using System.Security.Cryptography;
 
 namespace UpdateLib.Generator.Tasks
 {
