@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Text;
 
 namespace MatthiWare.UpdateLib.Files
@@ -18,7 +16,7 @@ namespace MatthiWare.UpdateLib.Files
         { 
             variables = new Dictionary<string, string>();
 
-            variables.Add("appdir", Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
+            variables.Add("appdir", new DirectoryInfo(".").FullName);
             variables.Add("appdata", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
             variables.Add("temp", Path.GetTempPath());
             variables.Add("otherdir", "");

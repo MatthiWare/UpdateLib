@@ -1,19 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Text;
 using MatthiWare.UpdateLib.Files;
-using System.Net;
-using MatthiWare.UpdateLib.Encoders;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Xml.Serialization;
 using System.Windows.Forms;
 using MatthiWare.UpdateLib.UI;
 using System.Drawing;
-using System.Threading;
 using MatthiWare.UpdateLib.Tasks;
 
 namespace MatthiWare.UpdateLib
@@ -50,19 +41,17 @@ namespace MatthiWare.UpdateLib
             set
             {
                 m_updateUrl = value;
-                m_localUpdateFile = GetFileNameFromUrl();
                 RemoteBasePath = GetRemoteBasePath();
             }
         }
-        private string m_localUpdateFile;
 
         public bool ShowUpdateMessage { get; set; } = true;
         public bool ShowMessageOnNoUpdate { get; set; } = true;
         public bool ShowErrorMessage { get; set; } = true;
         public PathVariableConverter Converter { get; private set; }
 
-        private CleanUpTask cleanUpTask;
-        private UpdateCacheTask updateCacheTask;
+        public CleanUpTask CleanUpTask { get; private set; }
+        public UpdateCacheTask UpdateCacheTask { get; private set; }
 
         private bool initialized = false;
 
@@ -80,11 +69,11 @@ namespace MatthiWare.UpdateLib
 
         public void Initialize()
         {
-            cleanUpTask = new CleanUpTask(".");
-            cleanUpTask.Start();
+            CleanUpTask = new CleanUpTask(".");
+            CleanUpTask.Start();
 
-            updateCacheTask = new UpdateCacheTask();
-            updateCacheTask.Start();
+            UpdateCacheTask = new UpdateCacheTask();
+            UpdateCacheTask.Start();
 
             initialized = true;
         }
@@ -97,91 +86,42 @@ namespace MatthiWare.UpdateLib
             if (!initialized)
                 throw new InvalidOperationException("The updater needs to be initialized first.");
 
-            if (String.IsNullOrEmpty(UpdateURL))
+            if (string.IsNullOrEmpty(UpdateURL))
                 throw new ArgumentException("You need to specifify a update url", "UpdateURL");
 
-            
+            //WebClient wc = new WebClient();
+            //wc.DownloadFileCompleted += UpdateFile_DownloadCompleted;
+            //wc.DownloadFileAsync(new Uri(UpdateURL), m_localUpdateFile);
 
-            WebClient wc = new WebClient();
-            wc.DownloadFileCompleted += UpdateFile_DownloadCompleted;
-            wc.DownloadFileAsync(new Uri(UpdateURL), m_localUpdateFile);
+            CheckForUpdatesTask task = new CheckForUpdatesTask(UpdateURL);
+            task.TaskCompleted += Task_TaskCompleted;
+            task.Start();
+
         }
 
-        private void UpdateFile_DownloadCompleted(object sender, AsyncCompletedEventArgs e)
+        private void Task_TaskCompleted(object sender, AsyncCompletedEventArgs e)
         {
-            WebClient download_client = (WebClient)sender;
-            download_client.Dispose();
-            
-            // the update process got cancelled. 
-            if (e.Cancelled)
-                return;
-
-            // error reporting
             if (e.Error != null)
             {
-                Debug.WriteLine(String.Concat(e.Error.Message, "\n", e.Error.StackTrace));
+                MessageDialog msgError = new MessageDialog(
+                    "Error",
+                    "Unable to get the update information",
+                    "There has been a problem getting the needed update information \nPlease contact customer support!",
+                    SystemIcons.Error, MessageBoxButtons.OK);
 
-                if (ShowErrorMessage)
-                    new MessageDialog(
-                        "Error", 
-                        "Unable to get the update information", 
-                        "There has been a problem getting the needed update information\nPlease contact customer support!", 
-                        SystemIcons.Error).ShowDialog();
+                msgError.ShowDialog();
 
                 return;
             }
 
-            Action caller = new Action(CheckForUpdatesTask);
-            caller.BeginInvoke(new AsyncCallback(r => caller.EndInvoke(r)), null);
-        }
-
-        private void CheckForUpdatesTask()
-        {
-            UpdateFile updateFile = LoadUpdateFile();
-
-            HashCacheFile cache = GetCache();
-            cleanUpTask.AwaitTask();
-
-            CheckForUpdatedFilesTask checkForUpdatesTask = new CheckForUpdatedFilesTask(updateFile, cache, Converter);
-            checkForUpdatesTask.Start();
-            checkForUpdatesTask.AwaitTask();
-
-            Console.WriteLine("[INFO]: CheckForUpdatesTask: {0}", (checkForUpdatesTask.Result) ? "New version available!" : "Latest version!");
-
-            if (!checkForUpdatesTask.Result)
+            if (e.Cancelled)
                 return;
-
-            DialogResult result = DialogResult.Yes;
-            if (ShowUpdateMessage)
-                result = new MessageDialog(
-                    "Update available",
-                    String.Format("Version {0} available", updateFile.VersionString),
-                    "Update now?\nPress yes to update or no to cancel.",
-                    SystemIcons.Question).ShowDialog();
-
-            if (result != DialogResult.Yes)
-                return;
-
-            // start actual updateform
-            UpdaterForm updateForm = new UpdaterForm(updateFile);
-            updateForm.ShowDialog();
         }
 
         public HashCacheFile GetCache()
         {
-            updateCacheTask.AwaitTask();
-            return updateCacheTask.Result;
-        }
-
-        private UpdateFile LoadUpdateFile()
-        {
-            return UpdateFile.Load(m_localUpdateFile);
-        }
-
-        private string GetFileNameFromUrl()
-        {
-            string[] tokens = UpdateURL.Split('/');
-            return string.Concat("./", tokens[tokens.Length - 1]);
+            UpdateCacheTask.AwaitTask();
+            return UpdateCacheTask.Result;
         }
 
         private string GetRemoteBasePath()

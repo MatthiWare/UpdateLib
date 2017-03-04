@@ -1,10 +1,7 @@
-﻿using MatthiWare.UpdateLib.Security;
+﻿using MatthiWare.UpdateLib.Logging;
+using MatthiWare.UpdateLib.Security;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using System.Xml.Serialization;
 
 namespace MatthiWare.UpdateLib.Files
@@ -45,7 +42,7 @@ namespace MatthiWare.UpdateLib.Files
                 Hash = HashUtil.GetHash(FilePath);
                 Ticks = tick;
 
-                Console.WriteLine("[HashCacheEntry] Recalculated\nTime: {1}\nName: {0}\nHash{2}\n", FilePath, DateTime.FromBinary(Ticks).ToString(), Hash);
+                Logger.Debug(GetType().Name, $"Recalculated\nTime: {DateTime.FromBinary(Ticks).ToString()}\nName: {FilePath}\nHash: {Hash}");
             }
         }
 

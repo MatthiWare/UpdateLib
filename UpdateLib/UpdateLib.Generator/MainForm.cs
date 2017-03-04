@@ -1,14 +1,8 @@
-﻿using MatthiWare.UpdateLib.Files;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using System.Xml.Serialization;
 using UpdateLib.Generator.Tasks;
 
 namespace UpdateLib.Generator
@@ -52,7 +46,7 @@ namespace UpdateLib.Generator
         private void Generate()
         {
 
-            UpdateGenerator generator = new UpdateGenerator(applicationFolder);
+            UpdateGeneratorTask generator = new UpdateGeneratorTask(applicationFolder);
             
             generator.TaskCompleted += Generator_TaskCompleted;
             generator.TaskProgressChanged += Generator_TaskProgressChanged;
@@ -120,7 +114,7 @@ namespace UpdateLib.Generator
         {
             string filePath = string.Concat(outputFolder.FullName, "\\", "updatefile.xml");
 
-            UpdateGenerator gen = (UpdateGenerator)sender;
+            UpdateGeneratorTask gen = (UpdateGeneratorTask)sender;
 
             gen.Result.Save(filePath);
 
