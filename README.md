@@ -11,3 +11,4 @@
 A .Net auto update library made in C#
 
 ## Features
+[Still in development]
