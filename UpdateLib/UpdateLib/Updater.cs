@@ -34,6 +34,8 @@ namespace MatthiWare.UpdateLib
         }
         #endregion
 
+        public event EventHandler<AsyncCompletedEventArgs> CheckForUpdatesCompleted;
+
         private string m_updateUrl = "";
         public string UpdateURL
         {
@@ -94,28 +96,8 @@ namespace MatthiWare.UpdateLib
             //wc.DownloadFileAsync(new Uri(UpdateURL), m_localUpdateFile);
 
             CheckForUpdatesTask task = new CheckForUpdatesTask(UpdateURL);
-            task.TaskCompleted += Task_TaskCompleted;
+            task.TaskCompleted += CheckForUpdatesCompleted;
             task.Start();
-
-        }
-
-        private void Task_TaskCompleted(object sender, AsyncCompletedEventArgs e)
-        {
-            if (e.Error != null)
-            {
-                MessageDialog msgError = new MessageDialog(
-                    "Error",
-                    "Unable to get the update information",
-                    "There has been a problem getting the needed update information \nPlease contact customer support!",
-                    SystemIcons.Error, MessageBoxButtons.OK);
-
-                msgError.ShowDialog();
-
-                return;
-            }
-
-            if (e.Cancelled)
-                return;
         }
 
         public HashCacheFile GetCache()

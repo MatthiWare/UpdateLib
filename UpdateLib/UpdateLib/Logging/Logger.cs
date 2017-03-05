@@ -15,14 +15,12 @@ namespace MatthiWare.UpdateLib.Logging
         {
             if (level < LogLevel) return;
 
-            Writers
-                .Where(w => w.LoggingLevel >= LogLevel)
-                .Where(w => level >= w.LoggingLevel)
-                .ToList()
-                .ForEach(w => 
-                {
-                    w.Log($"[{DateTime.Now.ToString()}][{level.ToString()}][{tag}]\t{msg}");
-                });
+            List<ILogWriter> e = Writers.Where(w => w.LoggingLevel >= LogLevel).ToList();
+            e = e.Where(w => level >= w.LoggingLevel).ToList();
+                
+
+            foreach (ILogWriter w in e)
+                w.Log("");
         }
 
         public static void Debug(string tag, string msg)
