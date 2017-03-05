@@ -36,5 +36,83 @@ namespace UpdateLib.Tests.Files
 
             Assert.AreEqual(result, get);
         }
+
+        [Test]
+        public void GetEmptyKeyShouldThrowArgumentNullException()
+        {
+            Assert.Throws<ArgumentNullException>(() => { string val = converter[null]; });
+            Assert.Throws<ArgumentNullException>(() => { string val = converter[""]; });
+        }
+
+        [Test]
+        public void GetNonExistingKeyReturnsNull()
+        {
+            string key = "myrandomtestkey";
+            if (converter.Contains(key))
+                converter.Remove(key);
+
+            Assert.IsNull(converter[key]);
+        }
+
+        [Test]
+        public void AddDuplicateKeyThrowsArgumentException()
+        {
+            string key = "myrandomtestkey";
+            string val = "value";
+
+            if (converter.Contains(key))
+                converter.Remove(key);
+
+            converter.Add(key, val);
+
+            Assert.AreEqual(val, converter[key]);
+
+            Assert.Throws<ArgumentException>(() => { converter.Add(key, val); });
+        }
+
+        [Test]
+        public void ContainsReturnsFalseForEmptyOrNullKey()
+        {
+            Assert.False(converter.Contains(""));
+            Assert.False(converter.Contains(null));
+        }
+
+        [Test]
+        public void ContainsReturnsFalseForNonExistingKey()
+        {
+            string key = "myrandomtestkey";
+
+            if (converter.Contains(key))
+                converter.Remove(key);
+
+            Assert.False(converter.Contains(key));
+        }
+
+        [Test]
+        public void ContainsReturnsTrueForExistingKey()
+        {
+            string key = "myrandomtestkey";
+            if (!converter.Contains(key))
+                converter.Add(key, "val");
+
+            Assert.True(converter.Contains(key));
+        }
+
+        [Test]
+        public void RemoveThrowsArgumentNullExceptionForEmptyOrNullKey()
+        {
+            Assert.Throws<ArgumentNullException>(() => { converter.Remove(""); });
+            Assert.Throws<ArgumentNullException>(() => { converter.Remove(null); });
+        }
+
+        [Test]
+        public void RemoveReturnsFalseForNonExistingKey()
+        {
+            string key = "mytestkey";
+            if (converter.Contains(key))
+                converter.Remove(key);
+
+            Assert.False(converter.Remove(key));
+        }
     }
 }
