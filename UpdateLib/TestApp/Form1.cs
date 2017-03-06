@@ -1,5 +1,7 @@
 ﻿using MatthiWare.UpdateLib;
 using MatthiWare.UpdateLib.Files;
+using MatthiWare.UpdateLib.Logging;
+using MatthiWare.UpdateLib.Tasks;
 using MatthiWare.UpdateLib.UI;
 using System;
 using System.Drawing;
@@ -16,9 +18,22 @@ namespace TestApp
             InitializeComponent();
 
             updater = Updater.Instance;
-            updater.UpdateURL= "https://dl.dropboxusercontent.com/u/30635736/UpdateLib/Dev/updatefile.xml";
+            updater.UpdateURL = "https://dl.dropboxusercontent.com/u/30635736/UpdateLib/Dev/updatefile.xml"; 
+            updater.CheckForUpdatesCompleted += Updater_CheckForUpdatesCompleted;
 
             updater.Initialize();
+        }
+
+        private void Updater_CheckForUpdatesCompleted(object sender, CheckForUpdatesCompletedEventArgs e)
+        {
+            if (e.Cancelled)
+                Logger.Debug(nameof(Updater), "Cancelled");
+
+            if (e.Error != null)
+                Logger.Error(nameof(Updater), e.Error);
+
+            Logger.Debug(nameof(Updater), $"Version: {e.LatestVersion}");
+            Logger.Debug(nameof(Updater), $"Update available: {e.UpdateAvailable}");
         }
 
         private void button1_Click(object sender, EventArgs e)

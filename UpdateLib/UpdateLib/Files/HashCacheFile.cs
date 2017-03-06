@@ -24,10 +24,11 @@ namespace MatthiWare.UpdateLib.Files
         private static string GetStoragePath()
         {
             if (string.IsNullOrEmpty(storagePath))
-                storagePath = string.Format(
-                    @"{0}\{1}\MatthiWare.UpdateLib\Cache\HashCacheFile.xml",
-                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                    Assembly.GetEntryAssembly().GetName().Name);
+            {
+                string appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                string name = Assembly.GetEntryAssembly().GetName().Name;
+                storagePath = $@"{appdata}\{name}\MatthiWare.UpdateLib\Cache\HashCacheFile.xml";
+            }
 
             return storagePath;
         }

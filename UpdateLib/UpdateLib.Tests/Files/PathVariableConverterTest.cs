@@ -38,6 +38,48 @@ namespace UpdateLib.Tests.Files
         }
 
         [Test]
+        public void AddingNullOrEmptyKeyAndOrValueThrowsArgumentNullException()
+        {
+            Assert.Throws<ArgumentNullException>(() => { converter.Add("", ""); });
+            Assert.Throws<ArgumentNullException>(() => { converter.Add(null, ""); });
+            Assert.Throws<ArgumentNullException>(() => { converter.Add("", null); });
+            Assert.Throws<ArgumentNullException>(() => { converter.Add(null, null); });
+            Assert.Throws<ArgumentNullException>(() => { converter.Add("test", null); });
+            Assert.Throws<ArgumentNullException>(() => { converter.Add("test", ""); });
+            Assert.Throws<ArgumentNullException>(() => { converter.Add(null, "test"); });
+            Assert.Throws<ArgumentNullException>(() => { converter.Add("", "test"); });
+        }
+
+        [Test]
+        public void ReplacingShouldReplaceTheCorrectWord()
+        {
+            string key = "myrandomtestkey";
+            if (converter.Contains(key))
+                converter.Remove(key);
+
+            string val = "myval";
+
+            converter.Add(key, val);
+            string input = $"C:\\mypath\\%{key}%\\test";
+            string output = $"C:\\mypath\\{val}\\test";
+
+            Assert.AreEqual(output, converter.Replace(input));
+        }
+
+        [Test]
+        public void ReplacingShouldNotReplaceAnythingWhenKeyDoesNotExist()
+        {
+            string key = "myrandomtestkey";
+            if (converter.Contains(key))
+                converter.Remove(key);
+
+            string input = $"C:\\mypath\\%{key}%\\test";
+            string ouput = $"C:\\mypath\\{key}\\test";
+
+            Assert.AreEqual(ouput, converter.Replace(input));
+        }
+
+        [Test]
         public void GetEmptyKeyShouldThrowArgumentNullException()
         {
             Assert.Throws<ArgumentNullException>(() => { string val = converter[null]; });

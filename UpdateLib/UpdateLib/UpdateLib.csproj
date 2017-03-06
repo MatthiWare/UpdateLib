@@ -67,6 +67,8 @@
     <Compile Include="Logging\ILogWriter.cs" />
     <Compile Include="Logging\Logger.cs" />
     <Compile Include="Logging\Writers\ConsoleLogWriter.cs" />
+    <Compile Include="Logging\Writers\FileLogWriter.cs" />
+    <Compile Include="Tasks\CheckForUpdatesCompletedEventArgs.cs" />
     <Compile Include="Tasks\CheckForUpdatesTask.cs" />
     <Compile Include="Tasks\UpdateFileProcessorTask.cs" />
     <Compile Include="Security\HashUtil.cs" />

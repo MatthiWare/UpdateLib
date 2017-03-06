@@ -11,6 +11,8 @@ namespace MatthiWare.UpdateLib.Tasks
     {
         public string Url { get; set; }
 
+        public string Version { get; set; }
+
         private WebClient wcDownloader;
 
         public CheckForUpdatesTask(string url)
@@ -34,6 +36,7 @@ namespace MatthiWare.UpdateLib.Tasks
 
             // load the updatefile from disk
             UpdateFile file = UpdateFile.Load(localFile);
+            Version = file.VersionString;
 
             // lets wait for the Cache update to complete and get the task
             HashCacheFile cache = Updater.Instance.GetCache();

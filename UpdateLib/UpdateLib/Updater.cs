@@ -6,6 +6,8 @@ using System.Windows.Forms;
 using MatthiWare.UpdateLib.UI;
 using System.Drawing;
 using MatthiWare.UpdateLib.Tasks;
+using MatthiWare.UpdateLib.Logging.Writers;
+using MatthiWare.UpdateLib.Logging;
 
 namespace MatthiWare.UpdateLib
 {
@@ -34,7 +36,7 @@ namespace MatthiWare.UpdateLib
         }
         #endregion
 
-        public event EventHandler<AsyncCompletedEventArgs> CheckForUpdatesCompleted;
+        public event EventHandler<CheckForUpdatesCompletedEventArgs> CheckForUpdatesCompleted;
 
         private string m_updateUrl = "";
         public string UpdateURL
@@ -64,9 +66,10 @@ namespace MatthiWare.UpdateLib
         /// </summary>
         private Updater()
         {
-            ShowUpdateMessage = true;
-            ShowMessageOnNoUpdate = false;
             Converter = new PathVariableConverter();
+
+            Logger.Writers.Add(new ConsoleLogWriter());
+            Logger.Writers.Add(new FileLogWriter());
         }
 
         public void Initialize()
@@ -91,12 +94,8 @@ namespace MatthiWare.UpdateLib
             if (string.IsNullOrEmpty(UpdateURL))
                 throw new ArgumentException("You need to specifify a update url", "UpdateURL");
 
-            //WebClient wc = new WebClient();
-            //wc.DownloadFileCompleted += UpdateFile_DownloadCompleted;
-            //wc.DownloadFileAsync(new Uri(UpdateURL), m_localUpdateFile);
-
             CheckForUpdatesTask task = new CheckForUpdatesTask(UpdateURL);
-            task.TaskCompleted += CheckForUpdatesCompleted;
+            task.TaskCompleted += (o, e) => { CheckForUpdatesCompleted?.Invoke(task, new CheckForUpdatesCompletedEventArgs(task.Version, task.Result, e)); };
             task.Start();
         }
 

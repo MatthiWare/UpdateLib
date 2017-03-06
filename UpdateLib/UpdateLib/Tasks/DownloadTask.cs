@@ -37,13 +37,32 @@ namespace MatthiWare.UpdateLib.Tasks
             Logger.Debug(GetType().Name, $"RemoteFile => {remoteFile}");
 
             if (File.Exists(localFile))
-                File.Move(localFile, string.Concat(localFile, ".old.tmp"));
+                File.Move(localFile, $"{localFile}.old.tmp");
 
             webClient.DownloadFileAsync(new Uri(remoteFile), localFile);
 
             wait.WaitOne();
             wait.Close();
             wait = null;
+        }
+
+        public override void Cancel()
+        {
+            base.Cancel();
+
+            webClient.CancelAsync();
+
+            string localFile = Updater.Instance.Converter.Replace(Entry.DestinationLocation);
+            string localTempFile = $"{localFile}.old.tmp";
+
+            if (!File.Exists(localTempFile))
+                return;
+
+            if (File.Exists(localFile))
+                File.Delete(localFile);
+
+            File.Move(localTempFile, localFile);
+
         }
     }
 }

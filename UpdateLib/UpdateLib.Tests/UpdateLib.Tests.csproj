@@ -54,6 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Files\DirectoryEntryTest.cs" />
     <Compile Include="Files\HashCacheEntryTest.cs" />
     <Compile Include="Files\PathVariableConverterTest.cs" />
     <Compile Include="Logging\LoggingTests.cs" />
