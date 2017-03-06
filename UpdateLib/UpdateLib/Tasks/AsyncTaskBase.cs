@@ -21,8 +21,6 @@ namespace MatthiWare.UpdateLib.Tasks
         private WaitHandle mainWait;
         private readonly object sync = new object();
 
-        private Thread _workerThread;
-
         private bool cancelled = false;
 
         /// <summary>
