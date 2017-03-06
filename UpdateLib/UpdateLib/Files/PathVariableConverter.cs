@@ -32,7 +32,7 @@ namespace MatthiWare.UpdateLib.Files
             get
             {
                 if (string.IsNullOrEmpty(key))
-                    throw new ArgumentNullException("key");
+                    throw new ArgumentNullException(nameof(key));
 
                 if (!variables.ContainsKey(key.ToLower()))
                     return null;
@@ -44,13 +44,13 @@ namespace MatthiWare.UpdateLib.Files
         public void Add(string key, string val)
         {
             if (string.IsNullOrEmpty(key))
-                throw new ArgumentNullException("key");
+                throw new ArgumentNullException(nameof(key));
 
             if (string.IsNullOrEmpty(val))
-                throw new ArgumentNullException("val");
+                throw new ArgumentNullException(nameof(val));
 
             if (variables.ContainsKey(key.ToLower()))
-                throw new ArgumentException("Duplicate key entry", "key");
+                throw new ArgumentException("Duplicate key entry", nameof(key));
 
             variables.Add(key.ToLower(), val);
         }
@@ -76,7 +76,7 @@ namespace MatthiWare.UpdateLib.Files
         public bool Remove(string key)
         {
             if (string.IsNullOrEmpty(key))
-                throw new ArgumentNullException("key");
+                throw new ArgumentNullException(nameof(key));
 
             if (!variables.ContainsKey(key.ToLower()))
                 return false;

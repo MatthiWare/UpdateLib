@@ -131,10 +131,12 @@ namespace MatthiWare.UpdateLib.UI.Components
                 return;
             }
 
-            // Everything went good lets just check the MD5 hash again to be a bit more secure against attacks
+            // Everything went good lets just check the hash again to be a bit more secure against attacks
             if (!VerifyDownloadedFileSignature(task))
             {
                 Logger.Error(nameof(DownloadTask), $"Signature match fail for file: {task.Entry.Name}");
+
+                task.Cancel();
 
                 SetSubItemText(task.Item.SubItems[2], "Error");
 

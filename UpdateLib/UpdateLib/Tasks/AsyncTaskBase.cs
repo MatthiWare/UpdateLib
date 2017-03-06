@@ -108,7 +108,7 @@ namespace MatthiWare.UpdateLib.Tasks
         /// Cancels the current <see cref="AsyncTaskBase"/>
         /// Check <see cref="IsCancelled"/> in the worker code to see if the <see cref="AsyncTaskBase"/> got cancelled.  
         /// </summary>
-        public void Cancel()
+        public virtual void Cancel()
         {
             lock (sync)
                 cancelled = true;
