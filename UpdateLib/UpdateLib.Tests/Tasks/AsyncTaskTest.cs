@@ -67,6 +67,49 @@ namespace UpdateLib.Tests.Tasks
             Assert.AreEqual(input, task.Result);
         }
 
+        [Test]
+        public void CheckDoubleWait()
+        {
+            TestTask task = new TestTask(500);
+            task.Start();
+            task.AwaitTask();
+            task.AwaitTask();
+        }
+
+        [Test]
+        public void TestAwaitWorker()
+        {
+            WorkerTestTask task = new WorkerTestTask();
+            task.TaskCompleted += (o, e) =>
+            {
+                Assert.IsFalse(e.Cancelled, "The task got cancelled??");
+                Assert.IsNull(e.Error, "there was an error");
+            };
+            task.Start();
+            task.AwaitTask();
+        }
+
+        private class WorkerTestTask : AsyncTaskBase
+        {
+            protected override void DoWork()
+            {
+                bool value = false;
+
+                Action simulation = new Action(() => {
+                    Thread.Sleep(1000);
+                    value = false;
+                });
+
+                //Enqueue(simulation.BeginInvoke(new AsyncCallback(r => simulation.EndInvoke(r)), null).AsyncWaitHandle);
+
+                Assert.IsFalse(value);
+
+                AwaitWorkers();
+
+                Assert.IsTrue(value);
+            }
+        }
+
         private class TestTask : AsyncTaskBase
         {
             public int Sleep { get; set; }
@@ -85,7 +128,11 @@ namespace UpdateLib.Tests.Tasks
         {
             protected override void DoWork()
             {
-                throw new InvalidOperationException("custom error");
+                Action a = new Action(() => { throw new InvalidOperationException(); });
+
+                Enqueue(a.BeginInvoke(new AsyncCallback(r => a.EndInvoke(r)), null).AsyncWaitHandle);
+
+                AwaitWorkers();
             }
         }
 
