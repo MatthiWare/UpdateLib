@@ -219,10 +219,16 @@ namespace MatthiWare.UpdateLib.Tasks
     /// <typeparam name="T">The type of the Result object</typeparam>
     public abstract class AsyncTaskBase<T> : AsyncTaskBase
     {
+        private T m_result;
+
         /// <summary>
-        /// The result <see cref="T"/> 
+        /// Gets or sets the result <see cref="T"/> 
         /// </summary>
-        public virtual T Result { get; set; }
+        public virtual T Result
+        {
+            get { return AwaitTask(); }
+            protected set { m_result = value; }
+        }
 
         /// <summary>
         /// Blocks the calling thread until the complete task is done.
@@ -232,7 +238,7 @@ namespace MatthiWare.UpdateLib.Tasks
         public new T AwaitTask()
         {
             base.AwaitTask();
-            return Result;
+            return m_result;
         }
     }
 }
