@@ -13,6 +13,8 @@ namespace MatthiWare.UpdateLib.Tasks
     public abstract class AsyncTaskBase
     {
 
+        #region private fields
+
 #if DEBUG
         public Stopwatch m_sw = new Stopwatch();
 #endif
@@ -23,6 +25,10 @@ namespace MatthiWare.UpdateLib.Tasks
 
         private bool cancelled = false;
 
+        #endregion
+
+        #region events
+
         /// <summary>
         /// Raises when this <see cref="AsyncTaskBase"/> is completed. 
         /// </summary>
@@ -31,6 +37,10 @@ namespace MatthiWare.UpdateLib.Tasks
         /// Raises when the <see cref="AsyncTaskBase"/> progress changed. 
         /// </summary>
         public event EventHandler<ProgressChangedEventArgs> TaskProgressChanged;
+
+        #endregion
+
+        #region properties
 
         /// <summary>
         /// Gets if the current <see cref="AsyncTaskBase"/> is cancelled. 
@@ -43,6 +53,8 @@ namespace MatthiWare.UpdateLib.Tasks
                     return cancelled;
             }
         }
+
+        #endregion
 
         /// <summary>
         /// Starts the task
@@ -211,5 +223,16 @@ namespace MatthiWare.UpdateLib.Tasks
         /// The result <see cref="T"/> 
         /// </summary>
         public virtual T Result { get; set; }
+
+        /// <summary>
+        /// Blocks the calling thread until the complete task is done.
+        /// DO NOT call this in the worker method use <see cref="AsyncTaskBase.AwaitWorkers"/> method instead. 
+        /// </summary>
+        /// <returns><see cref="Result"/></returns>
+        public new T AwaitTask()
+        {
+            base.AwaitTask();
+            return Result;
+        }
     }
 }

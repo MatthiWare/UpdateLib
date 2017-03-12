@@ -101,8 +101,7 @@ namespace MatthiWare.UpdateLib
 
         public HashCacheFile GetCache()
         {
-            UpdateCacheTask.AwaitTask();
-            return UpdateCacheTask.Result;
+            return UpdateCacheTask.AwaitTask();
         }
 
         private string GetRemoteBasePath()

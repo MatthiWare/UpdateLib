@@ -62,9 +62,9 @@ namespace UpdateLib.Tests.Tasks
                 Assert.AreEqual(input, task.Result);
             };
             task.Start();
-            task.AwaitTask();
+            
 
-            Assert.AreEqual(input, task.Result);
+            Assert.AreEqual(input, task.AwaitTask());
         }
 
         [Test]
@@ -147,9 +147,15 @@ namespace UpdateLib.Tests.Tasks
 
             protected override void DoWork()
             {
-                Thread.Sleep(100);
+                Action<int> call = new Action<int>((x) => 
+                {
+                    Thread.Sleep(x);
+                    Result = returnObj;
+                });
+
+                Enqueue(call.BeginInvoke(500, new AsyncCallback(r => call.EndInvoke(r)), null).AsyncWaitHandle);
                 AwaitWorkers();
-                Result = returnObj;
+                
             }
         }
     }

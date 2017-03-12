@@ -44,12 +44,11 @@ namespace MatthiWare.UpdateLib.Tasks
             // Wait for the clean up to complete
             Updater.Instance.CleanUpTask.AwaitTask();
 
-            // Start a task to get all the files that need to be updated
-            CheckForUpdatedFilesTask checkForUpdateNeeded = CheckForUpdatedFiles(file, cache);
-            checkForUpdateNeeded.AwaitTask();
-
-            // setting the output of the task
-            Result = checkForUpdateNeeded.Result;
+            /* 
+             * Start a task to get all the files that need to be updated
+             * Returns if there is anything to update
+             */
+            Result = CheckForUpdatedFiles(file, cache).AwaitTask();
 
             if (!Result) // no updates available
                 return;
