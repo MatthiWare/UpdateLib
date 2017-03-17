@@ -80,7 +80,6 @@ namespace MatthiWare.UpdateLib.Tasks
         public AsyncTaskBase Start()
         {
             Exception taskException = null;
-            AsyncTaskBase.
             Action worker = new Action(() =>
             {
                 try
