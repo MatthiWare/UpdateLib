@@ -1,5 +1,6 @@
 ﻿using MatthiWare.UpdateLib.Logging;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -56,11 +57,30 @@ namespace MatthiWare.UpdateLib.Tasks
 
         #endregion
 
+        #region static methods
+
+        /// <summary>
+        /// Blocks the calling threads and calls <see cref="AsyncTaskBase.AwaitTask"/> on each <see cref="AsyncTaskBase"/> in <paramref name="tasks"/>.
+        /// </summary>
+        /// <param name="tasks">The tasks to await.</param>
+        public static void WaitAll(IEnumerable<AsyncTaskBase> tasks)
+        {
+            foreach (AsyncTaskBase task in tasks)
+            {
+                task.AwaitTask();
+            }
+        }
+
+        #endregion
+
         /// <summary>
         /// Starts the task
         /// </summary>
-        public void Start()
+        /// <returns>Returns the current Task.</returns>
+        public AsyncTaskBase Start()
         {
+            Exception taskException = null;
+            AsyncTaskBase.
             Action worker = new Action(() =>
             {
                 try
@@ -69,7 +89,8 @@ namespace MatthiWare.UpdateLib.Tasks
                 }
                 catch (Exception ex)
                 {
-                    throw ex;
+                    taskException = ex;
+                    Logger.Error(GetType().Name, ex);
                 }
                 finally
                 {
@@ -84,29 +105,18 @@ namespace MatthiWare.UpdateLib.Tasks
 
             mainWait = worker.BeginInvoke(new AsyncCallback((IAsyncResult r) =>
             {
-
 #if DEBUG
                 m_sw.Stop();
 #endif
-
-                Exception error = null;
-                try
-                {
-                    worker.EndInvoke(r);
-
+                worker.EndInvoke(r);
 #if DEBUG
-                    Logger.Debug(GetType().Name, $"Completed in {m_sw.ElapsedMilliseconds}ms");
+                Logger.Debug(GetType().Name, $"Completed in {m_sw.ElapsedMilliseconds}ms");
 #endif
-                }
-                catch (Exception e)
-                {
-                    error = e;
-                    Logger.Error(GetType().Name, e);
-                }
-
-                OnTaskCompleted(error, IsCancelled);
+                OnTaskCompleted(taskException, IsCancelled);
 
             }), null).AsyncWaitHandle;
+
+            return this;
         }
 
         /// <summary>
@@ -140,12 +150,12 @@ namespace MatthiWare.UpdateLib.Tasks
         /// </summary>
         public void AwaitTask()
         {
-            if (mainWait == null)
-                return;
-
-            mainWait.WaitOne();
-            mainWait.Close();
-            mainWait = null;
+            if (mainWait != null)
+            {
+                mainWait.WaitOne();
+                mainWait.Close();
+                mainWait = null;
+            }
         }
 
         /// <summary>
@@ -219,15 +229,19 @@ namespace MatthiWare.UpdateLib.Tasks
     /// <typeparam name="T">The type of the Result object</typeparam>
     public abstract class AsyncTaskBase<T> : AsyncTaskBase
     {
-        private T m_result;
-
         /// <summary>
         /// Gets or sets the result <see cref="T"/> 
         /// </summary>
-        public virtual T Result
+        public virtual T Result { get; protected set; }
+
+        /// <summary>
+        /// Starts the task
+        /// </summary>
+        /// <returns>Returns the current Task.</returns>
+        public new AsyncTaskBase<T> Start()
         {
-            get { return AwaitTask(); }
-            protected set { m_result = value; }
+            base.Start();
+            return this;
         }
 
         /// <summary>
@@ -238,7 +252,7 @@ namespace MatthiWare.UpdateLib.Tasks
         public new T AwaitTask()
         {
             base.AwaitTask();
-            return m_result;
+            return Result;
         }
     }
 }

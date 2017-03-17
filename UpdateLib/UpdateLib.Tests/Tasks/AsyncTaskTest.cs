@@ -3,6 +3,7 @@ using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -33,14 +34,31 @@ namespace UpdateLib.Tests.Tasks
         public void FaultyTaskReturnsException()
         {
             ErrorTask task = new ErrorTask();
+            ManualResetEvent wait = new ManualResetEvent(false);
+
             task.TaskCompleted += (o, e) =>
             {
                 Assert.False(e.Cancelled, "The task got cancelled");
                 Assert.NotNull(e.Error, "The error object is null");
                 Assert.IsInstanceOf<InvalidOperationException>(e.Error, $"{e.Error} is not an instance of {nameof(InvalidOperationException)}");
+                wait.Set();
             };
             task.Start();
             task.AwaitTask();
+            wait.WaitOne();
+        }
+
+        [Test]
+        public void TestMethod()
+        {
+            Object o = new Object();
+            ResultTask<Object> task = new ResultTask<Object>(o);
+            task.TaskCompleted += (s, e) =>
+            {
+                Assert.Fail("lol");
+            };
+            task.Start();
+           Assert.AreEqual(o, task.AwaitTask());
         }
 
         [Test]
@@ -62,7 +80,6 @@ namespace UpdateLib.Tests.Tasks
                 Assert.AreEqual(input, task.Result);
             };
             task.Start();
-            
 
             Assert.AreEqual(input, task.AwaitTask());
         }
@@ -95,12 +112,13 @@ namespace UpdateLib.Tests.Tasks
             {
                 bool value = false;
 
-                Action simulation = new Action(() => {
+                Action simulation = new Action(() =>
+                {
                     Thread.Sleep(1000);
                     value = false;
                 });
 
-                //Enqueue(simulation.BeginInvoke(new AsyncCallback(r => simulation.EndInvoke(r)), null).AsyncWaitHandle);
+                Enqueue(simulation.BeginInvoke(new AsyncCallback(r => simulation.EndInvoke(r)), null).AsyncWaitHandle);
 
                 Assert.IsFalse(value);
 
@@ -128,9 +146,11 @@ namespace UpdateLib.Tests.Tasks
         {
             protected override void DoWork()
             {
-                Action a = new Action(() => { throw new InvalidOperationException(); });
+                Action a = new Action(() => { Thread.Sleep(1000); throw new InvalidOperationException(); });
 
                 Enqueue(a.BeginInvoke(new AsyncCallback(r => a.EndInvoke(r)), null).AsyncWaitHandle);
+
+                //throw new InvalidOperationException();
 
                 AwaitWorkers();
             }
@@ -147,15 +167,15 @@ namespace UpdateLib.Tests.Tasks
 
             protected override void DoWork()
             {
-                Action<int> call = new Action<int>((x) => 
+                Action<int> call = new Action<int>((x) =>
                 {
                     Thread.Sleep(x);
                     Result = returnObj;
                 });
 
-                Enqueue(call.BeginInvoke(500, new AsyncCallback(r => call.EndInvoke(r)), null).AsyncWaitHandle);
+                Enqueue(call.BeginInvoke(200, new AsyncCallback(r => call.EndInvoke(r)), null).AsyncWaitHandle);
                 AwaitWorkers();
-                
+
             }
         }
     }

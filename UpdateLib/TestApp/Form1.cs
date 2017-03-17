@@ -5,6 +5,7 @@ using MatthiWare.UpdateLib.Tasks;
 using MatthiWare.UpdateLib.UI;
 using System;
 using System.Drawing;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace TestApp
@@ -82,6 +83,10 @@ namespace TestApp
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            Action<object> test = new Action<object>((o) => {  });
+
+            AsyncTaskFactory.StartNew(test);
+
         }
     }
 }
