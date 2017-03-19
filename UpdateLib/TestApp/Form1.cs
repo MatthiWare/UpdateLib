@@ -87,8 +87,9 @@ namespace TestApp
 
             Func<int, bool> test2 = new Func<int, bool>((i) => { return i%2==0; });
 
-            Console.WriteLine("Result: " + AsyncTaskFactory.StartNew<bool>(test2, 2).AwaitTask());
-
+            AsyncTaskBase<bool> task =  AsyncTaskFactory.StartNew<bool>(test2, 2);
+            Console.WriteLine(task.GetType().FullName);
+            
         }
     }
 }

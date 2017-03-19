@@ -8,7 +8,7 @@ namespace MatthiWare.UpdateLib.Tasks
         private UpdateFile updateFile;
         private HashCacheFile cacheFile;
         private PathVariableConverter converter;
-        
+
         public CheckForUpdatedFilesTask(UpdateFile update, HashCacheFile cache, PathVariableConverter converter)
         {
             updateFile = update;
@@ -25,24 +25,24 @@ namespace MatthiWare.UpdateLib.Tasks
 
                 if (cacheEntry == null)
                     return false;
-                
-                bool val =  fe.Hash.Equals(cacheEntry.Hash);
+
+                bool val = fe.Hash.Equals(cacheEntry.Hash);
                 return val;
             });
 
             Action<DirectoryEntry> call = new Action<DirectoryEntry>(RecursiveCheck);
 
             foreach (DirectoryEntry de in dir.Directories)
-                Enqueue(call.BeginInvoke(de, new AsyncCallback(r => call.EndInvoke(r)), null).AsyncWaitHandle);
+                Enqueue(call, de);
         }
 
         protected override void DoWork()
         {
             Action<DirectoryEntry> call = new Action<DirectoryEntry>(RecursiveCheck);
 
-            Enqueue(call.BeginInvoke(updateFile.ApplicationDirectory, new AsyncCallback(r => call.EndInvoke(r)), null).AsyncWaitHandle);
+            Enqueue(call, updateFile.ApplicationDirectory);
 
-            Enqueue(call.BeginInvoke(updateFile.OtherDirectory, new AsyncCallback(r => call.EndInvoke(r)), null).AsyncWaitHandle);
+            Enqueue(call, updateFile.OtherDirectory);
 
             AwaitWorkers();
 

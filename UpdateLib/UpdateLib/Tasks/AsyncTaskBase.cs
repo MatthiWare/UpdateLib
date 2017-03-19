@@ -16,6 +16,8 @@ namespace MatthiWare.UpdateLib.Tasks
 
         #region private fields
 
+        private Exception m_lastException = null;
+
 #if DEBUG
         public Stopwatch m_sw = new Stopwatch();
 #endif
@@ -24,7 +26,7 @@ namespace MatthiWare.UpdateLib.Tasks
         private WaitHandle mainWait;
         private readonly object sync = new object();
 
-        private bool cancelled = false;
+        private bool m_cancelled = false;
 
         #endregion
 
@@ -43,6 +45,32 @@ namespace MatthiWare.UpdateLib.Tasks
 
         #region properties
 
+        public Exception LastException
+        {
+            get
+            {
+                lock (sync)
+                    return m_lastException;
+            }
+            protected set
+            {
+                lock (sync)
+                    m_lastException = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets if there have been any errors in the task.
+        /// </summary>
+        public bool HasErrors
+        {
+            get
+            {
+                lock (sync)
+                    return m_lastException != null;
+            }
+        }
+
         /// <summary>
         /// Gets if the current <see cref="AsyncTaskBase"/> is cancelled. 
         /// </summary>
@@ -51,7 +79,12 @@ namespace MatthiWare.UpdateLib.Tasks
             get
             {
                 lock (sync)
-                    return cancelled;
+                    return m_cancelled;
+            }
+            private set
+            {
+                lock (sync)
+                    m_cancelled = value;
             }
         }
 
@@ -74,12 +107,25 @@ namespace MatthiWare.UpdateLib.Tasks
         #endregion
 
         /// <summary>
+        /// Resets the task back to its initial state
+        /// </summary>
+        private void Reset()
+        {
+            IsCancelled = false;
+            m_lastException = null;
+
+            mainWait = null;
+            waitQueue.Clear();
+        }
+
+        /// <summary>
         /// Starts the task
         /// </summary>
         /// <returns>Returns the current Task.</returns>
         public AsyncTaskBase Start()
         {
-            Exception taskException = null;
+            Reset();
+
             Action worker = new Action(() =>
             {
                 try
@@ -88,7 +134,8 @@ namespace MatthiWare.UpdateLib.Tasks
                 }
                 catch (Exception ex)
                 {
-                    taskException = ex;
+                    LastException = ex;
+
                     Logger.Error(GetType().Name, ex);
                 }
                 finally
@@ -111,7 +158,7 @@ namespace MatthiWare.UpdateLib.Tasks
 #if DEBUG
                 Logger.Debug(GetType().Name, $"Completed in {m_sw.ElapsedMilliseconds}ms");
 #endif
-                OnTaskCompleted(taskException, IsCancelled);
+                OnTaskCompleted(m_lastException, IsCancelled);
 
             }), null).AsyncWaitHandle;
 
@@ -129,18 +176,37 @@ namespace MatthiWare.UpdateLib.Tasks
         /// </summary>
         public virtual void Cancel()
         {
-            lock (sync)
-                cancelled = true;
+            IsCancelled = true;
         }
 
         /// <summary>
-        /// Adds a new wait object to the queue
+        /// Adds a new inner task
         /// </summary>
-        /// <param name="waitHandle">The wait object</param>
-        public void Enqueue(WaitHandle waitHandle)
+        /// <param name="action"></param>
+        /// <param name="args">Optional arguments for the action</param>
+        protected void Enqueue(Delegate action, params object[] args)
         {
+            Action subTaskAction = new Action(() =>
+            {
+                try
+                {
+                    action.DynamicInvoke(args);
+                }
+                catch (Exception ex)
+                {
+                    LastException = ex?.InnerException ?? ex;
+
+                    Console.WriteLine(ex);
+                }
+            });
+
+            // Don't allow to start another task when the parent task has been cancelled or contains errors.
+            if (HasErrors || IsCancelled)
+                return;
+
+            IAsyncResult result = subTaskAction.BeginInvoke(new AsyncCallback(r => { subTaskAction.EndInvoke(r); }), null);
             lock (sync)
-                waitQueue.Enqueue(waitHandle);
+                waitQueue.Enqueue(result.AsyncWaitHandle);
         }
 
         /// <summary>

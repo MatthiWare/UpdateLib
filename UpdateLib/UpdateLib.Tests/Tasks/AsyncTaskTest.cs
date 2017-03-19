@@ -4,10 +4,12 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Runtime.Serialization;
 
 namespace UpdateLib.Tests.Tasks
 {
@@ -40,7 +42,7 @@ namespace UpdateLib.Tests.Tasks
             {
                 Assert.False(e.Cancelled, "The task got cancelled");
                 Assert.NotNull(e.Error, "The error object is null");
-                Assert.IsInstanceOf<InvalidOperationException>(e.Error, $"{e.Error} is not an instance of {nameof(InvalidOperationException)}");
+                Assert.IsInstanceOf<AsyncTaskTestException>(e.Error, $"{e.Error} is not an instance of {nameof(AsyncTaskTestException)}");
                 wait.Set();
             };
             task.Start();
@@ -118,7 +120,7 @@ namespace UpdateLib.Tests.Tasks
                     value = false;
                 });
 
-                Enqueue(simulation.BeginInvoke(new AsyncCallback(r => simulation.EndInvoke(r)), null).AsyncWaitHandle);
+                Enqueue(simulation);
 
                 Assert.IsFalse(value);
 
@@ -146,9 +148,9 @@ namespace UpdateLib.Tests.Tasks
         {
             protected override void DoWork()
             {
-                Action a = new Action(() => { Thread.Sleep(1000); throw new InvalidOperationException(); });
+                Action a = new Action(() => { Thread.Sleep(1000); throw new AsyncTaskTestException(); });
 
-                Enqueue(a.BeginInvoke(new AsyncCallback(r => a.EndInvoke(r)), null).AsyncWaitHandle);
+                Enqueue(a);
 
                 //throw new InvalidOperationException();
 
@@ -173,9 +175,26 @@ namespace UpdateLib.Tests.Tasks
                     Result = returnObj;
                 });
 
-                Enqueue(call.BeginInvoke(200, new AsyncCallback(r => call.EndInvoke(r)), null).AsyncWaitHandle);
-                AwaitWorkers();
+                Enqueue(call,200);
+            }
+        }
 
+        private class AsyncTaskTestException : Exception
+        {
+            public AsyncTaskTestException():base("Test Exception")
+            {
+            }
+
+            public AsyncTaskTestException(string message) : base(message)
+            {
+            }
+
+            public AsyncTaskTestException(string message, Exception innerException) : base(message, innerException)
+            {
+            }
+
+            protected AsyncTaskTestException(SerializationInfo info, StreamingContext context) : base(info, context)
+            {
             }
         }
     }
