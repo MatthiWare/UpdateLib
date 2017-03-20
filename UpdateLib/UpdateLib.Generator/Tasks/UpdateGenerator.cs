@@ -61,7 +61,7 @@ namespace UpdateLib.Generator.Tasks
                 entry.Directories.Add(newEntry);
 
                 AddDirRecursiveDelegate caller = new AddDirRecursiveDelegate(AddDirRecursive);
-                Enqueue(caller.BeginInvoke(newDir, newEntry, new AsyncCallback(r => caller.EndInvoke(r)), null).AsyncWaitHandle);
+                Enqueue(caller,newDir, newEntry);
             }
         }
     }

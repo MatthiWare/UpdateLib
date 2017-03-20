@@ -1,5 +1,6 @@
 ﻿using MatthiWare.UpdateLib.Logging;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -13,6 +14,10 @@ namespace MatthiWare.UpdateLib.Tasks
     public abstract class AsyncTaskBase
     {
 
+        #region private fields
+
+        private Exception m_lastException = null;
+
 #if DEBUG
         public Stopwatch m_sw = new Stopwatch();
 #endif
@@ -21,9 +26,11 @@ namespace MatthiWare.UpdateLib.Tasks
         private WaitHandle mainWait;
         private readonly object sync = new object();
 
-        private Thread _workerThread;
+        private bool m_cancelled = false;
 
-        private bool cancelled = false;
+        #endregion
+
+        #region events
 
         /// <summary>
         /// Raises when this <see cref="AsyncTaskBase"/> is completed. 
@@ -34,6 +41,36 @@ namespace MatthiWare.UpdateLib.Tasks
         /// </summary>
         public event EventHandler<ProgressChangedEventArgs> TaskProgressChanged;
 
+        #endregion
+
+        #region properties
+
+        public Exception LastException
+        {
+            get
+            {
+                lock (sync)
+                    return m_lastException;
+            }
+            protected set
+            {
+                lock (sync)
+                    m_lastException = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets if there have been any errors in the task.
+        /// </summary>
+        public bool HasErrors
+        {
+            get
+            {
+                lock (sync)
+                    return m_lastException != null;
+            }
+        }
+
         /// <summary>
         /// Gets if the current <see cref="AsyncTaskBase"/> is cancelled. 
         /// </summary>
@@ -42,15 +79,53 @@ namespace MatthiWare.UpdateLib.Tasks
             get
             {
                 lock (sync)
-                    return cancelled;
+                    return m_cancelled;
             }
+            private set
+            {
+                lock (sync)
+                    m_cancelled = value;
+            }
+        }
+
+        #endregion
+
+        #region static methods
+
+        /// <summary>
+        /// Blocks the calling threads and calls <see cref="AsyncTaskBase.AwaitTask"/> on each <see cref="AsyncTaskBase"/> in <paramref name="tasks"/>.
+        /// </summary>
+        /// <param name="tasks">The tasks to await.</param>
+        public static void WaitAll(IEnumerable<AsyncTaskBase> tasks)
+        {
+            foreach (AsyncTaskBase task in tasks)
+            {
+                task.AwaitTask();
+            }
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Resets the task back to its initial state
+        /// </summary>
+        private void Reset()
+        {
+            IsCancelled = false;
+            m_lastException = null;
+
+            mainWait = null;
+            waitQueue.Clear();
         }
 
         /// <summary>
         /// Starts the task
         /// </summary>
-        public void Start()
+        /// <returns>Returns the current Task.</returns>
+        public AsyncTaskBase Start()
         {
+            Reset();
+
             Action worker = new Action(() =>
             {
                 try
@@ -59,7 +134,9 @@ namespace MatthiWare.UpdateLib.Tasks
                 }
                 catch (Exception ex)
                 {
-                    throw ex;
+                    LastException = ex;
+
+                    Logger.Error(GetType().Name, ex);
                 }
                 finally
                 {
@@ -74,29 +151,18 @@ namespace MatthiWare.UpdateLib.Tasks
 
             mainWait = worker.BeginInvoke(new AsyncCallback((IAsyncResult r) =>
             {
-
 #if DEBUG
                 m_sw.Stop();
 #endif
-
-                Exception error = null;
-                try
-                {
-                    worker.EndInvoke(r);
-
+                worker.EndInvoke(r);
 #if DEBUG
-                    Logger.Debug(GetType().Name, $"Completed in {m_sw.ElapsedMilliseconds}ms");
+                Logger.Debug(GetType().Name, $"Completed in {m_sw.ElapsedMilliseconds}ms");
 #endif
-                }
-                catch (Exception e)
-                {
-                    error = e;
-                    Logger.Error(GetType().Name, e);
-                }
-
-                OnTaskCompleted(error, IsCancelled);
+                OnTaskCompleted(m_lastException, IsCancelled);
 
             }), null).AsyncWaitHandle;
+
+            return this;
         }
 
         /// <summary>
@@ -110,18 +176,37 @@ namespace MatthiWare.UpdateLib.Tasks
         /// </summary>
         public virtual void Cancel()
         {
-            lock (sync)
-                cancelled = true;
+            IsCancelled = true;
         }
 
         /// <summary>
-        /// Adds a new wait object to the queue
+        /// Adds a new inner task
         /// </summary>
-        /// <param name="waitHandle">The wait object</param>
-        public void Enqueue(WaitHandle waitHandle)
+        /// <param name="action"></param>
+        /// <param name="args">Optional arguments for the action</param>
+        protected void Enqueue(Delegate action, params object[] args)
         {
+            Action subTaskAction = new Action(() =>
+            {
+                try
+                {
+                    action.DynamicInvoke(args);
+                }
+                catch (Exception ex)
+                {
+                    LastException = ex?.InnerException ?? ex;
+
+                    Console.WriteLine(ex);
+                }
+            });
+
+            // Don't allow to start another task when the parent task has been cancelled or contains errors.
+            if (HasErrors || IsCancelled)
+                return;
+
+            IAsyncResult result = subTaskAction.BeginInvoke(new AsyncCallback(r => { subTaskAction.EndInvoke(r); }), null);
             lock (sync)
-                waitQueue.Enqueue(waitHandle);
+                waitQueue.Enqueue(result.AsyncWaitHandle);
         }
 
         /// <summary>
@@ -130,12 +215,12 @@ namespace MatthiWare.UpdateLib.Tasks
         /// </summary>
         public void AwaitTask()
         {
-            if (mainWait == null)
-                return;
-
-            mainWait.WaitOne();
-            mainWait.Close();
-            mainWait = null;
+            if (mainWait != null)
+            {
+                mainWait.WaitOne();
+                mainWait.Close();
+                mainWait = null;
+            }
         }
 
         /// <summary>
@@ -161,7 +246,7 @@ namespace MatthiWare.UpdateLib.Tasks
         /// <param name="total">The total amount of work.</param>
         protected virtual void OnTaskProgressChanged(int done, int total)
         {
-            int progress = (done * 100) / total;
+            int progress = (done / total) * 100;
             TaskProgressChanged?.Invoke(this, new ProgressChangedEventArgs(progress, null));
         }
 
@@ -210,8 +295,29 @@ namespace MatthiWare.UpdateLib.Tasks
     public abstract class AsyncTaskBase<T> : AsyncTaskBase
     {
         /// <summary>
-        /// The result <see cref="T"/> 
+        /// Gets or sets the result <see cref="T"/> 
         /// </summary>
-        public virtual T Result { get; set; }
+        public virtual T Result { get; protected set; }
+
+        /// <summary>
+        /// Starts the task
+        /// </summary>
+        /// <returns>Returns the current Task.</returns>
+        public new AsyncTaskBase<T> Start()
+        {
+            base.Start();
+            return this;
+        }
+
+        /// <summary>
+        /// Blocks the calling thread until the complete task is done.
+        /// DO NOT call this in the worker method use <see cref="AsyncTaskBase.AwaitWorkers"/> method instead. 
+        /// </summary>
+        /// <returns><see cref="Result"/></returns>
+        public new T AwaitTask()
+        {
+            base.AwaitTask();
+            return Result;
+        }
     }
 }

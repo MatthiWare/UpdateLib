@@ -23,7 +23,7 @@ namespace MatthiWare.UpdateLib.Tasks
             foreach (DirectoryEntry subDir in dir.Directories)
             {
                 subDir.Parent = dir;
-                Enqueue(call.BeginInvoke(subDir, new AsyncCallback(r => call.EndInvoke(r)), null).AsyncWaitHandle);
+                Enqueue(call, subDir);
             }
         }
 

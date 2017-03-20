@@ -5,6 +5,7 @@ using MatthiWare.UpdateLib.Tasks;
 using MatthiWare.UpdateLib.UI;
 using System;
 using System.Drawing;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace TestApp
@@ -18,7 +19,7 @@ namespace TestApp
             InitializeComponent();
 
             updater = Updater.Instance;
-            updater.UpdateURL = "https://dl.dropboxusercontent.com/u/30635736/UpdateLib/Dev/updatefile.xml"; 
+            updater.UpdateURL = "http://matthiware.dev/UpdateLib/Dev/updatefile.xml"; 
             updater.CheckForUpdatesCompleted += Updater_CheckForUpdatesCompleted;
 
             updater.Initialize();
@@ -82,6 +83,13 @@ namespace TestApp
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            Action<object> test = new Action<object>((o) => {  });
+
+            Func<int, bool> test2 = new Func<int, bool>((i) => { return i%2==0; });
+
+            AsyncTaskBase<bool> task =  AsyncTaskFactory.StartNew<bool>(test2, 2);
+            Console.WriteLine(task.GetType().FullName);
+            
         }
     }
 }
