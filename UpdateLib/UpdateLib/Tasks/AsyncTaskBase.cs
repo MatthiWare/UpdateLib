@@ -246,7 +246,7 @@ namespace MatthiWare.UpdateLib.Tasks
         /// <param name="total">The total amount of work.</param>
         protected virtual void OnTaskProgressChanged(int done, int total)
         {
-            int progress = (done * 100) / total;
+            int progress = (done / total) * 100;
             TaskProgressChanged?.Invoke(this, new ProgressChangedEventArgs(progress, null));
         }
 
