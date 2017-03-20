@@ -19,7 +19,7 @@ namespace TestApp
             InitializeComponent();
 
             updater = Updater.Instance;
-            updater.UpdateURL = "https://dl.dropboxusercontent.com/u/30635736/UpdateLib/Dev/updatefile.xml"; 
+            updater.UpdateURL = "http://matthiware.dev/UpdateLib/Dev/updatefile.xml"; 
             updater.CheckForUpdatesCompleted += Updater_CheckForUpdatesCompleted;
 
             updater.Initialize();
