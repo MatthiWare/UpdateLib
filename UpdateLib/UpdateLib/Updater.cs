@@ -68,8 +68,8 @@ namespace MatthiWare.UpdateLib
         {
             Converter = new PathVariableConverter();
 
-            Logger.Writers.Add(new ConsoleLogWriter());
-            Logger.Writers.Add(new FileLogWriter());
+            //Logger.Writers.Add(new ConsoleLogWriter());
+            //Logger.Writers.Add(new FileLogWriter());
         }
 
         public void Initialize()
@@ -97,6 +97,14 @@ namespace MatthiWare.UpdateLib
             CheckForUpdatesTask task = new CheckForUpdatesTask(UpdateURL);
             task.TaskCompleted += (o, e) => { CheckForUpdatesCompleted?.Invoke(task, new CheckForUpdatesCompletedEventArgs(task.Version, task.Result, e)); };
             task.Start();
+        }
+
+        /// <summary>
+        /// Start the update process asynchronously
+        /// </summary>
+        public void CheckForUpdatesAsync()
+        {
+
         }
 
         public HashCacheFile GetCache()

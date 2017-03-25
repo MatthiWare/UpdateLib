@@ -17,7 +17,7 @@ namespace UpdateLib.Tests.Tasks
     public class AsyncTaskTest
     {
 
-        [Test]
+        [Test, Parallelizable]
         public void CancelledTaskIsCancelled()
         {
             TestTask task = new TestTask(1000);
@@ -32,7 +32,7 @@ namespace UpdateLib.Tests.Tasks
             Assert.True(task.IsCancelled, "Task did not cancel");
         }
 
-        [Test]
+        [Test, Parallelizable]
         public void FaultyTaskReturnsException()
         {
             ErrorTask task = new ErrorTask();
@@ -50,7 +50,7 @@ namespace UpdateLib.Tests.Tasks
             wait.WaitOne();
         }
 
-        [Test]
+        [Test, Parallelizable]
         public void TestMethod()
         {
             Object o = new Object();
@@ -63,7 +63,7 @@ namespace UpdateLib.Tests.Tasks
            Assert.AreEqual(o, task.AwaitTask());
         }
 
-        [Test]
+        [Test, Parallelizable]
         public void TestResultReturnsCorrectObject()
         {
             TestResultTask<bool>(false);
@@ -86,7 +86,7 @@ namespace UpdateLib.Tests.Tasks
             Assert.AreEqual(input, task.AwaitTask());
         }
 
-        [Test]
+        [Test, Parallelizable]
         public void CheckDoubleWait()
         {
             TestTask task = new TestTask(500);
@@ -95,7 +95,7 @@ namespace UpdateLib.Tests.Tasks
             task.AwaitTask();
         }
 
-        [Test]
+        [Test, Parallelizable]
         public void TestAwaitWorker()
         {
             WorkerTestTask task = new WorkerTestTask();

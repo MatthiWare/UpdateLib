@@ -196,7 +196,7 @@ namespace MatthiWare.UpdateLib.Tasks
                 {
                     LastException = ex?.InnerException ?? ex;
 
-                    Console.WriteLine(ex);
+                    Logger.Error(GetType().Name, LastException);
                 }
             });
 
@@ -246,8 +246,8 @@ namespace MatthiWare.UpdateLib.Tasks
         /// <param name="total">The total amount of work.</param>
         protected virtual void OnTaskProgressChanged(int done, int total)
         {
-            int progress = (done / total) * 100;
-            TaskProgressChanged?.Invoke(this, new ProgressChangedEventArgs(progress, null));
+            double progress = ((double)done / total) * 100;
+            TaskProgressChanged?.Invoke(this, new ProgressChangedEventArgs((int)progress, null));
         }
 
         /// <summary>

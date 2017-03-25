@@ -80,8 +80,11 @@ namespace MatthiWare.UpdateLib.Files
             if (!output.CanWrite)
                 throw new ArgumentException("Stream is not writable", "output");
 
-            XmlSerializer serializer = new XmlSerializer(typeof(UpdateFile));
-            serializer.Serialize(output, this);
+            XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
+            ns.Add(string.Empty, string.Empty);
+
+            XmlSerializer serializer = new XmlSerializer(typeof(UpdateFile), string.Empty);
+            serializer.Serialize(output, this, ns);
         }
 
         /// <summary>
@@ -114,7 +117,7 @@ namespace MatthiWare.UpdateLib.Files
 
             if (!input.CanRead)
                 throw new ArgumentException("Stream is not readable", "input");
-
+            
             XmlSerializer xml = new XmlSerializer(typeof(UpdateFile));
 
             UpdateFile file = (UpdateFile)xml.Deserialize(input);

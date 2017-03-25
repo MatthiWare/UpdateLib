@@ -28,18 +28,20 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.TreeNode treeNode9 = new System.Windows.Forms.TreeNode("General Information");
-            System.Windows.Forms.TreeNode treeNode10 = new System.Windows.Forms.TreeNode("Files");
-            System.Windows.Forms.TreeNode treeNode11 = new System.Windows.Forms.TreeNode("Registry");
-            System.Windows.Forms.TreeNode treeNode12 = new System.Windows.Forms.TreeNode("Project", new System.Windows.Forms.TreeNode[] {
-            treeNode9,
-            treeNode10,
-            treeNode11});
+            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("General Information");
+            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Files");
+            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Registry");
+            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Project", new System.Windows.Forms.TreeNode[] {
+            treeNode1,
+            treeNode2,
+            treeNode3});
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.tvProject = new System.Windows.Forms.TreeView();
             this.lvItems = new System.Windows.Forms.ListView();
             this.clmnName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.clmnDate = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.clmnPath = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.menuStrip = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -57,8 +59,6 @@
             this.saveToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator = new System.Windows.Forms.ToolStripSeparator();
             this.buildToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this.clmnDate = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.clmnPath = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
             this.splitContainer.SuspendLayout();
@@ -82,8 +82,8 @@
             // splitContainer.Panel2
             // 
             this.splitContainer.Panel2.Controls.Add(this.lvItems);
-            this.splitContainer.Size = new System.Drawing.Size(626, 315);
-            this.splitContainer.SplitterDistance = 228;
+            this.splitContainer.Size = new System.Drawing.Size(968, 308);
+            this.splitContainer.SplitterDistance = 352;
             this.splitContainer.TabIndex = 0;
             // 
             // tvProject
@@ -91,17 +91,17 @@
             this.tvProject.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tvProject.Location = new System.Drawing.Point(0, 0);
             this.tvProject.Name = "tvProject";
-            treeNode9.Name = "nodeInfo";
-            treeNode9.Text = "General Information";
-            treeNode10.Name = "nodeFiles";
-            treeNode10.Text = "Files";
-            treeNode11.Name = "nodeRegistry";
-            treeNode11.Text = "Registry";
-            treeNode12.Name = "root";
-            treeNode12.Text = "Project";
+            treeNode1.Name = "nodeInfo";
+            treeNode1.Text = "General Information";
+            treeNode2.Name = "nodeFiles";
+            treeNode2.Text = "Files";
+            treeNode3.Name = "nodeRegistry";
+            treeNode3.Text = "Registry";
+            treeNode4.Name = "root";
+            treeNode4.Text = "Project";
             this.tvProject.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode12});
-            this.tvProject.Size = new System.Drawing.Size(228, 315);
+            treeNode4});
+            this.tvProject.Size = new System.Drawing.Size(352, 308);
             this.tvProject.TabIndex = 0;
             this.tvProject.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tvProject_AfterSelect);
             // 
@@ -116,7 +116,7 @@
             this.lvItems.Location = new System.Drawing.Point(0, 0);
             this.lvItems.MultiSelect = false;
             this.lvItems.Name = "lvItems";
-            this.lvItems.Size = new System.Drawing.Size(394, 315);
+            this.lvItems.Size = new System.Drawing.Size(612, 308);
             this.lvItems.TabIndex = 0;
             this.lvItems.UseCompatibleStateImageBehavior = false;
             this.lvItems.View = System.Windows.Forms.View.Details;
@@ -127,6 +127,10 @@
             this.clmnName.Text = "Name";
             this.clmnName.Width = 139;
             // 
+            // clmnPath
+            // 
+            this.clmnPath.Text = "Path";
+            // 
             // menuStrip
             // 
             this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -134,7 +138,7 @@
             this.helpToolStripMenuItem});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
-            this.menuStrip.Size = new System.Drawing.Size(626, 24);
+            this.menuStrip.Size = new System.Drawing.Size(968, 24);
             this.menuStrip.TabIndex = 1;
             this.menuStrip.Text = "menuStrip1";
             // 
@@ -190,9 +194,9 @@
             this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.lblStatus,
             this.progressBar});
-            this.statusStrip.Location = new System.Drawing.Point(0, 370);
+            this.statusStrip.Location = new System.Drawing.Point(0, 363);
             this.statusStrip.Name = "statusStrip";
-            this.statusStrip.Size = new System.Drawing.Size(626, 22);
+            this.statusStrip.Size = new System.Drawing.Size(968, 22);
             this.statusStrip.TabIndex = 2;
             this.statusStrip.Text = "statusStrip1";
             // 
@@ -221,7 +225,7 @@
             this.buildToolStripButton});
             this.toolStrip.Location = new System.Drawing.Point(0, 24);
             this.toolStrip.Name = "toolStrip";
-            this.toolStrip.Size = new System.Drawing.Size(626, 25);
+            this.toolStrip.Size = new System.Drawing.Size(968, 25);
             this.toolStrip.TabIndex = 3;
             this.toolStrip.Text = "toolStrip1";
             // 
@@ -267,15 +271,11 @@
             this.buildToolStripButton.Text = "C&ut";
             this.buildToolStripButton.Click += new System.EventHandler(this.buildToolStripButton_Click);
             // 
-            // clmnPath
-            // 
-            this.clmnPath.Text = "Path";
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(626, 392);
+            this.ClientSize = new System.Drawing.Size(968, 385);
             this.Controls.Add(this.toolStrip);
             this.Controls.Add(this.statusStrip);
             this.Controls.Add(this.splitContainer);
