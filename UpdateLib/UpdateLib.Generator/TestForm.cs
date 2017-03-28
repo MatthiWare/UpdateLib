@@ -15,5 +15,10 @@ namespace UpdateLib.Generator
         {
             InitializeComponent();
         }
+
+        private void TestForm_Click(object sender, EventArgs e)
+        {
+            WindowState = (WindowState == FormWindowState.Maximized) ? FormWindowState.Normal : FormWindowState.Maximized;
+        }
     }
 }

@@ -69,6 +69,9 @@
     <Compile Include="UI\ElipseComponent.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="UI\GradientPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
