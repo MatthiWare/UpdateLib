@@ -25,5 +25,21 @@ namespace UpdateLib.Generator
         {
 
         }
+
+        private void pbMinimize_Click(object sender, EventArgs e)
+        {
+            WindowState = FormWindowState.Minimized;
+        }
+
+        private void pbMaximize_Click(object sender, EventArgs e)
+        {
+            MaximumSize = Screen.FromControl(this).WorkingArea.Size;
+            WindowState = (WindowState == FormWindowState.Normal ? FormWindowState.Maximized : FormWindowState.Normal);
+        }
+
+        private void pbClose_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
     }
 }
