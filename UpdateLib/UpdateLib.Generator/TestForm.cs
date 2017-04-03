@@ -21,11 +21,6 @@ namespace UpdateLib.Generator
             WindowState = (WindowState == FormWindowState.Maximized) ? FormWindowState.Normal : FormWindowState.Maximized;
         }
 
-        private void label1_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void pbMinimize_Click(object sender, EventArgs e)
         {
             WindowState = FormWindowState.Minimized;
@@ -40,6 +35,11 @@ namespace UpdateLib.Generator
         private void pbClose_Click(object sender, EventArgs e)
         {
             Close();
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

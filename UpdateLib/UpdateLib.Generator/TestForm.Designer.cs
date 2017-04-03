@@ -30,14 +30,14 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TestForm));
-            this.HeaderPanel = new System.Windows.Forms.Panel();
-            this.pbMinimize = new System.Windows.Forms.PictureBox();
-            this.pbMaximize = new System.Windows.Forms.PictureBox();
-            this.pbClose = new System.Windows.Forms.PictureBox();
-            this.pbIcon = new System.Windows.Forms.PictureBox();
-            this.lblTitle = new System.Windows.Forms.Label();
             this.SidebarPanel = new System.Windows.Forms.Panel();
             this.ContentPanel = new System.Windows.Forms.Panel();
+            this.HeaderPanel = new UpdateLib.Generator.UI.MoveablePanel();
+            this.pbMinimize = new UpdateLib.Generator.UI.HoverPictureBox();
+            this.pbMaximize = new UpdateLib.Generator.UI.HoverPictureBox();
+            this.pbClose = new UpdateLib.Generator.UI.HoverPictureBox();
+            this.pbIcon = new System.Windows.Forms.PictureBox();
+            this.lblTitle = new System.Windows.Forms.Label();
             this.elipseComponent1 = new UpdateLib.Generator.UI.ElipseComponent(this.components);
             this.HeaderPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbMinimize)).BeginInit();
@@ -45,6 +45,26 @@
             ((System.ComponentModel.ISupportInitialize)(this.pbClose)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbIcon)).BeginInit();
             this.SuspendLayout();
+            // 
+            // SidebarPanel
+            // 
+            this.SidebarPanel.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.SidebarPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.SidebarPanel.Dock = System.Windows.Forms.DockStyle.Left;
+            this.SidebarPanel.Location = new System.Drawing.Point(0, 33);
+            this.SidebarPanel.Name = "SidebarPanel";
+            this.SidebarPanel.Size = new System.Drawing.Size(170, 275);
+            this.SidebarPanel.TabIndex = 1;
+            // 
+            // ContentPanel
+            // 
+            this.ContentPanel.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.ContentPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.ContentPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ContentPanel.Location = new System.Drawing.Point(170, 33);
+            this.ContentPanel.Name = "ContentPanel";
+            this.ContentPanel.Size = new System.Drawing.Size(549, 275);
+            this.ContentPanel.TabIndex = 2;
             // 
             // HeaderPanel
             // 
@@ -58,6 +78,7 @@
             this.HeaderPanel.Location = new System.Drawing.Point(0, 0);
             this.HeaderPanel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.HeaderPanel.Name = "HeaderPanel";
+            this.HeaderPanel.ParentForm = this;
             this.HeaderPanel.Size = new System.Drawing.Size(719, 33);
             this.HeaderPanel.TabIndex = 1;
             // 
@@ -65,7 +86,7 @@
             // 
             this.pbMinimize.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.pbMinimize.Image = ((System.Drawing.Image)(resources.GetObject("pbMinimize.Image")));
-            this.pbMinimize.Location = new System.Drawing.Point(645, 3);
+            this.pbMinimize.Location = new System.Drawing.Point(645, 5);
             this.pbMinimize.Name = "pbMinimize";
             this.pbMinimize.Size = new System.Drawing.Size(24, 24);
             this.pbMinimize.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -76,8 +97,9 @@
             // pbMaximize
             // 
             this.pbMaximize.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.pbMaximize.BackColor = System.Drawing.Color.Transparent;
             this.pbMaximize.Image = ((System.Drawing.Image)(resources.GetObject("pbMaximize.Image")));
-            this.pbMaximize.Location = new System.Drawing.Point(668, 3);
+            this.pbMaximize.Location = new System.Drawing.Point(668, 5);
             this.pbMaximize.Name = "pbMaximize";
             this.pbMaximize.Size = new System.Drawing.Size(24, 24);
             this.pbMaximize.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -89,7 +111,7 @@
             // 
             this.pbClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.pbClose.Image = ((System.Drawing.Image)(resources.GetObject("pbClose.Image")));
-            this.pbClose.Location = new System.Drawing.Point(691, 3);
+            this.pbClose.Location = new System.Drawing.Point(691, 5);
             this.pbClose.Name = "pbClose";
             this.pbClose.Size = new System.Drawing.Size(24, 24);
             this.pbClose.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -118,25 +140,6 @@
             this.lblTitle.Size = new System.Drawing.Size(157, 21);
             this.lblTitle.TabIndex = 0;
             this.lblTitle.Text = "Update Generator";
-            this.lblTitle.Click += new System.EventHandler(this.label1_Click);
-            // 
-            // SidebarPanel
-            // 
-            this.SidebarPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(83)))), ((int)(((byte)(92)))), ((int)(((byte)(156)))));
-            this.SidebarPanel.Dock = System.Windows.Forms.DockStyle.Left;
-            this.SidebarPanel.Location = new System.Drawing.Point(0, 33);
-            this.SidebarPanel.Name = "SidebarPanel";
-            this.SidebarPanel.Size = new System.Drawing.Size(170, 275);
-            this.SidebarPanel.TabIndex = 1;
-            // 
-            // ContentPanel
-            // 
-            this.ContentPanel.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.ContentPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ContentPanel.Location = new System.Drawing.Point(170, 33);
-            this.ContentPanel.Name = "ContentPanel";
-            this.ContentPanel.Size = new System.Drawing.Size(549, 275);
-            this.ContentPanel.TabIndex = 2;
             // 
             // elipseComponent1
             // 
@@ -175,11 +178,11 @@
         private UI.ElipseComponent elipseComponent1;
         private System.Windows.Forms.Label lblTitle;
         private System.Windows.Forms.Panel SidebarPanel;
-        private System.Windows.Forms.Panel HeaderPanel;
+        private UI.MoveablePanel HeaderPanel;
         private System.Windows.Forms.Panel ContentPanel;
         private System.Windows.Forms.PictureBox pbIcon;
-        private System.Windows.Forms.PictureBox pbClose;
-        private System.Windows.Forms.PictureBox pbMinimize;
-        private System.Windows.Forms.PictureBox pbMaximize;
+        private UI.HoverPictureBox pbClose;
+        private UI.HoverPictureBox pbMinimize;
+        private UI.HoverPictureBox pbMaximize;
     }
 }
