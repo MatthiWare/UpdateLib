@@ -32,6 +32,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TestForm));
             this.SidebarPanel = new System.Windows.Forms.Panel();
             this.ContentPanel = new System.Windows.Forms.Panel();
+            this.flatButton1 = new UpdateLib.Generator.UI.FlatButton();
             this.HeaderPanel = new UpdateLib.Generator.UI.MoveablePanel();
             this.pbMinimize = new UpdateLib.Generator.UI.HoverPictureBox();
             this.pbMaximize = new UpdateLib.Generator.UI.HoverPictureBox();
@@ -39,6 +40,8 @@
             this.pbIcon = new System.Windows.Forms.PictureBox();
             this.lblTitle = new System.Windows.Forms.Label();
             this.elipseComponent1 = new UpdateLib.Generator.UI.ElipseComponent(this.components);
+            this.flatButton2 = new UpdateLib.Generator.UI.FlatButton();
+            this.SidebarPanel.SuspendLayout();
             this.HeaderPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbMinimize)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbMaximize)).BeginInit();
@@ -48,8 +51,10 @@
             // 
             // SidebarPanel
             // 
-            this.SidebarPanel.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.SidebarPanel.BackColor = System.Drawing.Color.DarkGray;
             this.SidebarPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.SidebarPanel.Controls.Add(this.flatButton2);
+            this.SidebarPanel.Controls.Add(this.flatButton1);
             this.SidebarPanel.Dock = System.Windows.Forms.DockStyle.Left;
             this.SidebarPanel.Location = new System.Drawing.Point(0, 33);
             this.SidebarPanel.Name = "SidebarPanel";
@@ -65,6 +70,17 @@
             this.ContentPanel.Name = "ContentPanel";
             this.ContentPanel.Size = new System.Drawing.Size(549, 275);
             this.ContentPanel.TabIndex = 2;
+            // 
+            // flatButton1
+            // 
+            this.flatButton1.ActiveItem = false;
+            this.flatButton1.BackHoverColor = System.Drawing.Color.LightGray;
+            this.flatButton1.BackSelectedColor = System.Drawing.Color.DimGray;
+            this.flatButton1.Location = new System.Drawing.Point(0, 0);
+            this.flatButton1.Name = "flatButton1";
+            this.flatButton1.Size = new System.Drawing.Size(169, 63);
+            this.flatButton1.TabIndex = 0;
+            this.flatButton1.Text = "flatButton1";
             // 
             // HeaderPanel
             // 
@@ -146,6 +162,17 @@
             this.elipseComponent1.Control = this;
             this.elipseComponent1.Radius = 5;
             // 
+            // flatButton2
+            // 
+            this.flatButton2.ActiveItem = false;
+            this.flatButton2.BackHoverColor = System.Drawing.Color.LightGray;
+            this.flatButton2.BackSelectedColor = System.Drawing.Color.DimGray;
+            this.flatButton2.Location = new System.Drawing.Point(-1, 63);
+            this.flatButton2.Name = "flatButton2";
+            this.flatButton2.Size = new System.Drawing.Size(169, 63);
+            this.flatButton2.TabIndex = 1;
+            this.flatButton2.Text = "flatButton2";
+            // 
             // TestForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
@@ -163,6 +190,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "TestForm";
             this.Click += new System.EventHandler(this.TestForm_Click);
+            this.SidebarPanel.ResumeLayout(false);
             this.HeaderPanel.ResumeLayout(false);
             this.HeaderPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbMinimize)).EndInit();
@@ -184,5 +212,7 @@
         private UI.HoverPictureBox pbClose;
         private UI.HoverPictureBox pbMinimize;
         private UI.HoverPictureBox pbMaximize;
+        private UI.FlatButton flatButton1;
+        private UI.FlatButton flatButton2;
     }
 }
