@@ -78,6 +78,12 @@
     <Compile Include="UI\HoverPictureBox.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="UI\LoaderControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\LoaderControl.Designer.cs">
+      <DependentUpon>LoaderControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\MoveablePanel.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -96,6 +102,9 @@
     </Compile>
     <EmbeddedResource Include="TestForm.resx">
       <DependentUpon>TestForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\LoaderControl.resx">
+      <DependentUpon>LoaderControl.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

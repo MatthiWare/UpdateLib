@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using UpdateLib.Generator.UI;
 
 namespace UpdateLib.Generator
 {
@@ -40,6 +41,16 @@ namespace UpdateLib.Generator
         private void label1_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void flatButton1_Click(object sender, EventArgs e)
+        {
+            LoaderControl.Show(ContentPanel);
+        }
+
+        private void flatButton2_Click(object sender, EventArgs e)
+        {
+            LoaderControl.Hide(ContentPanel);
         }
     }
 }

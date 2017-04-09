@@ -97,8 +97,9 @@ namespace UpdateLib.Generator.UI
 
         private void UpdateBackgroundColor()
         {
-            m_backColor = (mouseInside ? m_hoveColor : BackColor);
-            m_backColor = (m_activeItem ? m_selectedColor : m_backColor);
+            m_backColor = (m_activeItem ? m_selectedColor : BackColor);
+            m_backColor = (mouseInside ? m_hoveColor : m_backColor);
+            
 
             Invalidate();
         }

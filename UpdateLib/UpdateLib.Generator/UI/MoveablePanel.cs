@@ -17,20 +17,40 @@ namespace UpdateLib.Generator.UI
         private const int HT_CAPTION = 0x2;
 
         [DllImport("user32.dll")]
-        public static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
+        private static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
+
         [DllImport("user32.dll")]
-        public static extern bool ReleaseCapture();
+        private static extern bool ReleaseCapture();
         
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
 
+            MoveParentForm(this, e);
+        }
+
+        private void MoveParentForm(object sender, MouseEventArgs e)
+        {
             if (ParentForm != null)
             {
                 ReleaseCapture();
                 SendMessage(this.ParentForm.Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0);
             }
-            
         }
+
+        protected override void OnControlAdded(ControlEventArgs e)
+        {
+            base.OnControlAdded(e);
+
+            e.Control.MouseMove += MoveParentForm;
+        }
+
+        protected override void OnControlRemoved(ControlEventArgs e)
+        {
+            base.OnControlRemoved(e);
+
+            e.Control.MouseMove -= MoveParentForm;
+        }
+
     }
 }

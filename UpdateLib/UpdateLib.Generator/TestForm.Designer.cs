@@ -32,6 +32,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TestForm));
             this.SidebarPanel = new System.Windows.Forms.Panel();
             this.ContentPanel = new System.Windows.Forms.Panel();
+            this.flatButton2 = new UpdateLib.Generator.UI.FlatButton();
             this.flatButton1 = new UpdateLib.Generator.UI.FlatButton();
             this.HeaderPanel = new UpdateLib.Generator.UI.MoveablePanel();
             this.pbMinimize = new UpdateLib.Generator.UI.HoverPictureBox();
@@ -40,7 +41,6 @@
             this.pbIcon = new System.Windows.Forms.PictureBox();
             this.lblTitle = new System.Windows.Forms.Label();
             this.elipseComponent1 = new UpdateLib.Generator.UI.ElipseComponent(this.components);
-            this.flatButton2 = new UpdateLib.Generator.UI.FlatButton();
             this.SidebarPanel.SuspendLayout();
             this.HeaderPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbMinimize)).BeginInit();
@@ -71,6 +71,18 @@
             this.ContentPanel.Size = new System.Drawing.Size(549, 275);
             this.ContentPanel.TabIndex = 2;
             // 
+            // flatButton2
+            // 
+            this.flatButton2.ActiveItem = false;
+            this.flatButton2.BackHoverColor = System.Drawing.Color.LightGray;
+            this.flatButton2.BackSelectedColor = System.Drawing.Color.DimGray;
+            this.flatButton2.Location = new System.Drawing.Point(-1, 63);
+            this.flatButton2.Name = "flatButton2";
+            this.flatButton2.Size = new System.Drawing.Size(169, 63);
+            this.flatButton2.TabIndex = 1;
+            this.flatButton2.Text = "flatButton2";
+            this.flatButton2.Click += new System.EventHandler(this.flatButton2_Click);
+            // 
             // flatButton1
             // 
             this.flatButton1.ActiveItem = false;
@@ -81,6 +93,7 @@
             this.flatButton1.Size = new System.Drawing.Size(169, 63);
             this.flatButton1.TabIndex = 0;
             this.flatButton1.Text = "flatButton1";
+            this.flatButton1.Click += new System.EventHandler(this.flatButton1_Click);
             // 
             // HeaderPanel
             // 
@@ -161,17 +174,6 @@
             // 
             this.elipseComponent1.Control = this;
             this.elipseComponent1.Radius = 5;
-            // 
-            // flatButton2
-            // 
-            this.flatButton2.ActiveItem = false;
-            this.flatButton2.BackHoverColor = System.Drawing.Color.LightGray;
-            this.flatButton2.BackSelectedColor = System.Drawing.Color.DimGray;
-            this.flatButton2.Location = new System.Drawing.Point(-1, 63);
-            this.flatButton2.Name = "flatButton2";
-            this.flatButton2.Size = new System.Drawing.Size(169, 63);
-            this.flatButton2.TabIndex = 1;
-            this.flatButton2.Text = "flatButton2";
             // 
             // TestForm
             // 
