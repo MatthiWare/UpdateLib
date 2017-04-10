@@ -42,6 +42,9 @@ namespace UpdateLib.Generator.UI
         {
             base.OnControlAdded(e);
 
+            if (typeof(HoverPictureBox) == e.Control.GetType())
+                return;
+
             e.Control.MouseMove += MoveParentForm;
         }
 
