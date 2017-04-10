@@ -123,10 +123,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\gears.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Generator_logo.ico" />
+    <None Include="Resources\loading_gear.gif" />
+    <None Include="Resources\gears.png" />
     <None Include="Resources\loading.gif" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

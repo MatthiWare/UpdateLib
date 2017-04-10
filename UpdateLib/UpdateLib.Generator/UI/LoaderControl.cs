@@ -9,7 +9,6 @@ using System.Windows.Forms;
 
 namespace UpdateLib.Generator.UI
 {
-
     public partial class LoaderControl : UserControl
     {
         private static Dictionary<Control, LoaderControl> loaders = new Dictionary<Control, LoaderControl>();
@@ -17,8 +16,10 @@ namespace UpdateLib.Generator.UI
         public LoaderControl()
         {
             InitializeComponent();
-        }
 
+            SetStyle(ControlStyles.SupportsTransparentBackColor, true);
+            DoubleBuffered = true;
+        }
 
         public static void Show(Control parent)
         {
