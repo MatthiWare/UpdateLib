@@ -35,6 +35,7 @@
             // pbLoader
             // 
             this.pbLoader.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.pbLoader.BackColor = System.Drawing.Color.Transparent;
             this.pbLoader.Image = global::UpdateLib.Generator.Properties.Resources.loading_gear;
             this.pbLoader.Location = new System.Drawing.Point(0, 0);
             this.pbLoader.Name = "pbLoader";

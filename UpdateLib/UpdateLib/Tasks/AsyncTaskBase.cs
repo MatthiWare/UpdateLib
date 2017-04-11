@@ -26,6 +26,7 @@ namespace MatthiWare.UpdateLib.Tasks
         private WaitHandle mainWait;
         private readonly object sync = new object();
 
+        private bool m_running = false;
         private bool m_cancelled = false;
 
         #endregion
@@ -88,6 +89,21 @@ namespace MatthiWare.UpdateLib.Tasks
             }
         }
 
+
+        public bool IsRunning
+        {
+            get
+            {
+                lock (sync)
+                    return m_running;
+            }
+            private set
+            {
+                lock (sync)
+                    m_running = value;
+            }
+        }
+
         #endregion
 
         #region static methods
@@ -112,6 +128,7 @@ namespace MatthiWare.UpdateLib.Tasks
         private void Reset()
         {
             IsCancelled = false;
+            IsRunning = false;
             m_lastException = null;
 
             mainWait = null;
@@ -130,6 +147,7 @@ namespace MatthiWare.UpdateLib.Tasks
             {
                 try
                 {
+                    IsRunning = true;
                     DoWork();
                 }
                 catch (Exception ex)
@@ -141,6 +159,7 @@ namespace MatthiWare.UpdateLib.Tasks
                 finally
                 {
                     AwaitWorkers();
+                    IsRunning = false;
                 }
             });
 

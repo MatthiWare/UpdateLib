@@ -20,6 +20,16 @@ namespace MatthiWare.UpdateLib.Tasks
             return task.Start();
         }
 
+        public static AsyncTaskBase From(Delegate action, params object[] args)
+        {
+            return new GenericTask(action, args);
+        }
+
+        public static AsyncTaskBase<T> From<T>(Delegate action, params object[] args)
+        {
+            return new GenericFuncTask<T>(action, args);
+        }
+
         private class GenericFuncTask<T> : AsyncTaskBase<T>
         {
             private Delegate action;

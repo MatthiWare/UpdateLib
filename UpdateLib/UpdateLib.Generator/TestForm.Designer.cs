@@ -32,6 +32,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TestForm));
             this.SidebarPanel = new System.Windows.Forms.Panel();
             this.ContentPanel = new System.Windows.Forms.Panel();
+            this.button1 = new System.Windows.Forms.Button();
             this.flatButton2 = new UpdateLib.Generator.UI.FlatButton();
             this.flatButton1 = new UpdateLib.Generator.UI.FlatButton();
             this.HeaderPanel = new UpdateLib.Generator.UI.MoveablePanel();
@@ -42,6 +43,7 @@
             this.lblTitle = new System.Windows.Forms.Label();
             this.elipseComponent1 = new UpdateLib.Generator.UI.ElipseComponent(this.components);
             this.SidebarPanel.SuspendLayout();
+            this.ContentPanel.SuspendLayout();
             this.HeaderPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbMinimize)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbMaximize)).BeginInit();
@@ -63,13 +65,23 @@
             // 
             // ContentPanel
             // 
-            this.ContentPanel.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.ContentPanel.BackColor = System.Drawing.SystemColors.ButtonShadow;
             this.ContentPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.ContentPanel.Controls.Add(this.button1);
             this.ContentPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ContentPanel.Location = new System.Drawing.Point(170, 33);
             this.ContentPanel.Name = "ContentPanel";
             this.ContentPanel.Size = new System.Drawing.Size(549, 275);
             this.ContentPanel.TabIndex = 2;
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(73, 40);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 0;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
             // 
             // flatButton2
             // 
@@ -193,6 +205,7 @@
             this.Text = "TestForm";
             this.Click += new System.EventHandler(this.TestForm_Click);
             this.SidebarPanel.ResumeLayout(false);
+            this.ContentPanel.ResumeLayout(false);
             this.HeaderPanel.ResumeLayout(false);
             this.HeaderPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbMinimize)).EndInit();
@@ -216,5 +229,6 @@
         private UI.HoverPictureBox pbMaximize;
         private UI.FlatButton flatButton1;
         private UI.FlatButton flatButton2;
+        private System.Windows.Forms.Button button1;
     }
 }
