@@ -13,6 +13,13 @@ namespace UpdateLib.Generator.UI
     [DefaultEvent(nameof(Click))]
     public class FlatButton : Control
     {
+        private const float PADDING_WIDTH = 0.0625f;
+        private const float PADDING_HEIGHT = 0.25f;
+        private const float IMG_SIZE_WIDTH = 0.125f;
+        private const float IMG_SIZE_HEIGHT = 0.5f;
+        private const float TEXT_SIZE_WIDTH = 1f - (PADDING_WIDTH * 3) - IMG_SIZE_WIDTH;
+        private const float TEXT_SIZE_HEIGHT = 1f - (PADDING_HEIGHT * 2);
+
         private bool mouseInside = false;
 
         private Bitmap buffer;
@@ -41,6 +48,25 @@ namespace UpdateLib.Generator.UI
         {
             get { return m_selectedColor; }
             set { m_selectedColor = value; }
+        }
+
+        private Image m_infoImage;
+
+        public Image InfoImage
+        {
+            get { return m_infoImage; }
+            set
+            {
+                m_infoImage = value;
+
+                Rectangle rect = new Rectangle(
+                    (int)(Width * PADDING_WIDTH),
+                    (int)(Height * PADDING_HEIGHT),
+                    (int)(Width * IMG_SIZE_WIDTH),
+                    (int)(Height * IMG_SIZE_HEIGHT));
+
+                Invalidate(rect);
+            }
         }
 
 
@@ -99,7 +125,7 @@ namespace UpdateLib.Generator.UI
         {
             m_backColor = (m_activeItem ? m_selectedColor : BackColor);
             m_backColor = (mouseInside ? m_hoveColor : m_backColor);
-            
+
 
             Invalidate();
         }
@@ -113,7 +139,7 @@ namespace UpdateLib.Generator.UI
 
         protected override void OnPaint(PaintEventArgs e)
         {
-            Rectangle rect = new Rectangle(0, 0, Width , Height );
+            Rectangle rect = new Rectangle(0, 0, Width, Height);
 
             buffer = buffer ?? new Bitmap(Width, Height);
 
@@ -127,10 +153,25 @@ namespace UpdateLib.Generator.UI
 
                 g.FillRectangle(new SolidBrush(m_backColor), rect);
 
-                SizeF textSize = g.MeasureString(Text, Font, Width);
+                RectangleF imgRect = new RectangleF(
+                    Width * PADDING_WIDTH,
+                    Height * PADDING_HEIGHT,
+                    Width * IMG_SIZE_WIDTH,
+                    Height * IMG_SIZE_HEIGHT);
 
-                float x = (Width / 2) - (textSize.Width / 2);
-                float y = (Height / 2) - (textSize.Height / 2);
+                if (InfoImage != null)
+                    g.DrawImage(InfoImage, imgRect);
+
+                SizeF textSize = g.MeasureString(Text, Font, (int)(Width * TEXT_SIZE_WIDTH));
+
+                float offsetX = ((Width * PADDING_WIDTH) * 2) + imgRect.Width;
+                float offsetY = imgRect.Y;
+
+                float availableTextWidth = Width - offsetX - (Width * PADDING_WIDTH);
+                float availableTextHeight = Height - (offsetY * 2);
+
+                float x = offsetX + (availableTextWidth / 2) - (textSize.Width / 2);
+                float y = offsetY + (availableTextHeight / 2) - (textSize.Height / 2);
 
                 g.DrawString(Text, Font, new SolidBrush(ForeColor), x, y);
 

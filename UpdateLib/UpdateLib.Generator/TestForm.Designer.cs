@@ -33,8 +33,9 @@
             this.SidebarPanel = new System.Windows.Forms.Panel();
             this.ContentPanel = new System.Windows.Forms.Panel();
             this.button1 = new System.Windows.Forms.Button();
-            this.flatButton2 = new UpdateLib.Generator.UI.FlatButton();
-            this.flatButton1 = new UpdateLib.Generator.UI.FlatButton();
+            this.btnTabBuild = new UpdateLib.Generator.UI.FlatButton();
+            this.btnTabFiles = new UpdateLib.Generator.UI.FlatButton();
+            this.btnTabInformation = new UpdateLib.Generator.UI.FlatButton();
             this.HeaderPanel = new UpdateLib.Generator.UI.MoveablePanel();
             this.pbMinimize = new UpdateLib.Generator.UI.HoverPictureBox();
             this.pbMaximize = new UpdateLib.Generator.UI.HoverPictureBox();
@@ -55,23 +56,24 @@
             // 
             this.SidebarPanel.BackColor = System.Drawing.Color.DarkGray;
             this.SidebarPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.SidebarPanel.Controls.Add(this.flatButton2);
-            this.SidebarPanel.Controls.Add(this.flatButton1);
+            this.SidebarPanel.Controls.Add(this.btnTabBuild);
+            this.SidebarPanel.Controls.Add(this.btnTabFiles);
+            this.SidebarPanel.Controls.Add(this.btnTabInformation);
             this.SidebarPanel.Dock = System.Windows.Forms.DockStyle.Left;
             this.SidebarPanel.Location = new System.Drawing.Point(0, 33);
             this.SidebarPanel.Name = "SidebarPanel";
-            this.SidebarPanel.Size = new System.Drawing.Size(170, 275);
+            this.SidebarPanel.Size = new System.Drawing.Size(233, 275);
             this.SidebarPanel.TabIndex = 1;
             // 
             // ContentPanel
             // 
-            this.ContentPanel.BackColor = System.Drawing.SystemColors.ButtonShadow;
+            this.ContentPanel.BackColor = System.Drawing.SystemColors.Control;
             this.ContentPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.ContentPanel.Controls.Add(this.button1);
             this.ContentPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ContentPanel.Location = new System.Drawing.Point(170, 33);
+            this.ContentPanel.Location = new System.Drawing.Point(233, 33);
             this.ContentPanel.Name = "ContentPanel";
-            this.ContentPanel.Size = new System.Drawing.Size(549, 275);
+            this.ContentPanel.Size = new System.Drawing.Size(486, 275);
             this.ContentPanel.TabIndex = 2;
             // 
             // button1
@@ -83,29 +85,49 @@
             this.button1.Text = "button1";
             this.button1.UseVisualStyleBackColor = true;
             // 
-            // flatButton2
+            // btnTabBuild
             // 
-            this.flatButton2.ActiveItem = false;
-            this.flatButton2.BackHoverColor = System.Drawing.Color.LightGray;
-            this.flatButton2.BackSelectedColor = System.Drawing.Color.DimGray;
-            this.flatButton2.Location = new System.Drawing.Point(-1, 63);
-            this.flatButton2.Name = "flatButton2";
-            this.flatButton2.Size = new System.Drawing.Size(169, 63);
-            this.flatButton2.TabIndex = 1;
-            this.flatButton2.Text = "flatButton2";
-            this.flatButton2.Click += new System.EventHandler(this.flatButton2_Click);
+            this.btnTabBuild.ActiveItem = false;
+            this.btnTabBuild.BackHoverColor = System.Drawing.Color.LightGray;
+            this.btnTabBuild.BackSelectedColor = System.Drawing.Color.DimGray;
+            this.btnTabBuild.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnTabBuild.Font = new System.Drawing.Font("Century Gothic", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnTabBuild.InfoImage = ((System.Drawing.Image)(resources.GetObject("btnTabBuild.InfoImage")));
+            this.btnTabBuild.Location = new System.Drawing.Point(0, 126);
+            this.btnTabBuild.Name = "btnTabBuild";
+            this.btnTabBuild.Size = new System.Drawing.Size(231, 63);
+            this.btnTabBuild.TabIndex = 2;
+            this.btnTabBuild.Text = "Build";
             // 
-            // flatButton1
+            // btnTabFiles
             // 
-            this.flatButton1.ActiveItem = false;
-            this.flatButton1.BackHoverColor = System.Drawing.Color.LightGray;
-            this.flatButton1.BackSelectedColor = System.Drawing.Color.DimGray;
-            this.flatButton1.Location = new System.Drawing.Point(0, 0);
-            this.flatButton1.Name = "flatButton1";
-            this.flatButton1.Size = new System.Drawing.Size(169, 63);
-            this.flatButton1.TabIndex = 0;
-            this.flatButton1.Text = "flatButton1";
-            this.flatButton1.Click += new System.EventHandler(this.flatButton1_Click);
+            this.btnTabFiles.ActiveItem = false;
+            this.btnTabFiles.BackHoverColor = System.Drawing.Color.LightGray;
+            this.btnTabFiles.BackSelectedColor = System.Drawing.Color.DimGray;
+            this.btnTabFiles.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnTabFiles.Font = new System.Drawing.Font("Century Gothic", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnTabFiles.InfoImage = ((System.Drawing.Image)(resources.GetObject("btnTabFiles.InfoImage")));
+            this.btnTabFiles.Location = new System.Drawing.Point(0, 63);
+            this.btnTabFiles.Name = "btnTabFiles";
+            this.btnTabFiles.Size = new System.Drawing.Size(231, 63);
+            this.btnTabFiles.TabIndex = 1;
+            this.btnTabFiles.Text = "Files";
+            this.btnTabFiles.Click += new System.EventHandler(this.flatButton2_Click);
+            // 
+            // btnTabInformation
+            // 
+            this.btnTabInformation.ActiveItem = false;
+            this.btnTabInformation.BackHoverColor = System.Drawing.Color.LightGray;
+            this.btnTabInformation.BackSelectedColor = System.Drawing.Color.DimGray;
+            this.btnTabInformation.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnTabInformation.Font = new System.Drawing.Font("Century Gothic", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnTabInformation.InfoImage = ((System.Drawing.Image)(resources.GetObject("btnTabInformation.InfoImage")));
+            this.btnTabInformation.Location = new System.Drawing.Point(0, 0);
+            this.btnTabInformation.Name = "btnTabInformation";
+            this.btnTabInformation.Size = new System.Drawing.Size(231, 63);
+            this.btnTabInformation.TabIndex = 0;
+            this.btnTabInformation.Text = "Update Information";
+            this.btnTabInformation.Click += new System.EventHandler(this.flatButton1_Click);
             // 
             // HeaderPanel
             // 
@@ -164,7 +186,7 @@
             // 
             this.pbIcon.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pbIcon.BackgroundImage")));
             this.pbIcon.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.pbIcon.Location = new System.Drawing.Point(5, 4);
+            this.pbIcon.Location = new System.Drawing.Point(5, 5);
             this.pbIcon.Name = "pbIcon";
             this.pbIcon.Size = new System.Drawing.Size(24, 24);
             this.pbIcon.TabIndex = 1;
@@ -176,7 +198,7 @@
             this.lblTitle.BackColor = System.Drawing.Color.Transparent;
             this.lblTitle.Font = new System.Drawing.Font("Century Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblTitle.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.lblTitle.Location = new System.Drawing.Point(31, 5);
+            this.lblTitle.Location = new System.Drawing.Point(31, 6);
             this.lblTitle.Name = "lblTitle";
             this.lblTitle.Size = new System.Drawing.Size(157, 21);
             this.lblTitle.TabIndex = 0;
@@ -227,8 +249,9 @@
         private UI.HoverPictureBox pbClose;
         private UI.HoverPictureBox pbMinimize;
         private UI.HoverPictureBox pbMaximize;
-        private UI.FlatButton flatButton1;
-        private UI.FlatButton flatButton2;
+        private UI.FlatButton btnTabInformation;
+        private UI.FlatButton btnTabFiles;
         private System.Windows.Forms.Button button1;
+        private UI.FlatButton btnTabBuild;
     }
 }
