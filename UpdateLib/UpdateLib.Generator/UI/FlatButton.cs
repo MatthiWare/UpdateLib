@@ -153,11 +153,13 @@ namespace UpdateLib.Generator.UI
 
                 g.FillRectangle(new SolidBrush(m_backColor), rect);
 
+                float imgSize = Math.Min(Width * IMG_SIZE_WIDTH, Height * IMG_SIZE_HEIGHT);
+
                 RectangleF imgRect = new RectangleF(
                     Width * PADDING_WIDTH,
                     Height * PADDING_HEIGHT,
-                    Width * IMG_SIZE_WIDTH,
-                    Height * IMG_SIZE_HEIGHT);
+                    imgSize,
+                    imgSize);
 
                 if (InfoImage != null)
                     g.DrawImage(InfoImage, imgRect);
