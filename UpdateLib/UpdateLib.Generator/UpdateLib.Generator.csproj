@@ -87,6 +87,12 @@
     <Compile Include="UI\MoveablePanel.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="UI\Pages\InformationPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\Pages\InformationPage.Designer.cs">
+      <DependentUpon>InformationPage.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -105,6 +111,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\LoaderControl.resx">
       <DependentUpon>LoaderControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\Pages\InformationPage.resx">
+      <DependentUpon>InformationPage.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
