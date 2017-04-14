@@ -44,30 +44,6 @@ namespace MatthiWare.UpdateLib.Files
         {
         }
 
-        public override bool Equals(object obj)
-        {
-            UpdateFile file = obj as UpdateFile;
-            if (file == null)
-                return false;
-
-            if (!file.VersionString.Equals(this.VersionString))
-                return false;
-
-
-
-            return true;
-
-        }
-
-        public override int GetHashCode()
-        {
-            int hash = 7;
-
-            hash = (hash * 7) + VersionString.GetHashCode();
-
-            return hash;
-        }
-
         /// <summary>
         /// Saves the current <see cref="UpdateFile"/> to the output <see cref="Stream"/>
         /// </summary>
@@ -75,10 +51,10 @@ namespace MatthiWare.UpdateLib.Files
         public void Save(Stream output)
         {
             if (output == null)
-                throw new ArgumentNullException("output");
+                throw new ArgumentNullException(nameof(output));
 
             if (!output.CanWrite)
-                throw new ArgumentException("Stream is not writable", "output");
+                throw new ArgumentException("Stream is not writable", nameof(output));
 
             XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
             ns.Add(string.Empty, string.Empty);
@@ -94,8 +70,8 @@ namespace MatthiWare.UpdateLib.Files
         /// <param name="path">The path of the file where to save</param>
         public void Save(string path)
         {
-            if (path == null)
-                throw new ArgumentNullException("path");
+            if (string.IsNullOrEmpty(path))
+                throw new ArgumentNullException(nameof(path));
 
             if (File.Exists(path))
                 File.Delete(path);
@@ -113,14 +89,19 @@ namespace MatthiWare.UpdateLib.Files
         public static UpdateFile Load(Stream input)
         {
             if (input == null)
-                throw new ArgumentNullException("input");
+                throw new ArgumentNullException(nameof(input));
 
             if (!input.CanRead)
-                throw new ArgumentException("Stream is not readable", "input");
+                throw new ArgumentException("Stream is not readable", nameof(input));
             
-            XmlSerializer xml = new XmlSerializer(typeof(UpdateFile));
+            XmlSerializer serializer = new XmlSerializer(typeof(UpdateFile));
 
-            UpdateFile file = (UpdateFile)xml.Deserialize(input);
+            XmlReader xml = new XmlTextReader(input);
+
+            if (!serializer.CanDeserialize(xml))
+                throw new InvalidOperationException("The current stream cannot be deserialized");
+
+            UpdateFile file = (UpdateFile)serializer.Deserialize(xml);
 
             UpdateFileProcessorTask processor = new UpdateFileProcessorTask(file);
             processor.Start();
@@ -137,8 +118,8 @@ namespace MatthiWare.UpdateLib.Files
         /// <returns>The loaded instance of <see cref="UpdateFile"/></returns>
         public static UpdateFile Load(string path)
         {
-            if (path == null)
-                throw new ArgumentNullException("path");
+            if (string.IsNullOrEmpty(path))
+                throw new ArgumentNullException(nameof(path));
 
             if (!File.Exists(path))
                 throw new FileNotFoundException("The UpdateFile doesn't exist.", path);

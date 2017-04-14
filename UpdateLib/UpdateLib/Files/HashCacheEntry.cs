@@ -22,7 +22,7 @@ namespace MatthiWare.UpdateLib.Files
 
         public HashCacheEntry(string file)
         {
-            if (String.IsNullOrEmpty(file))
+            if (string.IsNullOrEmpty(file))
                 throw new ArgumentNullException("file");
 
             FilePath = Path.GetFullPath(file);
