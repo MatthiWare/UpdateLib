@@ -48,7 +48,7 @@ namespace MatthiWare.UpdateLib.Generator
         {
 
             UpdateGeneratorTask generator = new UpdateGeneratorTask(applicationFolder);
-            
+
             generator.TaskCompleted += Generator_TaskCompleted;
             generator.TaskProgressChanged += Generator_TaskProgressChanged;
 
@@ -63,47 +63,22 @@ namespace MatthiWare.UpdateLib.Generator
 
         private void SetWaitCursor(bool val)
         {
-
-            if (this.InvokeRequired)
-            {
-                this.Invoke(new Action<bool>(SetWaitCursor), val);
-                return;
-            }
-
-            UseWaitCursor = val;
+            this.InvokeOnUI((form) => form.UseWaitCursor = val);
         }
 
         private void SetProgressBarVisible(bool val)
         {
-            if (statusStrip.InvokeRequired)
-            {
-                statusStrip.Invoke(new Action<bool>(SetProgressBarVisible), val);
-                return;
-            }
-
-            progressBar.Visible = val;
+            this.InvokeOnUI((form) => form.progressBar.Visible = val);
         }
 
         private void SetProgressBarValue(int val)
         {
-            if (statusStrip.InvokeRequired)
-            {
-                statusStrip.Invoke(new Action<int>(SetProgressBarValue), val);
-                return;
-            }
-
-            progressBar.Value = val;
+            this.InvokeOnUI((form) => form.progressBar.Value = val);
         }
 
         private void SetStatusMessage(string msg)
         {
-            if (statusStrip.InvokeRequired)
-            {
-                statusStrip.Invoke(new Action<string>(SetStatusMessage), msg);
-                return;
-            }
-
-            lblStatus.Text = msg;
+            this.InvokeOnUI((form) => form.lblStatus.Text = msg);
         }
 
         private void Generator_TaskProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -127,7 +102,7 @@ namespace MatthiWare.UpdateLib.Generator
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-           tvProject.ExpandAll();
+            tvProject.ExpandAll();
             tvProject.SelectedNode = tvProject.Nodes["root"].Nodes["nodeInfo"];
         }
 
@@ -151,8 +126,9 @@ namespace MatthiWare.UpdateLib.Generator
         private void buildToolStripButton_Click(object sender, EventArgs e)
         {
             Action generateAction = new Action(Generate);
-            
-            generateAction.BeginInvoke(new AsyncCallback(r => {
+
+            generateAction.BeginInvoke(new AsyncCallback(r =>
+            {
                 SetWaitCursor(false);
                 //SetProgressBarVisible(false);
                 generateAction.EndInvoke(r);

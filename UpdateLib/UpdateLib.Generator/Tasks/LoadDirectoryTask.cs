@@ -1,4 +1,5 @@
 ﻿using MatthiWare.UpdateLib.Tasks;
+using MatthiWare.UpdateLib.UI;
 using System;
 using System.Drawing;
 using System.IO;
@@ -62,57 +63,27 @@ namespace MatthiWare.UpdateLib.Generator.Tasks
 
         private void SetColumnAutoSize(int clmn)
         {
-            if (ItemsListView.InvokeRequired)
-            {
-                ItemsListView.Invoke(new Action<int>(SetColumnAutoSize), clmn);
-                return;
-            }
-
-            ItemsListView.Columns[clmn].Width = -1;
+            UIExtensions.InvokeOnUI(ItemsListView, (lv) => lv.Columns[clmn].Width = -1);
         }
 
         private void EndUpdate()
         {
-            if (ItemsListView.InvokeRequired)
-            {
-                ItemsListView.Invoke(new Action(EndUpdate));
-                return;
-            }
-
-            ItemsListView.EndUpdate();
+            UIExtensions.InvokeOnUI(ItemsListView, (lv) => lv.EndUpdate());
         }
 
         private void BeginUpdate()
         {
-            if (ItemsListView.InvokeRequired)
-            {
-                ItemsListView.Invoke(new Action(BeginUpdate));
-                return;
-            }
-
-            ItemsListView.BeginUpdate();
+            UIExtensions.InvokeOnUI(ItemsListView, (lv) => lv.BeginUpdate());
         }
 
         private void Clear()
         {
-            if (ItemsListView.InvokeRequired)
-            {
-                ItemsListView.Invoke(new Action(Clear));
-                return;
-            }
-
-            ItemsListView.Items.Clear();
+            UIExtensions.InvokeOnUI(ItemsListView, (lv) => lv.Items.Clear());
         }
 
         private void AddItem(ListViewItem item)
         {
-            if (ItemsListView.InvokeRequired)
-            {
-                ItemsListView.Invoke(new Action<ListViewItem>(AddItem), item);
-                return;
-            }
-
-            ItemsListView.Items.Add(item);
+            UIExtensions.InvokeOnUI(ItemsListView, (lv) => lv.Items.Add(item));
         }
     }
 }
