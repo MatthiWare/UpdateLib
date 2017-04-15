@@ -31,10 +31,10 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TestForm));
             this.SidebarPanel = new System.Windows.Forms.Panel();
-            this.ContentPanel = new System.Windows.Forms.Panel();
             this.btnTabBuild = new UpdateLib.Generator.UI.FlatButton();
             this.btnTabFiles = new UpdateLib.Generator.UI.FlatButton();
             this.btnTabInformation = new UpdateLib.Generator.UI.FlatButton();
+            this.ContentPanel = new System.Windows.Forms.Panel();
             this.HeaderPanel = new UpdateLib.Generator.UI.MoveablePanel();
             this.pbMinimize = new UpdateLib.Generator.UI.HoverPictureBox();
             this.pbMaximize = new UpdateLib.Generator.UI.HoverPictureBox();
@@ -63,16 +63,6 @@
             this.SidebarPanel.Size = new System.Drawing.Size(233, 275);
             this.SidebarPanel.TabIndex = 1;
             // 
-            // ContentPanel
-            // 
-            this.ContentPanel.BackColor = System.Drawing.SystemColors.Control;
-            this.ContentPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.ContentPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ContentPanel.Location = new System.Drawing.Point(233, 33);
-            this.ContentPanel.Name = "ContentPanel";
-            this.ContentPanel.Size = new System.Drawing.Size(486, 275);
-            this.ContentPanel.TabIndex = 2;
-            // 
             // btnTabBuild
             // 
             this.btnTabBuild.ActiveItem = false;
@@ -86,6 +76,7 @@
             this.btnTabBuild.Size = new System.Drawing.Size(231, 63);
             this.btnTabBuild.TabIndex = 2;
             this.btnTabBuild.Text = "Build";
+            this.btnTabBuild.Click += new System.EventHandler(this.btnTabBuild_Click);
             // 
             // btnTabFiles
             // 
@@ -116,6 +107,16 @@
             this.btnTabInformation.TabIndex = 0;
             this.btnTabInformation.Text = "Update Information";
             this.btnTabInformation.Click += new System.EventHandler(this.flatButton1_Click);
+            // 
+            // ContentPanel
+            // 
+            this.ContentPanel.BackColor = System.Drawing.SystemColors.Control;
+            this.ContentPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.ContentPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ContentPanel.Location = new System.Drawing.Point(233, 33);
+            this.ContentPanel.Name = "ContentPanel";
+            this.ContentPanel.Size = new System.Drawing.Size(486, 275);
+            this.ContentPanel.TabIndex = 2;
             // 
             // HeaderPanel
             // 

@@ -11,6 +11,7 @@ namespace UpdateLib.Generator.UI.Pages
 {
     public partial class InformationPage : UserControl
     {
+
         public string ApplicationName
         {
             get

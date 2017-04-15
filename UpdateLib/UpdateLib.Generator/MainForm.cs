@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using UpdateLib.Generator.Tasks;
+using MatthiWare.UpdateLib.UI;
 
 namespace UpdateLib.Generator
 {
@@ -62,6 +63,8 @@ namespace UpdateLib.Generator
 
         private void SetWaitCursor(bool val)
         {
+            this.INvokeOnUi
+
             if (this.InvokeRequired)
             {
                 this.Invoke(new Action<bool>(SetWaitCursor), val);

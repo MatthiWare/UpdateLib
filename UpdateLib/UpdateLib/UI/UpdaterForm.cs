@@ -61,20 +61,32 @@ namespace MatthiWare.UpdateLib.UI
         delegate void _OnPageUpdate(IWizardPage page);
         private void OnPageUpdate(IWizardPage page)
         {
-            if (this.InvokeRequired)
+            this.InvokeOnUI((c) => 
             {
-                Invoke(new _OnPageUpdate(OnPageUpdate), page);
-                return;
-            }
+                if (page.IsDone && !page.IsBusy)
+                {
+                    btnNext.Enabled = true;
+                    if (page == pages.CurrentPage)
+                        btnNext.Focus();
+                    if (page.NeedsExecution)
+                        btnNext.Text = "Next >";
+                }
 
-            if (page.IsDone && !page.IsBusy)
-            {
-                btnNext.Enabled = true;
-                if (page == pages.CurrentPage)
-                    btnNext.Focus();
-                if (page.NeedsExecution)
-                    btnNext.Text = "Next >";
-            }
+            });
+            //if (this.InvokeRequired)
+            //{
+            //    Invoke(new _OnPageUpdate(OnPageUpdate), page);
+            //    return;
+            //}
+
+            //if (page.IsDone && !page.IsBusy)
+            //{
+            //    btnNext.Enabled = true;
+            //    if (page == pages.CurrentPage)
+            //        btnNext.Focus();
+            //    if (page.NeedsExecution)
+            //        btnNext.Text = "Next >";
+            //}
         }
 
         private void btnPrevious_Click(object sender, EventArgs e)

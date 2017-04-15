@@ -21,6 +21,7 @@ namespace UpdateLib.Generator
 
             pageCache = new Dictionary<string, UserControl>();
         }
+        
 
         private void TestForm_Click(object sender, EventArgs e)
         {
@@ -51,7 +52,6 @@ namespace UpdateLib.Generator
         private void flatButton1_Click(object sender, EventArgs e)
         {
             var name = nameof(InformationPage);
-            //LoaderControl.Show(ContentPanel);
 
             if (!LoadPage(name))
             {
@@ -84,6 +84,11 @@ namespace UpdateLib.Generator
             }
 
             return success;
+        }
+
+        private void btnTabBuild_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

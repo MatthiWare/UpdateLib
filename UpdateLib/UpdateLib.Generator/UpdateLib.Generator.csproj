@@ -7,7 +7,7 @@
     <ProjectGuid>{5194FF71-49F6-4ADB-9B0E-4BEB418DC6F3}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>UpdateLib.Generator</RootNamespace>
+    <RootNamespace>MatthiWare.UpdateLib.Generator</RootNamespace>
     <AssemblyName>UpdateLib.Generator</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -87,6 +87,12 @@
     <Compile Include="UI\MoveablePanel.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="UI\Pages\BuilderPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\Pages\BuilderPage.Designer.cs">
+      <DependentUpon>BuilderPage.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\Pages\InformationPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -111,6 +117,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\LoaderControl.resx">
       <DependentUpon>LoaderControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\Pages\BuilderPage.resx">
+      <DependentUpon>BuilderPage.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\Pages\InformationPage.resx">
       <DependentUpon>InformationPage.cs</DependentUpon>

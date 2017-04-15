@@ -114,6 +114,7 @@
     <Compile Include="UI\MessageDialog.Designer.cs">
       <DependentUpon>MessageDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\UIExtensions.cs" />
     <Compile Include="UI\UpdaterForm.cs">
       <SubType>Form</SubType>
     </Compile>
