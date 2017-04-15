@@ -71,7 +71,7 @@ namespace TestApp
 
         private void button3_Click(object sender, EventArgs e)
         {
-            UpdateFile file = UpdateFile.Load("../../../UpdateLib.Generator/bin/Debug/Output/updatefile.xml");
+            UpdateFile file = UpdateFile.Load("../../../MatthiWare.UpdateLib.Generator/bin/Debug/Output/updatefile.xml");
             UpdaterForm updaterForm = new UpdaterForm(file);
             updaterForm.ShowDialog(this);
         }

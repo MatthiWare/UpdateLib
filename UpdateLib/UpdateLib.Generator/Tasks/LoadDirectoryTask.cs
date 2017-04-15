@@ -4,7 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 
-namespace UpdateLib.Generator.Tasks
+namespace MatthiWare.UpdateLib.Generator.Tasks
 {
     public class LoadDirectoryTask : AsyncTaskBase
     {

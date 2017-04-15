@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("UpdateLib.Generator")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("UpdateLib Generator")]
+[assembly: AssemblyDescription("Update Generator")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("UpdateLib.Generator")]
-[assembly: AssemblyCopyright("Copyright ©  2017")]
+[assembly: AssemblyCompany("MatthiWare")]
+[assembly: AssemblyProduct("UpdateLib")]
+[assembly: AssemblyCopyright("Copyright © MatthiWare 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

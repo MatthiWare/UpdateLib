@@ -5,7 +5,7 @@ using System.Threading;
 using System.IO;
 using MatthiWare.UpdateLib.Tasks;
 
-namespace UpdateLib.Generator.Tasks
+namespace MatthiWare.UpdateLib.Generator.Tasks
 {
     public class UpdateGeneratorTask : AsyncTaskBase<UpdateFile>
     {

@@ -35,7 +35,7 @@
     <ApplicationIcon>Generator_logo.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>UpdateLib.Generator.Program</StartupObject>
+    <StartupObject>MatthiWare.UpdateLib.Generator.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

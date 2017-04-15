@@ -1,4 +1,4 @@
-﻿namespace UpdateLib.Generator
+﻿namespace MatthiWare.UpdateLib.Generator
 {
     partial class TestForm
     {
@@ -31,17 +31,17 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TestForm));
             this.SidebarPanel = new System.Windows.Forms.Panel();
-            this.btnTabBuild = new UpdateLib.Generator.UI.FlatButton();
-            this.btnTabFiles = new UpdateLib.Generator.UI.FlatButton();
-            this.btnTabInformation = new UpdateLib.Generator.UI.FlatButton();
+            this.btnTabBuild = new MatthiWare.UpdateLib.Generator.UI.FlatButton();
+            this.btnTabFiles = new MatthiWare.UpdateLib.Generator.UI.FlatButton();
+            this.btnTabInformation = new MatthiWare.UpdateLib.Generator.UI.FlatButton();
             this.ContentPanel = new System.Windows.Forms.Panel();
-            this.HeaderPanel = new UpdateLib.Generator.UI.MoveablePanel();
-            this.pbMinimize = new UpdateLib.Generator.UI.HoverPictureBox();
-            this.pbMaximize = new UpdateLib.Generator.UI.HoverPictureBox();
-            this.pbClose = new UpdateLib.Generator.UI.HoverPictureBox();
+            this.HeaderPanel = new MatthiWare.UpdateLib.Generator.UI.MoveablePanel();
+            this.pbMinimize = new MatthiWare.UpdateLib.Generator.UI.HoverPictureBox();
+            this.pbMaximize = new MatthiWare.UpdateLib.Generator.UI.HoverPictureBox();
+            this.pbClose = new MatthiWare.UpdateLib.Generator.UI.HoverPictureBox();
             this.pbIcon = new System.Windows.Forms.PictureBox();
             this.lblTitle = new System.Windows.Forms.Label();
-            this.elipseComponent1 = new UpdateLib.Generator.UI.ElipseComponent(this.components);
+            this.elipseComponent1 = new MatthiWare.UpdateLib.Generator.UI.ElipseComponent(this.components);
             this.SidebarPanel.SuspendLayout();
             this.HeaderPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbMinimize)).BeginInit();

@@ -1,4 +1,4 @@
-﻿namespace UpdateLib.Generator.UI
+﻿namespace MatthiWare.UpdateLib.Generator.UI
 {
     partial class LoaderControl
     {
@@ -36,7 +36,7 @@
             // 
             this.pbLoader.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.pbLoader.BackColor = System.Drawing.Color.Transparent;
-            this.pbLoader.Image = global::UpdateLib.Generator.Properties.Resources.loading_gear;
+            this.pbLoader.Image = global::MatthiWare.UpdateLib.Generator.Properties.Resources.loading_gear;
             this.pbLoader.Location = new System.Drawing.Point(0, 0);
             this.pbLoader.Name = "pbLoader";
             this.pbLoader.Size = new System.Drawing.Size(150, 150);

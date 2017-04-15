@@ -6,10 +6,10 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using UpdateLib.Generator.UI;
-using UpdateLib.Generator.UI.Pages;
+using MatthiWare.UpdateLib.Generator.UI;
+using MatthiWare.UpdateLib.Generator.UI.Pages;
 
-namespace UpdateLib.Generator
+namespace MatthiWare.UpdateLib.Generator
 {
     public partial class TestForm : Form
     {

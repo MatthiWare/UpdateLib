@@ -3,10 +3,10 @@ using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
-using UpdateLib.Generator.Tasks;
+using MatthiWare.UpdateLib.Generator.Tasks;
 using MatthiWare.UpdateLib.UI;
 
-namespace UpdateLib.Generator
+namespace MatthiWare.UpdateLib.Generator
 {
     public partial class MainForm : Form
     {
@@ -63,7 +63,6 @@ namespace UpdateLib.Generator
 
         private void SetWaitCursor(bool val)
         {
-            this.INvokeOnUi
 
             if (this.InvokeRequired)
             {

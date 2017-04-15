@@ -5,7 +5,7 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace UpdateLib.Generator.UI
+namespace MatthiWare.UpdateLib.Generator.UI
 {
     public class ElipseComponent : Component
     {

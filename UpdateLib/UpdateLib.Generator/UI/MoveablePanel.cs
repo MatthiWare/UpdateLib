@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 
-namespace UpdateLib.Generator.UI
+namespace MatthiWare.UpdateLib.Generator.UI
 {
     public class MoveablePanel : Panel
     {

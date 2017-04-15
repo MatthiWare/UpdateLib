@@ -1,4 +1,4 @@
-﻿namespace UpdateLib.Generator
+﻿namespace MatthiWare.UpdateLib.Generator
 {
     partial class MainForm
     {
@@ -264,7 +264,7 @@
             // buildToolStripButton
             // 
             this.buildToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.buildToolStripButton.Image = global::UpdateLib.Generator.Properties.Resources.gears;
+            this.buildToolStripButton.Image = global::MatthiWare.UpdateLib.Generator.Properties.Resources.gears;
             this.buildToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.buildToolStripButton.Name = "buildToolStripButton";
             this.buildToolStripButton.Size = new System.Drawing.Size(23, 22);

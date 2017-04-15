@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using MatthiWare.UpdateLib.Tasks;
 using System.Threading;
 
-namespace UpdateLib.Generator.UI
+namespace MatthiWare.UpdateLib.Generator.UI
 {
     public partial class LoaderControl : UserControl
     {

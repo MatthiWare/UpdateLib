@@ -1,4 +1,4 @@
-﻿namespace UpdateLib.Generator.UI.Pages
+﻿namespace MatthiWare.UpdateLib.Generator.UI.Pages
 {
     partial class InformationPage
     {

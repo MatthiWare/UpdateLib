@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace UpdateLib.Generator.UI.Pages
+namespace MatthiWare.UpdateLib.Generator.UI.Pages
 {
     public partial class InformationPage : UserControl
     {

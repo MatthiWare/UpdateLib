@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace UpdateLib.Generator.UI
+namespace MatthiWare.UpdateLib.Generator.UI
 {
     public class HoverPictureBox : PictureBox
     {

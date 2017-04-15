@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace UpdateLib.Generator
+namespace MatthiWare.UpdateLib.Generator
 {
     static class Program
     {
