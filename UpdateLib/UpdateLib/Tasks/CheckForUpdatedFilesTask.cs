@@ -3,7 +3,7 @@ using System;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
-    public class CheckForUpdatedFilesTask : AsyncTaskBase<bool>
+    public class CheckForUpdatedFilesTask : AsyncTask<bool>
     {
         private UpdateFile updateFile;
         private HashCacheFile cacheFile;

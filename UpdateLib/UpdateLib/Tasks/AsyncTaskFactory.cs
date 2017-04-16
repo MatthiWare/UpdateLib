@@ -8,34 +8,34 @@ namespace MatthiWare.UpdateLib.Tasks
     public class AsyncTaskFactory
     {
 
-        public static AsyncTaskBase StartNew(Delegate action, params object[] args)
+        public static AsyncTask StartNew(Delegate action, params object[] args)
         {
-            GenericTask task = new GenericTask(action, args);
+            AnonymousTask task = new AnonymousTask(action, args);
             return task.Start();
         }
 
-        public static AsyncTaskBase<T> StartNew<T>(Delegate action, params object[] args)
+        public static AsyncTask<T> StartNew<T>(Delegate action, params object[] args)
         {
-            GenericFuncTask<T> task = new GenericFuncTask<T>(action, args);
+            AnonymousTask<T> task = new AnonymousTask<T>(action, args);
             return task.Start();
         }
 
-        public static AsyncTaskBase From(Delegate action, params object[] args)
+        public static AsyncTask From(Delegate action, params object[] args)
         {
-            return new GenericTask(action, args);
+            return new AnonymousTask(action, args);
         }
 
-        public static AsyncTaskBase<T> From<T>(Delegate action, params object[] args)
+        public static AsyncTask<T> From<T>(Delegate action, params object[] args)
         {
-            return new GenericFuncTask<T>(action, args);
+            return new AnonymousTask<T>(action, args);
         }
 
-        private class GenericFuncTask<T> : AsyncTaskBase<T>
+        private class AnonymousTask<T> : AsyncTask<T>
         {
             private Delegate action;
             private object[] args;
 
-            public GenericFuncTask(Delegate action, params object[] args)
+            public AnonymousTask(Delegate action, params object[] args)
             {
                 this.action = action;
                 this.args = args;
@@ -47,12 +47,12 @@ namespace MatthiWare.UpdateLib.Tasks
             }
         }
 
-        private class GenericTask : AsyncTaskBase
+        private class AnonymousTask : AsyncTask
         {
             private Delegate action;
             private object[] args;
 
-            public GenericTask(Delegate action, params object[] args)
+            public AnonymousTask(Delegate action, params object[] args)
             {
                 this.action = action;
                 this.args = args;

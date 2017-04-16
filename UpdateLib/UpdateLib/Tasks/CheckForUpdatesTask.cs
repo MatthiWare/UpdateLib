@@ -8,7 +8,7 @@ using static MatthiWare.UpdateLib.Tasks.CheckForUpdatesTask;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
-    public class CheckForUpdatesTask : AsyncTaskBase<Data>
+    public class CheckForUpdatesTask : AsyncTask<Data>
     {
         public string Url { get; set; }
 

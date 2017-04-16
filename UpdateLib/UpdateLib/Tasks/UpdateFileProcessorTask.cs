@@ -3,7 +3,7 @@ using System;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
-    public class UpdateFileProcessorTask : AsyncTaskBase
+    public class UpdateFileProcessorTask : AsyncTask
     {
         private UpdateFile file;
 

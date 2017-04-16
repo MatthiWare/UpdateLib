@@ -99,6 +99,9 @@
     <Compile Include="UI\Pages\InformationPage.Designer.cs">
       <DependentUpon>InformationPage.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\Pages\PageControlBase.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>

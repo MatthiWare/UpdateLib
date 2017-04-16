@@ -4,7 +4,7 @@ using System.IO;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
-    public class CleanUpTask : AsyncTaskBase
+    public class CleanUpTask : AsyncTask
     {
         public string PathToClean { get; set; }
         public string SearchPattern { get; set; }

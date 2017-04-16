@@ -108,7 +108,7 @@ namespace UpdateLib.Tests.Tasks
             task.AwaitTask();
         }
 
-        private class WorkerTestTask : AsyncTaskBase
+        private class WorkerTestTask : AsyncTask
         {
             protected override void DoWork()
             {
@@ -130,7 +130,7 @@ namespace UpdateLib.Tests.Tasks
             }
         }
 
-        private class TestTask : AsyncTaskBase
+        private class TestTask : AsyncTask
         {
             public int Sleep { get; set; }
             public TestTask(int sleep)
@@ -144,7 +144,7 @@ namespace UpdateLib.Tests.Tasks
             }
         }
 
-        private class ErrorTask : AsyncTaskBase
+        private class ErrorTask : AsyncTask
         {
             protected override void DoWork()
             {
@@ -158,7 +158,7 @@ namespace UpdateLib.Tests.Tasks
             }
         }
 
-        private class ResultTask<T> : AsyncTaskBase<T>
+        private class ResultTask<T> : AsyncTask<T>
         {
             private T returnObj;
 

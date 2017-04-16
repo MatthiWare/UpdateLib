@@ -73,7 +73,7 @@
     <Compile Include="Tasks\CheckForUpdatesTask.cs" />
     <Compile Include="Tasks\UpdateFileProcessorTask.cs" />
     <Compile Include="Security\HashUtil.cs" />
-    <Compile Include="Tasks\AsyncTaskBase.cs" />
+    <Compile Include="Tasks\AsyncTask.cs" />
     <Compile Include="Tasks\CheckForUpdatedFilesTask.cs" />
     <Compile Include="Tasks\CleanUpTask.cs" />
     <Compile Include="Tasks\DownloadTask.cs" />

@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace MatthiWare.UpdateLib.Generator.UI.Pages
 {
-    public partial class InformationPage : UserControl
+    public partial class InformationPage : PageControlBase
     {
 
         public string ApplicationName

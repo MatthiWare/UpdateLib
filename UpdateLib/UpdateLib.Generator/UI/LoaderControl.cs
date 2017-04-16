@@ -19,7 +19,7 @@ namespace MatthiWare.UpdateLib.Generator.UI
 
         private int m_opacity = 100;
 
-        private AsyncTaskBase m_fadeOutTask;
+        private AsyncTask m_fadeOutTask;
 
         public int Opacity
         {
@@ -109,16 +109,15 @@ namespace MatthiWare.UpdateLib.Generator.UI
 
         public void HideLoader(Control parent)
         {
-            if (m_fadeOutTask == null)
-            {
-                m_fadeOutTask = AsyncTaskFactory.From(new Action(FadeOut));
-                m_fadeOutTask.TaskCompleted += (o, e) => HideControls(parent);
-            }
+            //if (m_fadeOutTask == null)
+            //{
+            //    m_fadeOutTask = AsyncTaskFactory.From(new Action(FadeOut));
+            //    m_fadeOutTask.TaskCompleted += (o, e) => HideControls(parent);
+            //}
 
-            if (m_fadeOutTask.IsRunning)
-                return;
+            //m_fadeOutTask.Start();
 
-            m_fadeOutTask.Start();
+            HideControls(parent);
         }
 
         private void HideControls(Control parent)

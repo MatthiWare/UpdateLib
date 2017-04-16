@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
-    public class UpdateCacheTask : AsyncTaskBase<HashCacheFile>
+    public class UpdateCacheTask : AsyncTask<HashCacheFile>
     {
         protected override void DoWork()
         {

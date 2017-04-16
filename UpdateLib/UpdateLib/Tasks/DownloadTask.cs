@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
-    public class DownloadTask : AsyncTaskBase
+    public class DownloadTask : AsyncTask
     {
         private WebClient webClient;
         private ManualResetEvent wait;

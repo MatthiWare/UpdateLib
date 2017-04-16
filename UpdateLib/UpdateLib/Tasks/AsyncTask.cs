@@ -11,7 +11,7 @@ namespace MatthiWare.UpdateLib.Tasks
     /// <summary>
     /// Base class for all Tasks that need to be run Async
     /// </summary>
-    public abstract class AsyncTaskBase
+    public abstract class AsyncTask
     {
 
         #region private fields
@@ -34,11 +34,11 @@ namespace MatthiWare.UpdateLib.Tasks
         #region events
 
         /// <summary>
-        /// Raises when this <see cref="AsyncTaskBase"/> is completed. 
+        /// Raises when this <see cref="AsyncTask"/> is completed. 
         /// </summary>
         public event EventHandler<AsyncCompletedEventArgs> TaskCompleted;
         /// <summary>
-        /// Raises when the <see cref="AsyncTaskBase"/> progress changed. 
+        /// Raises when the <see cref="AsyncTask"/> progress changed. 
         /// </summary>
         public event EventHandler<ProgressChangedEventArgs> TaskProgressChanged;
 
@@ -73,7 +73,7 @@ namespace MatthiWare.UpdateLib.Tasks
         }
 
         /// <summary>
-        /// Gets if the current <see cref="AsyncTaskBase"/> is cancelled. 
+        /// Gets if the current <see cref="AsyncTask"/> is cancelled. 
         /// </summary>
         public bool IsCancelled
         {
@@ -109,12 +109,12 @@ namespace MatthiWare.UpdateLib.Tasks
         #region static methods
 
         /// <summary>
-        /// Blocks the calling threads and calls <see cref="AsyncTaskBase.AwaitTask"/> on each <see cref="AsyncTaskBase"/> in <paramref name="tasks"/>.
+        /// Blocks the calling threads and calls <see cref="AsyncTask.AwaitTask"/> on each <see cref="AsyncTask"/> in <paramref name="tasks"/>.
         /// </summary>
         /// <param name="tasks">The tasks to await.</param>
-        public static void WaitAll(IEnumerable<AsyncTaskBase> tasks)
+        public static void WaitAll(IEnumerable<AsyncTask> tasks)
         {
-            foreach (AsyncTaskBase task in tasks)
+            foreach (AsyncTask task in tasks)
             {
                 task.AwaitTask();
             }
@@ -139,8 +139,11 @@ namespace MatthiWare.UpdateLib.Tasks
         /// Starts the task
         /// </summary>
         /// <returns>Returns the current Task.</returns>
-        public AsyncTaskBase Start()
+        public AsyncTask Start()
         {
+            if (IsRunning)
+                return this;
+
             Reset();
 
             Action worker = new Action(() =>
@@ -190,8 +193,8 @@ namespace MatthiWare.UpdateLib.Tasks
         protected abstract void DoWork();
 
         /// <summary>
-        /// Cancels the current <see cref="AsyncTaskBase"/>
-        /// Check <see cref="IsCancelled"/> in the worker code to see if the <see cref="AsyncTaskBase"/> got cancelled.  
+        /// Cancels the current <see cref="AsyncTask"/>
+        /// Check <see cref="IsCancelled"/> in the worker code to see if the <see cref="AsyncTask"/> got cancelled.  
         /// </summary>
         public virtual void Cancel()
         {
@@ -291,7 +294,7 @@ namespace MatthiWare.UpdateLib.Tasks
         /// Raises the <see cref="TaskCompleted"/> event. 
         /// </summary>
         /// <param name="e">If an <see cref="Exception"/> occured pass the <see cref="Exception"/> object.</param>
-        /// <param name="cancelled">Indicates whether the <see cref="AsyncTaskBase"/> got cancelled.</param>
+        /// <param name="cancelled">Indicates whether the <see cref="AsyncTask"/> got cancelled.</param>
         protected virtual void OnTaskCompleted(Exception e, bool cancelled = false)
         {
             TaskCompleted?.Invoke(this, new AsyncCompletedEventArgs(e, cancelled, null));
@@ -311,7 +314,7 @@ namespace MatthiWare.UpdateLib.Tasks
     /// Base class for all Tasks that need to be run Async
     /// </summary>
     /// <typeparam name="T">The type of the Result object</typeparam>
-    public abstract class AsyncTaskBase<T> : AsyncTaskBase
+    public abstract class AsyncTask<T> : AsyncTask
     {
         /// <summary>
         /// Gets or sets the result <see cref="T"/> 
@@ -322,7 +325,7 @@ namespace MatthiWare.UpdateLib.Tasks
         /// Starts the task
         /// </summary>
         /// <returns>Returns the current Task.</returns>
-        public new AsyncTaskBase<T> Start()
+        public new AsyncTask<T> Start()
         {
             base.Start();
             return this;
@@ -330,7 +333,7 @@ namespace MatthiWare.UpdateLib.Tasks
 
         /// <summary>
         /// Blocks the calling thread until the complete task is done.
-        /// DO NOT call this in the worker method use <see cref="AsyncTaskBase.AwaitWorkers"/> method instead. 
+        /// DO NOT call this in the worker method use <see cref="AsyncTask.AwaitWorkers"/> method instead. 
         /// </summary>
         /// <returns><see cref="Result"/></returns>
         public new T AwaitTask()

@@ -40,7 +40,7 @@
             this.pbLoader.Location = new System.Drawing.Point(0, 0);
             this.pbLoader.Name = "pbLoader";
             this.pbLoader.Size = new System.Drawing.Size(150, 150);
-            this.pbLoader.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pbLoader.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pbLoader.TabIndex = 0;
             this.pbLoader.TabStop = false;
             // 

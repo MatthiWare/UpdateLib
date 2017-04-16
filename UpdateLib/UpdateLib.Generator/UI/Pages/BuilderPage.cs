@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace MatthiWare.UpdateLib.Generator.UI.Pages
 {
-    public partial class BuilderPage : UserControl
+    public partial class BuilderPage : PageControlBase
     {
         public BuilderPage()
         {

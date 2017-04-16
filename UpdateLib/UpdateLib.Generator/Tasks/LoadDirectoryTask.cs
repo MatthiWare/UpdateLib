@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace MatthiWare.UpdateLib.Generator.Tasks
 {
-    public class LoadDirectoryTask : AsyncTaskBase
+    public class LoadDirectoryTask : AsyncTask
     {
         public ListView ItemsListView { get; set; }
         public ImageList IconList { get; set; }
