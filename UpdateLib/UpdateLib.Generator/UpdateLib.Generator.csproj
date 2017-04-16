@@ -93,6 +93,12 @@
     <Compile Include="UI\Pages\BuilderPage.Designer.cs">
       <DependentUpon>BuilderPage.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\Pages\FilesPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\Pages\FilesPage.Designer.cs">
+      <DependentUpon>FilesPage.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\Pages\InformationPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -123,6 +129,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\Pages\BuilderPage.resx">
       <DependentUpon>BuilderPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\Pages\FilesPage.resx">
+      <DependentUpon>FilesPage.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\Pages\InformationPage.resx">
       <DependentUpon>InformationPage.cs</DependentUpon>

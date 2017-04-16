@@ -44,7 +44,7 @@ namespace MatthiWare.UpdateLib.Generator
                     {
                         var name = type.Name;
                         PageControlBase page = Activator.CreateInstance(type) as PageControlBase;
-                        Thread.Sleep(5000);
+                        //Thread.Sleep(5000);
                         pageCache.Add(name, page);
                     }
                 });
