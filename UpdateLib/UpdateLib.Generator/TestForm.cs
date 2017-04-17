@@ -18,6 +18,7 @@ namespace MatthiWare.UpdateLib.Generator
     {
         private Dictionary<string, PageControlBase> pageCache;
         private AsyncTask loadTask;
+        private bool shouldShowNewPage = false;
 
         public TestForm()
         {
@@ -106,6 +107,8 @@ namespace MatthiWare.UpdateLib.Generator
 
             if (success)
             {
+                shouldShowNewPage = true;
+
                 if (page.IsPageInitialized)
                 {
                     AddControlToContentPanel(page);
@@ -168,7 +171,8 @@ namespace MatthiWare.UpdateLib.Generator
 
         private void AddControlToContentPanel(Control toAdd)
         {
-            
+            if (!shouldShowNewPage)
+                return;
 
             this.InvokeOnUI((form) =>
             {
@@ -180,12 +184,12 @@ namespace MatthiWare.UpdateLib.Generator
                 {
                     toAdd.Dock = DockStyle.Fill;
                     ContentPanel.Controls.Add(toAdd);
+
+                    shouldShowNewPage = false;
                 }
 
                 ContentPanel.ResumeLayout();
             });
-
-            
         }
 
         private void btnTabBuild_Click(object sender, EventArgs e)

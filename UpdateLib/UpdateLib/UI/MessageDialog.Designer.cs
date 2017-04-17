@@ -30,12 +30,12 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MessageDialog));
             this.panel1 = new System.Windows.Forms.Panel();
+            this.btn2 = new System.Windows.Forms.Button();
+            this.btn1 = new System.Windows.Forms.Button();
             this.btn3 = new System.Windows.Forms.Button();
             this.pbIcon = new System.Windows.Forms.PictureBox();
             this.lblHeader = new System.Windows.Forms.Label();
             this.lblDesc = new System.Windows.Forms.Label();
-            this.btn1 = new System.Windows.Forms.Button();
-            this.btn2 = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbIcon)).BeginInit();
             this.SuspendLayout();
@@ -51,6 +51,26 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(401, 46);
             this.panel1.TabIndex = 0;
+            // 
+            // btn2
+            // 
+            this.btn2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btn2.Location = new System.Drawing.Point(227, 11);
+            this.btn2.Name = "btn2";
+            this.btn2.Size = new System.Drawing.Size(75, 23);
+            this.btn2.TabIndex = 3;
+            this.btn2.UseVisualStyleBackColor = true;
+            this.btn2.Visible = false;
+            // 
+            // btn1
+            // 
+            this.btn1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btn1.Location = new System.Drawing.Point(146, 11);
+            this.btn1.Name = "btn1";
+            this.btn1.Size = new System.Drawing.Size(75, 23);
+            this.btn1.TabIndex = 2;
+            this.btn1.UseVisualStyleBackColor = true;
+            this.btn1.Visible = false;
             // 
             // btn3
             // 
@@ -92,26 +112,6 @@
             this.lblDesc.TabIndex = 3;
             this.lblDesc.Text = "Update now?\r\nPress yes to update or no to cancel.";
             // 
-            // btn1
-            // 
-            this.btn1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btn1.Location = new System.Drawing.Point(146, 11);
-            this.btn1.Name = "btn1";
-            this.btn1.Size = new System.Drawing.Size(75, 23);
-            this.btn1.TabIndex = 2;
-            this.btn1.UseVisualStyleBackColor = true;
-            this.btn1.Visible = false;
-            // 
-            // btn2
-            // 
-            this.btn2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btn2.Location = new System.Drawing.Point(227, 11);
-            this.btn2.Name = "btn2";
-            this.btn2.Size = new System.Drawing.Size(75, 23);
-            this.btn2.TabIndex = 3;
-            this.btn2.UseVisualStyleBackColor = true;
-            this.btn2.Visible = false;
-            // 
             // MessageDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -130,6 +130,7 @@
             this.MinimizeBox = false;
             this.Name = "MessageDialog";
             this.ShowIcon = false;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Message Dialog";
             this.panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pbIcon)).EndInit();
