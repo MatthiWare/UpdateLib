@@ -40,5 +40,10 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
         {
             InitializeComponent();
         }
+
+        protected override void OnPageInitialize()
+        {
+
+        }
     }
 }

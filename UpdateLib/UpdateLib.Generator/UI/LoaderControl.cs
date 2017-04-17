@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using MatthiWare.UpdateLib.Tasks;
 using System.Threading;
+using MatthiWare.UpdateLib.UI;
 
 namespace MatthiWare.UpdateLib.Generator.UI
 {
@@ -18,8 +19,6 @@ namespace MatthiWare.UpdateLib.Generator.UI
         private const int WS_EX_TRANSPARENT = 0x20;
 
         private int m_opacity = 100;
-
-        private AsyncTask m_fadeOutTask;
 
         public int Opacity
         {
@@ -67,26 +66,33 @@ namespace MatthiWare.UpdateLib.Generator.UI
         {
             if (!loaders.ContainsKey(parent))
                 loaders.Add(parent, new LoaderControl());
-
+            
             loaders[parent].ShowLoader(parent);
         }
 
         public void ShowLoader(Control parent)
         {
-            parent.SuspendLayout();
+           
 
-            Opacity = 100;
+            UIExtensions.InvokeOnUI(parent, (c) => 
+            {
+                parent.SuspendLayout();
 
-            parent.Controls.Add(this);
+                Opacity = 100;
 
-            Size = parent.Size;
-            Location = new Point(0, 0);
+                c.Controls.Add(this);
 
-            parent.Resize += ParentResize;
+                Size = parent.Size;
+                Location = new Point(0, 0);
 
-            BringToFront();
+                c.Resize += ParentResize;
 
-            parent.ResumeLayout();
+                BringToFront();
+
+                parent.ResumeLayout();
+            });
+
+            
         }
 
         private void ParentResize(object sender, EventArgs e)
@@ -109,38 +115,20 @@ namespace MatthiWare.UpdateLib.Generator.UI
 
         public void HideLoader(Control parent)
         {
-            //if (m_fadeOutTask == null)
-            //{
-            //    m_fadeOutTask = AsyncTaskFactory.From(new Action(FadeOut));
-            //    m_fadeOutTask.TaskCompleted += (o, e) => HideControls(parent);
-            //}
-
-            //m_fadeOutTask.Start();
-
-            HideControls(parent);
-        }
-
-        private void HideControls(Control parent)
-        {
-            SuspendLayout();
+            
 
             parent.Invoke(new Action(() =>
             {
+                SuspendLayout();
+
                 parent.Controls.Remove(this);
 
                 parent.Resize -= ParentResize;
+
+                ResumeLayout();
             }));
 
-            ResumeLayout();
-        }
-
-        private void FadeOut()
-        {
-            while (Opacity != 1)
-            {
-                Opacity -= 5;
-                Thread.Sleep(200);
-            }
+            
         }
     }
 }

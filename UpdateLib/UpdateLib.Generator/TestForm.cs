@@ -10,13 +10,14 @@ using MatthiWare.UpdateLib.Generator.UI;
 using MatthiWare.UpdateLib.Generator.UI.Pages;
 using MatthiWare.UpdateLib.Tasks;
 using System.Threading;
+using MatthiWare.UpdateLib.UI;
 
 namespace MatthiWare.UpdateLib.Generator
 {
     public partial class TestForm : Form
     {
         private Dictionary<string, PageControlBase> pageCache;
-        private AsyncTask loadTask; 
+        private AsyncTask loadTask;
 
         public TestForm()
         {
@@ -33,7 +34,7 @@ namespace MatthiWare.UpdateLib.Generator
             {
                 LoaderControl.Show(ContentPanel);
 
-                Action loadAction = new Action(()=> 
+                Action loadAction = new Action(() =>
                 {
                     var pageType = typeof(PageControlBase);
                     var types = AppDomain.CurrentDomain.GetAssemblies()
@@ -51,7 +52,7 @@ namespace MatthiWare.UpdateLib.Generator
 
                 loadTask = AsyncTaskFactory.From(loadAction, null);
 
-                loadTask.TaskCompleted += (o, e) => 
+                loadTask.TaskCompleted += (o, e) =>
                 {
                     LoaderControl.Hide(ContentPanel);
                 };
@@ -93,27 +94,98 @@ namespace MatthiWare.UpdateLib.Generator
 
         private void flatButton2_Click(object sender, EventArgs e)
         {
-            LoaderControl.Hide(ContentPanel);
+            LoadPage(nameof(FilesPage));
         }
 
         private bool LoadPage(string pageName)
         {
-            PageControlBase control = null;
-            bool success = pageCache.TryGetValue(pageName, out control);
+            loadTask.AwaitTask();
 
-            if (control != null)
+            PageControlBase page = null;
+            bool success = pageCache.TryGetValue(pageName, out page);
+
+            if (success)
+            {
+                if (page.IsPageInitialized)
+                {
+                    AddControlToContentPanel(page);
+                }
+                else
+                {
+                    AddControlToContentPanel(null);
+
+                    LoaderControl.Show(ContentPanel);
+
+                    page.InitializePage((o, e) =>
+                    {
+                        LoaderControl.Hide(ContentPanel);
+
+                        if (e.Cancelled)
+                        {
+                            ShowMessageBox(
+                                "Page Load",
+                                "Task cancelled",
+                                "The loading of the page got cancelled.",
+                                SystemIcons.Warning,
+                                MessageBoxButtons.OK);
+
+                            return;
+                        }
+
+                        if (e.Error != null)
+                        {
+                            ShowMessageBox(
+                                "Page Load",
+                                "Error occured when loading the page",
+                                "Check the log files for more information!",
+                                SystemIcons.Error,
+                                MessageBoxButtons.OK);
+
+                            return;
+                        }
+
+                        AddControlToContentPanel(page);
+                    });
+                }
+            }
+
+            return success;
+        }
+
+        private void ShowMessageBox(string title, string header, string desc, Icon icon, MessageBoxButtons buttons = MessageBoxButtons.YesNo)
+        {
+            this.InvokeOnUI((form) =>
+            {
+                new MessageDialog(
+                    title,
+                    header,
+                    desc,
+                    icon,
+                    buttons)
+                    .ShowDialog();
+            });
+        }
+
+        private void AddControlToContentPanel(Control toAdd)
+        {
+            
+
+            this.InvokeOnUI((form) =>
             {
                 ContentPanel.SuspendLayout();
 
                 ContentPanel.Controls.Clear();
-                ContentPanel.Controls.Add(control);
 
-                control.Dock = DockStyle.Fill;
+                if (toAdd != null)
+                {
+                    toAdd.Dock = DockStyle.Fill;
+                    ContentPanel.Controls.Add(toAdd);
+                }
 
                 ContentPanel.ResumeLayout();
-            }
+            });
 
-            return success;
+            
         }
 
         private void btnTabBuild_Click(object sender, EventArgs e)
