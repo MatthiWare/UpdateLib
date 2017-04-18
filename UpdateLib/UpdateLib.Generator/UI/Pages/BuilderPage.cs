@@ -20,8 +20,8 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 
         protected override void OnPageInitialize()
         {
-            Thread.Sleep(1000);
-            throw new FileNotFoundException("Config file missing");
+            //Thread.Sleep(1000);
+            //throw new FileNotFoundException("Config file missing");
         }
     }
 }
