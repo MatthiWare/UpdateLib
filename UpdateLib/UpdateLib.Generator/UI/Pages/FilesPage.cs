@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Threading;
+using MatthiWare.UpdateLib.Tasks;
+using MatthiWare.UpdateLib.Generator.Data;
 
 namespace MatthiWare.UpdateLib.Generator.UI.Pages
 {
@@ -19,7 +21,10 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 
         protected override void OnPageInitialize()
         {
-            Thread.Sleep(3000);
+            TreeViewFolderNode appFolder = new TreeViewFolderNode("Application Folder");
+            TreeViewFolderNode appDataFolder = new TreeViewFolderNode("AppData");
+
+
         }
     }
 }

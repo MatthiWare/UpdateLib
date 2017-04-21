@@ -29,20 +29,19 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Application Folder");
-            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("AppData");
-            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Update Project", new System.Windows.Forms.TreeNode[] {
-            treeNode1,
-            treeNode2});
             this.label1 = new System.Windows.Forms.Label();
             this.tvFolders = new System.Windows.Forms.TreeView();
-            this.lvFiles = new System.Windows.Forms.ListView();
-            this.clmnName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.clmnType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.clmnDate = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.clmnSize = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.clmnIcon = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ilIcons = new System.Windows.Forms.ImageList(this.components);
+            this.lvFiles = new System.Windows.Forms.ListView();
+            this.clmnIcon = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.clmnName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.clmnDate = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.clmnType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.clmnSize = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.contextMenuRightClick = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.menuAddFiles = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuAddFolder = new System.Windows.Forms.ToolStripMenuItem();
+            this.contextMenuRightClick.SuspendLayout();
             this.SuspendLayout();
             // 
             // label1
@@ -59,21 +58,20 @@
             // 
             this.tvFolders.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+            this.tvFolders.ContextMenuStrip = this.contextMenuRightClick;
             this.tvFolders.ImageIndex = 0;
             this.tvFolders.ImageList = this.ilIcons;
             this.tvFolders.Location = new System.Drawing.Point(18, 53);
             this.tvFolders.Name = "tvFolders";
-            treeNode1.Name = "nodeProjectFiles";
-            treeNode1.Text = "Application Folder";
-            treeNode2.Name = "nodeAppData";
-            treeNode2.Text = "AppData";
-            treeNode3.Name = "nodeProject";
-            treeNode3.Text = "Update Project";
-            this.tvFolders.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode3});
             this.tvFolders.SelectedImageIndex = 0;
             this.tvFolders.Size = new System.Drawing.Size(191, 331);
             this.tvFolders.TabIndex = 2;
+            // 
+            // ilIcons
+            // 
+            this.ilIcons.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
+            this.ilIcons.ImageSize = new System.Drawing.Size(16, 16);
+            this.ilIcons.TransparentColor = System.Drawing.Color.Transparent;
             // 
             // lvFiles
             // 
@@ -86,6 +84,7 @@
             this.clmnDate,
             this.clmnType,
             this.clmnSize});
+            this.lvFiles.ContextMenuStrip = this.contextMenuRightClick;
             this.lvFiles.Location = new System.Drawing.Point(215, 53);
             this.lvFiles.Name = "lvFiles";
             this.lvFiles.Size = new System.Drawing.Size(514, 331);
@@ -94,31 +93,48 @@
             this.lvFiles.UseCompatibleStateImageBehavior = false;
             this.lvFiles.View = System.Windows.Forms.View.Details;
             // 
+            // clmnIcon
+            // 
+            this.clmnIcon.Text = "";
+            // 
             // clmnName
             // 
             this.clmnName.Text = "Name";
-            // 
-            // clmnType
-            // 
-            this.clmnType.Text = "Type";
             // 
             // clmnDate
             // 
             this.clmnDate.Text = "Last Modified";
             // 
+            // clmnType
+            // 
+            this.clmnType.Text = "Type";
+            // 
             // clmnSize
             // 
             this.clmnSize.Text = "Size";
             // 
-            // clmnIcon
+            // contextMenuRightClick
             // 
-            this.clmnIcon.Text = "";
+            this.contextMenuRightClick.Font = new System.Drawing.Font("Century Gothic", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.contextMenuRightClick.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuAddFiles,
+            this.menuAddFolder});
+            this.contextMenuRightClick.Name = "menuTV";
+            this.contextMenuRightClick.Size = new System.Drawing.Size(142, 48);
             // 
-            // ilIcons
+            // menuAddFiles
             // 
-            this.ilIcons.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
-            this.ilIcons.ImageSize = new System.Drawing.Size(16, 16);
-            this.ilIcons.TransparentColor = System.Drawing.Color.Transparent;
+            this.menuAddFiles.Image = global::MatthiWare.UpdateLib.Generator.Properties.Resources.image_transparent_16px;
+            this.menuAddFiles.Name = "menuAddFiles";
+            this.menuAddFiles.Size = new System.Drawing.Size(141, 22);
+            this.menuAddFiles.Text = "Add File(s)";
+            // 
+            // menuAddFolder
+            // 
+            this.menuAddFolder.Image = global::MatthiWare.UpdateLib.Generator.Properties.Resources.folder_transparent_16px;
+            this.menuAddFolder.Name = "menuAddFolder";
+            this.menuAddFolder.Size = new System.Drawing.Size(141, 22);
+            this.menuAddFolder.Text = "Add Folder";
             // 
             // FilesPage
             // 
@@ -131,6 +147,7 @@
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "FilesPage";
             this.Size = new System.Drawing.Size(747, 402);
+            this.contextMenuRightClick.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -147,5 +164,8 @@
         private System.Windows.Forms.ColumnHeader clmnType;
         private System.Windows.Forms.ColumnHeader clmnSize;
         private System.Windows.Forms.ImageList ilIcons;
+        private System.Windows.Forms.ContextMenuStrip contextMenuRightClick;
+        private System.Windows.Forms.ToolStripMenuItem menuAddFiles;
+        private System.Windows.Forms.ToolStripMenuItem menuAddFolder;
     }
 }
