@@ -8,5 +8,11 @@ namespace MatthiWare.UpdateLib.Generator.Data
 {
     public class TreeViewFileNode : TreeNode
     {
+
+
+        public TreeViewFileNode(string folderName)
+        {
+            Text = folderName;
+        }
     }
 }

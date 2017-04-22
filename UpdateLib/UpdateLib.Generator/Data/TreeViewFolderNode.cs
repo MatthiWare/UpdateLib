@@ -8,13 +8,14 @@ namespace MatthiWare.UpdateLib.Generator.Data
 {
     public class TreeViewFolderNode : TreeNode
     {
-        private const string FOLDER_KEY = "folderimagekey";
+        internal const string FOLDER_KEY = "folderimagekey";
 
 
         public TreeViewFolderNode(string folderName)
         {
-            Name = folderName;
+            Text = folderName;
             ImageKey = FOLDER_KEY;
+            SelectedImageKey = FOLDER_KEY;
         }
 
     }

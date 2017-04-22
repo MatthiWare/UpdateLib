@@ -31,10 +31,10 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TestForm));
             this.SidebarPanel = new System.Windows.Forms.Panel();
+            this.ContentPanel = new System.Windows.Forms.Panel();
             this.btnTabBuild = new MatthiWare.UpdateLib.Generator.UI.FlatButton();
             this.btnTabFiles = new MatthiWare.UpdateLib.Generator.UI.FlatButton();
             this.btnTabInformation = new MatthiWare.UpdateLib.Generator.UI.FlatButton();
-            this.ContentPanel = new System.Windows.Forms.Panel();
             this.HeaderPanel = new MatthiWare.UpdateLib.Generator.UI.MoveablePanel();
             this.pbMinimize = new MatthiWare.UpdateLib.Generator.UI.HoverPictureBox();
             this.pbMaximize = new MatthiWare.UpdateLib.Generator.UI.HoverPictureBox();
@@ -60,8 +60,18 @@
             this.SidebarPanel.Dock = System.Windows.Forms.DockStyle.Left;
             this.SidebarPanel.Location = new System.Drawing.Point(0, 33);
             this.SidebarPanel.Name = "SidebarPanel";
-            this.SidebarPanel.Size = new System.Drawing.Size(233, 275);
+            this.SidebarPanel.Size = new System.Drawing.Size(233, 352);
             this.SidebarPanel.TabIndex = 1;
+            // 
+            // ContentPanel
+            // 
+            this.ContentPanel.BackColor = System.Drawing.SystemColors.Control;
+            this.ContentPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.ContentPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ContentPanel.Location = new System.Drawing.Point(233, 33);
+            this.ContentPanel.Name = "ContentPanel";
+            this.ContentPanel.Size = new System.Drawing.Size(618, 352);
+            this.ContentPanel.TabIndex = 2;
             // 
             // btnTabBuild
             // 
@@ -108,16 +118,6 @@
             this.btnTabInformation.Text = "Update Information";
             this.btnTabInformation.Click += new System.EventHandler(this.flatButton1_Click);
             // 
-            // ContentPanel
-            // 
-            this.ContentPanel.BackColor = System.Drawing.SystemColors.Control;
-            this.ContentPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.ContentPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ContentPanel.Location = new System.Drawing.Point(233, 33);
-            this.ContentPanel.Name = "ContentPanel";
-            this.ContentPanel.Size = new System.Drawing.Size(486, 275);
-            this.ContentPanel.TabIndex = 2;
-            // 
             // HeaderPanel
             // 
             this.HeaderPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(78)))), ((int)(((byte)(99)))), ((int)(((byte)(133)))));
@@ -131,14 +131,14 @@
             this.HeaderPanel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.HeaderPanel.Name = "HeaderPanel";
             this.HeaderPanel.ParentForm = this;
-            this.HeaderPanel.Size = new System.Drawing.Size(719, 33);
+            this.HeaderPanel.Size = new System.Drawing.Size(851, 33);
             this.HeaderPanel.TabIndex = 1;
             // 
             // pbMinimize
             // 
             this.pbMinimize.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.pbMinimize.Image = ((System.Drawing.Image)(resources.GetObject("pbMinimize.Image")));
-            this.pbMinimize.Location = new System.Drawing.Point(645, 5);
+            this.pbMinimize.Location = new System.Drawing.Point(777, 5);
             this.pbMinimize.Name = "pbMinimize";
             this.pbMinimize.Size = new System.Drawing.Size(24, 24);
             this.pbMinimize.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -151,7 +151,7 @@
             this.pbMaximize.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.pbMaximize.BackColor = System.Drawing.Color.Transparent;
             this.pbMaximize.Image = ((System.Drawing.Image)(resources.GetObject("pbMaximize.Image")));
-            this.pbMaximize.Location = new System.Drawing.Point(668, 5);
+            this.pbMaximize.Location = new System.Drawing.Point(800, 5);
             this.pbMaximize.Name = "pbMaximize";
             this.pbMaximize.Size = new System.Drawing.Size(24, 24);
             this.pbMaximize.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -163,7 +163,7 @@
             // 
             this.pbClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.pbClose.Image = ((System.Drawing.Image)(resources.GetObject("pbClose.Image")));
-            this.pbClose.Location = new System.Drawing.Point(691, 5);
+            this.pbClose.Location = new System.Drawing.Point(823, 5);
             this.pbClose.Name = "pbClose";
             this.pbClose.Size = new System.Drawing.Size(24, 24);
             this.pbClose.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -202,8 +202,9 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoSize = true;
             this.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.ClientSize = new System.Drawing.Size(719, 308);
+            this.ClientSize = new System.Drawing.Size(851, 385);
             this.Controls.Add(this.ContentPanel);
             this.Controls.Add(this.SidebarPanel);
             this.Controls.Add(this.HeaderPanel);
