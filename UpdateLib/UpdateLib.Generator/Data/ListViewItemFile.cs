@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MatthiWare.UpdateLib.Generator.Data.FilesPage;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,6 +10,8 @@ namespace MatthiWare.UpdateLib.Generator.Data
 {
     public class ListViewItemFile : ListViewItem
     {
+        public GenFile File { get; set; }
+
         private ListViewItemFile(string[] items, string imageKey)
             : base(items, imageKey)
         { }

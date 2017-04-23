@@ -49,6 +49,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\FilesPage\GenFile.cs" />
+    <Compile Include="Data\FilesPage\GenFolder.cs" />
     <Compile Include="Data\ListViewItemFile.cs" />
     <Compile Include="Data\ListViewItemFolder.cs" />
     <Compile Include="Data\TreeViewFolderNode.cs" />
