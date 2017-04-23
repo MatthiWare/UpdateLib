@@ -10,6 +10,7 @@ using System.Threading;
 using MatthiWare.UpdateLib.Tasks;
 using MatthiWare.UpdateLib.Generator.Data;
 using System.IO;
+using MatthiWare.UpdateLib.UI;
 
 namespace MatthiWare.UpdateLib.Generator.UI.Pages
 {
@@ -23,7 +24,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
         protected override void OnPageInitialize()
         {
             SuspendLayout();
-            
+
             ilIcons.Images.Add(TreeViewFolderNode.FOLDER_KEY, Properties.Resources.folder_transparent_16px);
 
             TreeViewFolderNode tvAppFolder = new TreeViewFolderNode("Application Folder");
@@ -43,29 +44,88 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             ResumeLayout();
         }
 
-       
+
 
         private void menuAddFiles_Click(object sender, EventArgs e)
         {
-            //TODO: implement
+            if (openFileDialog.ShowDialog(this.ParentForm) != DialogResult.OK)
+                return;
+            
+            AddExistingFileAsync(openFileDialog.FileNames.Select(file => new FileInfo(file)));
         }
 
         private void existingFolderToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            
             if (folderBrowserDialog.ShowDialog(this.ParentForm) != DialogResult.OK)
                 return;
 
-            AddExistingFolder(new DirectoryInfo(folderBrowserDialog.SelectedPath));
+            AddExistingFolderAsync(new DirectoryInfo(folderBrowserDialog.SelectedPath));
         }
 
-        private void AddExistingFolder(DirectoryInfo dir)
+        private AsyncTask AddExistingFolderAsync(DirectoryInfo dir)
         {
-            TreeViewFolderNode tvFolder = new TreeViewFolderNode(dir.Name);
-            ListViewItemFolder lvFolder = new ListViewItemFolder(dir.Name);
+            ShowLoader();
 
-            lvFiles.Items.Add(lvFolder);
-            tvFolders.Nodes.Add(tvFolder);
+            AsyncTask task = AsyncTaskFactory.From(new Action(() =>
+           {
+               SuspendLayout();
+
+               TreeViewFolderNode tvRoot = new TreeViewFolderNode(dir.Name);
+               ListViewItemFolder lvRoot = new ListViewItemFolder(dir.Name);
+
+               foreach (FileInfo file in dir.GetFiles())
+                   AddExistingFile(file);
+
+               foreach (DirectoryInfo subDir in dir.GetDirectories())
+                   AddExistingFolder(dir, tvRoot, lvRoot);
+
+               this.InvokeOnUI((page) =>
+               {
+                   lvFiles.Items.Add(lvRoot);
+                   tvFolders.Nodes.Add(tvRoot);
+               });
+
+               ResumeLayout();
+           }), null);
+
+            task.TaskCompleted += (o, e) => { HideLoader(); };
+
+            return task.Start();
+        }
+
+        private void AddExistingFolder(DirectoryInfo dir, TreeViewFolderNode tvRoot, ListViewItemFolder lvRoot)
+        {
+
+        }
+
+        private AsyncTask AddExistingFileAsync(IEnumerable<FileInfo> files)
+        {
+            return AsyncTaskFactory.StartNew(new Action(() =>
+            {
+                foreach (FileInfo file in files)
+                    AddExistingFile(file);
+
+            }), null);
+        }
+
+        private void AddExistingFile(FileInfo file)
+        {
+            ListViewItemFile lvFile = new ListViewItemFile(file);
+
+            EnsureExtensionIconExists(file);
+
+            this.InvokeOnUI((page) => lvFiles.Items.Add(lvFile));
+
+        }
+
+        private void EnsureExtensionIconExists(FileInfo file)
+        {
+            if (ilIcons.Images.ContainsKey(file.Extension))
+                return;
+
+            Icon extensionIcon = Icon.ExtractAssociatedIcon(file.FullName);
+
+            this.InvokeOnUI((page) => ilIcons.Images.Add(file.Extension, extensionIcon));
         }
     }
 }

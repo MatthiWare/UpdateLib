@@ -10,6 +10,23 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 {
     public class PageControlBase : UserControl
     {
+        internal TestForm TestForm { get; set; }
+
+        public PageControlBase()
+        {
+
+        }
+
+        public void ShowLoader()
+        {
+            LoaderControl.Show(TestForm?.ContentPanel);
+        }
+
+        public void HideLoader()
+        {
+            LoaderControl.Hide(TestForm?.ContentPanel);
+        }
+
         public bool IsPageInitialized { get; private set; } = false;
 
         private AsyncTask taskInitialize;

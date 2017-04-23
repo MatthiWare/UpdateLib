@@ -82,6 +82,11 @@ namespace MatthiWare.UpdateLib.Generator.UI
             DoubleBuffered = true;
         }
 
+        public void PerformClick()
+        {
+            OnClick(EventArgs.Empty);
+        }
+
         protected override void OnClick(EventArgs e)
         {
             ActiveItem = true;

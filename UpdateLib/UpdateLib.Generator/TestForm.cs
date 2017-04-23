@@ -45,8 +45,10 @@ namespace MatthiWare.UpdateLib.Generator
                     foreach (Type type in types)
                     {
                         var name = type.Name;
+
                         PageControlBase page = Activator.CreateInstance(type) as PageControlBase;
-                        //Thread.Sleep(5000);
+                        page.TestForm = this;
+
                         pageCache.Add(name, page);
                     }
                 });
@@ -56,6 +58,8 @@ namespace MatthiWare.UpdateLib.Generator
                 loadTask.TaskCompleted += (o, e) =>
                 {
                     LoaderControl.Hide(ContentPanel);
+
+                    this.InvokeOnUI((page) => btnTabInformation.PerformClick());
                 };
             }
 

@@ -60,17 +60,18 @@
             this.SidebarPanel.Dock = System.Windows.Forms.DockStyle.Left;
             this.SidebarPanel.Location = new System.Drawing.Point(0, 33);
             this.SidebarPanel.Name = "SidebarPanel";
-            this.SidebarPanel.Size = new System.Drawing.Size(233, 352);
+            this.SidebarPanel.Size = new System.Drawing.Size(233, 386);
             this.SidebarPanel.TabIndex = 1;
             // 
             // ContentPanel
             // 
+            this.ContentPanel.AutoScroll = true;
             this.ContentPanel.BackColor = System.Drawing.SystemColors.Control;
             this.ContentPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.ContentPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ContentPanel.Location = new System.Drawing.Point(233, 33);
             this.ContentPanel.Name = "ContentPanel";
-            this.ContentPanel.Size = new System.Drawing.Size(618, 352);
+            this.ContentPanel.Size = new System.Drawing.Size(639, 386);
             this.ContentPanel.TabIndex = 2;
             // 
             // btnTabBuild
@@ -131,14 +132,14 @@
             this.HeaderPanel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.HeaderPanel.Name = "HeaderPanel";
             this.HeaderPanel.ParentForm = this;
-            this.HeaderPanel.Size = new System.Drawing.Size(851, 33);
+            this.HeaderPanel.Size = new System.Drawing.Size(872, 33);
             this.HeaderPanel.TabIndex = 1;
             // 
             // pbMinimize
             // 
             this.pbMinimize.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.pbMinimize.Image = ((System.Drawing.Image)(resources.GetObject("pbMinimize.Image")));
-            this.pbMinimize.Location = new System.Drawing.Point(777, 5);
+            this.pbMinimize.Location = new System.Drawing.Point(798, 5);
             this.pbMinimize.Name = "pbMinimize";
             this.pbMinimize.Size = new System.Drawing.Size(24, 24);
             this.pbMinimize.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -151,7 +152,7 @@
             this.pbMaximize.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.pbMaximize.BackColor = System.Drawing.Color.Transparent;
             this.pbMaximize.Image = ((System.Drawing.Image)(resources.GetObject("pbMaximize.Image")));
-            this.pbMaximize.Location = new System.Drawing.Point(800, 5);
+            this.pbMaximize.Location = new System.Drawing.Point(821, 5);
             this.pbMaximize.Name = "pbMaximize";
             this.pbMaximize.Size = new System.Drawing.Size(24, 24);
             this.pbMaximize.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -163,7 +164,7 @@
             // 
             this.pbClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.pbClose.Image = ((System.Drawing.Image)(resources.GetObject("pbClose.Image")));
-            this.pbClose.Location = new System.Drawing.Point(823, 5);
+            this.pbClose.Location = new System.Drawing.Point(844, 5);
             this.pbClose.Name = "pbClose";
             this.pbClose.Size = new System.Drawing.Size(24, 24);
             this.pbClose.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -204,7 +205,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.ClientSize = new System.Drawing.Size(851, 385);
+            this.ClientSize = new System.Drawing.Size(872, 419);
             this.Controls.Add(this.ContentPanel);
             this.Controls.Add(this.SidebarPanel);
             this.Controls.Add(this.HeaderPanel);
@@ -233,7 +234,6 @@
         private System.Windows.Forms.Label lblTitle;
         private System.Windows.Forms.Panel SidebarPanel;
         private UI.MoveablePanel HeaderPanel;
-        private System.Windows.Forms.Panel ContentPanel;
         private System.Windows.Forms.PictureBox pbIcon;
         private UI.HoverPictureBox pbClose;
         private UI.HoverPictureBox pbMinimize;
@@ -241,5 +241,6 @@
         private UI.FlatButton btnTabInformation;
         private UI.FlatButton btnTabFiles;
         private UI.FlatButton btnTabBuild;
+        internal System.Windows.Forms.Panel ContentPanel;
     }
 }

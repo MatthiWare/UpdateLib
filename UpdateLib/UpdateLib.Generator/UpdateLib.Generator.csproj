@@ -51,7 +51,6 @@
   <ItemGroup>
     <Compile Include="Data\ListViewItemFile.cs" />
     <Compile Include="Data\ListViewItemFolder.cs" />
-    <Compile Include="Data\TreeViewFileNode.cs" />
     <Compile Include="Data\TreeViewFolderNode.cs" />
     <Compile Include="Files\ProjectFile.cs" />
     <Compile Include="MainForm.cs">

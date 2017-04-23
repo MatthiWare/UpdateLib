@@ -68,7 +68,7 @@
             this.tvFolders.Location = new System.Drawing.Point(18, 53);
             this.tvFolders.Name = "tvFolders";
             this.tvFolders.SelectedImageIndex = 0;
-            this.tvFolders.Size = new System.Drawing.Size(191, 256);
+            this.tvFolders.Size = new System.Drawing.Size(191, 332);
             this.tvFolders.TabIndex = 2;
             // 
             // contextMenuRightClick
@@ -131,7 +131,7 @@
             this.lvFiles.ContextMenuStrip = this.contextMenuRightClick;
             this.lvFiles.Location = new System.Drawing.Point(215, 53);
             this.lvFiles.Name = "lvFiles";
-            this.lvFiles.Size = new System.Drawing.Size(407, 256);
+            this.lvFiles.Size = new System.Drawing.Size(577, 332);
             this.lvFiles.SmallImageList = this.ilIcons;
             this.lvFiles.TabIndex = 3;
             this.lvFiles.UseCompatibleStateImageBehavior = false;
@@ -140,23 +140,27 @@
             // clmnIcon
             // 
             this.clmnIcon.Text = "";
+            this.clmnIcon.Width = 24;
             // 
             // clmnName
             // 
             this.clmnName.Text = "Name";
+            this.clmnName.Width = 109;
             // 
             // clmnDate
             // 
             this.clmnDate.Text = "Last Modified";
-            this.clmnDate.Width = 98;
+            this.clmnDate.Width = 147;
             // 
             // clmnType
             // 
             this.clmnType.Text = "Type";
+            this.clmnType.Width = 93;
             // 
             // clmnSize
             // 
             this.clmnSize.Text = "Size";
+            this.clmnSize.Width = 71;
             // 
             // folderBrowserDialog
             // 
@@ -164,7 +168,9 @@
             // 
             // openFileDialog
             // 
-            this.openFileDialog.FileName = "openFileDialog1";
+            this.openFileDialog.Multiselect = true;
+            this.openFileDialog.ReadOnlyChecked = true;
+            this.openFileDialog.Title = "Add files to be included in the updater";
             // 
             // FilesPage
             // 
@@ -173,10 +179,12 @@
             this.Controls.Add(this.lvFiles);
             this.Controls.Add(this.tvFolders);
             this.Controls.Add(this.label1);
+            this.DoubleBuffered = true;
             this.Font = new System.Drawing.Font("Century Gothic", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.MinimumSize = new System.Drawing.Size(589, 233);
             this.Name = "FilesPage";
-            this.Size = new System.Drawing.Size(640, 327);
+            this.Size = new System.Drawing.Size(810, 403);
             this.contextMenuRightClick.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();

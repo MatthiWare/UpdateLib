@@ -35,7 +35,7 @@ namespace MatthiWare.UpdateLib.Generator.UI
 
                 if (m_opacity < 0)
                     m_opacity = 1;
-                
+
                 var alpha = (m_opacity * 255) / 100;
                 BackColor = Color.FromArgb(alpha, BackColor);
                 Invalidate();
@@ -64,35 +64,35 @@ namespace MatthiWare.UpdateLib.Generator.UI
 
         public static void Show(Control parent)
         {
+            if (parent == null)
+                return;
+
             if (!loaders.ContainsKey(parent))
                 loaders.Add(parent, new LoaderControl());
-            
+
             loaders[parent].ShowLoader(parent);
         }
 
         public void ShowLoader(Control parent)
         {
-           
-
-            UIExtensions.InvokeOnUI(parent, (c) => 
+            UIExtensions.InvokeOnUI(parent, (c) =>
             {
                 parent.SuspendLayout();
 
                 Opacity = 100;
-
-                c.Controls.Add(this);
-
+                
                 Size = parent.Size;
+                //parent.Size = Size;
                 Location = new Point(0, 0);
 
                 c.Resize += ParentResize;
+
+                c.Controls.Add(this);
 
                 BringToFront();
 
                 parent.ResumeLayout();
             });
-
-            
         }
 
         private void ParentResize(object sender, EventArgs e)
@@ -107,6 +107,9 @@ namespace MatthiWare.UpdateLib.Generator.UI
 
         public static void Hide(Control parent)
         {
+            if (parent == null)
+                return;
+
             if (!loaders.ContainsKey(parent))
                 return;
 
@@ -115,20 +118,16 @@ namespace MatthiWare.UpdateLib.Generator.UI
 
         public void HideLoader(Control parent)
         {
-            
-
-            parent.Invoke(new Action(() =>
+            UIExtensions.InvokeOnUI(parent, (c) =>
             {
-                SuspendLayout();
+                c.SuspendLayout();
 
-                parent.Controls.Remove(this);
+                c.Resize -= ParentResize;
 
-                parent.Resize -= ParentResize;
-
-                ResumeLayout();
-            }));
-
-            
+                c.Controls.Remove(this);
+                
+                c.ResumeLayout();
+            });
         }
     }
 }
