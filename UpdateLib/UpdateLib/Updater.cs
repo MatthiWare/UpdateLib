@@ -54,7 +54,14 @@ namespace MatthiWare.UpdateLib
         public bool ShowErrorMessage { get; set; } = true;
         public PathVariableConverter Converter { get; private set; }
 
+        /// <summary>
+        /// Gets the clean up task
+        /// </summary>
         public CleanUpTask CleanUpTask { get; private set; }
+
+        /// <summary>
+        /// Gets the update cache task
+        /// </summary>
         public UpdateCacheTask UpdateCacheTask { get; private set; }
 
         private bool initialized = false;
@@ -67,11 +74,11 @@ namespace MatthiWare.UpdateLib
         private Updater()
         {
             Converter = new PathVariableConverter();
-
-            Logger.Writers.Add(new ConsoleLogWriter());
-            Logger.Writers.Add(new FileLogWriter());
         }
 
+        /// <summary>
+        /// Initializes the updater
+        /// </summary>
         public void Initialize()
         {
             CleanUpTask = new CleanUpTask(".");
@@ -86,19 +93,33 @@ namespace MatthiWare.UpdateLib
         /// <summary>
         /// Starting the update process
         /// </summary>
-        public void CheckForUpdates()
+        /// <returns>Whether or not there is an update available and the latest version</returns>
+        public CheckForUpdatesTask.Data CheckForUpdates()
+        {
+            return CheckForUpdatesAsync().AwaitTask();
+        }
+
+        /// <summary>
+        /// Start the update process asynchronously
+        /// </summary>
+        /// <returns>The Task object</returns>
+        public CheckForUpdatesTask CheckForUpdatesAsync()
         {
             if (!initialized)
                 throw new InvalidOperationException("The updater needs to be initialized first.");
 
             if (string.IsNullOrEmpty(UpdateURL))
-                throw new ArgumentException("You need to specifify a update url", "UpdateURL");
+                throw new ArgumentException("You need to specifify a update url", nameof(UpdateURL));
 
             CheckForUpdatesTask task = new CheckForUpdatesTask(UpdateURL);
-            task.TaskCompleted += (o, e) => { CheckForUpdatesCompleted?.Invoke(task, new CheckForUpdatesCompletedEventArgs(task.Version, task.Result, e)); };
-            task.Start();
+            task.TaskCompleted += (o, e) => { CheckForUpdatesCompleted?.Invoke(task, new CheckForUpdatesCompletedEventArgs(task.Result, e)); };
+            return (CheckForUpdatesTask)task.Start();
         }
 
+        /// <summary>
+        /// Gets the cached index of the current application
+        /// </summary>
+        /// <returns>The <see cref="HashCacheFile"/> of the current application</returns>
         public HashCacheFile GetCache()
         {
             return UpdateCacheTask.AwaitTask();

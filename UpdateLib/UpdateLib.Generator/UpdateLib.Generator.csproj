@@ -7,7 +7,7 @@
     <ProjectGuid>{5194FF71-49F6-4ADB-9B0E-4BEB418DC6F3}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>UpdateLib.Generator</RootNamespace>
+    <RootNamespace>MatthiWare.UpdateLib.Generator</RootNamespace>
     <AssemblyName>UpdateLib.Generator</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -34,6 +34,9 @@
   <PropertyGroup>
     <ApplicationIcon>Generator_logo.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>MatthiWare.UpdateLib.Generator.Program</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -46,6 +49,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\FilesPage\GenFile.cs" />
+    <Compile Include="Data\FilesPage\GenFolder.cs" />
+    <Compile Include="Data\ListViewItemFile.cs" />
+    <Compile Include="Data\ListViewItemFolder.cs" />
+    <Compile Include="Data\TreeViewFolderNode.cs" />
+    <Compile Include="Files\ProjectFile.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -56,6 +65,54 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tasks\LoadDirectoryTask.cs" />
     <Compile Include="Tasks\UpdateGenerator.cs" />
+    <Compile Include="TestForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TestForm.Designer.cs">
+      <DependentUpon>TestForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\ElipseComponent.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UI\FlatButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UI\GradientPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UI\HoverPictureBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UI\LoaderControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\LoaderControl.Designer.cs">
+      <DependentUpon>LoaderControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\MoveablePanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UI\Pages\BuilderPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\Pages\BuilderPage.Designer.cs">
+      <DependentUpon>BuilderPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Pages\FilesPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\Pages\FilesPage.Designer.cs">
+      <DependentUpon>FilesPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Pages\InformationPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\Pages\InformationPage.Designer.cs">
+      <DependentUpon>InformationPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Pages\PageControlBase.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -69,6 +126,21 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="TestForm.resx">
+      <DependentUpon>TestForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\LoaderControl.resx">
+      <DependentUpon>LoaderControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\Pages\BuilderPage.resx">
+      <DependentUpon>BuilderPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\Pages\FilesPage.resx">
+      <DependentUpon>FilesPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\Pages\InformationPage.resx">
+      <DependentUpon>InformationPage.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -86,11 +158,14 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\gears.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Generator_logo.ico" />
+    <None Include="Resources\image_transparent_16px.png" />
+    <None Include="Resources\folder_transparent_16px.png" />
+    <None Include="Resources\loading_gear.gif" />
+    <None Include="Resources\gears.png" />
+    <None Include="Resources\loading.gif" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

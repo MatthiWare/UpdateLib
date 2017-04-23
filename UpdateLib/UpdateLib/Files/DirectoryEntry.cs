@@ -66,6 +66,5 @@ namespace MatthiWare.UpdateLib.Files
             Files = new List<FileEntry>();
             Directories = new List<DirectoryEntry>();
         }
-
     }
 }

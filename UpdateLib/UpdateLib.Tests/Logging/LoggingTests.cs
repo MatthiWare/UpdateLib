@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MatthiWare.UpdateLib.Logging.Writers;
 
 namespace UpdateLib.Tests.Logging
 {
@@ -68,7 +69,7 @@ namespace UpdateLib.Tests.Logging
         private Mock<ILogWriter> SetUpWriter(LoggingLevel level)
         {
             Mock<ILogWriter> writer = new Mock<ILogWriter>();
-            writer.SetupGet<LoggingLevel>(w => w.LoggingLevel).Returns(level);
+            writer.SetupGet(w => w.LoggingLevel).Returns(level);
 
             return writer;
         }

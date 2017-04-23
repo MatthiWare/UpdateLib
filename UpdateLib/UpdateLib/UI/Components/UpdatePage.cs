@@ -29,7 +29,7 @@ namespace MatthiWare.UpdateLib.UI.Components
 
             ImageList ilItems = MakeImageList();
             lvItems.SmallImageList = ilItems;
-            
+
 
             FillListView();
 
@@ -67,9 +67,9 @@ namespace MatthiWare.UpdateLib.UI.Components
 
         private void AddDirectoryToListView(DirectoryEntry dir)
         {
-            foreach(FileEntry file in dir.Files)
+            foreach (FileEntry file in dir.Files)
             {
-                
+
                 ListViewItem lvItem = new ListViewItem(new string[] { "", file.Name, "Ready to download", "0%", file.Description, Updater.Instance.Converter.Replace(file.DestinationLocation) });
                 lvItem.Tag = file;
 
@@ -113,9 +113,9 @@ namespace MatthiWare.UpdateLib.UI.Components
             {
                 Logger.Info(nameof(DownloadTask), $"Cancelled -> '{task.Entry.Name}'");
 
-                SetSubItemText(task.Item.SubItems[2],  "Cancelled");
+                SetSubItemText(task.Item.SubItems[2], "Cancelled");
 
-                SetImageKey(task.Item,"status_warning");
+                SetImageKey(task.Item, "status_warning");
 
                 return;
             }
@@ -173,14 +173,14 @@ namespace MatthiWare.UpdateLib.UI.Components
 
         private void StartDownloadItem(ListViewItem item)
         {
-            
+
             //Test(item);
 
         }
 
         Random rnd = new Random();
 
-        
+
 
         private void Test(ListViewItem item)
         {
@@ -195,7 +195,7 @@ namespace MatthiWare.UpdateLib.UI.Components
             wait = rnd.Next(100);
             for (int i = 0; i <= 100; i++)
             {
-                
+
                 Thread.Sleep(wait);
             }
 
@@ -203,7 +203,7 @@ namespace MatthiWare.UpdateLib.UI.Components
             SetSubItemText(item.SubItems[2], val ? "Done" : "Error");
 
             SetImageKey(item, val ? "status_done" : "status_error");
-            
+
 
             int amountLeft = Interlocked.Decrement(ref amountToDownload);
 
@@ -215,26 +215,28 @@ namespace MatthiWare.UpdateLib.UI.Components
 
             PageUpdate?.Invoke(this, new EventArgs());
         }
-        
+
         private void SetImageKey(ListViewItem item, string key)
         {
-            if (InvokeRequired)
-            {
-                Invoke(new Action<ListViewItem, string>(SetImageKey), item, key);
-                return;
-            }
-            item.ImageKey = key;
+            this.InvokeOnUI((c) => item.ImageKey = key);
+            //if (InvokeRequired)
+            //{
+            //    Invoke(new Action<ListViewItem, string>(SetImageKey), item, key);
+            //    return;
+            //}
+            //item.ImageKey = key;
         }
-        
+
         private void SetSubItemText(ListViewItem.ListViewSubItem item, string key)
         {
-            if (InvokeRequired)
-            {
-                Invoke(new Action<ListViewItem.ListViewSubItem, string>(SetSubItemText), item, key);
-                return;
-            }
+            this.InvokeOnUI((c) => item.Text = key);
+            //if (InvokeRequired)
+            //{
+            //    Invoke(new Action<ListViewItem.ListViewSubItem, string>(SetSubItemText), item, key);
+            //    return;
+            //}
 
-            item.Text = key;
+            //item.Text = key;
         }
 
         public void Cancel()

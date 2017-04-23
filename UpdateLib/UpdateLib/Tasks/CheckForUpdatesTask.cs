@@ -4,14 +4,13 @@ using MatthiWare.UpdateLib.Files;
 using System.Windows.Forms;
 using System.Drawing;
 using MatthiWare.UpdateLib.UI;
+using static MatthiWare.UpdateLib.Tasks.CheckForUpdatesTask;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
-    public class CheckForUpdatesTask : AsyncTaskBase<bool>
+    public class CheckForUpdatesTask : AsyncTask<Data>
     {
         public string Url { get; set; }
-
-        public string Version { get; set; }
 
         private WebClient wcDownloader;
 
@@ -28,6 +27,8 @@ namespace MatthiWare.UpdateLib.Tasks
         {
             if (string.IsNullOrEmpty(Url)) throw new WebException("Invalid Url");
 
+            Result = new Data();
+
             // Getting the file name from the url
             string localFile = GetLocalFileName();
 
@@ -36,7 +37,7 @@ namespace MatthiWare.UpdateLib.Tasks
 
             // load the updatefile from disk
             UpdateFile file = UpdateFile.Load(localFile);
-            Version = file.VersionString;
+            Result.Version = file.VersionString;
 
             // lets wait for the Cache update to complete and get the task
             HashCacheFile cache = Updater.Instance.GetCache();
@@ -48,14 +49,16 @@ namespace MatthiWare.UpdateLib.Tasks
              * Start a task to get all the files that need to be updated
              * Returns if there is anything to update
              */
-            Result = CheckForUpdatedFiles(file, cache).AwaitTask();
+            Result.UpdateAvailable = CheckForUpdatedFiles(file, cache).AwaitTask();
 
-            if (!Result) // no updates available
+
+
+            if (!Result.UpdateAvailable) // no updates available
                 return;
 
             DialogResult result = new MessageDialog(
                     "Update available",
-                    $"Version {file.VersionString} available",
+                    $"Version {Result.Version} available",
                     "Update now?\nPress yes to update or no to cancel.",
                     SystemIcons.Question).ShowDialog();
 
@@ -81,6 +84,12 @@ namespace MatthiWare.UpdateLib.Tasks
         {
             string[] tokens = Url.Split('/');
             return string.Concat("./", tokens[tokens.Length - 1]);
+        }
+
+        public class Data
+        {
+            public string Version { get; set; } = "";
+            public bool UpdateAvailable { get; set; } = false;
         }
     }
 }

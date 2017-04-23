@@ -43,19 +43,7 @@ namespace MatthiWare.UpdateLib.Logging
 
         public static void Error(string tag, Exception e)
         {
-            StringBuilder sb = new StringBuilder();
-            sb.Append(e.GetBaseException().GetType().Name);
-            sb.AppendLine(e.Message);
-            sb.AppendLine(e.StackTrace);
-
-            Exception inner = e;
-            while ((inner = inner.InnerException) != null)
-            {
-                sb.AppendLine(inner.Message);
-                sb.AppendLine(inner.StackTrace);
-            }
-
-            Error(tag, sb.ToString());
+            Error(tag, e.ToString());
         }
     }
 }

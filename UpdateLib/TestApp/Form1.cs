@@ -71,7 +71,7 @@ namespace TestApp
 
         private void button3_Click(object sender, EventArgs e)
         {
-            UpdateFile file = UpdateFile.Load("../../../UpdateLib.Generator/bin/Debug/Output/updatefile.xml");
+            UpdateFile file = UpdateFile.Load("../../../MatthiWare.UpdateLib.Generator/bin/Debug/Output/updatefile.xml");
             UpdaterForm updaterForm = new UpdaterForm(file);
             updaterForm.ShowDialog(this);
         }
@@ -87,7 +87,7 @@ namespace TestApp
 
             Func<int, bool> test2 = new Func<int, bool>((i) => { return i%2==0; });
 
-            AsyncTaskBase<bool> task =  AsyncTaskFactory.StartNew<bool>(test2, 2);
+            AsyncTask<bool> task =  AsyncTaskFactory.StartNew<bool>(test2, 2);
             Console.WriteLine(task.GetType().FullName);
             
         }

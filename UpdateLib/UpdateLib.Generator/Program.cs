@@ -1,9 +1,11 @@
-﻿using System;
+﻿using MatthiWare.UpdateLib.Logging;
+using MatthiWare.UpdateLib.Logging.Writers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace UpdateLib.Generator
+namespace MatthiWare.UpdateLib.Generator
 {
     static class Program
     {
@@ -13,9 +15,11 @@ namespace UpdateLib.Generator
         [STAThread]
         static void Main()
         {
+            Logger.Writers.Add(new ConsoleLogWriter());
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainForm());
+            Application.Run(new TestForm());
         }
     }
 }
