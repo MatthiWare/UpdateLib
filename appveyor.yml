@@ -18,7 +18,7 @@ build:
   project: .\UpdateLib\UpdateLib.sln
   verbosity: minimal
 test_script:
-  - C:\\projects\\updatelib\\UpdateLib\\packages\\OpenCover.4.6.519\\tools\\OpenCover.Console.exe -register:user -target:nunit3-console.exe -targetargs:"UpdateLib\UpdateLib.Tests\bin\Release\UpdateLib.Tests.dll" -filter:"+[UpdateLib*]*" -output:opencoverCoverage.xml
+  - C:\\projects\\updatelib\\UpdateLib\\packages\\OpenCover.4.6.519\\tools\\OpenCover.Console.exe -register:user -target:nunit3-console.exe -targetargs:"UpdateLib\UpdateLib.Tests\bin\Release\UpdateLib.Tests.dll" -filter:"+[UpdateLib*]* -[UpdateLib.Tests*]*" -output:opencoverCoverage.xml
   - "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
   - pip install codecov
   - codecov -f "opencoverCoverage.xml"
