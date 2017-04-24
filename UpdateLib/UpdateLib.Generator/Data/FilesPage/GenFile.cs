@@ -8,12 +8,12 @@ namespace MatthiWare.UpdateLib.Generator.Data.FilesPage
 {
     public class GenFile
     {
-        private FileInfo m_file;
+        public FileInfo FileInfo { get; set; }
 
-        public string Name { get { return m_file.Name; } }
-        public string RealPath { get { return m_file.FullName; } }
-        public string Extension { get { return m_file.Extension; } }
-        public string Size { get { return ConvertBytesToSizeString(m_file.Length); } }
+        public string Name { get { return FileInfo.Name; } }
+        public string RealPath { get { return FileInfo.FullName; } }
+        public string Extension { get { return FileInfo.Extension; } }
+        public string Size { get { return ConvertBytesToSizeString(FileInfo.Length); } }
 
         public GenFolder ParentFolder { get; set; }
 
@@ -21,7 +21,7 @@ namespace MatthiWare.UpdateLib.Generator.Data.FilesPage
 
         public GenFile(FileInfo file)
         {
-            m_file = file;
+            FileInfo = file;
 
             FileListView = new ListViewItemFile(file);
         }

@@ -17,6 +17,16 @@ namespace MatthiWare.UpdateLib.Generator.Data.FilesPage
         public ListViewItemFolder FolderListView { get; set; }
         public TreeViewFolderNode FolderTreeView { get; set; }
 
+        public int Count {
+            get
+            {
+                int x = Files.Count;
+                foreach (GenFolder f in Directories)
+                    x += f.Count;
+               
+                return x;
+            }
+        }
 
         public GenFolder(string name, GenFolder parent)
         {

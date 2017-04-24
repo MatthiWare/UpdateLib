@@ -4,43 +4,51 @@ using System;
 using System.Threading;
 using System.IO;
 using MatthiWare.UpdateLib.Tasks;
+using MatthiWare.UpdateLib.Generator.Data.FilesPage;
+using System.Collections.Generic;
+using MatthiWare.UpdateLib.Generator.UI.Pages;
 
 namespace MatthiWare.UpdateLib.Generator.Tasks
 {
     public class UpdateGeneratorTask : AsyncTask<UpdateFile>
     {
-        private delegate void AddDirRecursiveDelegate(DirectoryInfo dir, DirectoryEntry entry);
+        private delegate void AddDirRecursiveDelegate(GenFolder dir, DirectoryEntry entry);
 
-        private DirectoryInfo baseDir;
+        private GenFolder baseDir;
 
         private int total;
         private int done = 0;
 
-        public UpdateGeneratorTask(DirectoryInfo dir)
+        private InformationPage infoPage;
+
+        public UpdateGeneratorTask(GenFolder dir, InformationPage info)
         {
             if (dir == null)
                 throw new ArgumentNullException("dir", "The directory cannot be null");
-
-            if (!dir.Exists)
-                throw new DirectoryNotFoundException(string.Format("The directory '{0}' does not exist.", dir.FullName));
 
             Result = new UpdateFile();
 
             baseDir = dir;
 
-            total = dir.GetFiles("*", SearchOption.AllDirectories).Length;
+            total = dir.Count;
+
+            infoPage = info;
         }
 
         protected override void DoWork()
         {
             AddDirRecursive(baseDir, Result.ApplicationDirectory);
+
+            Result.ApplicationName = infoPage.ApplicationName;
+            Result.VersionString = infoPage.ApplicationVersion;
         }
 
-        private void AddDirRecursive(DirectoryInfo dir, DirectoryEntry entry)
+        private void AddDirRecursive(GenFolder dir, DirectoryEntry entry)
         {
-            FileInfo[] files = dir.GetFiles();
-            foreach (FileInfo fi in files)
+            List<GenFile> files = dir.Files;
+            foreach (GenFile genFile in files)
             {
+                FileInfo fi = genFile.FileInfo;
                 FileEntry newEntry = new FileEntry(fi.Name);
                 newEntry.Hash = HashUtil.GetHash(fi.FullName);
 
@@ -49,12 +57,12 @@ namespace MatthiWare.UpdateLib.Generator.Tasks
                 Interlocked.Increment(ref done);
             }
 
-            if (files.Length > 0)
+            if (files.Count > 0)
                 OnTaskProgressChanged(done, total);
 
-            foreach (DirectoryInfo newDir in dir.GetDirectories())
+            foreach (GenFolder newDir in dir.Directories)
             {
-                if (newDir.GetFiles("*", SearchOption.AllDirectories).Length == 0)
+                if (newDir.Count == 0)
                     continue;
 
                 DirectoryEntry newEntry = new DirectoryEntry(newDir.Name);

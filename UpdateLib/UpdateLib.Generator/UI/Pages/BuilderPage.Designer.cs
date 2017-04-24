@@ -31,6 +31,10 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.btnBuild = new System.Windows.Forms.Button();
+            this.lblProgress = new System.Windows.Forms.Label();
+            this.pbProgress = new System.Windows.Forms.ProgressBar();
+            this.lblStatus = new System.Windows.Forms.Label();
+            this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.SuspendLayout();
             // 
             // label1
@@ -60,11 +64,48 @@
             this.btnBuild.TabIndex = 3;
             this.btnBuild.Text = "Build";
             this.btnBuild.UseVisualStyleBackColor = true;
+            this.btnBuild.Click += new System.EventHandler(this.btnBuild_Click);
+            // 
+            // lblProgress
+            // 
+            this.lblProgress.AutoSize = true;
+            this.lblProgress.Location = new System.Drawing.Point(139, 100);
+            this.lblProgress.Name = "lblProgress";
+            this.lblProgress.Size = new System.Drawing.Size(79, 17);
+            this.lblProgress.TabIndex = 4;
+            this.lblProgress.Text = "Progress: 0%";
+            // 
+            // pbProgress
+            // 
+            this.pbProgress.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.pbProgress.Location = new System.Drawing.Point(17, 139);
+            this.pbProgress.Name = "pbProgress";
+            this.pbProgress.Size = new System.Drawing.Size(593, 23);
+            this.pbProgress.TabIndex = 5;
+            // 
+            // lblStatus
+            // 
+            this.lblStatus.AutoSize = true;
+            this.lblStatus.Location = new System.Drawing.Point(14, 100);
+            this.lblStatus.Name = "lblStatus";
+            this.lblStatus.Size = new System.Drawing.Size(104, 17);
+            this.lblStatus.TabIndex = 6;
+            this.lblStatus.Text = "Status: Waiting..";
+            // 
+            // saveFileDialog
+            // 
+            this.saveFileDialog.FileName = "updatefile";
+            this.saveFileDialog.Filter = "Update files (.xml)|*.xml";
+            this.saveFileDialog.Title = "Save location";
             // 
             // BuilderPage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.lblStatus);
+            this.Controls.Add(this.pbProgress);
+            this.Controls.Add(this.lblProgress);
             this.Controls.Add(this.btnBuild);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -72,7 +113,7 @@
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.MinimumSize = new System.Drawing.Size(239, 104);
             this.Name = "BuilderPage";
-            this.Size = new System.Drawing.Size(239, 104);
+            this.Size = new System.Drawing.Size(629, 182);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -83,5 +124,9 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button btnBuild;
+        private System.Windows.Forms.Label lblProgress;
+        private System.Windows.Forms.ProgressBar pbProgress;
+        private System.Windows.Forms.Label lblStatus;
+        private System.Windows.Forms.SaveFileDialog saveFileDialog;
     }
 }

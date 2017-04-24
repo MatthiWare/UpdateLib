@@ -17,7 +17,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 {
     public partial class FilesPage : PageControlBase
     {
-        private GenFolder ProjectRootFolder;
+        public GenFolder Root { get; set; }
 
         private GenFile _selectedFile;
         private GenFile SelectedFile
@@ -53,12 +53,12 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 
             ilIcons.Images.Add(TreeViewFolderNode.FOLDER_KEY, Properties.Resources.folder_transparent_16px);
 
-            ProjectRootFolder = new GenFolder("Update Project", null);
-            TreeViewFolderNode tvProjectRootFolder = new TreeViewFolderNode("Update Project", ProjectRootFolder);
+            Root = new GenFolder("Update Project", null);
+            TreeViewFolderNode tvProjectRootFolder = new TreeViewFolderNode("Update Project", Root);
             tvProjectRootFolder.ContextMenuStrip = contextMenuRightClick;
 
-            tvProjectRootFolder.Folder = ProjectRootFolder;
-            ProjectRootFolder.FolderTreeView = tvProjectRootFolder;
+            tvProjectRootFolder.Folder = Root;
+            Root.FolderTreeView = tvProjectRootFolder;
 
             tvFolders.Nodes.Add(tvProjectRootFolder);
 
@@ -93,11 +93,11 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             {
                 this.InvokeOnUI((p) => SuspendLayout());
 
-                AddExistingFolder(dir, ProjectRootFolder, true);
+                AddExistingFolder(dir, Root, true);
 
                 this.InvokeOnUI((p) =>
                 {
-                    ProjectRootFolder.FolderTreeView.Expand();
+                    Root.FolderTreeView.Expand();
                     ResumeLayout();
                 });
             }), null);
@@ -186,7 +186,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             SelectedFolder = folder;
             SelectedFile = null;
 
-            if (SelectedFolder == ProjectRootFolder && deleteToolStripMenuItem.Enabled)
+            if (SelectedFolder == Root && deleteToolStripMenuItem.Enabled)
                 deleteToolStripMenuItem.Enabled = false;
 
             lvFiles.SuspendLayout();
@@ -265,7 +265,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
                 lvFiles.Items.Remove(SelectedFile.FileListView);
                 SelectedFile = null;
             }
-            else if (SelectedFolder != null && SelectedFolder != ProjectRootFolder)
+            else if (SelectedFolder != null && SelectedFolder != Root)
             {
                 SelectedFolder.ParentFolder.Directories.Remove(SelectedFolder);
                 tvFolders.Nodes.Remove(SelectedFolder.FolderTreeView);

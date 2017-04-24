@@ -29,6 +29,11 @@ namespace MatthiWare.UpdateLib.Generator
             LoadPagesTask().Start();
         }
 
+        public bool TryGetPage(string key, out PageControlBase page)
+        {
+            return pageCache.TryGetValue(key, out page);
+        }
+
         private AsyncTask LoadPagesTask()
         {
             if (loadTask == null)
@@ -102,7 +107,7 @@ namespace MatthiWare.UpdateLib.Generator
             loadTask.AwaitTask();
 
             PageControlBase page = null;
-            bool success = pageCache.TryGetValue(pageName, out page);
+            bool success = TryGetPage(pageName, out page);
 
             if (success)
             {
