@@ -89,6 +89,12 @@
     <Compile Include="UI\LoaderControl.Designer.cs">
       <DependentUpon>LoaderControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\InputDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\InputDialog.Designer.cs">
+      <DependentUpon>InputDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\MoveablePanel.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -132,6 +138,9 @@
     <EmbeddedResource Include="UI\LoaderControl.resx">
       <DependentUpon>LoaderControl.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="UI\InputDialog.resx">
+      <DependentUpon>InputDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\Pages\BuilderPage.resx">
       <DependentUpon>BuilderPage.cs</DependentUpon>
     </EmbeddedResource>
@@ -159,6 +168,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Generator_logo.ico" />
+    <None Include="Resources\cross.png" />
     <None Include="Resources\image_transparent_16px.png" />
     <None Include="Resources\folder_transparent_16px.png" />
     <None Include="Resources\loading_gear.gif" />

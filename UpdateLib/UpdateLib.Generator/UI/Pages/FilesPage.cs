@@ -18,7 +18,29 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
     public partial class FilesPage : PageControlBase
     {
         private GenFolder ProjectRootFolder;
-        private GenFolder SelectedFolder;
+
+        private GenFile _selectedFile;
+        private GenFile SelectedFile
+        {
+            get { return _selectedFile; }
+            set
+            {
+                _selectedFile = value;
+                if (value != null && !deleteToolStripMenuItem.Enabled)
+                    deleteToolStripMenuItem.Enabled = true;
+            }
+        }
+        private GenFolder _selectedFolder;
+        private GenFolder SelectedFolder
+        {
+            get { return _selectedFolder; }
+            set
+            {
+                _selectedFolder = value;
+                if (value != null && !deleteToolStripMenuItem.Enabled)
+                    deleteToolStripMenuItem.Enabled = true;
+            }
+        }
 
         public FilesPage()
         {
@@ -31,7 +53,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 
             ilIcons.Images.Add(TreeViewFolderNode.FOLDER_KEY, Properties.Resources.folder_transparent_16px);
 
-            ProjectRootFolder = new GenFolder("Update Project");
+            ProjectRootFolder = new GenFolder("Update Project", null);
             TreeViewFolderNode tvProjectRootFolder = new TreeViewFolderNode("Update Project", ProjectRootFolder);
             tvProjectRootFolder.ContextMenuStrip = contextMenuRightClick;
 
@@ -87,7 +109,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 
         private void AddExistingFolder(DirectoryInfo dir, GenFolder parentFolder, bool addToUI = false)
         {
-            GenFolder folder = new GenFolder(dir.Name);
+            GenFolder folder = new GenFolder(dir.Name, parentFolder);
             folder.FolderListView = new ListViewItemFolder(dir.Name, folder);
             folder.FolderTreeView = new TreeViewFolderNode(dir.Name, folder);
 
@@ -162,7 +184,11 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
                 return;
 
             SelectedFolder = folder;
-            Console.WriteLine("Update..");
+            SelectedFile = null;
+
+            if (SelectedFolder == ProjectRootFolder && deleteToolStripMenuItem.Enabled)
+                deleteToolStripMenuItem.Enabled = false;
+
             lvFiles.SuspendLayout();
 
             lvFiles.Items.Clear();
@@ -189,6 +215,70 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 
             UpdateSelectedFolder(item?.Folder);
 
+        }
+
+        private void newFolderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            InputDialog inputDlg = new InputDialog("New folder", "Please enter the folder name: ", MessageBoxButtons.OKCancel);
+
+            if (inputDlg.ShowDialog(ParentForm) != DialogResult.OK && SelectedFolder != null)
+                return;
+
+            var name = inputDlg.Input;
+
+            GenFolder folder = new GenFolder(name, SelectedFolder);
+            folder.FolderListView = new ListViewItemFolder(name, folder);
+            folder.FolderTreeView = new TreeViewFolderNode(name, folder);
+
+            folder.FolderTreeView.ContextMenuStrip = contextMenuRightClick;
+
+            SelectedFolder.Directories.Add(folder);
+
+            this.InvokeOnUI(p =>
+            {
+                SelectedFolder.FolderTreeView.Nodes.Add(folder.FolderTreeView);
+                lvFiles.Items.Add(folder.FolderListView);
+            });
+        }
+
+        private void lvFiles_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (lvFiles.SelectedItems.Count == 0)
+                return;
+
+            ListViewItemFile item = lvFiles.SelectedItems[0] as ListViewItemFile;
+            if (item == null)
+                return;
+
+            SelectedFile = item.File;
+        }
+
+        private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SuspendLayout();
+
+            deleteToolStripMenuItem.Enabled = false;
+
+            if (SelectedFile != null)
+            {
+                SelectedFile.ParentFolder.Files.Remove(SelectedFile);
+                lvFiles.Items.Remove(SelectedFile.FileListView);
+                SelectedFile = null;
+            }
+            else if (SelectedFolder != null && SelectedFolder != ProjectRootFolder)
+            {
+                SelectedFolder.ParentFolder.Directories.Remove(SelectedFolder);
+                tvFolders.Nodes.Remove(SelectedFolder.FolderTreeView);
+
+                foreach (GenFile f in SelectedFolder.Files)
+                    lvFiles.Items.Remove(f.FileListView);
+
+                foreach (GenFolder f in SelectedFolder.Directories)
+                    lvFiles.Items.Remove(f.FolderListView);
+
+                SelectedFolder = null;
+            }
+            ResumeLayout();
         }
     }
 }

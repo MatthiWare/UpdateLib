@@ -18,9 +18,10 @@ namespace MatthiWare.UpdateLib.Generator.Data.FilesPage
         public TreeViewFolderNode FolderTreeView { get; set; }
 
 
-        public GenFolder(string name)
+        public GenFolder(string name, GenFolder parent)
         {
             Name = name;
+            ParentFolder = parent;
         }
 
     }

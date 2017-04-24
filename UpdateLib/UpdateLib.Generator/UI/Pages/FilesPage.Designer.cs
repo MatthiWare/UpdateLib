@@ -37,6 +37,8 @@
             this.menuAddFolder = new System.Windows.Forms.ToolStripMenuItem();
             this.newFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.existingFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lvFiles = new System.Windows.Forms.ListView();
             this.clmnIcon = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.clmnName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -82,9 +84,11 @@
             this.contextMenuRightClick.Font = new System.Drawing.Font("Century Gothic", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.contextMenuRightClick.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuAddFiles,
-            this.menuAddFolder});
+            this.menuAddFolder,
+            this.toolStripSeparator1,
+            this.deleteToolStripMenuItem});
             this.contextMenuRightClick.Name = "menuTV";
-            this.contextMenuRightClick.Size = new System.Drawing.Size(142, 48);
+            this.contextMenuRightClick.Size = new System.Drawing.Size(153, 98);
             // 
             // menuAddFiles
             // 
@@ -109,6 +113,7 @@
             this.newFolderToolStripMenuItem.Name = "newFolderToolStripMenuItem";
             this.newFolderToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
             this.newFolderToolStripMenuItem.Text = "New Folder";
+            this.newFolderToolStripMenuItem.Click += new System.EventHandler(this.newFolderToolStripMenuItem_Click);
             // 
             // existingFolderToolStripMenuItem
             // 
@@ -116,6 +121,20 @@
             this.existingFolderToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
             this.existingFolderToolStripMenuItem.Text = "Existing Folder";
             this.existingFolderToolStripMenuItem.Click += new System.EventHandler(this.existingFolderToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(138, 6);
+            // 
+            // deleteToolStripMenuItem
+            // 
+            this.deleteToolStripMenuItem.Enabled = false;
+            this.deleteToolStripMenuItem.Image = global::MatthiWare.UpdateLib.Generator.Properties.Resources.cross;
+            this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.deleteToolStripMenuItem.Text = "Delete";
+            this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
             // 
             // lvFiles
             // 
@@ -138,6 +157,7 @@
             this.lvFiles.TabIndex = 3;
             this.lvFiles.UseCompatibleStateImageBehavior = false;
             this.lvFiles.View = System.Windows.Forms.View.Details;
+            this.lvFiles.SelectedIndexChanged += new System.EventHandler(this.lvFiles_SelectedIndexChanged);
             this.lvFiles.DoubleClick += new System.EventHandler(this.lvFiles_DoubleClick);
             // 
             // clmnIcon
@@ -212,5 +232,7 @@
         private System.Windows.Forms.ToolStripMenuItem existingFolderToolStripMenuItem;
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog;
         private System.Windows.Forms.OpenFileDialog openFileDialog;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
     }
 }
