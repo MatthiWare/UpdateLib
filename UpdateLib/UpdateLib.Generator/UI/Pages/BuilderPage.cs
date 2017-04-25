@@ -66,6 +66,8 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
         {
             UpdateGeneratorTask task = new UpdateGeneratorTask(filesPage.Root, infoPage);
 
+            btnBuild.Enabled = false;
+
             task.TaskProgressChanged += (o, e) =>
             {
                 this.InvokeOnUI(p => 
@@ -77,6 +79,9 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 
             task.TaskCompleted += (o, e) =>
             {
+
+                this.InvokeOnUI(p => btnBuild.Enabled = true);
+
                 if (e.Cancelled)
                 {
                     this.InvokeOnUI(p => lblStatus.Text = $"Status: Cancelled");

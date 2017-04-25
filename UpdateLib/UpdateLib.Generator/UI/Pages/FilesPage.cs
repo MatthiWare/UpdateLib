@@ -125,7 +125,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 
             foreach (FileInfo f in dir.GetFiles())
             {
-                AddExistingFile(f, folder, addToUI);
+                AddExistingFile(f, folder);
             }
 
             this.InvokeOnUI(p => parentFolder.FolderTreeView.Nodes.Add(folder.FolderTreeView));
