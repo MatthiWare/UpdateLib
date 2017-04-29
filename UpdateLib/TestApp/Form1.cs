@@ -5,6 +5,8 @@ using MatthiWare.UpdateLib.Tasks;
 using MatthiWare.UpdateLib.UI;
 using System;
 using System.Drawing;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -19,7 +21,7 @@ namespace TestApp
             InitializeComponent();
 
             updater = Updater.Instance;
-            updater.UpdateURL = "http://matthiware.dev/UpdateLib/Dev/updatefile.xml"; 
+            
             updater.CheckForUpdatesCompleted += Updater_CheckForUpdatesCompleted;
 
             updater.Initialize();
@@ -83,13 +85,24 @@ namespace TestApp
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            Action<object> test = new Action<object>((o) => {  });
+            Action<object> test = new Action<object>((o) => { });
 
-            Func<int, bool> test2 = new Func<int, bool>((i) => { return i%2==0; });
+            Func<int, bool> test2 = new Func<int, bool>((i) => { return i % 2 == 0; });
 
-            AsyncTask<bool> task =  AsyncTaskFactory.StartNew<bool>(test2, 2);
+            AsyncTask<bool> task = AsyncTaskFactory.StartNew<bool>(test2, 2);
             Console.WriteLine(task.GetType().FullName);
-            
+
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            var test = "my md5 hash";
+            using (MD5 md5 = MD5.Create())
+            {
+              
+                byte[] hash = md5.ComputeHash(Encoding.UTF8.GetBytes(test));
+                Console.Write(BitConverter.ToString(hash).Replace("-", string.Empty));
+            }
         }
     }
 }

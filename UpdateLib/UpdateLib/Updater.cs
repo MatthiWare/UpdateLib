@@ -25,12 +25,10 @@ namespace MatthiWare.UpdateLib
             get
             {
                 if (instance == null)
-                {
                     lock (synclock)
-                    {
-                        instance = new Updater();
-                    }
-                }
+                        if (instance == null)
+                            instance = new Updater();
+
                 return instance;
             }
         }

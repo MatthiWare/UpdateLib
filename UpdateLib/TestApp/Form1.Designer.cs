@@ -35,6 +35,7 @@
             this.button4 = new System.Windows.Forms.Button();
             this.updaterControl2 = new MatthiWare.UpdateLib.Controls.UpdaterControl();
             this.updaterControl1 = new MatthiWare.UpdateLib.Controls.UpdaterControl();
+            this.button5 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // button1
@@ -107,11 +108,22 @@
             this.updaterControl1.Size = new System.Drawing.Size(20, 20);
             this.updaterControl1.TabIndex = 1;
             // 
+            // button5
+            // 
+            this.button5.Location = new System.Drawing.Point(37, 148);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(75, 23);
+            this.button5.TabIndex = 7;
+            this.button5.Text = "button5";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(490, 266);
+            this.Controls.Add(this.button5);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.propertyGrid1);
             this.Controls.Add(this.button3);
@@ -135,6 +147,7 @@
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.PropertyGrid propertyGrid1;
         private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.Button button5;
     }
 }
 
