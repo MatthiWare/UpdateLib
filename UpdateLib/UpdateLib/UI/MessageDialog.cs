@@ -7,14 +7,12 @@ namespace MatthiWare.UpdateLib.UI
     {
         public static DialogResult Show(IWin32Window owner, string title, string header, string desc, Icon icon, MessageBoxButtons buttons = MessageBoxButtons.YesNo)
         {
-            MessageDialog dlg = new MessageDialog(
+            return new MessageDialog(
                 title,
                 header,
                 desc,
                 icon,
-                buttons);
-
-            return dlg.InvokeOnUI(() => dlg.ShowDialog(owner));
+                buttons).ShowDialog(owner);
         }
 
         public static DialogResult Show(string title, string header, string desc, Icon icon, MessageBoxButtons buttons = MessageBoxButtons.YesNo)

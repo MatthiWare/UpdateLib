@@ -27,26 +27,27 @@ namespace TestApp
 
             if (e.Cancelled || e.Error != null)
             {
-                MessageDialog.Show(
+                this.InvokeOnUI(() => MessageDialog.Show(
                     this,
                     "Updater",
                     e.Cancelled ? "Cancelled" : "Error",
                     e.Cancelled ? "Update got cancelled" : "Please check the logs for more information.",
                     e.Cancelled ? SystemIcons.Warning : SystemIcons.Error,
-                    MessageBoxButtons.OK);
+                    MessageBoxButtons.OK));
 
                 return;
             }
 
             if (!e.UpdateAvailable)
             {
+                this.InvokeOnUI(() =>
                 MessageDialog.Show(
                     this,
                     "Updater",
                     "No update available!",
                     $"You already have the latest version ({e.LatestVersion}).",
                     SystemIcons.Information,
-                    MessageBoxButtons.OK);
+                    MessageBoxButtons.OK));
 
                 return;
             }
