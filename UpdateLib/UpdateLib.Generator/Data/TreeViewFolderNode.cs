@@ -13,11 +13,11 @@ namespace MatthiWare.UpdateLib.Generator.Data
 
         public GenFolder Folder { get; set; }
 
-        public TreeViewFolderNode(string folderName, GenFolder folder)
+        public TreeViewFolderNode(string folderName, GenFolder folder, string imageKey = FOLDER_KEY)
         {
             Text = folderName;
-            ImageKey = FOLDER_KEY;
-            SelectedImageKey = FOLDER_KEY;
+            ImageKey = imageKey;
+            SelectedImageKey = imageKey;
             Folder = folder;
         }
 

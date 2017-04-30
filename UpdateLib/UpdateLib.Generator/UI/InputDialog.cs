@@ -1,54 +1,32 @@
 ﻿using System.Drawing;
 using System.Windows.Forms;
 
-namespace MatthiWare.UpdateLib.UI
+namespace MatthiWare.UpdateLib.Generator.UI
 {
-    public partial class MessageDialog : Form
+    public partial class InputDialog : Form
     {
-        public static DialogResult Show(IWin32Window owner, string title, string header, string desc, Icon icon, MessageBoxButtons buttons = MessageBoxButtons.YesNo)
-        {
-            return new MessageDialog(
-                title,
-                header,
-                desc,
-                icon,
-                buttons).ShowDialog(owner);
-        }
-
-        public static DialogResult Show(string title, string header, string desc, Icon icon, MessageBoxButtons buttons = MessageBoxButtons.YesNo)
-        {
-            return Show(null, title, header, desc, icon, buttons);
-        }
-
         public string Header
         {
             get { return this.lblHeader.Text; }
             set { this.lblHeader.Text = value; }
         }
 
-        public string Description
+        public string Input
         {
-            get { return this.lblDesc.Text; }
-            set { this.lblDesc.Text = value; }
+            get { return this.txtInput.Text; }
+            set { this.txtInput.Text = value; }
         }
 
-        public Icon DialogIcon
-        {
-            set { this.pbIcon.BackgroundImage = value.ToBitmap(); }
-        }
-
-        public MessageDialog()
+        public InputDialog()
         {
             InitializeComponent();
         }
 
-        public MessageDialog(string title, string header, string desc, Icon icon, MessageBoxButtons buttons = MessageBoxButtons.YesNo)
+        public InputDialog(string title, string header, MessageBoxButtons buttons = MessageBoxButtons.YesNo)
             : this()
         {
             Header = header;
-            Description = desc;
             Text = title;
-            DialogIcon = icon;
 
             SetUpButtons(buttons);
         }

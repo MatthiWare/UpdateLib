@@ -63,6 +63,16 @@ namespace MatthiWare.UpdateLib.Generator.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap cross {
+            get {
+                object obj = ResourceManager.GetObject("cross", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap folder_transparent_16px {
             get {
                 object obj = ResourceManager.GetObject("folder_transparent_16px", resourceCulture);
@@ -106,6 +116,16 @@ namespace MatthiWare.UpdateLib.Generator.Properties {
         internal static System.Drawing.Bitmap loading_gear {
             get {
                 object obj = ResourceManager.GetObject("loading_gear", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap project_16px {
+            get {
+                object obj = ResourceManager.GetObject("project_16px", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

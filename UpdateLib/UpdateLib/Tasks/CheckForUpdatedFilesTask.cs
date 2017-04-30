@@ -40,9 +40,8 @@ namespace MatthiWare.UpdateLib.Tasks
         {
             Action<DirectoryEntry> call = new Action<DirectoryEntry>(RecursiveCheck);
 
-            Enqueue(call, updateFile.ApplicationDirectory);
-
-            Enqueue(call, updateFile.OtherDirectory);
+            foreach (DirectoryEntry dir in updateFile.Folders)
+                Enqueue(call, dir);
 
             AwaitWorkers();
 

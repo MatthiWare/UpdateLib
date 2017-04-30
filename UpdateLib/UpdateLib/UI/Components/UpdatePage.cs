@@ -56,8 +56,8 @@ namespace MatthiWare.UpdateLib.UI.Components
 
             lvItems.BeginUpdate();
 
-            AddDirectoryToListView(UpdateFile.ApplicationDirectory);
-            AddDirectoryToListView(UpdateFile.OtherDirectory);
+            foreach (DirectoryEntry dir in UpdateFile.Folders)
+                AddDirectoryToListView(dir);
 
             lvItems.Columns[5].Width = -1;
             lvItems.Columns[1].Width = -1;
@@ -218,7 +218,7 @@ namespace MatthiWare.UpdateLib.UI.Components
 
         private void SetImageKey(ListViewItem item, string key)
         {
-            this.InvokeOnUI((c) => item.ImageKey = key);
+            this.InvokeOnUI(() => item.ImageKey = key);
             //if (InvokeRequired)
             //{
             //    Invoke(new Action<ListViewItem, string>(SetImageKey), item, key);
@@ -229,7 +229,7 @@ namespace MatthiWare.UpdateLib.UI.Components
 
         private void SetSubItemText(ListViewItem.ListViewSubItem item, string key)
         {
-            this.InvokeOnUI((c) => item.Text = key);
+            this.InvokeOnUI(() => item.Text = key);
             //if (InvokeRequired)
             //{
             //    Invoke(new Action<ListViewItem.ListViewSubItem, string>(SetSubItemText), item, key);

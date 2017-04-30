@@ -5,6 +5,9 @@ using MatthiWare.UpdateLib.Tasks;
 using MatthiWare.UpdateLib.UI;
 using System;
 using System.Drawing;
+using System.IO;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -12,84 +15,64 @@ namespace TestApp
 {
     public partial class Form1 : Form
     {
-        private Updater updater;
-
         public Form1()
         {
             InitializeComponent();
 
-            updater = Updater.Instance;
-            updater.UpdateURL = "http://matthiware.dev/UpdateLib/Dev/updatefile.xml"; 
-            updater.CheckForUpdatesCompleted += Updater_CheckForUpdatesCompleted;
-
-            updater.Initialize();
+            Updater.Instance.CheckForUpdatesCompleted += Instance_CheckForUpdatesCompleted;
         }
 
-        private void Updater_CheckForUpdatesCompleted(object sender, CheckForUpdatesCompletedEventArgs e)
+        private void Instance_CheckForUpdatesCompleted(object sender, CheckForUpdatesCompletedEventArgs e)
         {
-            if (e.Cancelled)
-                Logger.Debug(nameof(Updater), "Cancelled");
+            this.InvokeOnUI(() => checkForUpdatesToolStripMenuItem.Enabled = true);
 
-            if (e.Error != null)
-                Logger.Error(nameof(Updater), e.Error);
-
-            Logger.Debug(nameof(Updater), $"Version: {e.LatestVersion}");
-            Logger.Debug(nameof(Updater), $"Update available: {e.UpdateAvailable}");
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            DialogResult result = new MessageDialog(
-                "Test title",
-                "Version 1.0.0.0 available",
-                "Download update now?\nPress yes to download or no to cancel.", SystemIcons.Question, MessageBoxButtons.YesNoCancel).ShowDialog(this);
-
-            if (result == DialogResult.Yes)
+            if (e.Cancelled || e.Error != null)
             {
-                UpdateFile updateFile = new UpdateFile();
-                updateFile.VersionString = "1.0.0.0";
-                updateFile.ApplicationDirectory.Files.Add(new FileEntry("test"));
-                updateFile.ApplicationDirectory.Files.Add(new FileEntry("Updater.exe"));
-                updateFile.ApplicationDirectory.Files.Add(new FileEntry("App.exe"));
+                this.InvokeOnUI(() => MessageDialog.Show(
+                    this,
+                    "Updater",
+                    e.Cancelled ? "Cancelled" : "Error",
+                    e.Cancelled ? "Update got cancelled" : "Please check the logs for more information.",
+                    e.Cancelled ? SystemIcons.Warning : SystemIcons.Error,
+                    MessageBoxButtons.OK));
 
-                UpdaterForm updateForm = new UpdaterForm(updateFile);
-                updateForm.ShowDialog(this);
+                return;
+            }
+
+            if (!e.UpdateAvailable)
+            {
+                this.InvokeOnUI(() =>
+                MessageDialog.Show(
+                    this,
+                    "Updater",
+                    "No update available!",
+                    $"You already have the latest version ({e.LatestVersion}).",
+                    SystemIcons.Information,
+                    MessageBoxButtons.OK));
+
+                return;
             }
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void checkForUpdatesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            UpdateFile updateFile = new UpdateFile();
-            updateFile.VersionString = "1.0.0.0";
-            updateFile.ApplicationDirectory.Files.Add(new FileEntry("test"));
-            updateFile.ApplicationDirectory.Files.Add(new FileEntry("Updater.exe"));
-            updateFile.ApplicationDirectory.Files.Add(new FileEntry("App.exe"));
+            checkForUpdatesToolStripMenuItem.Enabled = false;
 
-            UpdaterForm updateForm = new UpdaterForm(updateFile);
-            updateForm.ShowDialog(this);
-        }
-
-        private void button3_Click(object sender, EventArgs e)
-        {
-            UpdateFile file = UpdateFile.Load("../../../MatthiWare.UpdateLib.Generator/bin/Debug/Output/updatefile.xml");
-            UpdaterForm updaterForm = new UpdaterForm(file);
-            updaterForm.ShowDialog(this);
-        }
-
-        private void button4_Click(object sender, EventArgs e)
-        {
-            updater.CheckForUpdates();
+            Updater.Instance.CheckForUpdatesAsync();
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            Action<object> test = new Action<object>((o) => {  });
+            label1.Text = ReadFile("data/testfile1.txt");
+            label2.Text = ReadFile("data/testfile2.txt");
+            label3.Text = ReadFile("data/testfile3.txt");
+        }
 
-            Func<int, bool> test2 = new Func<int, bool>((i) => { return i%2==0; });
+        private string ReadFile(string file)
+        {
+            string[] lines = File.ReadAllLines(file);
 
-            AsyncTask<bool> task =  AsyncTaskFactory.StartNew<bool>(test2, 2);
-            Console.WriteLine(task.GetType().FullName);
-            
+            return string.Join(", ", lines); 
         }
     }
 }

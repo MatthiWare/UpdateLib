@@ -75,7 +75,7 @@ namespace MatthiWare.UpdateLib.Generator.UI
 
         public void ShowLoader(Control parent)
         {
-            UIExtensions.InvokeOnUI(parent, (c) =>
+            Parent.InvokeOnUI(() =>
             {
                 parent.SuspendLayout();
 
@@ -85,9 +85,9 @@ namespace MatthiWare.UpdateLib.Generator.UI
                 //parent.Size = Size;
                 Location = new Point(0, 0);
 
-                c.Resize += ParentResize;
+                parent.Resize += ParentResize;
 
-                c.Controls.Add(this);
+                parent.Controls.Add(this);
 
                 BringToFront();
 
@@ -118,15 +118,15 @@ namespace MatthiWare.UpdateLib.Generator.UI
 
         public void HideLoader(Control parent)
         {
-            UIExtensions.InvokeOnUI(parent, (c) =>
+            Parent.InvokeOnUI(() =>
             {
-                c.SuspendLayout();
+                parent.SuspendLayout();
 
-                c.Resize -= ParentResize;
+                parent.Resize -= ParentResize;
 
-                c.Controls.Remove(this);
-                
-                c.ResumeLayout();
+                parent.Controls.Remove(this);
+
+                parent.ResumeLayout();
             });
         }
     }

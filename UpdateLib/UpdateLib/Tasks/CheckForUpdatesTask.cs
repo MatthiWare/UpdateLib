@@ -50,17 +50,15 @@ namespace MatthiWare.UpdateLib.Tasks
              * Returns if there is anything to update
              */
             Result.UpdateAvailable = CheckForUpdatedFiles(file, cache).AwaitTask();
-
-
-
+            
             if (!Result.UpdateAvailable) // no updates available
                 return;
 
-            DialogResult result = new MessageDialog(
+            DialogResult result = MessageDialog.Show(
                     "Update available",
                     $"Version {Result.Version} available",
                     "Update now?\nPress yes to update or no to cancel.",
-                    SystemIcons.Question).ShowDialog();
+                    SystemIcons.Question);
 
 
             if (result != DialogResult.Yes)

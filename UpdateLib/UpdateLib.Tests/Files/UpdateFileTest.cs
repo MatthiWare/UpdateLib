@@ -96,8 +96,8 @@ namespace UpdateLib.Tests.Files
             appSubFolder.Files.Add(appFile);
             otherSubFolder.Files.Add(otherFile);
 
-            file.ApplicationDirectory.Directories.Add(appSubFolder);
-            file.OtherDirectory.Directories.Add(otherSubFolder);
+            file.Folders.Add(appSubFolder);
+            file.Folders.Add(otherSubFolder);
 
             Assert.AreEqual(2, file.Count);
 
