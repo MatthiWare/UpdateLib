@@ -23,10 +23,32 @@ namespace TestApp
 
         private void Instance_CheckForUpdatesCompleted(object sender, CheckForUpdatesCompletedEventArgs e)
         {
-            this.InvokeOnUI(p => checkForUpdatesToolStripMenuItem.Enabled = true);
+            this.InvokeOnUI(() => checkForUpdatesToolStripMenuItem.Enabled = true);
 
-            if (e.Cancelled)
+            if (e.Cancelled || e.Error != null)
             {
+                MessageDialog.Show(
+                    this,
+                    "Updater",
+                    e.Cancelled ? "Cancelled" : "Error",
+                    e.Cancelled ? "Update got cancelled" : "Please check the logs for more information.",
+                    e.Cancelled ? SystemIcons.Warning : SystemIcons.Error,
+                    MessageBoxButtons.OK);
+
+                return;
+            }
+
+            if (!e.UpdateAvailable)
+            {
+                MessageDialog.Show(
+                    this,
+                    "Updater",
+                    "No update available!",
+                    $"You already have the latest version ({e.LatestVersion}).",
+                    SystemIcons.Information,
+                    MessageBoxButtons.OK);
+
+                return;
             }
         }
 

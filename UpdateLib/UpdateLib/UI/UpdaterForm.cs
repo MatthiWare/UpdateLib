@@ -61,7 +61,7 @@ namespace MatthiWare.UpdateLib.UI
         delegate void _OnPageUpdate(IWizardPage page);
         private void OnPageUpdate(IWizardPage page)
         {
-            this.InvokeOnUI((c) => 
+            this.InvokeOnUI(() => 
             {
                 if (page.IsDone && !page.IsBusy)
                 {
@@ -73,20 +73,6 @@ namespace MatthiWare.UpdateLib.UI
                 }
 
             });
-            //if (this.InvokeRequired)
-            //{
-            //    Invoke(new _OnPageUpdate(OnPageUpdate), page);
-            //    return;
-            //}
-
-            //if (page.IsDone && !page.IsBusy)
-            //{
-            //    btnNext.Enabled = true;
-            //    if (page == pages.CurrentPage)
-            //        btnNext.Focus();
-            //    if (page.NeedsExecution)
-            //        btnNext.Text = "Next >";
-            //}
         }
 
         private void btnPrevious_Click(object sender, EventArgs e)
@@ -165,7 +151,7 @@ namespace MatthiWare.UpdateLib.UI
                 pages.Add(new FinishPage(this));
                 SetContentPage(pages.CurrentPage);
                 btnPrevious.Enabled = false;
-                this.Close();
+                Close();
             }
 
 
@@ -173,7 +159,7 @@ namespace MatthiWare.UpdateLib.UI
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            this.Close();
+            Close();
         }
 
         private bool Cancel()

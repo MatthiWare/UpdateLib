@@ -64,7 +64,7 @@ namespace MatthiWare.UpdateLib.Generator
                 {
                     LoaderControl.Hide(ContentPanel);
 
-                    this.InvokeOnUI((page) => btnTabInformation.PerformClick());
+                    this.InvokeOnUI(() => btnTabInformation.PerformClick());
                 };
             }
 
@@ -161,7 +161,7 @@ namespace MatthiWare.UpdateLib.Generator
 
         private void ShowMessageBox(string title, string header, string desc, Icon icon, MessageBoxButtons buttons = MessageBoxButtons.YesNo)
         {
-            this.InvokeOnUI((form) =>
+            this.InvokeOnUI(() =>
             {
                 MessageDialog.Show(
                     title,
@@ -177,7 +177,7 @@ namespace MatthiWare.UpdateLib.Generator
             if (!shouldShowNewPage)
                 return;
 
-            this.InvokeOnUI((form) =>
+            this.InvokeOnUI(() =>
             {
                 ContentPanel.SuspendLayout();
 

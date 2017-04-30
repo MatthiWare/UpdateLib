@@ -63,27 +63,27 @@ namespace MatthiWare.UpdateLib.Generator.Tasks
 
         private void SetColumnAutoSize(int clmn)
         {
-            UIExtensions.InvokeOnUI(ItemsListView, (lv) => lv.Columns[clmn].Width = -1);
+            ItemsListView.InvokeOnUI(() => ItemsListView.Columns[clmn].Width = -1);
         }
 
         private void EndUpdate()
         {
-            UIExtensions.InvokeOnUI(ItemsListView, (lv) => lv.EndUpdate());
+            ItemsListView.InvokeOnUI(() => ItemsListView.EndUpdate());
         }
 
         private void BeginUpdate()
         {
-            UIExtensions.InvokeOnUI(ItemsListView, (lv) => lv.BeginUpdate());
+            ItemsListView.InvokeOnUI(() => ItemsListView.BeginUpdate());
         }
 
         private void Clear()
         {
-            UIExtensions.InvokeOnUI(ItemsListView, (lv) => lv.Items.Clear());
+            ItemsListView.InvokeOnUI(() => ItemsListView.Items.Clear());
         }
 
         private void AddItem(ListViewItem item)
         {
-            UIExtensions.InvokeOnUI(ItemsListView, (lv) => lv.Items.Add(item));
+            ItemsListView.InvokeOnUI(() => ItemsListView.Items.Add(item));
         }
     }
 }

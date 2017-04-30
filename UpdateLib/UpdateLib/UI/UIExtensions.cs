@@ -9,18 +9,21 @@ namespace MatthiWare.UpdateLib.UI
 {
     public static class UIExtensions
     {
-        public static void InvokeOnUI<T>(this T control, Action<T> action) where T : ISynchronizeInvoke
+        public static void InvokeOnUI<T>(this T control, Action action) where T : ISynchronizeInvoke
         {
             if (control.InvokeRequired)
-            {
-                
-                control.Invoke(new Action(() => action(control)), null);
-            }
+                control.Invoke(action, null);
             else
-            {
-                action(control);
-            }
+                action();
             
+        }
+
+        public static TResult InvokeOnUI<T, TResult>(this T control, Func<TResult> action) where T : ISynchronizeInvoke
+        {
+            if (control.InvokeRequired)
+                return (TResult)control.Invoke(action, null);
+            else
+                return action();
         }
 
     }

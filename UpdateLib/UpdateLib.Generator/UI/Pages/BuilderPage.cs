@@ -70,7 +70,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 
             task.TaskProgressChanged += (o, e) =>
             {
-                this.InvokeOnUI(p => 
+                this.InvokeOnUI(() => 
                 {
                     lblProgress.Text = $"Progress: {e.ProgressPercentage}%";
                     pbProgress.Value = e.ProgressPercentage;
@@ -80,17 +80,17 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             task.TaskCompleted += (o, e) =>
             {
 
-                this.InvokeOnUI(p => btnBuild.Enabled = true);
+                this.InvokeOnUI(() => btnBuild.Enabled = true);
 
                 if (e.Cancelled)
                 {
-                    this.InvokeOnUI(p => lblStatus.Text = $"Status: Cancelled");
+                    this.InvokeOnUI(() => lblStatus.Text = $"Status: Cancelled");
                     return;
                 }
 
                 if (e.Error != null)
                 {
-                    this.InvokeOnUI(p => lblStatus.Text = $"Status: Error");
+                    this.InvokeOnUI(() => lblStatus.Text = $"Status: Error");
 
                     MessageDialog.Show(
                         ParentForm,
@@ -106,7 +106,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
                 using (s)
                     task.Result.Save(s);
 
-                this.InvokeOnUI(p => lblStatus.Text = $"Status: Completed");
+                this.InvokeOnUI(() => lblStatus.Text = $"Status: Completed");
             };
 
             lblStatus.Text = "Status: Building..";

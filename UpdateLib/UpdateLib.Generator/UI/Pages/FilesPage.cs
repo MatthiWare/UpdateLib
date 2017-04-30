@@ -91,11 +91,11 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 
             AsyncTask task = AsyncTaskFactory.From(new Action(() =>
             {
-                this.InvokeOnUI((p) => SuspendLayout());
+                this.InvokeOnUI(() => SuspendLayout());
 
                 AddExistingFolder(dir, Root, true);
 
-                this.InvokeOnUI((p) =>
+                this.InvokeOnUI(() =>
                 {
                     Root.FolderTreeView.Expand();
                     ResumeLayout();
@@ -116,7 +116,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             folder.FolderTreeView.ContextMenuStrip = contextMenuRightClick;
 
             if (addToUI)
-                this.InvokeOnUI(p => lvFiles.Items.Add(folder.FolderListView));
+                this.InvokeOnUI(() => lvFiles.Items.Add(folder.FolderListView));
 
             foreach (DirectoryInfo subDir in dir.GetDirectories())
             {
@@ -128,7 +128,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
                 AddExistingFile(f, folder);
             }
 
-            this.InvokeOnUI(p => parentFolder.FolderTreeView.Nodes.Add(folder.FolderTreeView));
+            this.InvokeOnUI(()=> parentFolder.FolderTreeView.Nodes.Add(folder.FolderTreeView));
 
             parentFolder.Directories.Add(folder);
         }
@@ -154,7 +154,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             folder.Files.Add(file);
 
             if (addToUI)
-                this.InvokeOnUI((page) => lvFiles.Items.Add(file.FileListView));
+                this.InvokeOnUI(() => lvFiles.Items.Add(file.FileListView));
 
         }
 
@@ -165,7 +165,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 
             Icon extensionIcon = Icon.ExtractAssociatedIcon(file.FullName);
 
-            this.InvokeOnUI((page) => ilIcons.Images.Add(file.Extension, extensionIcon));
+            this.InvokeOnUI(() => ilIcons.Images.Add(file.Extension, extensionIcon));
         }
 
         private void tvFolders_AfterSelect(object sender, TreeViewEventArgs e)
@@ -234,7 +234,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 
             SelectedFolder.Directories.Add(folder);
 
-            this.InvokeOnUI(p =>
+            this.InvokeOnUI(() =>
             {
                 SelectedFolder.FolderTreeView.Nodes.Add(folder.FolderTreeView);
                 lvFiles.Items.Add(folder.FolderListView);

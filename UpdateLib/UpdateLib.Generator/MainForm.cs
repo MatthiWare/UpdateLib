@@ -47,7 +47,7 @@ namespace MatthiWare.UpdateLib.Generator
         private void Generate()
         {
 
-            UpdateGeneratorTask generator = new UpdateGeneratorTask(null,null);
+            UpdateGeneratorTask generator = new UpdateGeneratorTask(null, null);
 
             generator.TaskCompleted += Generator_TaskCompleted;
             generator.TaskProgressChanged += Generator_TaskProgressChanged;
@@ -63,22 +63,22 @@ namespace MatthiWare.UpdateLib.Generator
 
         private void SetWaitCursor(bool val)
         {
-            this.InvokeOnUI((form) => form.UseWaitCursor = val);
+            this.InvokeOnUI(() => UseWaitCursor = val);
         }
 
         private void SetProgressBarVisible(bool val)
         {
-            this.InvokeOnUI((form) => form.progressBar.Visible = val);
+            this.InvokeOnUI(() => progressBar.Visible = val);
         }
 
         private void SetProgressBarValue(int val)
         {
-            this.InvokeOnUI((form) => form.progressBar.Value = val);
+            this.InvokeOnUI(() => progressBar.Value = val);
         }
 
         private void SetStatusMessage(string msg)
         {
-            this.InvokeOnUI((form) => form.lblStatus.Text = msg);
+            this.InvokeOnUI(() => lblStatus.Text = msg);
         }
 
         private void Generator_TaskProgressChanged(object sender, ProgressChangedEventArgs e)
