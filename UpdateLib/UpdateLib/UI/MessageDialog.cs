@@ -5,6 +5,21 @@ namespace MatthiWare.UpdateLib.UI
 {
     public partial class MessageDialog : Form
     {
+        public static DialogResult Show(IWin32Window owner, string title, string header, string desc, Icon icon,  MessageBoxButtons buttons = MessageBoxButtons.YesNo)
+        {
+            return new MessageDialog(
+                title,
+                header,
+                desc,
+                icon,
+                buttons).ShowDialog(owner);
+        }
+
+        public static DialogResult Show(string title, string header, string desc, Icon icon, MessageBoxButtons buttons = MessageBoxButtons.YesNo)
+        {
+            return Show(null, title, header, desc, icon, buttons);
+        }
+
         public string Header
         {
             get { return this.lblHeader.Text; }

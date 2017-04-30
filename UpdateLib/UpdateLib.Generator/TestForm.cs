@@ -163,13 +163,12 @@ namespace MatthiWare.UpdateLib.Generator
         {
             this.InvokeOnUI((form) =>
             {
-                new MessageDialog(
+                MessageDialog.Show(
                     title,
                     header,
                     desc,
                     icon,
-                    buttons)
-                    .ShowDialog();
+                    buttons);
             });
         }
 

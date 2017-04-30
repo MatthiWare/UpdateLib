@@ -14,95 +14,27 @@ namespace TestApp
 {
     public partial class Form1 : Form
     {
-        private Updater updater;
-
         public Form1()
         {
             InitializeComponent();
 
-            updater = Updater.Instance;
-            
-            updater.CheckForUpdatesCompleted += Updater_CheckForUpdatesCompleted;
-
-            updater.Initialize();
+            Updater.Instance.CheckForUpdatesCompleted += Instance_CheckForUpdatesCompleted;
         }
 
-        private void Updater_CheckForUpdatesCompleted(object sender, CheckForUpdatesCompletedEventArgs e)
+        private void Instance_CheckForUpdatesCompleted(object sender, CheckForUpdatesCompletedEventArgs e)
         {
+            this.InvokeOnUI(p => checkForUpdatesToolStripMenuItem.Enabled = true);
+
             if (e.Cancelled)
-                Logger.Debug(nameof(Updater), "Cancelled");
-
-            if (e.Error != null)
-                Logger.Error(nameof(Updater), e.Error);
-
-            Logger.Debug(nameof(Updater), $"Version: {e.LatestVersion}");
-            Logger.Debug(nameof(Updater), $"Update available: {e.UpdateAvailable}");
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            DialogResult result = new MessageDialog(
-                "Test title",
-                "Version 1.0.0.0 available",
-                "Download update now?\nPress yes to download or no to cancel.", SystemIcons.Question, MessageBoxButtons.YesNoCancel).ShowDialog(this);
-
-            if (result == DialogResult.Yes)
             {
-                UpdateFile updateFile = new UpdateFile();
-                updateFile.VersionString = "1.0.0.0";
-                updateFile.ApplicationDirectory.Files.Add(new FileEntry("test"));
-                updateFile.ApplicationDirectory.Files.Add(new FileEntry("Updater.exe"));
-                updateFile.ApplicationDirectory.Files.Add(new FileEntry("App.exe"));
-
-                UpdaterForm updateForm = new UpdaterForm(updateFile);
-                updateForm.ShowDialog(this);
             }
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void checkForUpdatesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            UpdateFile updateFile = new UpdateFile();
-            updateFile.VersionString = "1.0.0.0";
-            updateFile.ApplicationDirectory.Files.Add(new FileEntry("test"));
-            updateFile.ApplicationDirectory.Files.Add(new FileEntry("Updater.exe"));
-            updateFile.ApplicationDirectory.Files.Add(new FileEntry("App.exe"));
+            checkForUpdatesToolStripMenuItem.Enabled = false;
 
-            UpdaterForm updateForm = new UpdaterForm(updateFile);
-            updateForm.ShowDialog(this);
-        }
-
-        private void button3_Click(object sender, EventArgs e)
-        {
-            UpdateFile file = UpdateFile.Load("../../../MatthiWare.UpdateLib.Generator/bin/Debug/Output/updatefile.xml");
-            UpdaterForm updaterForm = new UpdaterForm(file);
-            updaterForm.ShowDialog(this);
-        }
-
-        private void button4_Click(object sender, EventArgs e)
-        {
-            updater.CheckForUpdates();
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            Action<object> test = new Action<object>((o) => { });
-
-            Func<int, bool> test2 = new Func<int, bool>((i) => { return i % 2 == 0; });
-
-            AsyncTask<bool> task = AsyncTaskFactory.StartNew<bool>(test2, 2);
-            Console.WriteLine(task.GetType().FullName);
-
-        }
-
-        private void button5_Click(object sender, EventArgs e)
-        {
-            var test = "my md5 hash";
-            using (MD5 md5 = MD5.Create())
-            {
-              
-                byte[] hash = md5.ComputeHash(Encoding.UTF8.GetBytes(test));
-                Console.Write(BitConverter.ToString(hash).Replace("-", string.Empty));
-            }
+            Updater.Instance.CheckForUpdatesAsync();
         }
     }
 }

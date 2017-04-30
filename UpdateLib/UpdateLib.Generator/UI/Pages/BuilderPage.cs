@@ -92,12 +92,13 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
                 {
                     this.InvokeOnUI(p => lblStatus.Text = $"Status: Error");
 
-                    new MessageDialog(
+                    MessageDialog.Show(
+                        ParentForm,
                         "Builder",
                         "Build error",
                         "Check the logs for more information",
                         SystemIcons.Error,
-                        MessageBoxButtons.OK).ShowDialog(ParentForm);
+                        MessageBoxButtons.OK);
 
                     return;
                 }
