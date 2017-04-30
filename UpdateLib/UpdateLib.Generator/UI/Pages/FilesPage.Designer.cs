@@ -71,7 +71,7 @@
             this.tvFolders.SelectedImageIndex = 0;
             this.tvFolders.Size = new System.Drawing.Size(191, 332);
             this.tvFolders.TabIndex = 2;
-            this.tvFolders.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tvFolders_AfterSelect);
+            this.tvFolders.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.tvFolders_BeforeSelect);
             // 
             // ilIcons
             // 
@@ -88,7 +88,7 @@
             this.toolStripSeparator1,
             this.deleteToolStripMenuItem});
             this.contextMenuRightClick.Name = "menuTV";
-            this.contextMenuRightClick.Size = new System.Drawing.Size(153, 98);
+            this.contextMenuRightClick.Size = new System.Drawing.Size(142, 76);
             // 
             // menuAddFiles
             // 
@@ -132,7 +132,7 @@
             this.deleteToolStripMenuItem.Enabled = false;
             this.deleteToolStripMenuItem.Image = global::MatthiWare.UpdateLib.Generator.Properties.Resources.cross;
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
             this.deleteToolStripMenuItem.Text = "Delete";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
             // 

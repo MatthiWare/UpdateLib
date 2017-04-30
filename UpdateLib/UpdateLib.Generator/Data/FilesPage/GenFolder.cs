@@ -8,22 +8,24 @@ namespace MatthiWare.UpdateLib.Generator.Data.FilesPage
     public class GenFolder
     {
         public string Name { get; set; }
+        public string PathVariable { get; set; }
         public List<GenFile> Files { get; private set; } = new List<GenFile>();
         public List<GenFolder> Directories { get; private set; } = new List<GenFolder>();
         public GenFolder ParentFolder { get; set; }
         public bool IsRoot { get { return ParentFolder == null; } }
-
+        public bool ProtectedFolder { get; set; } = false;
 
         public ListViewItemFolder FolderListView { get; set; }
         public TreeViewFolderNode FolderTreeView { get; set; }
 
-        public int Count {
+        public int Count
+        {
             get
             {
                 int x = Files.Count;
                 foreach (GenFolder f in Directories)
                     x += f.Count;
-               
+
                 return x;
             }
         }
@@ -32,6 +34,11 @@ namespace MatthiWare.UpdateLib.Generator.Data.FilesPage
         {
             Name = name;
             ParentFolder = parent;
+
+            ParentFolder?.Directories.Add(this);
+
+            FolderListView = new ListViewItemFolder(name, this);
+            FolderTreeView = new TreeViewFolderNode(name, this);
         }
 
     }

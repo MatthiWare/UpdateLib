@@ -168,6 +168,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Generator_logo.ico" />
+    <None Include="Resources\project_16px.png" />
     <None Include="Resources\cross.png" />
     <None Include="Resources\image_transparent_16px.png" />
     <None Include="Resources\folder_transparent_16px.png" />

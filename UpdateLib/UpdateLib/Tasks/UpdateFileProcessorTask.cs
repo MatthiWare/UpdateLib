@@ -29,8 +29,8 @@ namespace MatthiWare.UpdateLib.Tasks
 
         protected override void DoWork()
         {
-            PostProcessDirectory(file.ApplicationDirectory);
-            PostProcessDirectory(file.OtherDirectory);
+            foreach (DirectoryEntry dir in file.Folders)
+                PostProcessDirectory(dir);
 
             AwaitWorkers();
         }

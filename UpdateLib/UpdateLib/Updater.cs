@@ -107,7 +107,7 @@ namespace MatthiWare.UpdateLib
                 throw new InvalidOperationException("The updater needs to be initialized first.");
 
             if (string.IsNullOrEmpty(UpdateURL))
-                throw new ArgumentException("You need to specifify a update url", nameof(UpdateURL));
+                throw new ArgumentException("You need to specifify an update url", nameof(UpdateURL));
 
             CheckForUpdatesTask task = new CheckForUpdatesTask(UpdateURL);
             task.TaskCompleted += (o, e) => { CheckForUpdatesCompleted?.Invoke(task, new CheckForUpdatesCompletedEventArgs(task.Result, e)); };

@@ -5,6 +5,7 @@ using MatthiWare.UpdateLib.Tasks;
 using MatthiWare.UpdateLib.UI;
 using System;
 using System.Drawing;
+using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
@@ -58,6 +59,20 @@ namespace TestApp
             checkForUpdatesToolStripMenuItem.Enabled = false;
 
             Updater.Instance.CheckForUpdatesAsync();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            label1.Text = ReadFile("data/testfile1.txt");
+            label2.Text = ReadFile("data/testfile2.txt");
+            label3.Text = ReadFile("data/testfile3.txt");
+        }
+
+        private string ReadFile(string file)
+        {
+            string[] lines = File.ReadAllLines(file);
+
+            return string.Join(", ", lines); 
         }
     }
 }

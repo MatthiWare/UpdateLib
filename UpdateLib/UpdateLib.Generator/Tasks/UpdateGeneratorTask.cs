@@ -37,7 +37,15 @@ namespace MatthiWare.UpdateLib.Generator.Tasks
 
         protected override void DoWork()
         {
-            AddDirRecursive(baseDir, Result.ApplicationDirectory);
+            foreach (GenFolder subfolder in baseDir.Directories)
+            {
+                DirectoryEntry entry = new DirectoryEntry(string.IsNullOrEmpty(subfolder.PathVariable) ? subfolder.Name : subfolder.PathVariable);
+
+                Result.Folders.Add(entry);
+
+                AddDirRecursive(subfolder, entry);
+            }
+
 
             Result.ApplicationName = infoPage.ApplicationName;
             Result.VersionString = infoPage.ApplicationVersion;
@@ -65,11 +73,11 @@ namespace MatthiWare.UpdateLib.Generator.Tasks
                 if (newDir.Count == 0)
                     continue;
 
-                DirectoryEntry newEntry = new DirectoryEntry(newDir.Name);
+                DirectoryEntry newEntry = new DirectoryEntry(string.IsNullOrEmpty(newDir.PathVariable) ? newDir.Name : newDir.PathVariable);
                 entry.Directories.Add(newEntry);
 
                 AddDirRecursiveDelegate caller = new AddDirRecursiveDelegate(AddDirRecursive);
-                Enqueue(caller,newDir, newEntry);
+                Enqueue(caller, newDir, newEntry);
             }
         }
     }

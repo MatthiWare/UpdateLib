@@ -17,6 +17,8 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 {
     public partial class FilesPage : PageControlBase
     {
+        private const string PROJECT_IMAGE_KEY = "project_key";
+
         public GenFolder Root { get; set; }
 
         private GenFile _selectedFile;
@@ -52,26 +54,36 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             SuspendLayout();
 
             ilIcons.Images.Add(TreeViewFolderNode.FOLDER_KEY, Properties.Resources.folder_transparent_16px);
+            ilIcons.Images.Add(PROJECT_IMAGE_KEY, Properties.Resources.project_16px);
 
             Root = new GenFolder("Update Project", null);
-            TreeViewFolderNode tvProjectRootFolder = new TreeViewFolderNode("Update Project", Root);
-            tvProjectRootFolder.ContextMenuStrip = contextMenuRightClick;
+            Root.ProtectedFolder = true;
+            Root.FolderTreeView.SelectedImageKey = PROJECT_IMAGE_KEY;
+            Root.FolderTreeView.ImageKey = PROJECT_IMAGE_KEY;
+            Root.FolderTreeView.ContextMenuStrip = contextMenuRightClick;
 
-            tvProjectRootFolder.Folder = Root;
-            Root.FolderTreeView = tvProjectRootFolder;
+            tvFolders.Nodes.Add(Root.FolderTreeView);
 
-            tvFolders.Nodes.Add(tvProjectRootFolder);
+            GenFolder appFolder = new GenFolder("Application Folder", Root);
+            appFolder.ProtectedFolder = true;
+            appFolder.PathVariable = "%appdir%";
+            appFolder.FolderTreeView.ContextMenuStrip = contextMenuRightClick;
+
+            Root.FolderTreeView.Nodes.Add(appFolder.FolderTreeView);
 
             folderBrowserDialog.Description = "Please select the folder to import";
+
+            UpdateSelectedFolder(Root);
 
             ResumeLayout();
         }
 
-
-
         private void menuAddFiles_Click(object sender, EventArgs e)
         {
-            if (openFileDialog.ShowDialog(this.ParentForm) != DialogResult.OK)
+            if (openFileDialog.ShowDialog(ParentForm) != DialogResult.OK)
+                return;
+
+            if (SelectedFolder == Root)
                 return;
 
             AddExistingFileAsync(openFileDialog.FileNames.Select(file => new FileInfo(file)));
@@ -79,7 +91,10 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 
         private void existingFolderToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (folderBrowserDialog.ShowDialog(this.ParentForm) != DialogResult.OK)
+            if (folderBrowserDialog.ShowDialog(ParentForm) != DialogResult.OK)
+                return;
+
+            if (SelectedFolder == Root)
                 return;
 
             AddExistingFolderAsync(new DirectoryInfo(folderBrowserDialog.SelectedPath));
@@ -93,7 +108,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             {
                 this.InvokeOnUI(() => SuspendLayout());
 
-                AddExistingFolder(dir, Root, true);
+                AddExistingFolder(dir, SelectedFolder, true);
 
                 this.InvokeOnUI(() =>
                 {
@@ -110,27 +125,18 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
         private void AddExistingFolder(DirectoryInfo dir, GenFolder parentFolder, bool addToUI = false)
         {
             GenFolder folder = new GenFolder(dir.Name, parentFolder);
-            folder.FolderListView = new ListViewItemFolder(dir.Name, folder);
-            folder.FolderTreeView = new TreeViewFolderNode(dir.Name, folder);
-
             folder.FolderTreeView.ContextMenuStrip = contextMenuRightClick;
 
             if (addToUI)
                 this.InvokeOnUI(() => lvFiles.Items.Add(folder.FolderListView));
 
             foreach (DirectoryInfo subDir in dir.GetDirectories())
-            {
                 AddExistingFolder(subDir, folder);
-            }
 
             foreach (FileInfo f in dir.GetFiles())
-            {
                 AddExistingFile(f, folder);
-            }
 
-            this.InvokeOnUI(()=> parentFolder.FolderTreeView.Nodes.Add(folder.FolderTreeView));
-
-            parentFolder.Directories.Add(folder);
+            this.InvokeOnUI(() => parentFolder.FolderTreeView.Nodes.Add(folder.FolderTreeView));
         }
 
         private AsyncTask AddExistingFileAsync(IEnumerable<FileInfo> files)
@@ -168,16 +174,6 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             this.InvokeOnUI(() => ilIcons.Images.Add(file.Extension, extensionIcon));
         }
 
-        private void tvFolders_AfterSelect(object sender, TreeViewEventArgs e)
-        {
-            TreeViewFolderNode node = e.Node as TreeViewFolderNode;
-
-            if (node == null)
-                return;
-
-            UpdateSelectedFolder(node?.Folder);
-        }
-
         private void UpdateSelectedFolder(GenFolder folder)
         {
             if (folder == null || folder == SelectedFolder)
@@ -186,8 +182,17 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             SelectedFolder = folder;
             SelectedFile = null;
 
-            if (SelectedFolder == Root && deleteToolStripMenuItem.Enabled)
+            if (SelectedFolder == Root)
+            {
                 deleteToolStripMenuItem.Enabled = false;
+                menuAddFiles.Enabled = false;
+                menuAddFolder.Enabled = false;
+            }
+            else
+            {
+                menuAddFiles.Enabled = true;
+                menuAddFolder.Enabled = true;
+            }
 
             lvFiles.SuspendLayout();
 
@@ -219,6 +224,9 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 
         private void newFolderToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (SelectedFolder == null || SelectedFolder == Root)
+                return;
+
             InputDialog inputDlg = new InputDialog("New folder", "Please enter the folder name: ", MessageBoxButtons.OKCancel);
 
             if (inputDlg.ShowDialog(ParentForm) != DialogResult.OK && SelectedFolder != null)
@@ -227,8 +235,6 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             var name = inputDlg.Input;
 
             GenFolder folder = new GenFolder(name, SelectedFolder);
-            folder.FolderListView = new ListViewItemFolder(name, folder);
-            folder.FolderTreeView = new TreeViewFolderNode(name, folder);
 
             folder.FolderTreeView.ContextMenuStrip = contextMenuRightClick;
 
@@ -265,7 +271,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
                 lvFiles.Items.Remove(SelectedFile.FileListView);
                 SelectedFile = null;
             }
-            else if (SelectedFolder != null && SelectedFolder != Root)
+            else if (SelectedFolder != null && SelectedFolder != Root && !SelectedFolder.ProtectedFolder)
             {
                 SelectedFolder.ParentFolder.Directories.Remove(SelectedFolder);
                 tvFolders.Nodes.Remove(SelectedFolder.FolderTreeView);
@@ -279,6 +285,16 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
                 SelectedFolder = null;
             }
             ResumeLayout();
+        }
+
+        private void tvFolders_BeforeSelect(object sender, TreeViewCancelEventArgs e)
+        {
+            TreeViewFolderNode node = e.Node as TreeViewFolderNode;
+
+            if (node == null)
+                return;
+
+            UpdateSelectedFolder(node?.Folder);
         }
     }
 }

@@ -1,8 +1,10 @@
 ﻿using MatthiWare.UpdateLib.Tasks;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
+using System.Linq;
 
 namespace MatthiWare.UpdateLib.Files
 {
@@ -26,19 +28,15 @@ namespace MatthiWare.UpdateLib.Files
         public string VersionString { get; set; } = "1.0.0.0";
 
         /// <summary>
-        /// Gets the root folder of the application
+        /// Gets the folders of the project
         /// </summary>
-        public DirectoryEntry ApplicationDirectory { get; set; } = new DirectoryEntry("%appdir%");
-        /// <summary>
-        /// Gets the root folder for other files related elsewhere on the filesystem
-        /// </summary>
-        public DirectoryEntry OtherDirectory { get; set; } = new DirectoryEntry("%otherdir%");
+        public List<DirectoryEntry> Folders { get; set; } = new List<DirectoryEntry>();
 
         /// <summary>
-        /// Gets the count of all the files in the <see cref="ApplicationDirectory"/>, <see cref="OtherDirectory"/>
+        /// Gets the count of all the files in the <see cref="Folders"/>
         /// and their subdirectories.
         /// </summary>
-        public int Count { get { return ApplicationDirectory.Count + OtherDirectory.Count; } }
+        public int Count { get { return Folders.Select(d => d.Count).Sum(); } }
 
         public UpdateFile()
         {
@@ -93,7 +91,7 @@ namespace MatthiWare.UpdateLib.Files
 
             if (!input.CanRead)
                 throw new ArgumentException("Stream is not readable", nameof(input));
-            
+
             XmlSerializer serializer = new XmlSerializer(typeof(UpdateFile));
 
             XmlReader xml = new XmlTextReader(input);
