@@ -7,7 +7,7 @@
 <a href="https://gitter.im/MatthiWare/UpdateLib?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge"><img src="https://badges.gitter.im/MatthiWare/UpdateLib.svg" alt="Join the chat at https://gitter.im/MatthiWare/UpdateLib"></a>
 </p>
 
-# UpdateLib
+# UpdateLib v0.1.1
 A .Net auto update library made in C#
 
 ## Features
