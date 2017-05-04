@@ -36,8 +36,8 @@ namespace MatthiWare.UpdateLib.Tasks
             wcDownloader.DownloadFile(Url, localFile);
 
             // load the updatefile from disk
-            UpdateFile file = UpdateFile.Load(localFile);
-            Result.Version = file.VersionString;
+            Result.UpdateFile = UpdateFile.Load(localFile);
+            Result.Version = Result.UpdateFile.VersionString;
 
             // lets wait for the Cache update to complete and get the task
             HashCacheFile cache = Updater.Instance.GetCache();
@@ -49,32 +49,13 @@ namespace MatthiWare.UpdateLib.Tasks
              * Start a task to get all the files that need to be updated
              * Returns if there is anything to update
              */
-            Result.UpdateAvailable = CheckForUpdatedFiles(file, cache).AwaitTask();
-            
-            if (!Result.UpdateAvailable) // no updates available
-                return;
-
-            DialogResult result = MessageDialog.Show(
-                    "Update available",
-                    $"Version {Result.Version} available",
-                    "Update now?\nPress yes to update or no to cancel.",
-                    SystemIcons.Question);
-
-
-            if (result != DialogResult.Yes)
-            {
-                Cancel();
-                return;
-            }
-
-            UpdaterForm updateForm = new UpdaterForm(file);
-            updateForm.ShowDialog();
+            Result.UpdateAvailable = CheckForUpdatedFiles(Result.UpdateFile, cache).AwaitTask();
         }
 
         private CheckForUpdatedFilesTask CheckForUpdatedFiles(UpdateFile file, HashCacheFile cache)
         {
             CheckForUpdatedFilesTask task = new CheckForUpdatedFilesTask(file, cache, Updater.Instance.Converter);
-            task.Start();
+            task.ConfigureAwait(false).Start();
             return task;
         }
 
@@ -88,6 +69,7 @@ namespace MatthiWare.UpdateLib.Tasks
         {
             public string Version { get; set; } = "";
             public bool UpdateAvailable { get; set; } = false;
+            public UpdateFile UpdateFile { get; set; }
         }
     }
 }

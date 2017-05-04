@@ -80,7 +80,7 @@ namespace MatthiWare.UpdateLib
         public void Initialize()
         {
             CleanUpTask = new CleanUpTask(".");
-            CleanUpTask.Start();
+            CleanUpTask.ConfigureAwait(false).Start();
 
             UpdateCacheTask = new UpdateCacheTask();
             UpdateCacheTask.Start();
@@ -98,10 +98,30 @@ namespace MatthiWare.UpdateLib
         }
 
         /// <summary>
+        /// Starting the update process
+        /// </summary>
+        /// <param name="owner">The owner window</param>
+        /// <returns>Whether or not there is an update available and the latest version</returns>
+        public CheckForUpdatesTask.Data CheckForUpdates(IWin32Window owner)
+        {
+            return CheckForUpdatesAsync(owner).AwaitTask();
+        }
+
+        /// <summary>
         /// Start the update process asynchronously
         /// </summary>
-        /// <returns>The Task object</returns>
+        /// <returns>The update checker task.</returns>
         public CheckForUpdatesTask CheckForUpdatesAsync()
+        {
+            return CheckForUpdatesAsync(null);
+        }
+
+        /// <summary>
+        /// Start the update process asynchronously
+        /// </summary>
+        /// <param name="owner">The owner window</param>
+        /// <returns>The update checker task.</returns>
+        public CheckForUpdatesTask CheckForUpdatesAsync(IWin32Window owner)
         {
             if (!initialized)
                 throw new InvalidOperationException("The updater needs to be initialized first.");
@@ -110,7 +130,26 @@ namespace MatthiWare.UpdateLib
                 throw new ArgumentException("You need to specifify an update url", nameof(UpdateURL));
 
             CheckForUpdatesTask task = new CheckForUpdatesTask(UpdateURL);
-            task.TaskCompleted += (o, e) => { CheckForUpdatesCompleted?.Invoke(task, new CheckForUpdatesCompletedEventArgs(task.Result, e)); };
+            task.TaskCompleted += (o, e) => 
+            {
+                if (!task.Result.UpdateAvailable) // no updates available
+                    return;
+
+                DialogResult result = MessageDialog.Show(
+                        "Update available",
+                        $"Version {task.Result.Version} available",
+                        "Update now?\nPress yes to update or no to cancel.",
+                        SystemIcons.Question);
+
+
+                if (result == DialogResult.Yes)
+                {
+                    UpdaterForm updateForm = new UpdaterForm(task.Result.UpdateFile);
+                    updateForm.ShowDialog(owner);
+                }
+
+                CheckForUpdatesCompleted?.Invoke(task, new CheckForUpdatesCompletedEventArgs(task.Result, e));
+            };
             return (CheckForUpdatesTask)task.Start();
         }
 

@@ -1,6 +1,5 @@
 ﻿using MatthiWare.UpdateLib.Logging;
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -17,6 +16,9 @@ namespace MatthiWare.UpdateLib.Tasks
         #region private fields
 
         private Exception m_lastException = null;
+
+        private bool m_useSyncContext = true;
+        private SynchronizationContext m_syncContext;
 
 #if DEBUG
         public Stopwatch m_sw = new Stopwatch();
@@ -122,6 +124,22 @@ namespace MatthiWare.UpdateLib.Tasks
 
         #endregion
 
+        #region FluentAPI
+
+        /// <summary>
+        /// Enable if we should switch back to the synchronization context to continue our Task completed. 
+        /// </summary>
+        /// <remarks>default is true.</remarks>
+        /// <param name="useSyncContext">Indicate if we should use  the synchronization context</param>
+        /// <returns>The task object for fluent API.</returns>
+        public AsyncTask ConfigureAwait(bool useSyncContext)
+        {
+            m_useSyncContext = useSyncContext;
+            return this;
+        }
+
+        #endregion
+
         /// <summary>
         /// Resets the task back to its initial state
         /// </summary>
@@ -133,6 +151,10 @@ namespace MatthiWare.UpdateLib.Tasks
 
             mainWait = null;
             waitQueue.Clear();
+
+#if DEBUG
+            m_sw.Reset();
+#endif
         }
 
         /// <summary>
@@ -145,6 +167,8 @@ namespace MatthiWare.UpdateLib.Tasks
                 return this;
 
             Reset();
+
+            m_syncContext = SynchronizationContext.Current;
 
             Action worker = new Action(() =>
             {
@@ -167,7 +191,6 @@ namespace MatthiWare.UpdateLib.Tasks
             });
 
 #if DEBUG
-            m_sw.Reset();
             m_sw.Start();
 #endif
 
@@ -175,11 +198,10 @@ namespace MatthiWare.UpdateLib.Tasks
             {
 #if DEBUG
                 m_sw.Stop();
-#endif
-                worker.EndInvoke(r);
-#if DEBUG
                 Logger.Debug(GetType().Name, $"Completed in {m_sw.ElapsedMilliseconds}ms");
 #endif
+                worker.EndInvoke(r);
+
                 OnTaskCompleted(m_lastException, IsCancelled);
 
             }), null).AsyncWaitHandle;
@@ -268,18 +290,19 @@ namespace MatthiWare.UpdateLib.Tasks
         /// <param name="total">The total amount of work.</param>
         protected virtual void OnTaskProgressChanged(int done, int total)
         {
-            double progress = ((double)done / total) * 100;
-            TaskProgressChanged?.Invoke(this, new ProgressChangedEventArgs((int)progress, null));
+            double percent = ((double)done / total) * 100;
+            OnTaskProgressChanged((int)percent);
         }
 
-        /// <summary>
-        /// Raises the <see cref="TaskProgressChanged"/> event.  
+        /// <summary>   /// Raises the <see cref="TaskProgressChanged"/> event.  
         /// </summary>
         /// <param name="percent">The percentage of work that is done.</param>
         protected virtual void OnTaskProgressChanged(int percent)
         {
-            TaskProgressChanged?.Invoke(this, new ProgressChangedEventArgs(percent, null));
+            OnTaskProgressChanged(new ProgressChangedEventArgs(percent, null));
         }
+
+        private int m_lastProgressUpdate = -1;
 
         /// <summary>
         /// Raises the <see cref="TaskProgressChanged"/> event.  
@@ -287,7 +310,17 @@ namespace MatthiWare.UpdateLib.Tasks
         /// <param name="e">The <see cref="ProgressChangedEventArgs"/> event.</param>
         protected virtual void OnTaskProgressChanged(ProgressChangedEventArgs e)
         {
-            TaskProgressChanged?.Invoke(this, e);
+            // filter out redundant calls
+            if (m_lastProgressUpdate == e.ProgressPercentage)
+                return;
+
+            m_lastProgressUpdate = e.ProgressPercentage;
+
+            if (!m_useSyncContext || m_syncContext == null)
+                TaskProgressChanged?.Invoke(this, e);
+            else
+                m_syncContext.Post(new SendOrPostCallback((o) => TaskProgressChanged?.Invoke(this, e)), null);
+
         }
 
         /// <summary>
@@ -297,7 +330,7 @@ namespace MatthiWare.UpdateLib.Tasks
         /// <param name="cancelled">Indicates whether the <see cref="AsyncTask"/> got cancelled.</param>
         protected virtual void OnTaskCompleted(Exception e, bool cancelled = false)
         {
-            TaskCompleted?.Invoke(this, new AsyncCompletedEventArgs(e, cancelled, null));
+            OnTaskCompleted(new AsyncCompletedEventArgs(e, cancelled, null));
         }
 
         /// <summary>
@@ -306,7 +339,10 @@ namespace MatthiWare.UpdateLib.Tasks
         /// <param name="e">The <see cref="AsyncCompletedEventArgs"/> event.</param>
         protected virtual void OnTaskCompleted(AsyncCompletedEventArgs e)
         {
-            TaskCompleted?.Invoke(this, e);
+            if (!m_useSyncContext || m_syncContext == null)
+                TaskCompleted?.Invoke(this, e);
+            else
+                m_syncContext.Post(new SendOrPostCallback((o) => TaskCompleted?.Invoke(this, e)), null);
         }
     }
 
@@ -320,6 +356,22 @@ namespace MatthiWare.UpdateLib.Tasks
         /// Gets or sets the result <see cref="T"/> 
         /// </summary>
         public virtual T Result { get; protected set; }
+
+        #region FluentAPI
+
+        /// <summary>
+        /// Enable if we should switch back to the synchronization context to continue our Task completed. 
+        /// </summary>
+        /// <remarks>default is true.</remarks>
+        /// <param name="useSyncContext">Indicate if we should use  the synchronization context</param>
+        /// <returns>The task object for fluent API.</returns>
+        public new AsyncTask<T> ConfigureAwait(bool useSyncContext)
+        {
+            base.ConfigureAwait(useSyncContext);
+            return this;
+        }
+
+        #endregion
 
         /// <summary>
         /// Starts the task

@@ -1,5 +1,6 @@
 ﻿using MatthiWare.UpdateLib.Files;
 using MatthiWare.UpdateLib.Logging;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -26,7 +27,16 @@ namespace MatthiWare.UpdateLib.Tasks
                 Result = new HashCacheFile();
 
                 foreach (FileInfo f in files)
-                    Result.Items.Add(new HashCacheEntry(f.FullName));
+                {
+                    try
+                    {
+                        Result.Items.Add(new HashCacheEntry(f.FullName));
+                    }
+                    catch (Exception ex) // file might no longer exist or is in use
+                    {
+                        Logger.Error(GetType().Name, ex);
+                    }
+                }
 
                 Result.Save();
 
@@ -38,12 +48,29 @@ namespace MatthiWare.UpdateLib.Tasks
                 HashCacheEntry entry = Result.Items.Find(match => match.FilePath == f.FullName);
                 if (entry == null)
                 {
-                    Result.Items.Add(new HashCacheEntry(f.FullName));
+
+                    try
+                    {
+                        Result.Items.Add(new HashCacheEntry(f.FullName));
+                    }
+                    catch (Exception ex) // file might no longer exist or is in use
+                    {
+                        Logger.Error(GetType().Name, ex);
+                    }
+
                     continue;
                 }
-
-                // check to see if the file has been modified since last cache check
-                entry.Recalculate(f.LastWriteTime.Ticks);
+                
+                try
+                {
+                    // check to see if the file has been modified since last cache check
+                    entry.Recalculate(f.LastWriteTime.Ticks);
+                }
+                catch (Exception ex) // file might no longer exist or is in use
+                {
+                    Logger.Error(GetType().Name, ex);
+                }
+                
             }
 
             Result.Save();

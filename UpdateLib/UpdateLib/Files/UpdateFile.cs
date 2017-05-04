@@ -101,10 +101,7 @@ namespace MatthiWare.UpdateLib.Files
 
             UpdateFile file = (UpdateFile)serializer.Deserialize(xml);
 
-            UpdateFileProcessorTask processor = new UpdateFileProcessorTask(file);
-            processor.Start();
-
-            processor.AwaitTask();
+            new UpdateFileProcessorTask(file).ConfigureAwait(false).Start().AwaitTask();
 
             return file;
         }
