@@ -30,6 +30,7 @@ namespace MatthiWare.UpdateLib.Tasks
 
         private bool m_running = false;
         private bool m_cancelled = false;
+        private bool m_completed = false;
 
         #endregion
 
@@ -71,6 +72,20 @@ namespace MatthiWare.UpdateLib.Tasks
             {
                 lock (sync)
                     return m_lastException != null;
+            }
+        }
+
+        public bool IsCompleted
+        {
+            get
+            {
+                lock (sync)
+                    return m_completed;
+            }
+            set
+            {
+                lock (sync)
+                    m_completed = value;
             }
         }
 
@@ -147,7 +162,8 @@ namespace MatthiWare.UpdateLib.Tasks
         {
             IsCancelled = false;
             IsRunning = false;
-            m_lastException = null;
+            LastException = null;
+            IsCompleted = false;
 
             mainWait = null;
             waitQueue.Clear();
@@ -187,6 +203,7 @@ namespace MatthiWare.UpdateLib.Tasks
                 {
                     AwaitWorkers();
                     IsRunning = false;
+                    IsCompleted = true;
                 }
             });
 

@@ -12,6 +12,8 @@ using MatthiWare.UpdateLib.UI;
 using MatthiWare.UpdateLib.Tasks;
 using MatthiWare.UpdateLib.Generator.Tasks;
 using MatthiWare.UpdateLib.Files;
+using System.Diagnostics;
+using MatthiWare.UpdateLib.Logging;
 
 namespace MatthiWare.UpdateLib.Generator.UI.Pages
 {
@@ -27,7 +29,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 
         protected override void OnPageInitialize()
         {
-            saveFileDialog.InitialDirectory = new DirectoryInfo("./Output").FullName; 
+            saveFileDialog.InitialDirectory = new DirectoryInfo("./Output").FullName;
 
             PageControlBase page;
             if (!TestForm.TryGetPage(nameof(FilesPage), out page))
@@ -62,6 +64,8 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             Build(saveFileDialog.OpenFile());
         }
 
+        Stopwatch sw = new Stopwatch();
+
         private AsyncTask<UpdateFile> Build(Stream s)
         {
             UpdateGeneratorTask task = new UpdateGeneratorTask(filesPage.Root, infoPage);
@@ -70,13 +74,18 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 
             task.TaskProgressChanged += (o, e) =>
             {
-                    lblProgress.Text = $"Progress: {e.ProgressPercentage}%";
-                    pbProgress.Value = e.ProgressPercentage;
-                
+                lblProgress.Text = $"Progress: {e.ProgressPercentage}%";
+                pbProgress.Value = e.ProgressPercentage;
+
             };
 
             task.TaskCompleted += (o, e) =>
             {
+                sw.Stop();
+
+                Logger.Debug(GetType().Name, $"File generation completed in {sw.ElapsedMilliseconds} ms.");
+
+                sw.Reset();
 
                 btnBuild.Enabled = true;
 
@@ -105,9 +114,19 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
                     task.Result.Save(s);
 
                 lblStatus.Text = $"Status: Completed";
+
+                MessageDialog.Show(
+                        ParentForm,
+                        "Builder",
+                        "Build completed",
+                        "The update file has been succesfully generated!",
+                        SystemIcons.Information,
+                        MessageBoxButtons.OK);
             };
 
             lblStatus.Text = "Status: Building..";
+
+            sw.Start();
 
             return task.Start();
         }

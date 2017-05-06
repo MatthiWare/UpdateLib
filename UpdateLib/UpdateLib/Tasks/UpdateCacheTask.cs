@@ -60,17 +60,9 @@ namespace MatthiWare.UpdateLib.Tasks
 
                     continue;
                 }
-                
-                try
-                {
-                    // check to see if the file has been modified since last cache check
-                    entry.Recalculate(f.LastWriteTime.Ticks);
-                }
-                catch (Exception ex) // file might no longer exist or is in use
-                {
-                    Logger.Error(GetType().Name, ex);
-                }
-                
+
+                // check to see if the file has been modified since last cache check
+                entry.Recalculate(f.LastWriteTime.Ticks);
             }
 
             Result.Save();
