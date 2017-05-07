@@ -84,6 +84,7 @@
     </Compile>
     <Compile Include="Tasks\UpdateCacheTask.cs" />
     <Compile Include="Tasks\WorkerScheduler.cs" />
+    <Compile Include="Threading\ConcurrentQueue.cs" />
     <Compile Include="UI\Components\ChangelogPage.cs">
       <SubType>UserControl</SubType>
     </Compile>

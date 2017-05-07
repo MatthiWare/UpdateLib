@@ -1,4 +1,5 @@
 ﻿using MatthiWare.UpdateLib.Logging;
+using MatthiWare.UpdateLib.Threading;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -20,12 +21,14 @@ namespace MatthiWare.UpdateLib.Tasks
         private bool m_useSyncContext = true;
         private SynchronizationContext m_syncContext;
 
+        public bool IsChildTask { get; internal set; } = false;
+
 #if DEBUG
         public Stopwatch m_sw = new Stopwatch();
 #endif
 
-        private readonly Queue<WaitHandle> waitQueue = new Queue<WaitHandle>();
-        private WaitHandle mainWait;
+        private readonly ConcurrentQueue<AsyncTask> m_childTasks = new ConcurrentQueue<AsyncTask>();
+        private ManualResetEvent m_waitHandle = new ManualResetEvent(true);
         private readonly object sync = new object();
 
         private bool m_running = false;
@@ -165,8 +168,8 @@ namespace MatthiWare.UpdateLib.Tasks
             LastException = null;
             IsCompleted = false;
 
-            mainWait = null;
-            waitQueue.Clear();
+            m_waitHandle.Reset();
+            m_childTasks.Clear();
 
 #if DEBUG
             m_sw.Reset();
@@ -211,7 +214,7 @@ namespace MatthiWare.UpdateLib.Tasks
             m_sw.Start();
 #endif
 
-            mainWait = worker.BeginInvoke(new AsyncCallback((IAsyncResult r) =>
+            worker.BeginInvoke(new AsyncCallback((IAsyncResult r) =>
             {
 #if DEBUG
                 m_sw.Stop();
@@ -221,7 +224,9 @@ namespace MatthiWare.UpdateLib.Tasks
 
                 OnTaskCompleted(m_lastException, IsCancelled);
 
-            }), null).AsyncWaitHandle;
+                m_waitHandle.Set();
+
+            }), null); ;
 
             return this;
         }
@@ -247,27 +252,25 @@ namespace MatthiWare.UpdateLib.Tasks
         /// <param name="args">Optional arguments for the action</param>
         protected void Enqueue(Delegate action, params object[] args)
         {
-            Action subTaskAction = new Action(() =>
-            {
-                try
-                {
-                    action.DynamicInvoke(args);
-                }
-                catch (Exception ex)
-                {
-                    LastException = ex?.InnerException ?? ex;
-
-                    Logger.Error(GetType().Name, LastException);
-                }
-            });
-
             // Don't allow to start another task when the parent task has been cancelled or contains errors.
             if (HasErrors || IsCancelled)
                 return;
 
-            IAsyncResult result = subTaskAction.BeginInvoke(new AsyncCallback(r => { subTaskAction.EndInvoke(r); }), null);
-            lock (sync)
-                waitQueue.Enqueue(result.AsyncWaitHandle);
+            AsyncTask task = AsyncTaskFactory.From(action, args);
+            task.IsChildTask = true;
+            task.TaskCompleted += (o, e) =>
+            {
+                if (e.Error != null)
+                {
+                    LastException = e.Error?.InnerException ?? e.Error;
+
+                    Logger.Error(GetType().Name, LastException);
+                }
+            };
+
+            m_childTasks.Enqueue(task);
+
+            WorkerScheduler.Instance.Schedule(task);
         }
 
         /// <summary>
@@ -276,28 +279,27 @@ namespace MatthiWare.UpdateLib.Tasks
         /// </summary>
         public void AwaitTask()
         {
-            if (mainWait != null)
+            if (IsChildTask && !IsCompleted && !IsRunning)
+                Reset();
+
+            if (m_waitHandle != null)
             {
-                mainWait.WaitOne();
-                mainWait.Close();
-                mainWait = null;
+                m_waitHandle.WaitOne();
+                m_waitHandle.Close();
+                m_waitHandle = null;
             }
         }
+
+        private int x = 0;
 
         /// <summary>
         /// Blocks the calling thread until all the workers are done.
         /// </summary>
         protected void AwaitWorkers()
         {
-            while (waitQueue.Count > 0)
-            {
-                WaitHandle wh = null;
-                lock (sync)
-                    wh = waitQueue.Dequeue();
-
-                wh.WaitOne();
-                wh.Close();
-            }
+            AsyncTask task = null;
+            while (m_childTasks.TryDequeue(out task))
+                task.AwaitTask();
         }
 
         /// <summary>

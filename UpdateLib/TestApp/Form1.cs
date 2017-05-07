@@ -10,6 +10,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using TestApp.Testing;
 
 namespace TestApp
 {
@@ -75,7 +76,7 @@ namespace TestApp
 
             string[] lines = File.ReadAllLines(file);
 
-            return string.Join(", ", lines); 
+            return string.Join(", ", lines);
         }
 
         /// <summary>
@@ -94,6 +95,13 @@ namespace TestApp
             string text = sr.ReadToEnd();
 
             return text;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            DummyTask task = new DummyTask();
+            task.TaskCompleted += (o, ex) => Logger.Debug(nameof(DummyTask), "Callback task completed!");
+            task.Start();
         }
     }
 }

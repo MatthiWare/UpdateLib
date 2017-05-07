@@ -36,31 +36,27 @@ namespace UpdateLib.Tests.Tasks
         public void FaultyTaskReturnsException()
         {
             ErrorTask task = new ErrorTask();
-            ManualResetEvent wait = new ManualResetEvent(false);
+            //ManualResetEvent wait = new ManualResetEvent(false);
 
             task.TaskCompleted += (o, e) =>
             {
                 Assert.False(e.Cancelled, "The task got cancelled");
                 Assert.NotNull(e.Error, "The error object is null");
-                Assert.IsInstanceOf<AsyncTaskTestException>(e.Error, $"{e.Error} is not an instance of {nameof(AsyncTaskTestException)}");
-                wait.Set();
+                Assert.IsInstanceOf<ErrorTask>(e.Error, $"{e.Error} is not an instance of {nameof(AsyncTaskTestException)}");
+                //  wait.Set();
             };
             task.Start();
             task.AwaitTask();
-            wait.WaitOne();
+            //wait.WaitOne();
         }
 
         [Test, Parallelizable]
         public void TestMethod()
         {
-            Object o = new Object();
-            ResultTask<Object> task = new ResultTask<Object>(o);
-            task.TaskCompleted += (s, e) =>
-            {
-                Assert.Fail("lol");
-            };
+            object o = new object();
+            ResultTask<object> task = new ResultTask<object>(o);
             task.Start();
-           Assert.AreEqual(o, task.AwaitTask());
+            Assert.AreEqual(o, task.AwaitTask());
         }
 
         [Test, Parallelizable]
@@ -68,7 +64,7 @@ namespace UpdateLib.Tests.Tasks
         {
             TestResultTask<bool>(false);
             TestResultTask<int>(19951);
-            TestResultTask<Object>(new Object());
+            TestResultTask<object>(new object());
         }
 
         private void TestResultTask<T>(T input)
@@ -117,12 +113,12 @@ namespace UpdateLib.Tests.Tasks
                 Action simulation = new Action(() =>
                 {
                     Thread.Sleep(1000);
-                    value = false;
+                    value = true;
                 });
 
-                Enqueue(simulation);
-
                 Assert.IsFalse(value);
+
+                Enqueue(simulation);
 
                 AwaitWorkers();
 
@@ -175,13 +171,13 @@ namespace UpdateLib.Tests.Tasks
                     Result = returnObj;
                 });
 
-                Enqueue(call,200);
+                Enqueue(call, 200);
             }
         }
 
         private class AsyncTaskTestException : Exception
         {
-            public AsyncTaskTestException():base("Test Exception")
+            public AsyncTaskTestException() : base("Test Exception")
             {
             }
 

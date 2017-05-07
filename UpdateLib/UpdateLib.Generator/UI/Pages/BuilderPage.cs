@@ -85,7 +85,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 
                 Logger.Debug(GetType().Name, $"File generation completed in {sw.ElapsedMilliseconds} ms.");
 
-                sw.Reset();
+                
 
                 btnBuild.Enabled = true;
 
@@ -119,13 +119,15 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
                         ParentForm,
                         "Builder",
                         "Build completed",
-                        "The update file has been succesfully generated!",
+                        "The update file has been succesfully generated!\n" +
+                        $"File generation completed in {sw.ElapsedMilliseconds} ms.",
                         SystemIcons.Information,
                         MessageBoxButtons.OK);
             };
 
             lblStatus.Text = "Status: Building..";
 
+            sw.Reset();
             sw.Start();
 
             return task.Start();
