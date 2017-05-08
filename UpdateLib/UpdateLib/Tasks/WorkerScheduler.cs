@@ -39,6 +39,7 @@ namespace MatthiWare.UpdateLib.Tasks
         private readonly AtomicInteger m_currentWorkerCount;
         private readonly AsyncTask m_dispatcherTask;
         private readonly ManualResetEvent m_waitForAvailableWorker;
+        private readonly object sync = new object();
 
         #endregion
 
@@ -65,19 +66,22 @@ namespace MatthiWare.UpdateLib.Tasks
             AsyncTask task = null;
             while (m_taskQueue.TryDequeue(out task))
             {
-                if (task.IsCompleted || task.IsCancelled || task.HasErrors)
-                    continue;
+                lock (sync)
+                {
+                    if (task.IsCompleted || task.IsCancelled || task.HasErrors)
+                        continue;
 
-                SetupTask(task);
+                    SetupTask(task);
 
-                if (m_currentWorkerCount.Value >= MAX_WORKERS)
-                    m_waitForAvailableWorker.Reset();
+                    if (m_currentWorkerCount.Value >= MAX_WORKERS)
+                        m_waitForAvailableWorker.Reset();
 
-                m_waitForAvailableWorker.WaitOne();
+                    m_waitForAvailableWorker.WaitOne();
 
-                Logger.Debug(GetType().Name, $"Current worker count: {m_currentWorkerCount.Increment()}");
+                    Logger.Debug(GetType().Name, $"Current worker count: {m_currentWorkerCount.Increment()} | Current queue count: {m_taskQueue.Count}");
 
-                task.ConfigureAwait(false).Start();
+                    task.ConfigureAwait(false).Start();
+                }
             }
         }
 
