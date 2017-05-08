@@ -19,7 +19,7 @@ namespace MatthiWare.UpdateLib.Logging.Writers
         {
             string appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             string name = Assembly.GetEntryAssembly().GetName().Name;
-            logFile = new FileInfo($@"{appdata}\{name}\MatthiWare.UpdateLib\Log\log_{DateTime.Now.ToString("yyyyMMdd")}.log");
+            logFile = new FileInfo($@"{appdata}\{name}\UpdateLib\Log\log_{DateTime.Now.ToString("yyyyMMdd")}.log");
 
             if (!logFile.Directory.Exists)
                 logFile.Directory.Create();

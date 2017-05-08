@@ -83,7 +83,7 @@ namespace MatthiWare.UpdateLib
             CleanUpTask.ConfigureAwait(false).Start();
 
             UpdateCacheTask = new UpdateCacheTask();
-            UpdateCacheTask.Start();
+            UpdateCacheTask.ConfigureAwait(false).Start();
 
             initialized = true;
         }
@@ -130,10 +130,13 @@ namespace MatthiWare.UpdateLib
                 throw new ArgumentException("You need to specifify an update url", nameof(UpdateURL));
 
             CheckForUpdatesTask task = new CheckForUpdatesTask(UpdateURL);
-            task.TaskCompleted += (o, e) => 
+            task.TaskCompleted += (o, e) =>
             {
-                if (!task.Result.UpdateAvailable) // no updates available
+                if (!task.Result.UpdateAvailable || e.Cancelled || e.Error != null)
+                {
+                    CheckForUpdatesCompleted?.Invoke(task, new CheckForUpdatesCompletedEventArgs(task.Result, e));
                     return;
+                }
 
                 DialogResult result = MessageDialog.Show(
                         "Update available",
