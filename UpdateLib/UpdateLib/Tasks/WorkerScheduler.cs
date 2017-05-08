@@ -36,9 +36,9 @@ namespace MatthiWare.UpdateLib.Tasks
 
         private readonly long MAX_WORKERS;
         private readonly ConcurrentQueue<AsyncTask> m_taskQueue;
-        private long m_currentWorkerCount;
+        private readonly AtomicInteger m_currentWorkerCount;
         private readonly AsyncTask m_dispatcherTask;
-        private ManualResetEvent m_waitForAvailableWorker;
+        private readonly ManualResetEvent m_waitForAvailableWorker;
 
         #endregion
 
@@ -48,6 +48,7 @@ namespace MatthiWare.UpdateLib.Tasks
             m_taskQueue = new ConcurrentQueue<AsyncTask>();
             m_dispatcherTask = AsyncTaskFactory.From(new Action(Dispatcher), null);
             m_waitForAvailableWorker = new ManualResetEvent(true);
+            m_currentWorkerCount = new AtomicInteger();
         }
 
         public void Schedule(AsyncTask task)
@@ -67,18 +68,14 @@ namespace MatthiWare.UpdateLib.Tasks
                 if (task.IsCompleted || task.IsCancelled || task.HasErrors)
                     continue;
 
-                if (m_currentWorkerCount >= MAX_WORKERS)
+                SetupTask(task);
+
+                if (m_currentWorkerCount.Value >= MAX_WORKERS)
                     m_waitForAvailableWorker.Reset();
 
                 m_waitForAvailableWorker.WaitOne();
 
-                SetupTask(task);
-
-                m_currentWorkerCount++;
-                if (m_currentWorkerCount >= MAX_WORKERS)
-                    m_waitForAvailableWorker.Reset();
-
-                Logger.Debug(GetType().Name, $"Current worker count: {m_currentWorkerCount}");
+                Logger.Debug(GetType().Name, $"Current worker count: {m_currentWorkerCount.Increment()}");
 
                 task.ConfigureAwait(false).Start();
             }
@@ -88,8 +85,8 @@ namespace MatthiWare.UpdateLib.Tasks
         {
             task.TaskCompleted += (o, e) =>
             {
-                m_currentWorkerCount--;
-                if (m_currentWorkerCount < MAX_WORKERS)
+
+                if (m_currentWorkerCount.Decrement() < MAX_WORKERS)
                     m_waitForAvailableWorker.Set();
 
                 Logger.Debug(GetType().Name, $"Current worker count: {m_currentWorkerCount}");
