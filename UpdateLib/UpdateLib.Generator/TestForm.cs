@@ -64,7 +64,7 @@ namespace MatthiWare.UpdateLib.Generator
                 {
                     LoaderControl.Hide(ContentPanel);
 
-                    this.InvokeOnUI(() => btnTabInformation.PerformClick());
+                    btnTabInformation.PerformClick();
                 };
             }
 
@@ -161,15 +161,13 @@ namespace MatthiWare.UpdateLib.Generator
 
         private void ShowMessageBox(string title, string header, string desc, Icon icon, MessageBoxButtons buttons = MessageBoxButtons.YesNo)
         {
-            this.InvokeOnUI(() =>
-            {
-                MessageDialog.Show(
-                    title,
-                    header,
-                    desc,
-                    icon,
-                    buttons);
-            });
+            MessageDialog.Show(
+                this,
+                title,
+                header,
+                desc,
+                icon,
+                buttons);
         }
 
         private void AddControlToContentPanel(Control toAdd)
@@ -177,22 +175,20 @@ namespace MatthiWare.UpdateLib.Generator
             if (!shouldShowNewPage)
                 return;
 
-            this.InvokeOnUI(() =>
+            ContentPanel.SuspendLayout();
+
+            ContentPanel.Controls.Clear();
+
+            if (toAdd != null)
             {
-                ContentPanel.SuspendLayout();
+                toAdd.Dock = DockStyle.Fill;
+                ContentPanel.Controls.Add(toAdd);
 
-                ContentPanel.Controls.Clear();
+                shouldShowNewPage = false;
+            }
 
-                if (toAdd != null)
-                {
-                    toAdd.Dock = DockStyle.Fill;
-                    ContentPanel.Controls.Add(toAdd);
+            ContentPanel.ResumeLayout();
 
-                    shouldShowNewPage = false;
-                }
-
-                ContentPanel.ResumeLayout();
-            });
         }
 
         private void btnTabBuild_Click(object sender, EventArgs e)

@@ -10,6 +10,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using TestApp.Testing;
 
 namespace TestApp
 {
@@ -65,14 +66,42 @@ namespace TestApp
         {
             label1.Text = ReadFile("data/testfile1.txt");
             label2.Text = ReadFile("data/testfile2.txt");
-            label3.Text = ReadFile("data/testfile3.txt");
+            label3.Text = ReadFileAndKeepStreamOpen("data/testfile3.txt");
         }
 
         private string ReadFile(string file)
         {
+            if (!File.Exists(file))
+                return "ERROR: File doesn't exist..";
+
             string[] lines = File.ReadAllLines(file);
 
-            return string.Join(", ", lines); 
+            return string.Join(", ", lines);
+        }
+
+        /// <summary>
+        /// Bad code that keeps the file open & locked
+        /// Purpose: to demonstrate the updater still works on locked files.
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        private string ReadFileAndKeepStreamOpen(string file)
+        {
+            if (!File.Exists(file))
+                return "ERROR: File doesn't exist..";
+
+            FileStream fs = new FileStream(file, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+            StreamReader sr = new StreamReader(fs);
+            string text = sr.ReadToEnd();
+
+            return text;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            DummyTask task = new DummyTask();
+            task.TaskCompleted += (o, ex) => Logger.Debug(nameof(DummyTask), "Callback task completed!");
+            task.Start();
         }
     }
 }

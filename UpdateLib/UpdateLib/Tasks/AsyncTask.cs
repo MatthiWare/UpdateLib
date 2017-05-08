@@ -1,6 +1,6 @@
 ﻿using MatthiWare.UpdateLib.Logging;
+using MatthiWare.UpdateLib.Threading;
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -18,16 +18,22 @@ namespace MatthiWare.UpdateLib.Tasks
 
         private Exception m_lastException = null;
 
+        private bool m_useSyncContext = true;
+        private SynchronizationContext m_syncContext;
+
+        public bool IsChildTask { get; internal set; } = false;
+
 #if DEBUG
         public Stopwatch m_sw = new Stopwatch();
 #endif
 
-        private readonly Queue<WaitHandle> waitQueue = new Queue<WaitHandle>();
-        private WaitHandle mainWait;
+        private readonly ConcurrentQueue<AsyncTask> m_childTasks = new ConcurrentQueue<AsyncTask>();
+        private ManualResetEvent m_waitHandle = new ManualResetEvent(true);
         private readonly object sync = new object();
 
         private bool m_running = false;
         private bool m_cancelled = false;
+        private bool m_completed = false;
 
         #endregion
 
@@ -69,6 +75,20 @@ namespace MatthiWare.UpdateLib.Tasks
             {
                 lock (sync)
                     return m_lastException != null;
+            }
+        }
+
+        public bool IsCompleted
+        {
+            get
+            {
+                lock (sync)
+                    return m_completed;
+            }
+            set
+            {
+                lock (sync)
+                    m_completed = value;
             }
         }
 
@@ -122,6 +142,22 @@ namespace MatthiWare.UpdateLib.Tasks
 
         #endregion
 
+        #region FluentAPI
+
+        /// <summary>
+        /// Enable if we should switch back to the synchronization context to continue our Task completed. 
+        /// </summary>
+        /// <remarks>default is true.</remarks>
+        /// <param name="useSyncContext">Indicate if we should use  the synchronization context</param>
+        /// <returns>The task object for fluent API.</returns>
+        public AsyncTask ConfigureAwait(bool useSyncContext)
+        {
+            m_useSyncContext = useSyncContext;
+            return this;
+        }
+
+        #endregion
+
         /// <summary>
         /// Resets the task back to its initial state
         /// </summary>
@@ -129,10 +165,15 @@ namespace MatthiWare.UpdateLib.Tasks
         {
             IsCancelled = false;
             IsRunning = false;
-            m_lastException = null;
+            LastException = null;
+            IsCompleted = false;
 
-            mainWait = null;
-            waitQueue.Clear();
+            m_waitHandle.Reset();
+            m_childTasks.Clear();
+
+#if DEBUG
+            m_sw.Reset();
+#endif
         }
 
         /// <summary>
@@ -145,6 +186,8 @@ namespace MatthiWare.UpdateLib.Tasks
                 return this;
 
             Reset();
+
+            m_syncContext = SynchronizationContext.Current;
 
             Action worker = new Action(() =>
             {
@@ -163,26 +206,27 @@ namespace MatthiWare.UpdateLib.Tasks
                 {
                     AwaitWorkers();
                     IsRunning = false;
+                    IsCompleted = true;
                 }
             });
 
 #if DEBUG
-            m_sw.Reset();
             m_sw.Start();
 #endif
 
-            mainWait = worker.BeginInvoke(new AsyncCallback((IAsyncResult r) =>
+            worker.BeginInvoke(new AsyncCallback((IAsyncResult r) =>
             {
 #if DEBUG
                 m_sw.Stop();
-#endif
-                worker.EndInvoke(r);
-#if DEBUG
                 Logger.Debug(GetType().Name, $"Completed in {m_sw.ElapsedMilliseconds}ms");
 #endif
+                worker.EndInvoke(r);
+
                 OnTaskCompleted(m_lastException, IsCancelled);
 
-            }), null).AsyncWaitHandle;
+                m_waitHandle.Set();
+
+            }), null); ;
 
             return this;
         }
@@ -208,27 +252,25 @@ namespace MatthiWare.UpdateLib.Tasks
         /// <param name="args">Optional arguments for the action</param>
         protected void Enqueue(Delegate action, params object[] args)
         {
-            Action subTaskAction = new Action(() =>
-            {
-                try
-                {
-                    action.DynamicInvoke(args);
-                }
-                catch (Exception ex)
-                {
-                    LastException = ex?.InnerException ?? ex;
-
-                    Logger.Error(GetType().Name, LastException);
-                }
-            });
-
             // Don't allow to start another task when the parent task has been cancelled or contains errors.
             if (HasErrors || IsCancelled)
                 return;
 
-            IAsyncResult result = subTaskAction.BeginInvoke(new AsyncCallback(r => { subTaskAction.EndInvoke(r); }), null);
-            lock (sync)
-                waitQueue.Enqueue(result.AsyncWaitHandle);
+            AsyncTask task = AsyncTaskFactory.From(action, args);
+            task.IsChildTask = true;
+            task.TaskCompleted += (o, e) =>
+            {
+                if (e.Error != null)
+                {
+                    LastException = e.Error?.InnerException ?? e.Error;
+
+                    Logger.Error(GetType().Name, LastException);
+                }
+            };
+
+            m_childTasks.Enqueue(task);
+
+            WorkerScheduler.Instance.Schedule(task);
         }
 
         /// <summary>
@@ -237,28 +279,27 @@ namespace MatthiWare.UpdateLib.Tasks
         /// </summary>
         public void AwaitTask()
         {
-            if (mainWait != null)
+            if (IsChildTask && !IsCompleted && !IsRunning)
+                Reset();
+
+            if (m_waitHandle != null)
             {
-                mainWait.WaitOne();
-                mainWait.Close();
-                mainWait = null;
+                m_waitHandle.WaitOne();
+                m_waitHandle.Close();
+                m_waitHandle = null;
             }
         }
+
+        private int x = 0;
 
         /// <summary>
         /// Blocks the calling thread until all the workers are done.
         /// </summary>
         protected void AwaitWorkers()
         {
-            while (waitQueue.Count > 0)
-            {
-                WaitHandle wh = null;
-                lock (sync)
-                    wh = waitQueue.Dequeue();
-
-                wh.WaitOne();
-                wh.Close();
-            }
+            AsyncTask task = null;
+            while (m_childTasks.TryDequeue(out task))
+                task.AwaitTask();
         }
 
         /// <summary>
@@ -268,18 +309,19 @@ namespace MatthiWare.UpdateLib.Tasks
         /// <param name="total">The total amount of work.</param>
         protected virtual void OnTaskProgressChanged(int done, int total)
         {
-            double progress = ((double)done / total) * 100;
-            TaskProgressChanged?.Invoke(this, new ProgressChangedEventArgs((int)progress, null));
+            double percent = ((double)done / total) * 100;
+            OnTaskProgressChanged((int)percent);
         }
 
-        /// <summary>
-        /// Raises the <see cref="TaskProgressChanged"/> event.  
+        /// <summary>   /// Raises the <see cref="TaskProgressChanged"/> event.  
         /// </summary>
         /// <param name="percent">The percentage of work that is done.</param>
         protected virtual void OnTaskProgressChanged(int percent)
         {
-            TaskProgressChanged?.Invoke(this, new ProgressChangedEventArgs(percent, null));
+            OnTaskProgressChanged(new ProgressChangedEventArgs(percent, null));
         }
+
+        private int m_lastProgressUpdate = -1;
 
         /// <summary>
         /// Raises the <see cref="TaskProgressChanged"/> event.  
@@ -287,7 +329,17 @@ namespace MatthiWare.UpdateLib.Tasks
         /// <param name="e">The <see cref="ProgressChangedEventArgs"/> event.</param>
         protected virtual void OnTaskProgressChanged(ProgressChangedEventArgs e)
         {
-            TaskProgressChanged?.Invoke(this, e);
+            // filter out redundant calls
+            if (m_lastProgressUpdate == e.ProgressPercentage)
+                return;
+
+            m_lastProgressUpdate = e.ProgressPercentage;
+
+            if (!m_useSyncContext || m_syncContext == null)
+                TaskProgressChanged?.Invoke(this, e);
+            else
+                m_syncContext.Post(new SendOrPostCallback((o) => TaskProgressChanged?.Invoke(this, e)), null);
+
         }
 
         /// <summary>
@@ -297,7 +349,7 @@ namespace MatthiWare.UpdateLib.Tasks
         /// <param name="cancelled">Indicates whether the <see cref="AsyncTask"/> got cancelled.</param>
         protected virtual void OnTaskCompleted(Exception e, bool cancelled = false)
         {
-            TaskCompleted?.Invoke(this, new AsyncCompletedEventArgs(e, cancelled, null));
+            OnTaskCompleted(new AsyncCompletedEventArgs(e, cancelled, null));
         }
 
         /// <summary>
@@ -306,7 +358,10 @@ namespace MatthiWare.UpdateLib.Tasks
         /// <param name="e">The <see cref="AsyncCompletedEventArgs"/> event.</param>
         protected virtual void OnTaskCompleted(AsyncCompletedEventArgs e)
         {
-            TaskCompleted?.Invoke(this, e);
+            if (!m_useSyncContext || m_syncContext == null)
+                TaskCompleted?.Invoke(this, e);
+            else
+                m_syncContext.Post(new SendOrPostCallback((o) => TaskCompleted?.Invoke(this, e)), null);
         }
     }
 
@@ -320,6 +375,22 @@ namespace MatthiWare.UpdateLib.Tasks
         /// Gets or sets the result <see cref="T"/> 
         /// </summary>
         public virtual T Result { get; protected set; }
+
+        #region FluentAPI
+
+        /// <summary>
+        /// Enable if we should switch back to the synchronization context to continue our Task completed. 
+        /// </summary>
+        /// <remarks>default is true.</remarks>
+        /// <param name="useSyncContext">Indicate if we should use  the synchronization context</param>
+        /// <returns>The task object for fluent API.</returns>
+        public new AsyncTask<T> ConfigureAwait(bool useSyncContext)
+        {
+            base.ConfigureAwait(useSyncContext);
+            return this;
+        }
+
+        #endregion
 
         /// <summary>
         /// Starts the task

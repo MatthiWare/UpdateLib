@@ -150,6 +150,9 @@
     <EmbeddedResource Include="UI\Pages\InformationPage.resx">
       <DependentUpon>InformationPage.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="UI\Pages\PageControlBase.resx">
+      <DependentUpon>PageControlBase.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

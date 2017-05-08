@@ -7,6 +7,7 @@ using MatthiWare.UpdateLib.Tasks;
 using MatthiWare.UpdateLib.Generator.Data.FilesPage;
 using System.Collections.Generic;
 using MatthiWare.UpdateLib.Generator.UI.Pages;
+using MatthiWare.UpdateLib.Logging;
 
 namespace MatthiWare.UpdateLib.Generator.Tasks
 {
@@ -53,6 +54,8 @@ namespace MatthiWare.UpdateLib.Generator.Tasks
 
         private void AddDirRecursive(GenFolder dir, DirectoryEntry entry)
         {
+           // Logger.Debug(GetType().Name, $"Thread: {Thread.CurrentThread.ManagedThreadId}");
+
             List<GenFile> files = dir.Files;
             foreach (GenFile genFile in files)
             {
@@ -78,6 +81,8 @@ namespace MatthiWare.UpdateLib.Generator.Tasks
 
                 AddDirRecursiveDelegate caller = new AddDirRecursiveDelegate(AddDirRecursive);
                 Enqueue(caller, newDir, newEntry);
+
+                //AddDirRecursive(newDir, newEntry);
             }
         }
     }

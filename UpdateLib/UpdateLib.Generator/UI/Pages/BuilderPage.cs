@@ -12,6 +12,8 @@ using MatthiWare.UpdateLib.UI;
 using MatthiWare.UpdateLib.Tasks;
 using MatthiWare.UpdateLib.Generator.Tasks;
 using MatthiWare.UpdateLib.Files;
+using System.Diagnostics;
+using MatthiWare.UpdateLib.Logging;
 
 namespace MatthiWare.UpdateLib.Generator.UI.Pages
 {
@@ -27,7 +29,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 
         protected override void OnPageInitialize()
         {
-            saveFileDialog.InitialDirectory = new DirectoryInfo("./Output").FullName; 
+            saveFileDialog.InitialDirectory = new DirectoryInfo("./Output").FullName;
 
             PageControlBase page;
             if (!TestForm.TryGetPage(nameof(FilesPage), out page))
@@ -62,6 +64,8 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             Build(saveFileDialog.OpenFile());
         }
 
+        Stopwatch sw = new Stopwatch();
+
         private AsyncTask<UpdateFile> Build(Stream s)
         {
             UpdateGeneratorTask task = new UpdateGeneratorTask(filesPage.Root, infoPage);
@@ -70,27 +74,30 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 
             task.TaskProgressChanged += (o, e) =>
             {
-                this.InvokeOnUI(() => 
-                {
-                    lblProgress.Text = $"Progress: {e.ProgressPercentage}%";
-                    pbProgress.Value = e.ProgressPercentage;
-                });
+                lblProgress.Text = $"Progress: {e.ProgressPercentage}%";
+                pbProgress.Value = e.ProgressPercentage;
+
             };
 
             task.TaskCompleted += (o, e) =>
             {
+                sw.Stop();
 
-                this.InvokeOnUI(() => btnBuild.Enabled = true);
+                Logger.Debug(GetType().Name, $"File generation completed in {sw.ElapsedMilliseconds} ms.");
+
+                
+
+                btnBuild.Enabled = true;
 
                 if (e.Cancelled)
                 {
-                    this.InvokeOnUI(() => lblStatus.Text = $"Status: Cancelled");
+                    lblStatus.Text = $"Status: Cancelled";
                     return;
                 }
 
                 if (e.Error != null)
                 {
-                    this.InvokeOnUI(() => lblStatus.Text = $"Status: Error");
+                    lblStatus.Text = $"Status: Error";
 
                     MessageDialog.Show(
                         ParentForm,
@@ -106,10 +113,22 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
                 using (s)
                     task.Result.Save(s);
 
-                this.InvokeOnUI(() => lblStatus.Text = $"Status: Completed");
+                lblStatus.Text = $"Status: Completed";
+
+                MessageDialog.Show(
+                        ParentForm,
+                        "Builder",
+                        "Build completed",
+                        "The update file has been succesfully generated!\n" +
+                        $"File generation completed in {sw.ElapsedMilliseconds} ms.",
+                        SystemIcons.Information,
+                        MessageBoxButtons.OK);
             };
 
             lblStatus.Text = "Status: Building..";
+
+            sw.Reset();
+            sw.Start();
 
             return task.Start();
         }

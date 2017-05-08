@@ -5,23 +5,39 @@ namespace MatthiWare.UpdateLib.Tasks
 {
     public class CheckForUpdatedFilesTask : AsyncTask<bool>
     {
-        private UpdateFile updateFile;
-        private HashCacheFile cacheFile;
-        private PathVariableConverter converter;
+        private UpdateFile m_updateFile;
+        private HashCacheFile m_cacheFile;
+        private PathVariableConverter m_converter;
 
         public CheckForUpdatedFilesTask(UpdateFile update, HashCacheFile cache, PathVariableConverter converter)
         {
-            updateFile = update;
-            cacheFile = cache;
-            this.converter = converter;
+            if (update == null) throw new ArgumentNullException(nameof(update));
+            if (cache == null) throw new ArgumentNullException(nameof(cache));
+            if (converter == null) throw new ArgumentNullException(nameof(converter));
+
+            m_updateFile = update;
+            m_cacheFile = cache;
+            m_converter = converter;
+        }
+
+        protected override void DoWork()
+        {
+            Action<DirectoryEntry> call = new Action<DirectoryEntry>(RecursiveCheck);
+
+            foreach (DirectoryEntry dir in m_updateFile.Folders)
+                Enqueue(call, dir);
+
+            AwaitWorkers();
+
+            Result = m_updateFile.Count > 0;
         }
 
         private void RecursiveCheck(DirectoryEntry dir)
         {
             dir.Files.RemoveAll(fe =>
             {
-                string convertedPath = converter.Replace(fe.DestinationLocation);
-                HashCacheEntry cacheEntry = cacheFile.Items.Find(hash => hash.FilePath.Equals(convertedPath));
+                string convertedPath = m_converter.Replace(fe.DestinationLocation);
+                HashCacheEntry cacheEntry = m_cacheFile.Items.Find(hash => hash.FilePath.Equals(convertedPath));
 
                 if (cacheEntry == null)
                     return false;
@@ -34,18 +50,6 @@ namespace MatthiWare.UpdateLib.Tasks
 
             foreach (DirectoryEntry de in dir.Directories)
                 Enqueue(call, de);
-        }
-
-        protected override void DoWork()
-        {
-            Action<DirectoryEntry> call = new Action<DirectoryEntry>(RecursiveCheck);
-
-            foreach (DirectoryEntry dir in updateFile.Folders)
-                Enqueue(call, dir);
-
-            AwaitWorkers();
-
-            Result = updateFile.Count > 0;
         }
     }
 }

@@ -27,7 +27,7 @@ namespace MatthiWare.UpdateLib.Files
             {
                 string appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
                 string name = Assembly.GetEntryAssembly().GetName().Name;
-                storagePath = $@"{appdata}\{name}\MatthiWare.UpdateLib\Cache\HashCacheFile.xml";
+                storagePath = $@"{appdata}\{name}\UpdateLib\Cache\HashCacheFile.xml";
             }
 
             return storagePath;

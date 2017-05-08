@@ -50,5 +50,16 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 
         protected virtual void OnPageInitialize() { }
 
+        private void InitializeComponent()
+        {
+            this.SuspendLayout();
+            // 
+            // PageControlBase
+            // 
+            this.DoubleBuffered = true;
+            this.Name = "PageControlBase";
+            this.ResumeLayout(false);
+
+        }
     }
 }

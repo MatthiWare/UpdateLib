@@ -1,5 +1,6 @@
 ﻿using MatthiWare.UpdateLib.Files;
 using MatthiWare.UpdateLib.Logging;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,13 +11,20 @@ namespace MatthiWare.UpdateLib.Tasks
     {
         protected override void DoWork()
         {
-            // first of lets load the file
-            Result = HashCacheFile.Load();
+            try
+            {
+                // first of lets load the file, (file might be corrupt..)
+                Result = HashCacheFile.Load();
+            }
+            catch (Exception e)
+            {
+                Logger.Error(GetType().Name, e);
+                Result = null;
+            }
 
             DirectoryInfo dir = new DirectoryInfo(".");
             IEnumerable<FileInfo> files = dir.GetFiles("*", SearchOption.AllDirectories).Where(f => !f.FullName.Contains(".old.tmp"));
-
-
+            
             Logger.Debug(GetType().Name, $"found {files.Count()} files to recheck.");
 
             if (Result == null) // The file doesn't exist yet
@@ -26,7 +34,16 @@ namespace MatthiWare.UpdateLib.Tasks
                 Result = new HashCacheFile();
 
                 foreach (FileInfo f in files)
-                    Result.Items.Add(new HashCacheEntry(f.FullName));
+                {
+                    try
+                    {
+                        Result.Items.Add(new HashCacheEntry(f.FullName));
+                    }
+                    catch (Exception ex) // file might no longer exist or is in use
+                    {
+                        Logger.Error(GetType().Name, ex);
+                    }
+                }
 
                 Result.Save();
 
@@ -38,7 +55,16 @@ namespace MatthiWare.UpdateLib.Tasks
                 HashCacheEntry entry = Result.Items.Find(match => match.FilePath == f.FullName);
                 if (entry == null)
                 {
-                    Result.Items.Add(new HashCacheEntry(f.FullName));
+
+                    try
+                    {
+                        Result.Items.Add(new HashCacheEntry(f.FullName));
+                    }
+                    catch (Exception ex) // file might no longer exist or is in use
+                    {
+                        Logger.Error(GetType().Name, ex);
+                    }
+
                     continue;
                 }
 
