@@ -11,13 +11,20 @@ namespace MatthiWare.UpdateLib.Tasks
     {
         protected override void DoWork()
         {
-            // first of lets load the file
-            Result = HashCacheFile.Load();
+            try
+            {
+                // first of lets load the file, (file might be corrupt..)
+                Result = HashCacheFile.Load();
+            }
+            catch (Exception e)
+            {
+                Logger.Error(GetType().Name, e);
+                Result = null;
+            }
 
             DirectoryInfo dir = new DirectoryInfo(".");
             IEnumerable<FileInfo> files = dir.GetFiles("*", SearchOption.AllDirectories).Where(f => !f.FullName.Contains(".old.tmp"));
-
-
+            
             Logger.Debug(GetType().Name, $"found {files.Count()} files to recheck.");
 
             if (Result == null) // The file doesn't exist yet
