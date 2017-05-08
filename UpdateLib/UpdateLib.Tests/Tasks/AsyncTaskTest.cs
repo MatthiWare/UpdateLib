@@ -42,7 +42,7 @@ namespace UpdateLib.Tests.Tasks
             {
                 Assert.False(e.Cancelled, "The task got cancelled");
                 Assert.NotNull(e.Error, "The error object is null");
-                Assert.IsInstanceOf<ErrorTask>(e.Error, $"{e.Error} is not an instance of {nameof(AsyncTaskTestException)}");
+                Assert.IsInstanceOf<AsyncTaskTestException>(e.Error, $"{e.Error} is not an instance of {nameof(AsyncTaskTestException)}");
                 //  wait.Set();
             };
             task.Start();

@@ -21,6 +21,15 @@ namespace MatthiWare.UpdateLib.Threading
                 m_queue.Enqueue(item);
         }
 
+        public int Count
+        {
+            get
+            {
+                lock (sync)
+                    return m_queue.Count;
+            }
+        }
+
         public bool TryDequeue(out T data)
         {
             data = default(T);
