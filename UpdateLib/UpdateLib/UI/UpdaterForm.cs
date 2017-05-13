@@ -13,7 +13,7 @@ namespace MatthiWare.UpdateLib.UI
         internal bool NeedsRestart = true;
 
         private WizardPageCollection pages;
-        
+
         public UpdaterForm(UpdateFile updateFile)
         {
             InitializeComponent();
@@ -61,7 +61,7 @@ namespace MatthiWare.UpdateLib.UI
         delegate void _OnPageUpdate(IWizardPage page);
         private void OnPageUpdate(IWizardPage page)
         {
-            this.InvokeOnUI(() => 
+            this.InvokeOnUI(() =>
             {
                 if (page.IsDone && !page.IsBusy)
                 {
@@ -142,10 +142,11 @@ namespace MatthiWare.UpdateLib.UI
                 //}
 
                 Application.Restart();
+                Environment.Exit(0);
             }
             else
             {
-               Updater.Instance.Initialize();
+                Updater.Instance.Initialize();
 
                 pages.Clear();
                 pages.Add(new FinishPage(this));

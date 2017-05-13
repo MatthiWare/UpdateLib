@@ -47,6 +47,12 @@ namespace MatthiWare.UpdateLib
             }
         }
 
+        public bool EnableCmdArguments { get; set; } = true;
+        public bool UpdateSilently { get; set; } = false;
+        public string UpdateSilentlyCmdArg { get; set; } = "-silent";
+
+        public string StartUpdatingCmdArg { get; set; } = "-update";
+
         public bool ShowUpdateMessage { get; set; } = true;
         public bool ShowMessageOnNoUpdate { get; set; } = true;
         public bool ShowErrorMessage { get; set; } = true;
@@ -66,6 +72,31 @@ namespace MatthiWare.UpdateLib
 
         internal string RemoteBasePath { get; set; }
 
+        #region Fluent API
+
+        public Updater ConfigureCmdArgs(bool enabled)
+        {
+            EnableCmdArguments = enabled;
+
+            return this;
+        }
+
+        public Updater ConfigureSilentCmdArg(string cmdArg)
+        {
+            UpdateSilentlyCmdArg = cmdArg;
+
+            return this;
+        }
+
+        public Updater ConfigureUpdateCmdArg(string cmdArg)
+        {
+            StartUpdatingCmdArg = cmdArg;
+
+            return this;
+        }
+
+        #endregion
+
         /// <summary>
         /// Initializes a new instance of <see cref="Updater"/> with the default settings. 
         /// </summary>
@@ -79,6 +110,19 @@ namespace MatthiWare.UpdateLib
         /// </summary>
         public void Initialize()
         {
+            StartInitializationTasks();
+
+            if (!EnableCmdArguments)
+                return;
+
+            bool shouldStartUpdating = ParseCmdArguments(Environment.GetCommandLineArgs());
+
+            if (shouldStartUpdating)
+                CheckForUpdates();
+        }
+
+        private void StartInitializationTasks()
+        {
             CleanUpTask = new CleanUpTask(".");
             CleanUpTask.ConfigureAwait(false).Start();
 
@@ -86,6 +130,20 @@ namespace MatthiWare.UpdateLib
             UpdateCacheTask.ConfigureAwait(false).Start();
 
             initialized = true;
+        }
+
+        private bool ParseCmdArguments(string[] args)
+        {
+            bool startUpdating = false;
+            foreach (string arg in args)
+            {
+                if (arg == StartUpdatingCmdArg)
+                    startUpdating = true;
+                else if (arg == UpdateSilentlyCmdArg)
+                    UpdateSilently = true;
+            }
+
+            return startUpdating;
         }
 
         /// <summary>

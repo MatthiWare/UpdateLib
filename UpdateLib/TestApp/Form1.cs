@@ -7,6 +7,7 @@ using System;
 using System.Drawing;
 using System.IO;
 using System.Security.Cryptography;
+using System.Security.Permissions;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -79,6 +80,7 @@ namespace TestApp
             return string.Join(", ", lines);
         }
 
+        FileStream fs;
         /// <summary>
         /// Bad code that keeps the file open & locked
         /// Purpose: to demonstrate the updater still works on locked files.
@@ -90,13 +92,13 @@ namespace TestApp
             if (!File.Exists(file))
                 return "ERROR: File doesn't exist..";
 
-            FileStream fs = new FileStream(file, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+            fs = new FileStream(file, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
             StreamReader sr = new StreamReader(fs);
             string text = sr.ReadToEnd();
 
             return text;
         }
-
+        
         private void button1_Click(object sender, EventArgs e)
         {
             DummyTask task = new DummyTask();

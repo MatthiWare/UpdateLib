@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using System.Drawing;
 using MatthiWare.UpdateLib.UI;
 using static MatthiWare.UpdateLib.Tasks.CheckForUpdatesTask;
+using MatthiWare.UpdateLib.Logging;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
@@ -25,7 +26,7 @@ namespace MatthiWare.UpdateLib.Tasks
 
         protected override void DoWork()
         {
-            if (string.IsNullOrEmpty(Url)) throw new WebException("Invalid Url");
+            if (string.IsNullOrEmpty(Url)) throw new WebException("Invalid Url", WebExceptionStatus.NameResolutionFailure);
 
             Result = new Data();
 
