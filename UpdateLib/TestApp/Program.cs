@@ -22,6 +22,7 @@ namespace TestApp
 
             SetupLogging();
             InitializeUpdater();
+
             Application.Run(new Form1());
         }
 
@@ -37,9 +38,11 @@ namespace TestApp
             Updater.Instance.UpdateURL = "https://raw.githubusercontent.com/MatthiWare/UpdateLib.TestApp.UpdateExample/master/Dev/updatefile.xml";
             //Updater.Instance.UpdateURL = "http://matthiware.dev/UpdateLib/Dev/updatefile.xml";
 
-            Updater.Instance.Initialize();
+            Updater.Instance
+                .ConfigureInstallationMode(InstallationMode.Local)
+                .Initialize();
         }
 
-        
+
     }
 }

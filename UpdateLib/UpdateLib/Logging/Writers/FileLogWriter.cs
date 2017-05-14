@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MatthiWare.UpdateLib.Utils;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,28 +14,31 @@ namespace MatthiWare.UpdateLib.Logging.Writers
 
         public LoggingLevel LoggingLevel { get { return LoggingLevel.Debug; } }
 
-        private FileInfo logFile;
+        private Lazy<FileInfo> m_logFile = new Lazy<FileInfo>(GetLogFile);
 
         private readonly object sync = new object();
 
-        public FileLogWriter()
+        private static FileInfo GetLogFile()
         {
             string path = GetPathPrefix();
             string productName = GetProductName();
             string name = Assembly.GetEntryAssembly().GetName().Name;
-            logFile = new FileInfo($@"{path}\{name}\{productName}\{LOG_FOLDER_NAME}\log_{DateTime.Now.ToString("yyyyMMdd")}.log");
 
-            if (!logFile.Directory.Exists)
-                logFile.Directory.Create();
+            FileInfo m_logFile = new FileInfo($@"{path}\{name}\{productName}\{LOG_FOLDER_NAME}\log_{DateTime.Now.ToString("yyyyMMdd")}.log");
+
+            if (!m_logFile.Directory.Exists)
+                m_logFile.Directory.Create();
+
+            return m_logFile;
         }
 
-        private string GetProductName()
+        private static string GetProductName()
         {
             AssemblyProductAttribute attr = Attribute.GetCustomAttribute(Assembly.GetAssembly(typeof(FileLogWriter)), typeof(AssemblyProductAttribute)) as AssemblyProductAttribute;
             return attr?.Product ?? "";
         }
 
-        private string GetPathPrefix()
+        private static string GetPathPrefix()
         {
             switch (Updater.Instance.InstallationMode)
             {
@@ -55,7 +59,7 @@ namespace MatthiWare.UpdateLib.Logging.Writers
         {
             lock (sync)
             {
-                using (StreamWriter writer = new StreamWriter(logFile.Open(FileMode.OpenOrCreate, FileAccess.Write)))
+                using (StreamWriter writer = new StreamWriter(m_logFile.Value.Open(FileMode.OpenOrCreate, FileAccess.Write)))
                 {
                     writer.BaseStream.Seek(0, SeekOrigin.End);
                     writer.WriteLine(text);

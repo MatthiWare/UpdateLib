@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MatthiWare.UpdateLib.Utils;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -16,7 +17,7 @@ namespace MatthiWare.UpdateLib.Files
         [XmlArrayItem("Entry")]
         public List<HashCacheEntry> Items { get; set; }
 
-        private static string storagePath;
+        private static Lazy<string> storagePath = new Lazy<string>(GetStoragePath);
 
         public HashCacheFile()
         {
@@ -26,16 +27,11 @@ namespace MatthiWare.UpdateLib.Files
         #region Save/Load
         private static string GetStoragePath()
         {
-            if (string.IsNullOrEmpty(storagePath))
-            {
-                string path = GetPathPrefix();
-                string productName = GetProductName();
-                string name = Assembly.GetEntryAssembly().GetName().Name;
+            string path = GetPathPrefix();
+            string productName = GetProductName();
+            string name = Assembly.GetEntryAssembly().GetName().Name;
 
-                storagePath = $@"{path}\{name}\{productName}\{CACHE_FOLDER_NAME}\{FILE_NAME}";
-            }
-
-            return storagePath;
+            return $@"{path}\{name}\{productName}\{CACHE_FOLDER_NAME}\{FILE_NAME}";
         }
 
         private static string GetProductName()
@@ -57,10 +53,10 @@ namespace MatthiWare.UpdateLib.Files
 
         public static HashCacheFile Load()
         {
-            if (!File.Exists(GetStoragePath()))
+            if (!File.Exists(storagePath.Value))
                 return null;
 
-            using (Stream stream = File.Open(GetStoragePath(), FileMode.Open, FileAccess.Read))
+            using (Stream stream = File.Open(storagePath.Value, FileMode.Open, FileAccess.Read))
             {
                 XmlSerializer serializer = new XmlSerializer(typeof(HashCacheFile));
                 return (HashCacheFile)serializer.Deserialize(stream);
@@ -69,7 +65,7 @@ namespace MatthiWare.UpdateLib.Files
 
         public void Save()
         {
-            FileInfo fi = new FileInfo(GetStoragePath());
+            FileInfo fi = new FileInfo(storagePath.Value);
 
             if (!fi.Directory.Exists)
                 fi.Directory.Create();

@@ -128,6 +128,7 @@
     <Compile Include="UI\WizardPageCollection.cs" />
     <Compile Include="Updater.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\Lazy.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\status_working.png" />
