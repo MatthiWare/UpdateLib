@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading;
+using System.Linq;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
@@ -135,9 +136,7 @@ namespace MatthiWare.UpdateLib.Tasks
         public static void WaitAll(IEnumerable<AsyncTask> tasks)
         {
             foreach (AsyncTask task in tasks)
-            {
                 task.AwaitTask();
-            }
         }
 
         #endregion
@@ -277,7 +276,7 @@ namespace MatthiWare.UpdateLib.Tasks
         /// Blocks the calling thread until the complete task is done.
         /// DO NOT call this in the worker method use <see cref="AwaitWorkers"/> method instead. 
         /// </summary>
-        public void AwaitTask()
+        public AsyncTask AwaitTask()
         {
             if (IsChildTask && !IsCompleted && !IsRunning)
                 Reset();
@@ -288,6 +287,8 @@ namespace MatthiWare.UpdateLib.Tasks
                 m_waitHandle.Close();
                 m_waitHandle = null;
             }
+
+            return this;
         }
 
         private int x = 0;
@@ -386,11 +387,8 @@ namespace MatthiWare.UpdateLib.Tasks
         /// <returns>The task object for fluent API.</returns>
         public new AsyncTask<T> ConfigureAwait(bool useSyncContext)
         {
-            base.ConfigureAwait(useSyncContext);
-            return this;
+            return (AsyncTask<T>)base.ConfigureAwait(useSyncContext);
         }
-
-        #endregion
 
         /// <summary>
         /// Starts the task
@@ -398,8 +396,8 @@ namespace MatthiWare.UpdateLib.Tasks
         /// <returns>Returns the current Task.</returns>
         public new AsyncTask<T> Start()
         {
-            base.Start();
-            return this;
+            return (AsyncTask<T>)base.Start();
+
         }
 
         /// <summary>
@@ -407,10 +405,14 @@ namespace MatthiWare.UpdateLib.Tasks
         /// DO NOT call this in the worker method use <see cref="AsyncTask.AwaitWorkers"/> method instead. 
         /// </summary>
         /// <returns><see cref="Result"/></returns>
-        public new T AwaitTask()
+        public new AsyncTask<T> AwaitTask()
         {
-            base.AwaitTask();
-            return Result;
+            return (AsyncTask<T>)base.AwaitTask();
+
         }
+
+        #endregion
+
+
     }
 }
