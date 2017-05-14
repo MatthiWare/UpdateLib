@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Text;
 using MatthiWare.UpdateLib.Files;
-using System.ComponentModel;
 using System.Windows.Forms;
 using MatthiWare.UpdateLib.UI;
 using System.Drawing;
@@ -47,6 +46,8 @@ namespace MatthiWare.UpdateLib
             }
         }
 
+        public InstallationMode InstallationMode { get; set; } = InstallationMode.Shared;
+
         public bool EnableCmdArguments { get; set; } = true;
         public bool UpdateSilently { get; set; } = false;
         public string UpdateSilentlyCmdArg { get; set; } = "-silent";
@@ -68,11 +69,18 @@ namespace MatthiWare.UpdateLib
         /// </summary>
         public UpdateCacheTask UpdateCacheTask { get; private set; }
 
-        private bool initialized = false;
+        public bool IsInitialized { get; private set; }
 
         internal string RemoteBasePath { get; set; }
 
         #region Fluent API
+
+        public Updater ConfigureInstallationMode(InstallationMode mode)
+        {
+            InstallationMode = mode;
+
+            return this;
+        }
 
         public Updater ConfigureCmdArgs(bool enabled)
         {
@@ -129,7 +137,7 @@ namespace MatthiWare.UpdateLib
             UpdateCacheTask = new UpdateCacheTask();
             UpdateCacheTask.ConfigureAwait(false).Start();
 
-            initialized = true;
+            IsInitialized = true;
         }
 
         private bool ParseCmdArguments(string[] args)
@@ -152,7 +160,7 @@ namespace MatthiWare.UpdateLib
         /// <returns>Whether or not there is an update available and the latest version</returns>
         public CheckForUpdatesTask.Data CheckForUpdates()
         {
-            return CheckForUpdatesAsync().AwaitTask();
+            return CheckForUpdatesAsync().AwaitTask().Result;
         }
 
         /// <summary>
@@ -162,7 +170,7 @@ namespace MatthiWare.UpdateLib
         /// <returns>Whether or not there is an update available and the latest version</returns>
         public CheckForUpdatesTask.Data CheckForUpdates(IWin32Window owner)
         {
-            return CheckForUpdatesAsync(owner).AwaitTask();
+            return CheckForUpdatesAsync(owner).AwaitTask().Result;
         }
 
         /// <summary>
@@ -181,7 +189,7 @@ namespace MatthiWare.UpdateLib
         /// <returns>The update checker task.</returns>
         public CheckForUpdatesTask CheckForUpdatesAsync(IWin32Window owner)
         {
-            if (!initialized)
+            if (!IsInitialized)
                 throw new InvalidOperationException("The updater needs to be initialized first.");
 
             if (string.IsNullOrEmpty(UpdateURL))
@@ -220,7 +228,7 @@ namespace MatthiWare.UpdateLib
         /// <returns>The <see cref="HashCacheFile"/> of the current application</returns>
         public HashCacheFile GetCache()
         {
-            return UpdateCacheTask.AwaitTask();
+            return UpdateCacheTask.AwaitTask().Result;
         }
 
         private string GetRemoteBasePath()

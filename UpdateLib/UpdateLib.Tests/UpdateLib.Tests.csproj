@@ -66,6 +66,7 @@
     <Compile Include="Threading\AtomicIntegerTest.cs" />
     <Compile Include="Threading\ConcurrentQueueTests.cs" />
     <Compile Include="UI\WizardPageCollectionTest.cs" />
+    <Compile Include="UpdaterTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

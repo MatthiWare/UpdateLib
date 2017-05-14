@@ -9,6 +9,8 @@ namespace MatthiWare.UpdateLib.Logging.Writers
 {
     public class FileLogWriter : ILogWriter
     {
+        public const string LOG_FOLDER_NAME = "Log";
+
         public LoggingLevel LoggingLevel { get { return LoggingLevel.Debug; } }
 
         private FileInfo logFile;
@@ -17,12 +19,30 @@ namespace MatthiWare.UpdateLib.Logging.Writers
 
         public FileLogWriter()
         {
-            string appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            string path = GetPathPrefix();
+            string productName = GetProductName();
             string name = Assembly.GetEntryAssembly().GetName().Name;
-            logFile = new FileInfo($@"{appdata}\{name}\UpdateLib\Log\log_{DateTime.Now.ToString("yyyyMMdd")}.log");
+            logFile = new FileInfo($@"{path}\{name}\{productName}\{LOG_FOLDER_NAME}\log_{DateTime.Now.ToString("yyyyMMdd")}.log");
 
             if (!logFile.Directory.Exists)
                 logFile.Directory.Create();
+        }
+
+        private string GetProductName()
+        {
+            AssemblyProductAttribute attr = Attribute.GetCustomAttribute(Assembly.GetAssembly(typeof(FileLogWriter)), typeof(AssemblyProductAttribute)) as AssemblyProductAttribute;
+            return attr?.Product ?? "";
+        }
+
+        private string GetPathPrefix()
+        {
+            switch (Updater.Instance.InstallationMode)
+            {
+                case InstallationMode.Local:
+                    return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                default:
+                    return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            }
         }
 
         public void Log(string text)

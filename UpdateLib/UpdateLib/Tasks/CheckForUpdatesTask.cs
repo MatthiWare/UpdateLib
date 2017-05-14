@@ -50,7 +50,7 @@ namespace MatthiWare.UpdateLib.Tasks
              * Start a task to get all the files that need to be updated
              * Returns if there is anything to update
              */
-            Result.UpdateAvailable = CheckForUpdatedFiles(Result.UpdateFile, cache).AwaitTask();
+            Result.UpdateAvailable = CheckForUpdatedFiles(Result.UpdateFile, cache).AwaitTask().Result;
         }
 
         private CheckForUpdatedFilesTask CheckForUpdatedFiles(UpdateFile file, HashCacheFile cache)

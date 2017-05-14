@@ -9,6 +9,9 @@ namespace MatthiWare.UpdateLib.Files
     [Serializable]
     public class HashCacheFile
     {
+        public const string CACHE_FOLDER_NAME = "Cache";
+        public const string FILE_NAME = "HashCacheFile.xml";
+
         [XmlArray("Items")]
         [XmlArrayItem("Entry")]
         public List<HashCacheEntry> Items { get; set; }
@@ -25,12 +28,31 @@ namespace MatthiWare.UpdateLib.Files
         {
             if (string.IsNullOrEmpty(storagePath))
             {
-                string appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                string path = GetPathPrefix();
+                string productName = GetProductName();
                 string name = Assembly.GetEntryAssembly().GetName().Name;
-                storagePath = $@"{appdata}\{name}\UpdateLib\Cache\HashCacheFile.xml";
+
+                storagePath = $@"{path}\{name}\{productName}\{CACHE_FOLDER_NAME}\{FILE_NAME}";
             }
 
             return storagePath;
+        }
+
+        private static string GetProductName()
+        {
+            AssemblyProductAttribute attr = Attribute.GetCustomAttribute(Assembly.GetAssembly(typeof(HashCacheFile)), typeof(AssemblyProductAttribute)) as AssemblyProductAttribute;
+            return attr?.Product ?? "";
+        }
+
+        private static string GetPathPrefix()
+        {
+            switch (Updater.Instance.InstallationMode)
+            {
+                case InstallationMode.Local:
+                    return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                default:
+                    return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            }
         }
 
         public static HashCacheFile Load()

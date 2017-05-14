@@ -22,7 +22,6 @@ namespace TestApp
 
             SetupLogging();
             InitializeUpdater();
-
             Application.Run(new Form1());
         }
 

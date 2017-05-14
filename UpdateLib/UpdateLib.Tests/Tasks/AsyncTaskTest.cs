@@ -56,7 +56,7 @@ namespace UpdateLib.Tests.Tasks
             object o = new object();
             ResultTask<object> task = new ResultTask<object>(o);
             task.Start();
-            Assert.AreEqual(o, task.AwaitTask());
+            Assert.AreEqual(o, task.AwaitTask().Result);
         }
 
         [Test, Parallelizable]
@@ -79,7 +79,7 @@ namespace UpdateLib.Tests.Tasks
             };
             task.Start();
 
-            Assert.AreEqual(input, task.AwaitTask());
+            Assert.AreEqual(input, task.AwaitTask().Result);
         }
 
         [Test, Parallelizable]
