@@ -7,6 +7,7 @@ using System.Drawing;
 using MatthiWare.UpdateLib.Tasks;
 using MatthiWare.UpdateLib.Logging.Writers;
 using MatthiWare.UpdateLib.Logging;
+using System.Security;
 
 namespace MatthiWare.UpdateLib
 {
@@ -59,6 +60,8 @@ namespace MatthiWare.UpdateLib
         public bool ShowErrorMessage { get; set; } = true;
         public PathVariableConverter Converter { get; private set; }
 
+        public bool AllowUnsafeConnection { get; set; } = false;
+
         /// <summary>
         /// Gets the clean up task
         /// </summary>
@@ -74,6 +77,13 @@ namespace MatthiWare.UpdateLib
         internal string RemoteBasePath { get; set; }
 
         #region Fluent API
+
+        public Updater ConfigureUnsafeConnections(bool allow)
+        {
+            AllowUnsafeConnection = allow;
+
+            return this;
+        }
 
         public Updater ConfigureInstallationMode(InstallationMode mode)
         {
@@ -195,6 +205,9 @@ namespace MatthiWare.UpdateLib
             if (string.IsNullOrEmpty(UpdateURL))
                 throw new ArgumentException("You need to specifify an update url", nameof(UpdateURL));
 
+            if (!AllowUnsafeConnection && new Uri(UpdateURL).Scheme != Uri.UriSchemeHttps)
+                throw new SecurityException("Using unsafe connections to update from is not allowed");
+
             CheckForUpdatesTask task = new CheckForUpdatesTask(UpdateURL);
             task.TaskCompleted += (o, e) =>
             {
@@ -204,7 +217,10 @@ namespace MatthiWare.UpdateLib
                     return;
                 }
 
-                DialogResult result = MessageDialog.Show(
+                DialogResult result = DialogResult.Yes;
+
+                if (!UpdateSilently)
+                    result = MessageDialog.Show(
                         "Update available",
                         $"Version {task.Result.Version} available",
                         "Update now?\nPress yes to update or no to cancel.",
@@ -213,8 +229,15 @@ namespace MatthiWare.UpdateLib
 
                 if (result == DialogResult.Yes)
                 {
-                    UpdaterForm updateForm = new UpdaterForm(task.Result.UpdateFile);
-                    updateForm.ShowDialog(owner);
+                    if (UpdateSilently)
+                    {
+                        UpdateWithoutGUI(task.Result.UpdateFile);
+                    }
+                    else
+                    {
+                        UpdaterForm updateForm = new UpdaterForm(task.Result.UpdateFile);
+                        updateForm.ShowDialog(owner);
+                    }
                 }
 
                 CheckForUpdatesCompleted?.Invoke(task, new CheckForUpdatesCompletedEventArgs(task.Result, e));
@@ -243,6 +266,12 @@ namespace MatthiWare.UpdateLib
             }
 
             return builder.ToString();
+        }
+
+        private void UpdateWithoutGUI(UpdateFile file)
+        {
+            DownloadManager downloader = new DownloadManager(file);
+            downloader.Update();
         }
 
     }
