@@ -39,7 +39,7 @@ namespace TestApp
             //Updater.Instance.UpdateURL = "http://matthiware.dev/UpdateLib/Dev/updatefile.xml";
 
             Updater.Instance
-                .ConfigureInstallationMode(InstallationMode.Local)
+                .ConfigureInstallationMode(InstallationMode.Shared)
                 .Initialize();
         }
 

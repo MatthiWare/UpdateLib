@@ -69,9 +69,11 @@
     <Compile Include="Logging\Logger.cs" />
     <Compile Include="Logging\Writers\ConsoleLogWriter.cs" />
     <Compile Include="Logging\Writers\FileLogWriter.cs" />
+    <Compile Include="Security\InvalidHashException.cs" />
     <Compile Include="Tasks\AsyncTaskFactory.cs" />
     <Compile Include="Tasks\CheckForUpdatesCompletedEventArgs.cs" />
     <Compile Include="Tasks\CheckForUpdatesTask.cs" />
+    <Compile Include="Tasks\DownloadManager.cs" />
     <Compile Include="Tasks\UpdateFileProcessorTask.cs" />
     <Compile Include="Security\HashUtil.cs" />
     <Compile Include="Tasks\AsyncTask.cs" />
@@ -128,6 +130,7 @@
     <Compile Include="UI\WizardPageCollection.cs" />
     <Compile Include="Updater.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\ExtensionMethods.cs" />
     <Compile Include="Utils\Lazy.cs" />
   </ItemGroup>
   <ItemGroup>

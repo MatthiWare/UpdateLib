@@ -67,6 +67,7 @@
     <Compile Include="Threading\ConcurrentQueueTests.cs" />
     <Compile Include="UI\WizardPageCollectionTest.cs" />
     <Compile Include="UpdaterTest.cs" />
+    <Compile Include="Util\LazyTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

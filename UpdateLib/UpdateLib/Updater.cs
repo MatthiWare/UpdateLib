@@ -8,6 +8,7 @@ using MatthiWare.UpdateLib.Tasks;
 using MatthiWare.UpdateLib.Logging.Writers;
 using MatthiWare.UpdateLib.Logging;
 using System.Security;
+using System.Diagnostics;
 
 namespace MatthiWare.UpdateLib
 {
@@ -34,6 +35,8 @@ namespace MatthiWare.UpdateLib
         }
         #endregion
 
+        private int m_parentPid;
+
         public event EventHandler<CheckForUpdatesCompletedEventArgs> CheckForUpdatesCompleted;
 
         private string m_updateUrl = "";
@@ -51,9 +54,12 @@ namespace MatthiWare.UpdateLib
 
         public bool EnableCmdArguments { get; set; } = true;
         public bool UpdateSilently { get; set; } = false;
-        public string UpdateSilentlyCmdArg { get; set; } = "-silent";
+        public string UpdateSilentlyCmdArg { get; set; } = "--silent";
 
-        public string StartUpdatingCmdArg { get; set; } = "-update";
+        public string StartUpdatingCmdArg { get; set; } = "--update";
+
+        public bool WaitForProcessExit { get; set; }
+        public string WaitForProcessCmdArg { get; set; } = "--wait";
 
         public bool ShowUpdateMessage { get; set; } = true;
         public bool ShowMessageOnNoUpdate { get; set; } = true;
@@ -113,6 +119,13 @@ namespace MatthiWare.UpdateLib
             return this;
         }
 
+        public Updater ConfigureWaitForProcessCmdArg(string cmdArg)
+        {
+            WaitForProcessCmdArg = cmdArg;
+
+            return this;
+        }
+
         #endregion
 
         /// <summary>
@@ -135,6 +148,9 @@ namespace MatthiWare.UpdateLib
 
             bool shouldStartUpdating = ParseCmdArguments(Environment.GetCommandLineArgs());
 
+            if (WaitForProcessExit)
+                WaitForProcessToExit(m_parentPid);
+
             if (shouldStartUpdating)
                 CheckForUpdates();
         }
@@ -153,15 +169,29 @@ namespace MatthiWare.UpdateLib
         private bool ParseCmdArguments(string[] args)
         {
             bool startUpdating = false;
-            foreach (string arg in args)
+            for (int i = 0; i < args.Length; i++)
             {
-                if (arg == StartUpdatingCmdArg)
+                if (args[i] == StartUpdatingCmdArg)
                     startUpdating = true;
-                else if (arg == UpdateSilentlyCmdArg)
+                else if (args[i] == UpdateSilentlyCmdArg)
                     UpdateSilently = true;
+                else if (args[i] == WaitForProcessCmdArg)
+                    if (i + 1 <= args.Length && int.TryParse(args[i + 1], out m_parentPid))
+                    {
+                        i++;
+                        WaitForProcessExit = true;
+                    }
+
             }
 
             return startUpdating;
+        }
+
+        private void WaitForProcessToExit(int pid)
+        {
+            Process watchdog = Process.GetProcessById(pid);
+            watchdog.CloseMainWindow();
+            watchdog.WaitForExit();
         }
 
         /// <summary>

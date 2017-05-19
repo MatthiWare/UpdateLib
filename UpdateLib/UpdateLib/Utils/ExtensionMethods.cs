@@ -1,0 +1,29 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace MatthiWare.UpdateLib.Utils
+{
+    public static class ExtensionMethods
+    {
+
+        public static string AppendAll(this IEnumerable<string> collection, string seperator)
+        {
+            using (var enumerator = collection.GetEnumerator())
+            {
+                if (!enumerator.MoveNext())
+                    return string.Empty;
+
+                var builder = new StringBuilder().Append(enumerator.Current);
+
+                while (enumerator.MoveNext())
+                    builder.Append(seperator).Append(enumerator.Current);
+
+                return builder.ToString();
+            }
+
+        }
+
+    }
+}

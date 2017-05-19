@@ -1,8 +1,10 @@
 ﻿using MatthiWare.UpdateLib.Files;
 using MatthiWare.UpdateLib.Logging;
+using MatthiWare.UpdateLib.Security;
 using System;
 using System.IO;
 using System.Net;
+using System.Security;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -15,14 +17,18 @@ namespace MatthiWare.UpdateLib.Tasks
 
         public ListViewItem Item { get; private set; }
         public FileEntry Entry { get; private set; }
-        
+
         public DownloadTask(ListViewItem item)
+            : this((FileEntry)item.Tag)
         {
             Item = item;
-            Entry = (FileEntry)Item.Tag;
+        }
 
+        public DownloadTask(FileEntry entry)
+        {
+            Entry = entry;
             webClient = new WebClient();
-            webClient.DownloadProgressChanged += (o, e)=> { OnTaskProgressChanged(e); };
+            webClient.DownloadProgressChanged += (o, e) => { OnTaskProgressChanged(e); };
             webClient.DownloadFileCompleted += (o, e) => { wait.Set(); };
         }
 
@@ -44,6 +50,11 @@ namespace MatthiWare.UpdateLib.Tasks
             wait.WaitOne();
             wait.Close();
             wait = null;
+
+            string hash = HashUtil.GetHash(localFile);
+
+            if (hash.Length != Entry.Hash.Length || hash != Entry.Hash)
+                throw new InvalidHashException($"Calculated hash doesn't match provided hash for file: {localFile}");
         }
 
         public override void Cancel()
