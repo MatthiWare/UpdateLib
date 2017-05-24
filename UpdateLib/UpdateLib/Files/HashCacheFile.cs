@@ -27,7 +27,7 @@ namespace MatthiWare.UpdateLib.Files
         #region Save/Load
         private static string GetStoragePath()
         {
-            string path = GetPathPrefix();
+            string path = IOUtils.GetAppDataPath();
             string productName = GetProductName();
             string name = Assembly.GetEntryAssembly().GetName().Name;
 
@@ -40,16 +40,7 @@ namespace MatthiWare.UpdateLib.Files
             return attr?.Product ?? "";
         }
 
-        private static string GetPathPrefix()
-        {
-            switch (Updater.Instance.InstallationMode)
-            {
-                case InstallationMode.Local:
-                    return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-                default:
-                    return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            }
-        }
+        
 
         public static HashCacheFile Load()
         {

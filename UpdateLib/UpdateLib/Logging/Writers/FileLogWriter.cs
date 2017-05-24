@@ -20,7 +20,7 @@ namespace MatthiWare.UpdateLib.Logging.Writers
 
         private static FileInfo GetLogFile()
         {
-            string path = GetPathPrefix();
+            string path = IOUtils.GetAppDataPath();
             string productName = GetProductName();
             string name = Assembly.GetEntryAssembly().GetName().Name;
 
@@ -36,17 +36,6 @@ namespace MatthiWare.UpdateLib.Logging.Writers
         {
             AssemblyProductAttribute attr = Attribute.GetCustomAttribute(Assembly.GetAssembly(typeof(FileLogWriter)), typeof(AssemblyProductAttribute)) as AssemblyProductAttribute;
             return attr?.Product ?? "";
-        }
-
-        private static string GetPathPrefix()
-        {
-            switch (Updater.Instance.InstallationMode)
-            {
-                case InstallationMode.Local:
-                    return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-                default:
-                    return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            }
         }
 
         public void Log(string text)

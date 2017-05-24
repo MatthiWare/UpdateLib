@@ -62,9 +62,7 @@ namespace MatthiWare.UpdateLib.Tasks
             }
 
             if (amountToDownload.Decrement() == 0)
-            {
-                RestartApp();
-            }
+                Updater.Instance.RestartApp();
         }
 
         private void CancelOtherTasks()
@@ -73,27 +71,6 @@ namespace MatthiWare.UpdateLib.Tasks
                 task.Cancel();
         }
 
-        private void RestartApp()
-        {
-            Updater instance = Updater.Instance;
-            List<string> args = new List<string>(Environment.GetCommandLineArgs());
-
-            if (instance.EnableCmdArguments)
-                for (int i = 0; i < args.Count; i++)
-                    if (args[i] == instance.StartUpdatingCmdArg || args[i] == instance.UpdateSilentlyCmdArg)
-                        args[i] = string.Empty;
-
-            args.Add(instance.WaitForProcessCmdArg);
-            args.Add(Process.GetCurrentProcess().Id.ToString());
-
-            string arguments = args.Where(a => !string.IsNullOrEmpty(a)).Distinct().AppendAll(" ");
-
-            string startupPath = Application.StartupPath;
-
-            ProcessStartInfo startInfo = new ProcessStartInfo(startupPath, arguments);
-            Process.Start(startInfo);
-
-            Environment.Exit(0);
-        }
+        
     }
 }

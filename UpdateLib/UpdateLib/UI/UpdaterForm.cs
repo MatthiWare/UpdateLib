@@ -133,16 +133,7 @@ namespace MatthiWare.UpdateLib.UI
         {
             if (NeedsRestart)
             {
-                //Process current = Process.GetCurrentProcess();
-                //Process[] processes = Process.GetProcessesByName(current.ProcessName);
-                //foreach(Process p in processes)
-                //{
-                //    if (current != p)
-                //        p.Kill();
-                //}
-
-                Application.Restart();
-                Environment.Exit(0);
+                Updater.Instance.RestartApp();
             }
             else
             {

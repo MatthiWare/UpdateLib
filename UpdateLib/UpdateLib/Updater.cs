@@ -9,6 +9,10 @@ using MatthiWare.UpdateLib.Logging.Writers;
 using MatthiWare.UpdateLib.Logging;
 using System.Security;
 using System.Diagnostics;
+using System.Linq;
+using MatthiWare.UpdateLib.Utils;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace MatthiWare.UpdateLib
 {
@@ -35,37 +39,38 @@ namespace MatthiWare.UpdateLib
         }
         #endregion
 
+        #region Fields
+
         private int m_parentPid;
+        private string m_updateUrl = "";
+
+        #endregion
+
+        #region Events
 
         public event EventHandler<CheckForUpdatesCompletedEventArgs> CheckForUpdatesCompleted;
 
-        private string m_updateUrl = "";
+        #endregion
+
+        #region Properties
+
         public string UpdateURL
         {
             get { return m_updateUrl; }
             set
             {
                 m_updateUrl = value;
-                RemoteBasePath = GetRemoteBasePath();
+                RemoteBasePath = IOUtils.GetRemoteBasePath(value);
             }
         }
-
         public InstallationMode InstallationMode { get; set; } = InstallationMode.Shared;
-
-        public bool EnableCmdArguments { get; set; } = true;
+        public bool StartUpdating { get; set; } = false;
         public bool UpdateSilently { get; set; } = false;
         public string UpdateSilentlyCmdArg { get; set; } = "--silent";
-
         public string StartUpdatingCmdArg { get; set; } = "--update";
-
         public bool WaitForProcessExit { get; set; }
         public string WaitForProcessCmdArg { get; set; } = "--wait";
-
-        public bool ShowUpdateMessage { get; set; } = true;
-        public bool ShowMessageOnNoUpdate { get; set; } = true;
-        public bool ShowErrorMessage { get; set; } = true;
         public PathVariableConverter Converter { get; private set; }
-
         public bool AllowUnsafeConnection { get; set; } = false;
 
         /// <summary>
@@ -82,8 +87,16 @@ namespace MatthiWare.UpdateLib
 
         internal string RemoteBasePath { get; set; }
 
+        #endregion
+
         #region Fluent API
 
+        /// <summary>
+        /// Configures if unsafe connections are allowed
+        /// </summary>
+        /// <remarks>Do not enable this unless you know what you are doing</remarks>
+        /// <param name="allow">Allowed?</param>
+        /// <returns><see cref="Updater"/></returns>
         public Updater ConfigureUnsafeConnections(bool allow)
         {
             AllowUnsafeConnection = allow;
@@ -91,6 +104,11 @@ namespace MatthiWare.UpdateLib
             return this;
         }
 
+        /// <summary>
+        /// Configures the installation mode for the client
+        /// </summary>
+        /// <param name="mode">The <see cref="InstallationMode"/></param>
+        /// <returns><see cref="Updater"/></returns>
         public Updater ConfigureInstallationMode(InstallationMode mode)
         {
             InstallationMode = mode;
@@ -98,13 +116,11 @@ namespace MatthiWare.UpdateLib
             return this;
         }
 
-        public Updater ConfigureCmdArgs(bool enabled)
-        {
-            EnableCmdArguments = enabled;
-
-            return this;
-        }
-
+        /// <summary>
+        /// Configures the update silently command switch
+        /// </summary>
+        /// <param name="cmdArg">Command name</param>
+        /// <returns><see cref="Updater"/></returns>
         public Updater ConfigureSilentCmdArg(string cmdArg)
         {
             UpdateSilentlyCmdArg = cmdArg;
@@ -112,6 +128,11 @@ namespace MatthiWare.UpdateLib
             return this;
         }
 
+        /// <summary>
+        /// Configures the update command switch
+        /// </summary>
+        /// <param name="cmdArg">Command name</param>
+        /// <returns><see cref="Updater"/></returns>
         public Updater ConfigureUpdateCmdArg(string cmdArg)
         {
             StartUpdatingCmdArg = cmdArg;
@@ -119,6 +140,11 @@ namespace MatthiWare.UpdateLib
             return this;
         }
 
+        /// <summary>
+        /// Configures the wait for process to exit command switch
+        /// </summary>
+        /// <param name="cmdArg">Command name</param>
+        /// <returns><see cref="Updater"/></returns>
         public Updater ConfigureWaitForProcessCmdArg(string cmdArg)
         {
             WaitForProcessCmdArg = cmdArg;
@@ -143,18 +169,18 @@ namespace MatthiWare.UpdateLib
         {
             StartInitializationTasks();
 
-            if (!EnableCmdArguments)
-                return;
-
-            bool shouldStartUpdating = ParseCmdArguments(Environment.GetCommandLineArgs());
+            ParseCmdArguments(Environment.GetCommandLineArgs());
 
             if (WaitForProcessExit)
                 WaitForProcessToExit(m_parentPid);
 
-            if (shouldStartUpdating)
+            if (StartUpdating)
                 CheckForUpdates();
         }
 
+        /// <summary>
+        /// Starts the initialization tasks
+        /// </summary>
         private void StartInitializationTasks()
         {
             CleanUpTask = new CleanUpTask(".");
@@ -166,32 +192,40 @@ namespace MatthiWare.UpdateLib
             IsInitialized = true;
         }
 
-        private bool ParseCmdArguments(string[] args)
+        /// <summary>
+        /// Parses the given arguments
+        /// </summary>
+        /// <param name="args">The arguments to parse</param>
+        private void ParseCmdArguments(string[] args)
         {
-            bool startUpdating = false;
             for (int i = 0; i < args.Length; i++)
             {
-                if (args[i] == StartUpdatingCmdArg)
-                    startUpdating = true;
-                else if (args[i] == UpdateSilentlyCmdArg)
+                if (!string.IsNullOrEmpty(StartUpdatingCmdArg) && args[i] == StartUpdatingCmdArg)
+                    StartUpdating = true;
+                else if (!string.IsNullOrEmpty(UpdateSilentlyCmdArg) && args[i] == UpdateSilentlyCmdArg)
                     UpdateSilently = true;
-                else if (args[i] == WaitForProcessCmdArg)
+                else if (!string.IsNullOrEmpty(WaitForProcessCmdArg) && args[i] == WaitForProcessCmdArg)
                     if (i + 1 <= args.Length && int.TryParse(args[i + 1], out m_parentPid))
                     {
                         i++;
                         WaitForProcessExit = true;
                     }
-
             }
-
-            return startUpdating;
         }
 
+        /// <summary>
+        /// Waits for a process to exit on the current thread
+        /// </summary>
+        /// <param name="pid">Process ID</param>
         private void WaitForProcessToExit(int pid)
         {
-            Process watchdog = Process.GetProcessById(pid);
-            watchdog.CloseMainWindow();
-            watchdog.WaitForExit();
+            Process[] processes = Process.GetProcesses();
+            Process toWatch = processes.FirstOrDefault(p => p.Id == pid);
+
+            if (toWatch == null) return;
+
+            toWatch.CloseMainWindow();
+            toWatch.WaitForExit();
         }
 
         /// <summary>
@@ -281,27 +315,49 @@ namespace MatthiWare.UpdateLib
         /// <returns>The <see cref="HashCacheFile"/> of the current application</returns>
         public HashCacheFile GetCache()
         {
+            if (!IsInitialized) throw new InvalidOperationException("Updater has not been initialized yet!");
+
             return UpdateCacheTask.AwaitTask().Result;
         }
 
-        private string GetRemoteBasePath()
-        {
-            string[] tokens = UpdateURL.Split('/');
-            StringBuilder builder = new StringBuilder();
-
-            for (int i = 0; i < tokens.Length - 1; i++)
-            {
-                builder.Append(tokens[i]);
-                builder.Append('/');
-            }
-
-            return builder.ToString();
-        }
-
+        /// <summary>
+        /// Updates without user interaction
+        /// </summary>
+        /// <param name="file">The update specifications file <see cref="UpdateFile"/> </param>
         private void UpdateWithoutGUI(UpdateFile file)
         {
             DownloadManager downloader = new DownloadManager(file);
             downloader.Update();
+        }
+
+        internal void RestartApp()
+        {
+            List<string> args = new List<string>(Environment.GetCommandLineArgs());
+
+            for (int i = 0; i < args.Count; i++)
+            {
+                if (args[i] == StartUpdatingCmdArg || args[i] == UpdateSilentlyCmdArg)
+                {
+                    args[i] = string.Empty;
+                }
+                else if (args[i] == WaitForProcessCmdArg)
+                {
+                    args[i] = string.Empty;
+                    if (i + 1 < args.Count)
+                        args[++i] = string.Empty;
+                }
+            }
+
+            args.Add(instance.WaitForProcessCmdArg);
+            args.Add(Process.GetCurrentProcess().Id.ToString());
+
+            string arguments = args.Where(a => !string.IsNullOrEmpty(a)).Distinct().AppendAll(" ");
+
+            ProcessStartInfo startInfo = new ProcessStartInfo(Assembly.GetEntryAssembly().Location, arguments);
+            startInfo.UseShellExecute = false;
+            Process.Start(startInfo);
+
+            Environment.Exit(0);
         }
 
     }
