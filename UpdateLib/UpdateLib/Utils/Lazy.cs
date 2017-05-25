@@ -35,6 +35,14 @@ namespace MatthiWare.UpdateLib.Utils
 
                 return m_storedValue;
             }
+            set
+            {
+                lock (sync)
+                {
+                    m_initialized = true;
+                    m_storedValue = value;
+                }
+            }
         }
 
         /// <summary>

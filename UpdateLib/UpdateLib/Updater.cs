@@ -13,6 +13,7 @@ using System.Linq;
 using MatthiWare.UpdateLib.Utils;
 using System.Collections.Generic;
 using System.Reflection;
+using System.IO;
 
 namespace MatthiWare.UpdateLib
 {
@@ -41,19 +42,30 @@ namespace MatthiWare.UpdateLib
 
         #region Fields
 
-        private int m_parentPid;
+        private int m_pid;
         private string m_updateUrl = "";
+        private string m_argUpdateSilent = "--silent";
+        private string m_argUpdate = "--update";
+        private string m_argWait = "--wait";
+        private Lazy<PathVariableConverter> m_lazyPathVarConv = new Lazy<PathVariableConverter>(() => new PathVariableConverter());
 
         #endregion
 
         #region Events
 
+        /// <summary>
+        /// Check for updates completed event.
+        /// </summary>
         public event EventHandler<CheckForUpdatesCompletedEventArgs> CheckForUpdatesCompleted;
 
         #endregion
 
         #region Properties
 
+        /// <summary>
+        /// Gets or sets the url to update from
+        /// </summary>
+        /// <remarks>If you want to specify an unsafe connection you should enable <see cref="AllowUnsafeConnection"/></remarks>
         public string UpdateURL
         {
             get { return m_updateUrl; }
@@ -63,14 +75,73 @@ namespace MatthiWare.UpdateLib
                 RemoteBasePath = IOUtils.GetRemoteBasePath(value);
             }
         }
+
+        /// <summary>
+        /// Gets or sets the Updater Installation mode
+        /// </summary>
         public InstallationMode InstallationMode { get; set; } = InstallationMode.Shared;
+
+        /// <summary>
+        /// Gets or sets if we want to check for updates before the actual program is loaded.
+        /// </summary>
         public bool StartUpdating { get; set; } = false;
+
+        /// <summary>
+        /// Gets or sets if we want to update silently (no UI interaction).
+        /// </summary>
         public bool UpdateSilently { get; set; } = false;
-        public string UpdateSilentlyCmdArg { get; set; } = "--silent";
-        public string StartUpdatingCmdArg { get; set; } = "--update";
+
+        /// <summary>
+        /// Gets or sets the command line argument for the silent switch
+        /// If this argument has been set and is passed in the command line it will set <see cref="UpdateSilently"/> to <c>True</c> 
+        /// </summary>
+        public string UpdateSilentlyCmdArg
+        {
+            get { return m_argUpdateSilent; }
+            set { m_argUpdateSilent = SetAndVerifyCmdArgument(value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the command line argument for the update switch
+        /// If this argument has been set and is passed in the command line it will set <see cref="StartUpdating"/> to <c>True</c> 
+        /// </summary>
+        public string StartUpdatingCmdArg
+        {
+            get { return m_argUpdate; }
+            set { m_argUpdate = SetAndVerifyCmdArgument(value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the command line argument for the wait switch
+        /// If this argument has been set and passed in the command line followed by an <see cref="Process.Id"/> it will set <see cref="WaitForProcessExit"/> to <c>True</c>
+        /// </summary>
+        public string WaitForProcessCmdArg
+        {
+            get { return m_argWait; }
+            set { m_argWait = SetAndVerifyCmdArgument(value); }
+        }
+
+        /// <summary>
+        /// Indicates if we want to wait for the given process to wait
+        /// See <seealso cref="WaitForProcessCmdArg"/> and <seealso cref="ConfigureWaitForProcessCmdArg(string)"/>
+        /// If this property has been set to true it will wait for the <see cref="Process.Id"/> to exit before continuing when <see cref="Initialize"/> has been called.  
+        /// </summary>
         public bool WaitForProcessExit { get; set; }
-        public string WaitForProcessCmdArg { get; set; } = "--wait";
-        public PathVariableConverter Converter { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="PathVariableConverter"/>.
+        /// This property is only initialized when called.
+        /// </summary>
+        public PathVariableConverter Converter
+        {
+            get { return m_lazyPathVarConv.Value; }
+            private set { m_lazyPathVarConv.Value = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets if the updater allows unsafe connection 
+        /// <value>`True` to allow HTTP connections, `False` to only allow HTTPS connections</value>
+        /// </summary>
         public bool AllowUnsafeConnection { get; set; } = false;
 
         /// <summary>
@@ -83,8 +154,14 @@ namespace MatthiWare.UpdateLib
         /// </summary>
         public UpdateCacheTask UpdateCacheTask { get; private set; }
 
+        /// <summary>
+        /// Is the updater already initialized?
+        /// </summary>
         public bool IsInitialized { get; private set; }
 
+        /// <summary>
+        /// The remote base path to use for downloading etc..
+        /// </summary>
         internal string RemoteBasePath { get; set; }
 
         #endregion
@@ -157,10 +234,7 @@ namespace MatthiWare.UpdateLib
         /// <summary>
         /// Initializes a new instance of <see cref="Updater"/> with the default settings. 
         /// </summary>
-        private Updater()
-        {
-            Converter = new PathVariableConverter();
-        }
+        private Updater() { }
 
         /// <summary>
         /// Initializes the updater
@@ -172,7 +246,7 @@ namespace MatthiWare.UpdateLib
             ParseCmdArguments(Environment.GetCommandLineArgs());
 
             if (WaitForProcessExit)
-                WaitForProcessToExit(m_parentPid);
+                WaitForProcessToExit(m_pid);
 
             if (StartUpdating)
                 CheckForUpdates();
@@ -204,12 +278,8 @@ namespace MatthiWare.UpdateLib
                     StartUpdating = true;
                 else if (!string.IsNullOrEmpty(UpdateSilentlyCmdArg) && args[i] == UpdateSilentlyCmdArg)
                     UpdateSilently = true;
-                else if (!string.IsNullOrEmpty(WaitForProcessCmdArg) && args[i] == WaitForProcessCmdArg)
-                    if (i + 1 <= args.Length && int.TryParse(args[i + 1], out m_parentPid))
-                    {
-                        i++;
-                        WaitForProcessExit = true;
-                    }
+                else if (!string.IsNullOrEmpty(WaitForProcessCmdArg) && args[i] == WaitForProcessCmdArg && i + 1 < args.Length && int.TryParse(args[++i], out m_pid))
+                    WaitForProcessExit = true;
             }
         }
 
@@ -358,6 +428,14 @@ namespace MatthiWare.UpdateLib
             Process.Start(startInfo);
 
             Environment.Exit(0);
+        }
+
+        private string SetAndVerifyCmdArgument(string value)
+        {
+            if (value.Contains(' '))
+                throw new ArgumentException("Command line argument can not contain spaces");
+
+            return value;
         }
 
     }
