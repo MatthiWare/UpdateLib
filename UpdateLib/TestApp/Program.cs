@@ -34,11 +34,9 @@ namespace TestApp
 
         private static void InitializeUpdater()
         {
-            // Set update url
-            //Updater.Instance.UpdateURL = "https://raw.githubusercontent.com/MatthiWare/UpdateLib.TestApp.UpdateExample/master/Dev/updatefile.xml";
-            Updater.Instance.UpdateURL = "http://matthiware.dev/UpdateLib/Dev/updatefile.xml";
-
             Updater.Instance
+                //.ConfigureUpdateUrl("https://raw.githubusercontent.com/MatthiWare/UpdateLib.TestApp.UpdateExample/master/Dev/updatefile.xml")
+                .ConfigureUpdateUrl("http://matthiware.dev/UpdateLib/Dev/updatefile.xml")
                 .ConfigureUnsafeConnections(true)
                 .ConfigureInstallationMode(InstallationMode.Shared)
                 .Initialize();

@@ -62,13 +62,14 @@ namespace MatthiWare.UpdateLib.Tasks
 
         private string GetLocalFileName()
         {
-            string[] tokens = Url.Split('/');
-            return string.Concat("./", tokens[tokens.Length - 1]);
+            const char slash = '/';
+            string[] tokens = Url.Split(slash);
+            return string.Concat(".", slash, tokens[tokens.Length - 1]);
         }
 
         public class Data
         {
-            public string Version { get; set; } = "";
+            public string Version { get; set; } = string.Empty;
             public bool UpdateAvailable { get; set; } = false;
             public UpdateFile UpdateFile { get; set; }
         }

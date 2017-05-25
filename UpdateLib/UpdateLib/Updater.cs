@@ -17,7 +17,7 @@ using System.IO;
 
 namespace MatthiWare.UpdateLib
 {
-    public class Updater
+    public sealed class Updater
     {
         #region Singleton
         private static volatile Updater instance = null;
@@ -225,6 +225,19 @@ namespace MatthiWare.UpdateLib
         public Updater ConfigureWaitForProcessCmdArg(string cmdArg)
         {
             WaitForProcessCmdArg = cmdArg;
+
+            return this;
+        }
+
+        /// <summary>
+        /// Configures the update url
+        /// </summary>
+        /// <remarks>To use HTTP you should enable <see cref="AllowUnsafeConnection"/> </remarks>
+        /// <param name="url">Url to update from</param>
+        /// <returns><see cref="Updater"/> </returns>
+        public Updater ConfigureUpdateUrl(string url)
+        {
+            UpdateURL = url;
 
             return this;
         }
