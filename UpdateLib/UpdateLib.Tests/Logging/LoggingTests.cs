@@ -13,17 +13,23 @@ namespace UpdateLib.Tests.Logging
     [TestFixture]
     public class LoggingTests
     {
+        private Logger logger;
 
+        [SetUp]
+        public void Setup()
+        {
+            logger = new Logger();
+        }
 
         [Test]
         public void ErrorLogLevelShouldNotLogWhenDebugLog()
         {
-            Logger.LogLevel = LoggingLevel.Error;
+            logger.LogLevel = LoggingLevel.Error;
             Mock<ILogWriter> writer = SetUpWriter(LoggingLevel.Debug);
 
-            Logger.Writers.Add(writer.Object);
+            logger.Writers.Add(writer.Object);
 
-            Logger.Debug(nameof(LoggingTests), "This is my log msg");
+            logger.Debug(nameof(LoggingTests), "This is my log msg");
 
             writer.Verify(mock => mock.Log(It.IsAny<string>()), Times.Never);
         }
@@ -31,12 +37,12 @@ namespace UpdateLib.Tests.Logging
         [Test]
         public void DebugLogLevelShouldLogErrorLog()
         {
-            Logger.LogLevel = LoggingLevel.Debug;
+            logger.LogLevel = LoggingLevel.Debug;
             Mock<ILogWriter> writer = SetUpWriter(LoggingLevel.Error);
 
-            Logger.Writers.Add(writer.Object);
+            logger.Writers.Add(writer.Object);
 
-            Logger.Error(nameof(LoggingTests), "This is my log msg");
+            logger.Error(nameof(LoggingTests), "This is my log msg");
 
             writer.Verify(mock => mock.Log(It.IsAny<string>()), Times.Once);
         }
@@ -44,7 +50,7 @@ namespace UpdateLib.Tests.Logging
         [Test]
         public void ErrorLogLevelShouldNotLogAnyLowerLevel()
         {
-            Logger.LogLevel = LoggingLevel.Error;
+            logger.LogLevel = LoggingLevel.Error;
 
             Mock<ILogWriter> info = SetUpWriter(LoggingLevel.Info);
 
@@ -52,14 +58,14 @@ namespace UpdateLib.Tests.Logging
 
             Mock<ILogWriter> debug = SetUpWriter(LoggingLevel.Debug);
 
-            Logger.Writers.Add(info.Object);
-            Logger.Writers.Add(warn.Object);
-            Logger.Writers.Add(debug.Object);
+            logger.Writers.Add(info.Object);
+            logger.Writers.Add(warn.Object);
+            logger.Writers.Add(debug.Object);
 
-            Logger.Error("", "");
-            Logger.Warn("", "");
-            Logger.Info("", "");
-            Logger.Debug("", "");
+            logger.Error("", "");
+            logger.Warn("", "");
+            logger.Info("", "");
+            logger.Debug("", "");
 
             info.Verify(mock => mock.Log(It.IsAny<string>()), Times.Never);
             warn.Verify(mock => mock.Log(It.IsAny<string>()), Times.Never);
@@ -77,7 +83,7 @@ namespace UpdateLib.Tests.Logging
         [TearDown]
         public void CleanUp()
         {
-            Logger.Writers.Clear();
+            logger.Writers.Clear();
         }
 
     }

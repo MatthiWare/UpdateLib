@@ -110,7 +110,7 @@ namespace MatthiWare.UpdateLib.UI.Components
 
             if (e.Cancelled)
             {
-                Logger.Info(nameof(DownloadTask), $"Cancelled -> '{task.Entry.Name}'");
+                Updater.Instance.Logger.Info(nameof(DownloadTask), $"Cancelled -> '{task.Entry.Name}'");
 
                 SetSubItemText(task.Item.SubItems[2], "Cancelled");
 
@@ -121,7 +121,7 @@ namespace MatthiWare.UpdateLib.UI.Components
 
             if (e.Error != null)
             {
-                Logger.Error(nameof(DownloadTask), e.Error);
+                Updater.Instance.Logger.Error(nameof(DownloadTask), e.Error);
 
                 SetSubItemText(task.Item.SubItems[2], "Error");
 

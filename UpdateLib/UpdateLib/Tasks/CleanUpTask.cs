@@ -29,7 +29,7 @@ namespace MatthiWare.UpdateLib.Tasks
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(GetType().Name, e);
+                    Updater.Instance.Logger.Error(GetType().Name, e);
                 }
             }
         }

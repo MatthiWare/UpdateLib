@@ -20,28 +20,17 @@ namespace TestApp
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            SetupLogging();
-            InitializeUpdater();
-
-            Application.Run(new Form1());
-        }
-
-        private static void SetupLogging()
-        {
-            Logger.Writers.Add(new ConsoleLogWriter());
-            Logger.Writers.Add(new FileLogWriter());
-        }
-
-        private static void InitializeUpdater()
-        {
             Updater.Instance
                 //.ConfigureUpdateUrl("https://raw.githubusercontent.com/MatthiWare/UpdateLib.TestApp.UpdateExample/master/Dev/updatefile.xml")
                 .ConfigureUpdateUrl("http://matthiware.dev/UpdateLib/Dev/updatefile.xml")
+                .ConfigureLogger((logger) => logger.LogLevel = LoggingLevel.Debug)
+                .ConfigureLogger((logger) => logger.Writers.Add(new ConsoleLogWriter()))
+                .ConfigureLogger((logger) => logger.Writers.Add(new FileLogWriter()))
                 .ConfigureUnsafeConnections(true)
                 .ConfigureInstallationMode(InstallationMode.Shared)
                 .Initialize();
+
+            Application.Run(new Form1());
         }
-
-
     }
 }

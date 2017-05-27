@@ -48,6 +48,8 @@ namespace MatthiWare.UpdateLib
         private string m_argUpdate = "--update";
         private string m_argWait = "--wait";
         private Lazy<PathVariableConverter> m_lazyPathVarConv = new Lazy<PathVariableConverter>(() => new PathVariableConverter());
+        private TimeSpan m_cacheInvalidation = TimeSpan.FromMinutes(5);
+        private Lazy<Logger> m_lazyLogger = new Lazy<Logger>(() => new Logger());
 
         #endregion
 
@@ -76,6 +78,8 @@ namespace MatthiWare.UpdateLib
             }
         }
 
+        public ILogger Logger { get { return m_lazyLogger.Value; } }
+
         /// <summary>
         /// Gets or sets the Updater Installation mode
         /// </summary>
@@ -98,7 +102,7 @@ namespace MatthiWare.UpdateLib
         public string UpdateSilentlyCmdArg
         {
             get { return m_argUpdateSilent; }
-            set { m_argUpdateSilent = SetAndVerifyCmdArgument(value); }
+            set { SetAndVerifyCmdArgument(ref m_argUpdateSilent, value); }
         }
 
         /// <summary>
@@ -108,7 +112,7 @@ namespace MatthiWare.UpdateLib
         public string StartUpdatingCmdArg
         {
             get { return m_argUpdate; }
-            set { m_argUpdate = SetAndVerifyCmdArgument(value); }
+            set { SetAndVerifyCmdArgument(ref m_argUpdate, value); }
         }
 
         /// <summary>
@@ -118,7 +122,7 @@ namespace MatthiWare.UpdateLib
         public string WaitForProcessCmdArg
         {
             get { return m_argWait; }
-            set { m_argWait = SetAndVerifyCmdArgument(value); }
+            set { SetAndVerifyCmdArgument(ref m_argWait, value); }
         }
 
         /// <summary>
@@ -160,6 +164,17 @@ namespace MatthiWare.UpdateLib
         public bool IsInitialized { get; private set; }
 
         /// <summary>
+        /// Time before all the cached files become invalid
+        /// </summary>
+        public TimeSpan CacheInvalidationTime
+        {
+            get { return m_cacheInvalidation; }
+            set { m_cacheInvalidation = value; }
+        }
+
+        public bool NeedsRestartBeforeUpdate { get; set; } = true;
+
+        /// <summary>
         /// The remote base path to use for downloading etc..
         /// </summary>
         internal string RemoteBasePath { get; set; }
@@ -177,6 +192,27 @@ namespace MatthiWare.UpdateLib
         public Updater ConfigureUnsafeConnections(bool allow)
         {
             AllowUnsafeConnection = allow;
+
+            return this;
+        }
+
+        public Updater ConfigureLogger(Action<ILogger> logAction)
+        {
+            logAction(Logger);
+
+            return this;
+        }
+
+        public Updater ConfigureNeedsRestartBeforeUpdate(bool needsRestartBeforeUpdate)
+        {
+            NeedsRestartBeforeUpdate = needsRestartBeforeUpdate;
+
+            return this;
+        }
+
+        public Updater ConfigureCacheInvalidation(TimeSpan timeTillInvalidation)
+        {
+            CacheInvalidationTime = timeTillInvalidation;
 
             return this;
         }
@@ -376,6 +412,9 @@ namespace MatthiWare.UpdateLib
 
                 if (result == DialogResult.Yes)
                 {
+                    if (!StartUpdating && NeedsRestartBeforeUpdate)
+                        RestartApp(true, UpdateSilently, true, true);
+
                     if (UpdateSilently)
                     {
                         UpdateWithoutGUI(task.Result.UpdateFile);
@@ -413,13 +452,13 @@ namespace MatthiWare.UpdateLib
             downloader.Update();
         }
 
-        internal void RestartApp()
+        internal void RestartApp(bool update = false, bool silent = false, bool waitForPid = true, bool asAdmin = false)
         {
             List<string> args = new List<string>(Environment.GetCommandLineArgs());
 
             for (int i = 0; i < args.Count; i++)
             {
-                if (args[i] == StartUpdatingCmdArg || args[i] == UpdateSilentlyCmdArg)
+                if ((!update && args[i] == StartUpdatingCmdArg) || (!silent && args[i] == UpdateSilentlyCmdArg))
                 {
                     args[i] = string.Empty;
                 }
@@ -431,24 +470,38 @@ namespace MatthiWare.UpdateLib
                 }
             }
 
-            args.Add(instance.WaitForProcessCmdArg);
-            args.Add(Process.GetCurrentProcess().Id.ToString());
+            if (waitForPid && !string.IsNullOrEmpty(instance.WaitForProcessCmdArg))
+            {
+                args.Add(instance.WaitForProcessCmdArg);
+                args.Add(Process.GetCurrentProcess().Id.ToString());
+            }
+
+            if (update && !string.IsNullOrEmpty(instance.StartUpdatingCmdArg) && !args.Contains(instance.StartUpdatingCmdArg))
+                args.Add(instance.StartUpdatingCmdArg);
+
+            if (silent && !string.IsNullOrEmpty(instance.UpdateSilentlyCmdArg) && !args.Contains(instance.UpdateSilentlyCmdArg))
+                args.Add(instance.UpdateSilentlyCmdArg);
 
             string arguments = args.Where(a => !string.IsNullOrEmpty(a)).Distinct().AppendAll(" ");
 
             ProcessStartInfo startInfo = new ProcessStartInfo(Assembly.GetEntryAssembly().Location, arguments);
-            startInfo.UseShellExecute = false;
+
+            startInfo.UseShellExecute = true;
+
+            if (asAdmin)
+                startInfo.Verb = "runas";
+
             Process.Start(startInfo);
 
             Environment.Exit(0);
         }
 
-        private string SetAndVerifyCmdArgument(string value)
+        private void SetAndVerifyCmdArgument(ref string reference, string value)
         {
             if (value.Contains(' '))
                 throw new ArgumentException("Command line argument can not contain spaces");
 
-            return value;
+            reference = value;
         }
 
     }

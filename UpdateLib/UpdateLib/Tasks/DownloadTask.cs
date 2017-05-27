@@ -39,8 +39,8 @@ namespace MatthiWare.UpdateLib.Tasks
             string localFile = Updater.Instance.Converter.Replace(Entry.DestinationLocation);
             string remoteFile = string.Concat(Updater.Instance.RemoteBasePath, Entry.SourceLocation);
 
-            Logger.Debug(GetType().Name, $"LocalFile => {localFile}");
-            Logger.Debug(GetType().Name, $"RemoteFile => {remoteFile}");
+            Updater.Instance.Logger.Debug(GetType().Name, $"LocalFile => {localFile}");
+            Updater.Instance.Logger.Debug(GetType().Name, $"RemoteFile => {remoteFile}");
 
             if (File.Exists(localFile))
                 File.Move(localFile, $"{localFile}.old.tmp");

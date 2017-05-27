@@ -58,7 +58,7 @@ namespace MatthiWare.UpdateLib.Tasks
                 succes = false;
                 CancelOtherTasks();
 
-                Logger.Error(GetType().Name, e.Error);
+                Updater.Instance.Logger.Error(GetType().Name, e.Error);
             }
 
             if (amountToDownload.Decrement() == 0)
