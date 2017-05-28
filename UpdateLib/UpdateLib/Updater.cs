@@ -50,7 +50,6 @@ namespace MatthiWare.UpdateLib
         private Lazy<PathVariableConverter> m_lazyPathVarConv = new Lazy<PathVariableConverter>(() => new PathVariableConverter());
         private TimeSpan m_cacheInvalidation = TimeSpan.FromMinutes(5);
         private Lazy<Logger> m_lazyLogger = new Lazy<Logger>(() => new Logger());
-
         #endregion
 
         #region Events
@@ -78,6 +77,11 @@ namespace MatthiWare.UpdateLib
             }
         }
 
+        public bool UpdateRequiresAdmin { get; set; } = true;
+
+        /// <summary>
+        /// Gets the logger for the application.
+        /// </summary>
         public ILogger Logger { get { return m_lazyLogger.Value; } }
 
         /// <summary>
@@ -225,6 +229,13 @@ namespace MatthiWare.UpdateLib
         public Updater ConfigureInstallationMode(InstallationMode mode)
         {
             InstallationMode = mode;
+
+            return this;
+        }
+
+        public Updater ConfigureUpdateNeedsAdmin(bool needsAdmin)
+        {
+            UpdateRequiresAdmin = needsAdmin;
 
             return this;
         }
@@ -402,18 +413,17 @@ namespace MatthiWare.UpdateLib
 
                 DialogResult result = DialogResult.Yes;
 
-                if (!UpdateSilently)
+                if (!UpdateSilently && !StartUpdating)
                     result = MessageDialog.Show(
                         "Update available",
                         $"Version {task.Result.Version} available",
                         "Update now?\nPress yes to update or no to cancel.",
                         SystemIcons.Question);
 
-
                 if (result == DialogResult.Yes)
                 {
                     if (!StartUpdating && NeedsRestartBeforeUpdate)
-                        RestartApp(true, UpdateSilently, true, true);
+                        RestartApp(true, UpdateSilently, true, UpdateRequiresAdmin);
 
                     if (UpdateSilently)
                     {
