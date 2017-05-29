@@ -21,7 +21,7 @@ namespace MatthiWare.UpdateLib.Logging.Writers
         private static FileInfo GetLogFile()
         {
             string path = IOUtils.GetAppDataPath();
-            string productName = GetProductName();
+            string productName = Updater.ProductName;
             string name = Assembly.GetEntryAssembly().GetName().Name;
 
             FileInfo m_logFile = new FileInfo($@"{path}\{name}\{productName}\{LOG_FOLDER_NAME}\log_{DateTime.Now.ToString("yyyyMMdd")}.log");
@@ -30,12 +30,6 @@ namespace MatthiWare.UpdateLib.Logging.Writers
                 m_logFile.Directory.Create();
 
             return m_logFile;
-        }
-
-        private static string GetProductName()
-        {
-            AssemblyProductAttribute attr = Attribute.GetCustomAttribute(Assembly.GetAssembly(typeof(FileLogWriter)), typeof(AssemblyProductAttribute)) as AssemblyProductAttribute;
-            return attr?.Product ?? "";
         }
 
         public void Log(string text)

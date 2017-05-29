@@ -27,6 +27,8 @@ namespace TestApp
                 .ConfigureLogger((logger) => logger.Writers.Add(new ConsoleLogWriter()))
                 .ConfigureLogger((logger) => logger.Writers.Add(new FileLogWriter()))
                 .ConfigureUnsafeConnections(true)
+                .ConfigureCacheInvalidation(TimeSpan.FromSeconds(30))
+                .ConfigureUpdateNeedsAdmin(false)
                 .ConfigureInstallationMode(InstallationMode.Shared)
                 .Initialize();
 

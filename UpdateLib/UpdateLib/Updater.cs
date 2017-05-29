@@ -50,6 +50,13 @@ namespace MatthiWare.UpdateLib
         private Lazy<PathVariableConverter> m_lazyPathVarConv = new Lazy<PathVariableConverter>(() => new PathVariableConverter());
         private TimeSpan m_cacheInvalidation = TimeSpan.FromMinutes(5);
         private Lazy<Logger> m_lazyLogger = new Lazy<Logger>(() => new Logger());
+
+        private static Lazy<string> m_lazyProductName = new Lazy<string>(() =>
+        {
+            AssemblyProductAttribute attr = Attribute.GetCustomAttribute(Assembly.GetAssembly(typeof(Updater)), typeof(AssemblyProductAttribute)) as AssemblyProductAttribute;
+            return attr?.Product ?? "UpdateLib";
+        });
+
         #endregion
 
         #region Events
@@ -62,6 +69,8 @@ namespace MatthiWare.UpdateLib
         #endregion
 
         #region Properties
+
+        internal static string ProductName { get { return m_lazyProductName.Value; } }
 
         /// <summary>
         /// Gets or sets the url to update from
@@ -407,6 +416,14 @@ namespace MatthiWare.UpdateLib
             {
                 if (!task.Result.UpdateAvailable || e.Cancelled || e.Error != null)
                 {
+                    MessageDialog.Show(
+                       owner,
+                       $"{ProductName} Updater",
+                       e.Cancelled ? "Cancelled" : "Error while updating",
+                       e.Cancelled ? "Update got cancelled" : "Please check the logs for more information.",
+                       e.Cancelled ? SystemIcons.Warning : SystemIcons.Error,
+                       MessageBoxButtons.OK);
+
                     CheckForUpdatesCompleted?.Invoke(task, new CheckForUpdatesCompletedEventArgs(task.Result, e));
                     return;
                 }
@@ -415,6 +432,7 @@ namespace MatthiWare.UpdateLib
 
                 if (!UpdateSilently && !StartUpdating)
                     result = MessageDialog.Show(
+                        owner,
                         "Update available",
                         $"Version {task.Result.Version} available",
                         "Update now?\nPress yes to update or no to cancel.",
@@ -513,6 +531,5 @@ namespace MatthiWare.UpdateLib
 
             reference = value;
         }
-
     }
 }

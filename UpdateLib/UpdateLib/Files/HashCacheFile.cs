@@ -28,19 +28,11 @@ namespace MatthiWare.UpdateLib.Files
         private static string GetStoragePath()
         {
             string path = IOUtils.GetAppDataPath();
-            string productName = GetProductName();
+            string productName = Updater.ProductName;
             string name = Assembly.GetEntryAssembly().GetName().Name;
 
             return $@"{path}\{name}\{productName}\{CACHE_FOLDER_NAME}\{FILE_NAME}";
         }
-
-        private static string GetProductName()
-        {
-            AssemblyProductAttribute attr = Attribute.GetCustomAttribute(Assembly.GetAssembly(typeof(HashCacheFile)), typeof(AssemblyProductAttribute)) as AssemblyProductAttribute;
-            return attr?.Product ?? "";
-        }
-
-        
 
         public static HashCacheFile Load()
         {
