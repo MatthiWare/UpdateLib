@@ -185,6 +185,11 @@ namespace MatthiWare.UpdateLib
             set { m_cacheInvalidation = value; }
         }
 
+        /// <summary>
+        /// Gets or sets if the updater needs to launch as a new instance.
+        /// <c>True</c> if you want cold-swapping, <c>False</c> if you want hot-swapping
+        /// </summary>
+        /// <remarks>Hot-swapping might cause issues if the files are still in use.</remarks>
         public bool NeedsRestartBeforeUpdate { get; set; } = true;
 
         /// <summary>
@@ -209,6 +214,11 @@ namespace MatthiWare.UpdateLib
             return this;
         }
 
+        /// <summary>
+        /// Configures the logger
+        /// </summary>
+        /// <param name="logAction">Action to perform on the logger</param>
+        /// <returns><see cref="Updater"/> </returns>
         public Updater ConfigureLogger(Action<ILogger> logAction)
         {
             logAction(Logger);
@@ -216,6 +226,12 @@ namespace MatthiWare.UpdateLib
             return this;
         }
 
+        /// <summary>
+        /// Configures if the updater needs a restart before updating
+        /// </summary>
+        /// <remarks>Disabling this feature will allow for hot-swapping of the files. </remarks>
+        /// <param name="needsRestartBeforeUpdate">Restart updater in new instance</param>
+        /// <returns><see cref="Updater"/> </returns>
         public Updater ConfigureNeedsRestartBeforeUpdate(bool needsRestartBeforeUpdate)
         {
             NeedsRestartBeforeUpdate = needsRestartBeforeUpdate;
@@ -223,6 +239,11 @@ namespace MatthiWare.UpdateLib
             return this;
         }
 
+        /// <summary>
+        /// Configures the time till the cache becomes invalid
+        /// </summary>
+        /// <param name="timeTillInvalidation">Specify the validity time</param>
+        /// <returns><see cref="Updater"/> </returns>
         public Updater ConfigureCacheInvalidation(TimeSpan timeTillInvalidation)
         {
             CacheInvalidationTime = timeTillInvalidation;
