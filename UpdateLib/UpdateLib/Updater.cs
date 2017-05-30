@@ -424,7 +424,10 @@ namespace MatthiWare.UpdateLib
                         Logger.Error(GetType().Name, e.Error);
 
                     if (!update)
-                        Logger.Info()
+                        Logger.Info(GetType().Name, "No update available");
+
+                    if (cancelled)
+                        Logger.Info(GetType().Name, "Update cancalled");
 
                     if (!UpdateSilently)
                         MessageDialog.Show(

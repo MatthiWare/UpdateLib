@@ -61,7 +61,7 @@ namespace TestApp
             checkForUpdatesToolStripMenuItem.Enabled = false;
 
             AsyncTask task = Updater.Instance.CheckForUpdatesAsync();
-            task.Cancel();
+            //task.Cancel();
         }
 
         private void Form1_Load(object sender, EventArgs e)
