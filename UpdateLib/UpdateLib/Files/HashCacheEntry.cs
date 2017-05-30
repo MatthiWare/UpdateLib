@@ -16,7 +16,7 @@ namespace MatthiWare.UpdateLib.Files
         public string FilePath { get; set; }
 
         [XmlAttribute("Time")]
-        public long Ticks { get; set; }
+        public long Ticks { get; set; } = -1;
 
         public HashCacheEntry() { }
 
@@ -35,16 +35,18 @@ namespace MatthiWare.UpdateLib.Files
             Ticks = File.GetLastWriteTime(FilePath).Ticks;
         }
 
-        public void Recalculate(long tick)
+        public void Recalculate()
         {
             try
             {
-                if (tick != Ticks)
+                long tick = File.GetLastWriteTime(FilePath).Ticks;
+
+                if (Ticks == -1 || tick != Ticks)
                 {
                     Hash = HashUtil.GetHash(FilePath);
                     Ticks = tick;
 
-                    Logger.Debug(GetType().Name, $"Recalculated Time: {DateTime.FromBinary(Ticks).ToString()} Name: {FilePath} Hash: {Hash}");
+                    Updater.Instance.Logger.Debug(GetType().Name, $"Recalculated Time: {DateTime.FromBinary(Ticks).ToString()} Name: {FilePath} Hash: {Hash}");
                 }
             }
             catch (Exception ex) // file might no longer exist or is in use
@@ -52,7 +54,7 @@ namespace MatthiWare.UpdateLib.Files
                 Hash = string.Empty;
                 Ticks = -1;
 
-                Logger.Error(GetType().Name, ex);
+                Updater.Instance.Logger.Error(GetType().Name, ex);
             }
         }
 

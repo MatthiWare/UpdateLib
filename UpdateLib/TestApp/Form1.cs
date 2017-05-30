@@ -7,6 +7,7 @@ using System;
 using System.Drawing;
 using System.IO;
 using System.Security.Cryptography;
+using System.Security.Permissions;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -27,39 +28,40 @@ namespace TestApp
         {
             this.InvokeOnUI(() => checkForUpdatesToolStripMenuItem.Enabled = true);
 
-            if (e.Cancelled || e.Error != null)
-            {
-                this.InvokeOnUI(() => MessageDialog.Show(
-                    this,
-                    "Updater",
-                    e.Cancelled ? "Cancelled" : "Error",
-                    e.Cancelled ? "Update got cancelled" : "Please check the logs for more information.",
-                    e.Cancelled ? SystemIcons.Warning : SystemIcons.Error,
-                    MessageBoxButtons.OK));
+            //if (e.Cancelled || e.Error != null)
+            //{
+            //    this.InvokeOnUI(() => MessageDialog.Show(
+            //        this,
+            //        "Updater",
+            //        e.Cancelled ? "Cancelled" : "Error",
+            //        e.Cancelled ? "Update got cancelled" : "Please check the logs for more information.",
+            //        e.Cancelled ? SystemIcons.Warning : SystemIcons.Error,
+            //        MessageBoxButtons.OK));
 
-                return;
-            }
+            //    return;
+            //}
 
-            if (!e.UpdateAvailable)
-            {
-                this.InvokeOnUI(() =>
-                MessageDialog.Show(
-                    this,
-                    "Updater",
-                    "No update available!",
-                    $"You already have the latest version ({e.LatestVersion}).",
-                    SystemIcons.Information,
-                    MessageBoxButtons.OK));
+            //if (!e.UpdateAvailable)
+            //{
+            //    this.InvokeOnUI(() =>
+            //    MessageDialog.Show(
+            //        this,
+            //        "Updater",
+            //        "No update available!",
+            //        $"You already have the latest version ({e.LatestVersion}).",
+            //        SystemIcons.Information,
+            //        MessageBoxButtons.OK));
 
-                return;
-            }
+            //    return;
+            //}
         }
 
         private void checkForUpdatesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             checkForUpdatesToolStripMenuItem.Enabled = false;
 
-            Updater.Instance.CheckForUpdatesAsync();
+            AsyncTask task = Updater.Instance.CheckForUpdatesAsync();
+            //task.Cancel();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -79,6 +81,7 @@ namespace TestApp
             return string.Join(", ", lines);
         }
 
+        FileStream fs;
         /// <summary>
         /// Bad code that keeps the file open & locked
         /// Purpose: to demonstrate the updater still works on locked files.
@@ -90,18 +93,23 @@ namespace TestApp
             if (!File.Exists(file))
                 return "ERROR: File doesn't exist..";
 
-            FileStream fs = new FileStream(file, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+            fs = new FileStream(file, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
             StreamReader sr = new StreamReader(fs);
             string text = sr.ReadToEnd();
 
             return text;
         }
-
+        
         private void button1_Click(object sender, EventArgs e)
         {
             DummyTask task = new DummyTask();
-            task.TaskCompleted += (o, ex) => Logger.Debug(nameof(DummyTask), "Callback task completed!");
+            task.TaskCompleted += (o, ex) => Updater.Instance.Logger.Debug(nameof(DummyTask), "Callback task completed!");
             task.Start();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            //Updater.Instance.RestartApp(false, false, true, true);
         }
     }
 }

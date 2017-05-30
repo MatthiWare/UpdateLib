@@ -83,7 +83,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             {
                 sw.Stop();
 
-                Logger.Debug(GetType().Name, $"File generation completed in {sw.ElapsedMilliseconds} ms.");
+                Updater.Instance.Logger.Debug(GetType().Name, $"File generation completed in {sw.ElapsedMilliseconds} ms.");
 
                 
 

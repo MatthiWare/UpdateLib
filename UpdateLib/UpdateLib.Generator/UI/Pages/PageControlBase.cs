@@ -36,7 +36,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             if (IsPageInitialized || (taskInitialize != null && taskInitialize.IsRunning))
                 return taskInitialize;
 
-            taskInitialize = AsyncTaskFactory.From(new Action(() => OnPageInitialize()), null);
+            taskInitialize = AsyncTaskFactory.From(new Action(OnPageInitialize), null);
 
             taskInitialize.TaskCompleted += (o, e) =>
             {

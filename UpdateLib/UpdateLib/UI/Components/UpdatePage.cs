@@ -7,6 +7,7 @@ using MatthiWare.UpdateLib.Properties;
 using MatthiWare.UpdateLib.Tasks;
 using MatthiWare.UpdateLib.Security;
 using MatthiWare.UpdateLib.Logging;
+using MatthiWare.UpdateLib.Threading;
 
 namespace MatthiWare.UpdateLib.UI.Components
 {
@@ -17,7 +18,7 @@ namespace MatthiWare.UpdateLib.UI.Components
 
         public event EventHandler PageUpdate;
 
-        private int amountToDownload;
+        private AtomicInteger amountToDownload = new AtomicInteger();
 
         public UpdatePage(UpdaterForm parent)
         {
@@ -52,7 +53,7 @@ namespace MatthiWare.UpdateLib.UI.Components
 
         private void FillListView()
         {
-            amountToDownload = UpdateFile.Count;
+            amountToDownload.Value = UpdateFile.Count;
 
             lvItems.BeginUpdate();
 
@@ -99,10 +100,8 @@ namespace MatthiWare.UpdateLib.UI.Components
         private void Task_TaskCompleted(object sender, AsyncCompletedEventArgs e)
         {
             DownloadTask task = (DownloadTask)sender;
-
-            int amountLeft = Interlocked.Decrement(ref amountToDownload);
-
-            if (amountLeft == 0)
+            
+            if (amountToDownload.Decrement() == 0)
             {
                 IsBusy = false;
                 IsDone = true;
@@ -111,7 +110,7 @@ namespace MatthiWare.UpdateLib.UI.Components
 
             if (e.Cancelled)
             {
-                Logger.Info(nameof(DownloadTask), $"Cancelled -> '{task.Entry.Name}'");
+                Updater.Instance.Logger.Info(nameof(DownloadTask), $"Cancelled -> '{task.Entry.Name}'");
 
                 SetSubItemText(task.Item.SubItems[2], "Cancelled");
 
@@ -122,7 +121,7 @@ namespace MatthiWare.UpdateLib.UI.Components
 
             if (e.Error != null)
             {
-                Logger.Error(nameof(DownloadTask), e.Error);
+                Updater.Instance.Logger.Error(nameof(DownloadTask), e.Error);
 
                 SetSubItemText(task.Item.SubItems[2], "Error");
 
@@ -130,33 +129,10 @@ namespace MatthiWare.UpdateLib.UI.Components
 
                 return;
             }
-
-            // Everything went good lets just check the hash again to be a bit more secure against attacks
-            if (!VerifyDownloadedFileSignature(task))
-            {
-                Logger.Error(nameof(DownloadTask), $"Signature match fail for file: {task.Entry.Name}");
-
-                task.Cancel();
-
-                SetSubItemText(task.Item.SubItems[2], "Error");
-
-                SetImageKey(task.Item, "status_error");
-
-                return;
-            }
-
 
             SetSubItemText(task.Item.SubItems[2], "Done");
 
             SetImageKey(task.Item, "status_done");
-        }
-
-        private bool VerifyDownloadedFileSignature(DownloadTask task)
-        {
-            string localFile = Updater.Instance.Converter.Replace(task.Entry.DestinationLocation);
-            string md5local = HashUtil.GetHash(localFile);
-
-            return md5local.Equals(task.Entry.Hash);
         }
 
         private void Task_TaskProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -176,44 +152,6 @@ namespace MatthiWare.UpdateLib.UI.Components
 
             //Test(item);
 
-        }
-
-        Random rnd = new Random();
-
-
-
-        private void Test(ListViewItem item)
-        {
-
-            int wait = rnd.Next(2000);
-
-            Thread.Sleep(wait);
-
-            SetImageKey(item, "status_download");
-            SetSubItemText(item.SubItems[2], "Downloading..");
-
-            wait = rnd.Next(100);
-            for (int i = 0; i <= 100; i++)
-            {
-
-                Thread.Sleep(wait);
-            }
-
-            bool val = rnd.Next(0, 2) == 0 ? false : true;
-            SetSubItemText(item.SubItems[2], val ? "Done" : "Error");
-
-            SetImageKey(item, val ? "status_done" : "status_error");
-
-
-            int amountLeft = Interlocked.Decrement(ref amountToDownload);
-
-            if (amountLeft != 0)
-                return;
-
-            IsBusy = false;
-            IsDone = true;
-
-            PageUpdate?.Invoke(this, new EventArgs());
         }
 
         private void SetImageKey(ListViewItem item, string key)

@@ -1,8 +1,10 @@
 ﻿using MatthiWare.UpdateLib.Files;
 using MatthiWare.UpdateLib.Logging;
+using MatthiWare.UpdateLib.Security;
 using System;
 using System.IO;
 using System.Net;
+using System.Security;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -15,26 +17,33 @@ namespace MatthiWare.UpdateLib.Tasks
 
         public ListViewItem Item { get; private set; }
         public FileEntry Entry { get; private set; }
-        
+
         public DownloadTask(ListViewItem item)
+            : this((FileEntry)item.Tag)
         {
             Item = item;
-            Entry = (FileEntry)Item.Tag;
+        }
 
+        public DownloadTask(FileEntry entry)
+        {
+            Entry = entry;
             webClient = new WebClient();
-            webClient.DownloadProgressChanged += (o, e)=> { OnTaskProgressChanged(e); };
+            webClient.DownloadProgressChanged += (o, e) => { OnTaskProgressChanged(e); };
             webClient.DownloadFileCompleted += (o, e) => { wait.Set(); };
         }
 
         protected override void DoWork()
         {
+            if (IsCancelled)
+                return;
+
             wait = new ManualResetEvent(false);
 
             string localFile = Updater.Instance.Converter.Replace(Entry.DestinationLocation);
             string remoteFile = string.Concat(Updater.Instance.RemoteBasePath, Entry.SourceLocation);
 
-            Logger.Debug(GetType().Name, $"LocalFile => {localFile}");
-            Logger.Debug(GetType().Name, $"RemoteFile => {remoteFile}");
+            Updater.Instance.Logger.Debug(GetType().Name, $"LocalFile => {localFile}");
+            Updater.Instance.Logger.Debug(GetType().Name, $"RemoteFile => {remoteFile}");
 
             if (File.Exists(localFile))
                 File.Move(localFile, $"{localFile}.old.tmp");
@@ -44,6 +53,13 @@ namespace MatthiWare.UpdateLib.Tasks
             wait.WaitOne();
             wait.Close();
             wait = null;
+
+            string hash = HashUtil.GetHash(localFile);
+
+            if (hash.Length != Entry.Hash.Length || hash != Entry.Hash)
+                throw new InvalidHashException($"Calculated hash doesn't match provided hash for file: {localFile}");
+
+            Updater.Instance.GetCache().AddOrUpdateEntry(localFile, hash);
         }
 
         public override void Cancel()

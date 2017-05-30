@@ -15,7 +15,7 @@ namespace MatthiWare.UpdateLib.Generator
         [STAThread]
         static void Main()
         {
-            Logger.Writers.Add(new ConsoleLogWriter());
+            Updater.Instance.ConfigureLogger((logger) => logger.Writers.Add(new ConsoleLogWriter()));
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

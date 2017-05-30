@@ -13,7 +13,7 @@ namespace MatthiWare.UpdateLib.UI
         internal bool NeedsRestart = true;
 
         private WizardPageCollection pages;
-        
+
         public UpdaterForm(UpdateFile updateFile)
         {
             InitializeComponent();
@@ -61,7 +61,7 @@ namespace MatthiWare.UpdateLib.UI
         delegate void _OnPageUpdate(IWizardPage page);
         private void OnPageUpdate(IWizardPage page)
         {
-            this.InvokeOnUI(() => 
+            this.InvokeOnUI(() =>
             {
                 if (page.IsDone && !page.IsBusy)
                 {
@@ -131,30 +131,20 @@ namespace MatthiWare.UpdateLib.UI
 
         private void ExitUpdater()
         {
+            Updater.Instance.GetCache().Save();
+
             if (NeedsRestart)
             {
-                //Process current = Process.GetCurrentProcess();
-                //Process[] processes = Process.GetProcessesByName(current.ProcessName);
-                //foreach(Process p in processes)
-                //{
-                //    if (current != p)
-                //        p.Kill();
-                //}
-
-                Application.Restart();
+                Updater.Instance.RestartApp();
             }
             else
             {
-               Updater.Instance.Initialize();
-
                 pages.Clear();
                 pages.Add(new FinishPage(this));
                 SetContentPage(pages.CurrentPage);
                 btnPrevious.Enabled = false;
                 Close();
             }
-
-
         }
 
         private void btnCancel_Click(object sender, EventArgs e)

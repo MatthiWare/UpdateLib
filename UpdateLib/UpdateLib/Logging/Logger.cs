@@ -5,43 +5,45 @@ using System.Text;
 
 namespace MatthiWare.UpdateLib.Logging
 {
-    public static class Logger
+    public class Logger : ILogger
     {
-        public static LoggingLevel LogLevel { get; set; } = LoggingLevel.Debug;
+        public LoggingLevel LogLevel { get; set; } = LoggingLevel.Debug;
 
-        public static List<ILogWriter> Writers { get; } = new List<ILogWriter>();
+        public ICollection<ILogWriter> Writers { get; } = new List<ILogWriter>();
 
-        public static void Log(string tag, string msg, LoggingLevel level)
+        private const string TEMPLATE = "[{0}][{1}][{2}]: {3}";
+
+        public void Log(string tag, string msg, LoggingLevel level)
         {
             if (level < LogLevel) return;
 
             Writers
                 .Where(w => w.LoggingLevel >= LogLevel && level >= w.LoggingLevel)
                 .ToList()
-                .ForEach(w => w.Log($"[{DateTime.Now.ToString()}][{level.ToString()}][{tag}]: {msg}"));
+                .ForEach(w => w.Log(string.Format(TEMPLATE, DateTime.Now, level, tag, msg))); 
         }
 
-        public static void Debug(string tag, string msg)
+        public void Debug(string tag, string msg)
         {
             Log(tag, msg, LoggingLevel.Debug);
         }
 
-        public static void Info(string tag, string msg)
+        public void Info(string tag, string msg)
         {
             Log(tag, msg, LoggingLevel.Info);
         }
 
-        public static void Warn(string tag, string msg)
+        public void Warn(string tag, string msg)
         {
             Log(tag, msg, LoggingLevel.Warn);
         }
 
-        public static void Error(string tag, string msg)
+        public void Error(string tag, string msg)
         {
             Log(tag, msg, LoggingLevel.Error);
         }
 
-        public static void Error(string tag, Exception e)
+        public void Error(string tag, Exception e)
         {
             Error(tag, e.ToString());
         }
