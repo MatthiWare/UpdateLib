@@ -69,7 +69,7 @@ namespace MatthiWare.UpdateLib.Tasks
                 }
 
                 // check to see if the file has been modified since last cache check
-                entry.Recalculate(f.LastWriteTime.Ticks);
+                entry.Recalculate();
             }
 
             Result.Save();

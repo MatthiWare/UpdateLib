@@ -20,11 +20,10 @@ namespace MatthiWare.UpdateLib.Logging.Writers
 
         private static FileInfo GetLogFile()
         {
-            string path = IOUtils.GetAppDataPath();
-            string productName = Updater.ProductName;
+            string path = IOUtils.AppDataPath;
             string name = Assembly.GetEntryAssembly().GetName().Name;
 
-            FileInfo m_logFile = new FileInfo($@"{path}\{name}\{productName}\{LOG_FOLDER_NAME}\log_{DateTime.Now.ToString("yyyyMMdd")}.log");
+            FileInfo m_logFile = new FileInfo($@"{path}\{LOG_FOLDER_NAME}\log_{DateTime.Now.ToString("yyyyMMdd")}.log");
 
             if (!m_logFile.Directory.Exists)
                 m_logFile.Directory.Create();

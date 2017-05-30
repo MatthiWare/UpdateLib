@@ -16,7 +16,7 @@ namespace MatthiWare.UpdateLib.Files
         public string FilePath { get; set; }
 
         [XmlAttribute("Time")]
-        public long Ticks { get; set; }
+        public long Ticks { get; set; } = -1;
 
         public HashCacheEntry() { }
 
@@ -35,11 +35,13 @@ namespace MatthiWare.UpdateLib.Files
             Ticks = File.GetLastWriteTime(FilePath).Ticks;
         }
 
-        public void Recalculate(long tick)
+        public void Recalculate()
         {
             try
             {
-                if (tick != Ticks)
+                long tick = File.GetLastWriteTime(FilePath).Ticks;
+
+                if (Ticks == -1 || tick != Ticks)
                 {
                     Hash = HashUtil.GetHash(FilePath);
                     Ticks = tick;

@@ -62,7 +62,11 @@ namespace MatthiWare.UpdateLib.Tasks
             }
 
             if (amountToDownload.Decrement() == 0)
+            {
+                Updater.Instance.GetCache().Save();
                 Updater.Instance.RestartApp();
+            }
+
         }
 
         private void CancelOtherTasks()
@@ -71,6 +75,5 @@ namespace MatthiWare.UpdateLib.Tasks
                 task.Cancel();
         }
 
-        
     }
 }

@@ -1,9 +1,11 @@
-﻿using MatthiWare.UpdateLib.Utils;
+﻿using MatthiWare.UpdateLib.Security;
+using MatthiWare.UpdateLib.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Xml.Serialization;
+using System.Linq;
 
 namespace MatthiWare.UpdateLib.Files
 {
@@ -17,29 +19,53 @@ namespace MatthiWare.UpdateLib.Files
         [XmlArrayItem("Entry")]
         public List<HashCacheEntry> Items { get; set; }
 
-        private static Lazy<string> storagePath = new Lazy<string>(GetStoragePath);
+        private readonly object sync = new object();
 
         public HashCacheFile()
         {
             Items = new List<HashCacheEntry>();
         }
 
+        public void AddOrUpdateEntry(string fullPath, string hash = "")
+        {
+            lock (sync)
+            {
+                long ticks = File.GetLastWriteTime(fullPath).Ticks;
+                hash = string.IsNullOrEmpty(hash) ? HashUtil.GetHash(fullPath) : hash;
+
+                HashCacheEntry entry = Items.FirstOrDefault(f => f.FilePath == fullPath);
+
+                if (entry == null)
+                {
+                    entry = new HashCacheEntry();
+                    entry.FilePath = fullPath;
+                    entry.Hash = hash;
+                    entry.Ticks = ticks;
+
+                    Items.Add(entry);
+                }
+                else
+                {
+                    entry.Ticks = ticks;
+                    entry.Hash = hash;
+                }
+            }
+        }
+
         #region Save/Load
         private static string GetStoragePath()
         {
-            string path = IOUtils.GetAppDataPath();
-            string productName = Updater.ProductName;
-            string name = Assembly.GetEntryAssembly().GetName().Name;
+            string path = IOUtils.AppDataPath;
 
-            return $@"{path}\{name}\{productName}\{CACHE_FOLDER_NAME}\{FILE_NAME}";
+            return $@"{path}\{CACHE_FOLDER_NAME}\{FILE_NAME}";
         }
 
         public static HashCacheFile Load()
         {
-            if (!File.Exists(storagePath.Value))
+            if (!File.Exists(GetStoragePath()))
                 return null;
 
-            using (Stream stream = File.Open(storagePath.Value, FileMode.Open, FileAccess.Read))
+            using (Stream stream = File.Open(GetStoragePath(), FileMode.Open, FileAccess.Read))
             {
                 XmlSerializer serializer = new XmlSerializer(typeof(HashCacheFile));
                 return (HashCacheFile)serializer.Deserialize(stream);
@@ -48,7 +74,7 @@ namespace MatthiWare.UpdateLib.Files
 
         public void Save()
         {
-            FileInfo fi = new FileInfo(storagePath.Value);
+            FileInfo fi = new FileInfo(GetStoragePath());
 
             if (!fi.Directory.Exists)
                 fi.Directory.Create();

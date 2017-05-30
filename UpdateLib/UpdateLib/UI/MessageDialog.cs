@@ -49,7 +49,10 @@ namespace MatthiWare.UpdateLib.UI
             Description = desc;
             Text = title;
             DialogIcon = icon;
+            Icon = icon;
 
+            ShowIcon = true;
+           
             SetUpButtons(buttons);
         }
 

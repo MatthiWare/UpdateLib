@@ -34,6 +34,9 @@ namespace MatthiWare.UpdateLib.Tasks
 
         protected override void DoWork()
         {
+            if (IsCancelled)
+                return;
+
             wait = new ManualResetEvent(false);
 
             string localFile = Updater.Instance.Converter.Replace(Entry.DestinationLocation);
@@ -55,6 +58,8 @@ namespace MatthiWare.UpdateLib.Tasks
 
             if (hash.Length != Entry.Hash.Length || hash != Entry.Hash)
                 throw new InvalidHashException($"Calculated hash doesn't match provided hash for file: {localFile}");
+
+            Updater.Instance.GetCache().AddOrUpdateEntry(localFile, hash);
         }
 
         public override void Cancel()

@@ -131,14 +131,14 @@ namespace MatthiWare.UpdateLib.UI
 
         private void ExitUpdater()
         {
+            Updater.Instance.GetCache().Save();
+
             if (NeedsRestart)
             {
                 Updater.Instance.RestartApp();
             }
             else
             {
-                Updater.Instance.Initialize();
-
                 pages.Clear();
                 pages.Add(new FinishPage(this));
                 SetContentPage(pages.CurrentPage);

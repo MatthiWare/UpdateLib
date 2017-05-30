@@ -42,7 +42,7 @@ namespace UpdateLib.Tests.Files
 
             EditTempFile();
             
-            entry.Recalculate(File.GetLastWriteTime(temp_file).Ticks);
+            entry.Recalculate();
 
             Assert.AreNotEqual(ticks, entry.Ticks);
             Assert.AreNotEqual(hash, entry.Hash);

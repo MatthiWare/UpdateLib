@@ -414,15 +414,26 @@ namespace MatthiWare.UpdateLib
             CheckForUpdatesTask task = new CheckForUpdatesTask(UpdateURL);
             task.TaskCompleted += (o, e) =>
             {
-                if (!task.Result.UpdateAvailable || e.Cancelled || e.Error != null)
+                bool error = e.Error != null;
+                bool cancelled = e.Cancelled;
+                bool update = task.Result.UpdateAvailable;
+
+                if (!update || cancelled || error)
                 {
-                    MessageDialog.Show(
-                       owner,
-                       $"{ProductName} Updater",
-                       e.Cancelled ? "Cancelled" : "Error while updating",
-                       e.Cancelled ? "Update got cancelled" : "Please check the logs for more information.",
-                       e.Cancelled ? SystemIcons.Warning : SystemIcons.Error,
-                       MessageBoxButtons.OK);
+                    if (error)
+                        Logger.Error(GetType().Name, e.Error);
+
+                    if (!update)
+                        Logger.Info()
+
+                    if (!UpdateSilently)
+                        MessageDialog.Show(
+                           owner,
+                           $"{ProductName} Updater",
+                           error ? "Error while updating" : (cancelled ? "Cancelled" : "No Update available"),
+                           error ? "Check the log files for more information!" : (cancelled ? "Update got cancelled" : $"You already have the latest version {task.Result.Version}"),
+                           error ? SystemIcons.Error : (cancelled ? SystemIcons.Warning : SystemIcons.Information),
+                           MessageBoxButtons.OK);
 
                     CheckForUpdatesCompleted?.Invoke(task, new CheckForUpdatesCompletedEventArgs(task.Result, e));
                     return;
@@ -456,6 +467,7 @@ namespace MatthiWare.UpdateLib
 
                 CheckForUpdatesCompleted?.Invoke(task, new CheckForUpdatesCompletedEventArgs(task.Result, e));
             };
+
             return (CheckForUpdatesTask)task.Start();
         }
 
