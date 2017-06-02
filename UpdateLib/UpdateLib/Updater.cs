@@ -14,6 +14,8 @@ using MatthiWare.UpdateLib.Utils;
 using System.Collections.Generic;
 using System.Reflection;
 using System.IO;
+using System.Threading;
+using System.Net;
 
 namespace MatthiWare.UpdateLib
 {
@@ -53,7 +55,7 @@ namespace MatthiWare.UpdateLib
 
         private static Lazy<string> m_lazyProductName = new Lazy<string>(() =>
         {
-            AssemblyProductAttribute attr = Attribute.GetCustomAttribute(Assembly.GetAssembly(typeof(Updater)), typeof(AssemblyProductAttribute)) as AssemblyProductAttribute;
+            AssemblyProductAttribute attr = Attribute.GetCustomAttribute(Assembly.GetEntryAssembly(), typeof(AssemblyProductAttribute)) as AssemblyProductAttribute;
             return attr?.Product ?? "UpdateLib";
         });
 
@@ -338,6 +340,8 @@ namespace MatthiWare.UpdateLib
             if (WaitForProcessExit)
                 WaitForProcessToExit(m_pid);
 
+            IsInitialized = true;
+
             if (StartUpdating)
                 CheckForUpdates();
         }
@@ -352,8 +356,6 @@ namespace MatthiWare.UpdateLib
 
             UpdateCacheTask = new UpdateCacheTask();
             UpdateCacheTask.ConfigureAwait(false).Start();
-
-            IsInitialized = true;
         }
 
         /// <summary>
@@ -442,22 +444,11 @@ namespace MatthiWare.UpdateLib
                 if (!update || cancelled || error)
                 {
                     if (error)
-                        Logger.Error(GetType().Name, e.Error);
-
-                    if (!update)
-                        Logger.Info(GetType().Name, "No update available");
-
-                    if (cancelled)
-                        Logger.Info(GetType().Name, "Update cancalled");
-
-                    if (!UpdateSilently)
-                        MessageDialog.Show(
-                           owner,
-                           $"{ProductName} Updater",
-                           error ? "Error while updating" : (cancelled ? "Cancelled" : "No Update available"),
-                           error ? "Check the log files for more information!" : (cancelled ? "Update got cancelled" : $"You already have the latest version {task.Result.Version}"),
-                           error ? SystemIcons.Error : (cancelled ? SystemIcons.Warning : SystemIcons.Information),
-                           MessageBoxButtons.OK);
+                        HandleException(owner, e.Error);
+                    else if (cancelled)
+                        HandleUserCancelled(owner);
+                    else if (!update)
+                        HandleNoUpdate(owner, task.Result.Version);
 
                     CheckForUpdatesCompleted?.Invoke(task, new CheckForUpdatesCompletedEventArgs(task.Result, e));
                     return;
@@ -493,6 +484,50 @@ namespace MatthiWare.UpdateLib
             };
 
             return (CheckForUpdatesTask)task.Start();
+        }
+
+        private void HandleException(IWin32Window owner, Exception e)
+        {
+            Logger.Error(GetType().Name, e);
+
+            bool webException = e is WebException;
+
+            if (!UpdateSilently)
+                MessageDialog.Show(
+                   owner,
+                   $"{ProductName} Updater",
+                   "Error while updating",
+                   webException ? "Unable to connect to the update server!\nPlease check your internet connection!":"Check the log files for more information!",
+                   webException ? SystemIcons.Warning : SystemIcons.Error,
+                   MessageBoxButtons.OK);
+        }
+
+        private void HandleNoUpdate(IWin32Window owner, string latest)
+        {
+            Logger.Info(GetType().Name, "No update available");
+
+            if (!UpdateSilently)
+                MessageDialog.Show(
+                   owner,
+                   $"{ProductName} Updater",
+                    "No Update available",
+                  $"You already have the latest version {latest}",
+                   SystemIcons.Information,
+                   MessageBoxButtons.OK);
+        }
+
+        private void HandleUserCancelled(IWin32Window owner)
+        {
+            Logger.Info(GetType().Name, "Update cancalled");
+
+            if (!UpdateSilently)
+                MessageDialog.Show(
+                   owner,
+                   $"{ProductName} Updater",
+                    "Cancelled",
+                    "Update got cancelled",
+                   SystemIcons.Warning,
+                   MessageBoxButtons.OK);
         }
 
         /// <summary>
