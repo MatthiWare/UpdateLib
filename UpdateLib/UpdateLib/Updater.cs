@@ -16,6 +16,8 @@ using System.Reflection;
 using System.IO;
 using System.Threading;
 using System.Net;
+using MatthiWare.UpdateLib.Security;
+using System.ComponentModel;
 
 namespace MatthiWare.UpdateLib
 {
@@ -59,6 +61,12 @@ namespace MatthiWare.UpdateLib
             return attr?.Product ?? "UpdateLib";
         });
 
+        private static Lazy<string> m_lazyUpdaterName = new Lazy<string>(() =>
+        {
+            AssemblyProductAttribute attr = Attribute.GetCustomAttribute(Assembly.GetAssembly(typeof(Updater)), typeof(AssemblyProductAttribute)) as AssemblyProductAttribute;
+            return attr?.Product ?? "UpdateLib";
+        });
+
         #endregion
 
         #region Events
@@ -73,6 +81,8 @@ namespace MatthiWare.UpdateLib
         #region Properties
 
         internal static string ProductName { get { return m_lazyProductName.Value; } }
+
+        internal static string UpdaterName { get { return m_lazyUpdaterName.Value; } }
 
         /// <summary>
         /// Gets or sets the url to update from
@@ -441,6 +451,8 @@ namespace MatthiWare.UpdateLib
                 bool cancelled = e.Cancelled;
                 bool update = task.Result.UpdateAvailable;
 
+                CheckForUpdatesCompleted?.Invoke(task, new CheckForUpdatesCompletedEventArgs(task.Result, e));
+
                 if (!update || cancelled || error)
                 {
                     if (error)
@@ -450,7 +462,6 @@ namespace MatthiWare.UpdateLib
                     else if (!update)
                         HandleNoUpdate(owner, task.Result.Version);
 
-                    CheckForUpdatesCompleted?.Invoke(task, new CheckForUpdatesCompletedEventArgs(task.Result, e));
                     return;
                 }
 
@@ -466,8 +477,9 @@ namespace MatthiWare.UpdateLib
 
                 if (result == DialogResult.Yes)
                 {
-                    if (!StartUpdating && NeedsRestartBeforeUpdate)
-                        RestartApp(true, UpdateSilently, true, UpdateRequiresAdmin);
+                    if ((!StartUpdating && NeedsRestartBeforeUpdate) || (UpdateRequiresAdmin && !PermissionUtil.IsProcessElevated))
+                        if (!RestartApp(true, UpdateSilently, true, UpdateRequiresAdmin))
+                            return;
 
                     if (UpdateSilently)
                     {
@@ -475,12 +487,13 @@ namespace MatthiWare.UpdateLib
                     }
                     else
                     {
+                        //UpdateWithoutGUI(task.Result.UpdateFile);
                         UpdaterForm updateForm = new UpdaterForm(task.Result.UpdateFile);
                         updateForm.ShowDialog(owner);
                     }
                 }
 
-                CheckForUpdatesCompleted?.Invoke(task, new CheckForUpdatesCompletedEventArgs(task.Result, e));
+
             };
 
             return (CheckForUpdatesTask)task.Start();
@@ -488,37 +501,52 @@ namespace MatthiWare.UpdateLib
 
         private void HandleException(IWin32Window owner, Exception e)
         {
-            Logger.Error(GetType().Name, e);
+            if (UpdateSilently)
+                return;
 
-            bool webException = e is WebException;
-
-            if (!UpdateSilently)
+            if (e is WebException)
                 MessageDialog.Show(
                    owner,
                    $"{ProductName} Updater",
                    "Error while updating",
-                   webException ? "Unable to connect to the update server!\nPlease check your internet connection!":"Check the log files for more information!",
-                   webException ? SystemIcons.Warning : SystemIcons.Error,
+                   "Unable to connect to the update server!\nPlease check your internet connection!",
+                    SystemIcons.Warning,
+                   MessageBoxButtons.OK);
+            else if (e is Win32Exception)
+                MessageDialog.Show(
+                   owner,
+                   $"{ProductName} Updater",
+                   "Update cancelled",
+                   "Update got cancelled by the user!",
+                    SystemIcons.Warning,
+                   MessageBoxButtons.OK);
+            else
+                MessageDialog.Show(
+                   owner,
+                   $"{ProductName} Updater",
+                   "Error while updating",
+                   "Check the log files for more information!",
+                   SystemIcons.Error,
                    MessageBoxButtons.OK);
         }
 
         private void HandleNoUpdate(IWin32Window owner, string latest)
         {
-            Logger.Info(GetType().Name, "No update available");
+            Logger.Info(nameof(Updater), nameof(CheckForUpdatesAsync), "No update available");
 
             if (!UpdateSilently)
                 MessageDialog.Show(
                    owner,
                    $"{ProductName} Updater",
-                    "No Update available",
-                  $"You already have the latest version {latest}",
+                   "No Update available",
+                   $"You already have the latest version {latest}",
                    SystemIcons.Information,
                    MessageBoxButtons.OK);
         }
 
         private void HandleUserCancelled(IWin32Window owner)
         {
-            Logger.Info(GetType().Name, "Update cancalled");
+            Logger.Info(nameof(Updater), nameof(CheckForUpdatesAsync), "Update cancalled");
 
             if (!UpdateSilently)
                 MessageDialog.Show(
@@ -551,7 +579,7 @@ namespace MatthiWare.UpdateLib
             downloader.Update();
         }
 
-        internal void RestartApp(bool update = false, bool silent = false, bool waitForPid = true, bool asAdmin = false)
+        internal bool RestartApp(bool update = false, bool silent = false, bool waitForPid = true, bool asAdmin = false)
         {
             List<string> args = new List<string>(Environment.GetCommandLineArgs());
 
@@ -590,9 +618,23 @@ namespace MatthiWare.UpdateLib
             if (asAdmin)
                 startInfo.Verb = "runas";
 
-            Process.Start(startInfo);
+            try
+            {
+                Process.Start(startInfo);
 
-            Environment.Exit(0);
+                Environment.Exit(0);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(nameof(Updater), nameof(RestartApp), e);
+
+                HandleException(null, e);
+
+                return false;
+            }
+
+            // we will never reach this part of the code
+            return true;
         }
 
         private void SetAndVerifyCmdArgument(ref string reference, string value)

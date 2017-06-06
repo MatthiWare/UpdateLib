@@ -4,7 +4,7 @@ using System.IO;
 
 namespace MatthiWare.UpdateLib.Security
 {
-    public class HashUtil
+    public static class HashUtil
     {
         /// <summary>
         /// Get the hash from a file using the default hashing algorithm.

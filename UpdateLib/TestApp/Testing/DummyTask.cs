@@ -27,7 +27,7 @@ namespace TestApp.Testing
 
             Thread.Sleep(waitTime);
 
-            Updater.Instance.Logger.Debug(nameof(ChildWorkStuff), $"Task[{id.ToString("X2")}] Completed");
+            Updater.Instance.Logger.Debug(nameof(ChildWorkStuff), "", $"Task[{id.ToString("X2")}] Completed");
         }
 
 

@@ -42,8 +42,8 @@ namespace MatthiWare.UpdateLib.Tasks
             string localFile = Updater.Instance.Converter.Replace(Entry.DestinationLocation);
             string remoteFile = string.Concat(Updater.Instance.RemoteBasePath, Entry.SourceLocation);
 
-            Updater.Instance.Logger.Debug(GetType().Name, $"LocalFile => {localFile}");
-            Updater.Instance.Logger.Debug(GetType().Name, $"RemoteFile => {remoteFile}");
+            Updater.Instance.Logger.Debug(nameof(DownloadTask), nameof(DoWork), $"LocalFile => {localFile}");
+            Updater.Instance.Logger.Debug(nameof(DownloadTask), nameof(DoWork), $"RemoteFile => {remoteFile}");
 
             if (File.Exists(localFile))
                 File.Move(localFile, $"{localFile}.old.tmp");

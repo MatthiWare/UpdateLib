@@ -154,14 +154,17 @@ namespace MatthiWare.UpdateLib.UI
 
         private bool Cancel()
         {
-            DialogResult result = MessageDialog.Show(
+            bool result = MessageDialog.Show(
                 this,
                 "Cancel",
                 "Cancel updating?",
                 "Press Yes to cancel the updating process.\nPress no to keep updating.",
-                SystemIcons.Exclamation);
+                SystemIcons.Exclamation) == DialogResult.Yes;
 
-            return result == DialogResult.Yes;
+            //if (result)
+            //    StartRollback();
+
+            return result;
         }
 
         private void UpdaterForm_FormClosing(object sender, FormClosingEventArgs e)

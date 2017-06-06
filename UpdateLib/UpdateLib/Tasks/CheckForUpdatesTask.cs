@@ -42,10 +42,10 @@ namespace MatthiWare.UpdateLib.Tasks
 
             if (IsUpdateFileInvalid(localFile))
             {
-                Updater.Instance.Logger.Warn(GetType().Name, "Cached update file validity expired, downloading new one..");
+                Updater.Instance.Logger.Warn(nameof(CheckForUpdatesTask), nameof(DoWork), "Cached update file validity expired, downloading new one..");
                 wcDownloader.DownloadFile(Url, localFile);
             }
-            
+
             // load the updatefile from disk
             Result.UpdateFile = UpdateFile.Load(localFile);
             Result.Version = Result.UpdateFile.VersionString;

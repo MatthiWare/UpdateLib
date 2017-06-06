@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using MatthiWare.UpdateLib.Utils;
 
 namespace TestApp
 {
@@ -33,7 +34,7 @@ namespace TestApp
                     .ConfigureLogger((logger) => logger.Writers.Add(new FileLogWriter()))
                     .ConfigureUnsafeConnections(true)
                     .ConfigureCacheInvalidation(TimeSpan.FromSeconds(30))
-                    .ConfigureUpdateNeedsAdmin(false)
+                    .ConfigureUpdateNeedsAdmin(true)
                     .ConfigureInstallationMode(InstallationMode.Shared)
                     .Initialize();
 

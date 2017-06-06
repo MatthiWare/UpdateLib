@@ -58,7 +58,7 @@ namespace MatthiWare.UpdateLib.Tasks
                 succes = false;
                 CancelOtherTasks();
 
-                Updater.Instance.Logger.Error(GetType().Name, e.Error);
+                Updater.Instance.Logger.Error(nameof(DownloadManager), nameof(Update), e.Error);
             }
 
             if (amountToDownload.Decrement() == 0)
@@ -72,7 +72,8 @@ namespace MatthiWare.UpdateLib.Tasks
         private void CancelOtherTasks()
         {
             foreach (DownloadTask task in tasks)
-                task.Cancel();
+                if (!task.IsCancelled)
+                    task.Cancel();
         }
 
     }

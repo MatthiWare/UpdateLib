@@ -83,9 +83,9 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             {
                 sw.Stop();
 
-                Updater.Instance.Logger.Debug(GetType().Name, $"File generation completed in {sw.ElapsedMilliseconds} ms.");
+                Updater.Instance.Logger.Debug(nameof(BuilderPage), nameof(Build), $"File generation completed in {sw.ElapsedMilliseconds} ms.");
 
-                
+
 
                 btnBuild.Enabled = true;
 

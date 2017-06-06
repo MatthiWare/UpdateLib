@@ -18,18 +18,18 @@ namespace MatthiWare.UpdateLib.Tasks
             }
             catch (Exception e)
             {
-                Updater.Instance.Logger.Error(GetType().Name, e);
+                Updater.Instance.Logger.Error(nameof(UpdateCacheTask), nameof(DoWork), e);
                 Result = null;
             }
 
             DirectoryInfo dir = new DirectoryInfo(".");
             IEnumerable<FileInfo> files = dir.GetFiles("*", SearchOption.AllDirectories).Where(f => !f.FullName.Contains(".old.tmp"));
 
-            Updater.Instance.Logger.Debug(GetType().Name, $"found {files.Count()} files to recheck.");
+            Updater.Instance.Logger.Debug(nameof(UpdateCacheTask), nameof(DoWork), $"found {files.Count()} files to recheck.");
 
             if (Result == null) // The file doesn't exist yet
             {
-                Updater.Instance.Logger.Warn(GetType().Name, $"{nameof(HashCacheFile)} doesn't exist. Creating..");
+                Updater.Instance.Logger.Warn(nameof(UpdateCacheTask), nameof(DoWork), $"{nameof(HashCacheFile)} doesn't exist. Creating..");
 
                 Result = new HashCacheFile();
 
@@ -41,7 +41,7 @@ namespace MatthiWare.UpdateLib.Tasks
                     }
                     catch (Exception ex) // file might no longer exist or is in use
                     {
-                        Updater.Instance.Logger.Error(GetType().Name, ex);
+                        Updater.Instance.Logger.Error(nameof(UpdateCacheTask), nameof(DoWork), ex);
                     }
                 }
 
@@ -62,7 +62,7 @@ namespace MatthiWare.UpdateLib.Tasks
                     }
                     catch (Exception ex) // file might no longer exist or is in use
                     {
-                        Updater.Instance.Logger.Error(GetType().Name, ex);
+                        Updater.Instance.Logger.Error(nameof(UpdateCacheTask), nameof(DoWork), ex);
                     }
 
                     continue;

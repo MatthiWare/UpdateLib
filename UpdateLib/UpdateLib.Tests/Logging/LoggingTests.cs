@@ -29,7 +29,7 @@ namespace UpdateLib.Tests.Logging
 
             logger.Writers.Add(writer.Object);
 
-            logger.Debug(nameof(LoggingTests), "This is my log msg");
+            logger.Debug(nameof(LoggingTests), nameof(ErrorLogLevelShouldNotLogWhenDebugLog), "This is my log msg");
 
             writer.Verify(mock => mock.Log(It.IsAny<string>()), Times.Never);
         }
@@ -42,7 +42,7 @@ namespace UpdateLib.Tests.Logging
 
             logger.Writers.Add(writer.Object);
 
-            logger.Error(nameof(LoggingTests), "This is my log msg");
+            logger.Error(nameof(LoggingTests), nameof(DebugLogLevelShouldLogErrorLog), "This is my log msg");
 
             writer.Verify(mock => mock.Log(It.IsAny<string>()), Times.Once);
         }
@@ -62,10 +62,10 @@ namespace UpdateLib.Tests.Logging
             logger.Writers.Add(warn.Object);
             logger.Writers.Add(debug.Object);
 
-            logger.Error("", "");
-            logger.Warn("", "");
-            logger.Info("", "");
-            logger.Debug("", "");
+            logger.Error(string.Empty, string.Empty, string.Empty);
+            logger.Warn(string.Empty, string.Empty, string.Empty);
+            logger.Info(string.Empty, string.Empty, string.Empty);
+            logger.Debug(string.Empty, string.Empty, string.Empty);
 
             info.Verify(mock => mock.Log(It.IsAny<string>()), Times.Never);
             warn.Verify(mock => mock.Log(It.IsAny<string>()), Times.Never);

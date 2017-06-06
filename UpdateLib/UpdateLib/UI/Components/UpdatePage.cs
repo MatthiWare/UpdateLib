@@ -71,7 +71,7 @@ namespace MatthiWare.UpdateLib.UI.Components
             foreach (FileEntry file in dir.Files)
             {
 
-                ListViewItem lvItem = new ListViewItem(new string[] { "", file.Name, "Ready to download", "0%", file.Description, Updater.Instance.Converter.Replace(file.DestinationLocation) });
+                ListViewItem lvItem = new ListViewItem(new string[] { string.Empty, file.Name, "Ready to download", "0%", file.Description, Updater.Instance.Converter.Replace(file.DestinationLocation) });
                 lvItem.Tag = file;
 
                 lvItems.Items.Add(lvItem);
@@ -100,7 +100,7 @@ namespace MatthiWare.UpdateLib.UI.Components
         private void Task_TaskCompleted(object sender, AsyncCompletedEventArgs e)
         {
             DownloadTask task = (DownloadTask)sender;
-            
+
             if (amountToDownload.Decrement() == 0)
             {
                 IsBusy = false;
@@ -110,7 +110,7 @@ namespace MatthiWare.UpdateLib.UI.Components
 
             if (e.Cancelled)
             {
-                Updater.Instance.Logger.Info(nameof(DownloadTask), $"Cancelled -> '{task.Entry.Name}'");
+                Updater.Instance.Logger.Info(nameof(DownloadTask), nameof(Task_TaskCompleted), $"Cancelled -> '{task.Entry.Name}'");
 
                 SetSubItemText(task.Item.SubItems[2], "Cancelled");
 
@@ -121,7 +121,7 @@ namespace MatthiWare.UpdateLib.UI.Components
 
             if (e.Error != null)
             {
-                Updater.Instance.Logger.Error(nameof(DownloadTask), e.Error);
+                Updater.Instance.Logger.Error(nameof(UpdatePage), nameof(StartUpdate), e.Error);
 
                 SetSubItemText(task.Item.SubItems[2], "Error");
 
@@ -179,7 +179,7 @@ namespace MatthiWare.UpdateLib.UI.Components
 
         public void Cancel()
         {
-            throw new NotImplementedException();
+            Console.WriteLine("Cancel preseed");
         }
 
         public void Execute()

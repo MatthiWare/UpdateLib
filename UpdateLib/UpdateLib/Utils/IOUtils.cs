@@ -33,10 +33,10 @@ namespace MatthiWare.UpdateLib.Utils
         private static string GetAppDataPath()
         {
             string path = GetPathPrefix();
+            string updaterName = Updater.UpdaterName;
             string productName = Updater.ProductName;
-            string name = Assembly.GetEntryAssembly().GetName().Name;
 
-            return $@"{path}\{name}\{productName}";
+            return $@"{path}\{productName}\{updaterName}";
         }
 
         private static string GetPathPrefix()
