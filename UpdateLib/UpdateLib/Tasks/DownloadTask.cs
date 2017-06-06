@@ -79,6 +79,7 @@ namespace MatthiWare.UpdateLib.Tasks
 
             File.Move(localTempFile, localFile);
 
+            Updater.Instance.Logger.Warn(nameof(DownloadTask), nameof(Cancel), $"Rolled back {Entry.Name}");
         }
     }
 }

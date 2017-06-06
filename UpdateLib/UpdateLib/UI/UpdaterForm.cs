@@ -72,6 +72,13 @@ namespace MatthiWare.UpdateLib.UI
                         btnNext.Text = "Next >";
                 }
 
+                if (page.HasErrors && page.NeedsRollBack)
+                {
+                    btnNext.Enabled = true;
+                    btnPrevious.Enabled = false;
+                    btnNext.Text = "Rollback";
+                }
+
             });
         }
 
@@ -96,6 +103,13 @@ namespace MatthiWare.UpdateLib.UI
 
         private void btnNext_Click(object sender, EventArgs e)
         {
+            if (pages.CurrentPage.HasErrors && pages.CurrentPage.NeedsRollBack)
+            {
+                btnNext.Enabled = false;
+                pages.CurrentPage.Rollback();
+                return;
+            }
+
             if (pages.CurrentPage.NeedsExecution && !pages.CurrentPage.IsDone)
             {
                 pages.CurrentPage.Execute();
@@ -121,6 +135,9 @@ namespace MatthiWare.UpdateLib.UI
 
             if (page.NeedsExecution && !page.IsDone && page.IsBusy)
                 btnNext.Enabled = false;
+
+            if (page.HasErrors && page.NeedsRollBack)
+                btnNext.Text = "Rollback";
 
             if (page == pages.LastPage)
                 btnNext.Text = "Finish";

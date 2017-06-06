@@ -8,6 +8,7 @@ using MatthiWare.UpdateLib.Tasks;
 using MatthiWare.UpdateLib.Security;
 using MatthiWare.UpdateLib.Logging;
 using MatthiWare.UpdateLib.Threading;
+using System.Collections.Generic;
 
 namespace MatthiWare.UpdateLib.UI.Components
 {
@@ -71,30 +72,37 @@ namespace MatthiWare.UpdateLib.UI.Components
             foreach (FileEntry file in dir.Files)
             {
 
-                ListViewItem lvItem = new ListViewItem(new string[] { string.Empty, file.Name, "Ready to download", "0%", file.Description, Updater.Instance.Converter.Replace(file.DestinationLocation) });
-                lvItem.Tag = file;
+                ListViewItem item = new ListViewItem(new string[] { string.Empty, file.Name, "Ready to download", "0%", file.Description, Updater.Instance.Converter.Replace(file.DestinationLocation) });
+                item.Tag = file;
 
-                lvItems.Items.Add(lvItem);
+                DownloadTask task = new DownloadTask(item);
+                task.TaskProgressChanged += Task_TaskProgressChanged;
+                task.TaskCompleted += Task_TaskCompleted;
+
+                downloadTasks.Add(task);
+
+                lvItems.Items.Add(item);
             }
 
             foreach (DirectoryEntry subDir in dir.Directories)
                 AddDirectoryToListView(subDir);
         }
 
+        private List<DownloadTask> downloadTasks = new List<DownloadTask>();
+
         public void StartUpdate()
         {
             IsBusy = true;
             PageUpdate?.Invoke(this, new EventArgs());
+
             foreach (ListViewItem item in lvItems.Items)
             {
-                DownloadTask task = new DownloadTask(item);
-                task.TaskProgressChanged += Task_TaskProgressChanged;
-                task.TaskCompleted += Task_TaskCompleted;
-                task.Start();
-
                 SetImageKey(item, "status_download");
                 SetSubItemText(item.SubItems[2], "Downloading..");
             }
+
+            foreach (DownloadTask task in downloadTasks)
+                task.Start();
         }
 
         private void Task_TaskCompleted(object sender, AsyncCompletedEventArgs e)
@@ -105,14 +113,14 @@ namespace MatthiWare.UpdateLib.UI.Components
             {
                 IsBusy = false;
                 IsDone = true;
-                PageUpdate?.Invoke(this, new EventArgs());
+                PageUpdate?.Invoke(this, EventArgs.Empty);
             }
 
             if (e.Cancelled)
             {
-                Updater.Instance.Logger.Info(nameof(DownloadTask), nameof(Task_TaskCompleted), $"Cancelled -> '{task.Entry.Name}'");
+                Updater.Instance.Logger.Info(nameof(UpdatePage), nameof(StartUpdate), $"Rolled back -> '{task.Entry.Name}'");
 
-                SetSubItemText(task.Item.SubItems[2], "Cancelled");
+                SetSubItemText(task.Item.SubItems[2], "Rolled back");
 
                 SetImageKey(task.Item, "status_warning");
 
@@ -121,6 +129,9 @@ namespace MatthiWare.UpdateLib.UI.Components
 
             if (e.Error != null)
             {
+                HasErrors = true;
+                PageUpdate?.Invoke(this, EventArgs.Empty);
+
                 Updater.Instance.Logger.Error(nameof(UpdatePage), nameof(StartUpdate), e.Error);
 
                 SetSubItemText(task.Item.SubItems[2], "Error");
@@ -220,6 +231,8 @@ namespace MatthiWare.UpdateLib.UI.Components
             }
         }
 
+        public bool NeedsRollBack { get { return true; } }
+
         private bool _isbusy;
         public bool IsBusy
         {
@@ -237,6 +250,23 @@ namespace MatthiWare.UpdateLib.UI.Components
         public void PageEntered()
         {
 
+        }
+
+        public void Rollback()
+        {
+            foreach (DownloadTask task in downloadTasks)
+            {
+                if (!task.IsCancelled)
+                    task.Cancel();
+
+                SetSubItemText(task.Item.SubItems[2], "Rolled back");
+
+                SetImageKey(task.Item, "status_warning");
+            }
+
+            HasErrors = false;
+
+            PageUpdate?.Invoke(this, EventArgs.Empty);
         }
 
         private bool _isdone;
@@ -259,6 +289,11 @@ namespace MatthiWare.UpdateLib.UI.Components
             {
                 return lblHeader.Text;
             }
+        }
+
+        public bool HasErrors
+        {
+            get; set;
         }
     }
 }

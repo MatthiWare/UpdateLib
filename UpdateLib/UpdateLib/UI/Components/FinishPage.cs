@@ -11,8 +11,8 @@ namespace MatthiWare.UpdateLib.UI.Components
 
             _updaterForm = parent;
 
-            txtDescription.Text= txtDescription.Text.Replace("%AppName%", parent.updateInfoFile.ApplicationName);
-            txtDescription.Text= txtDescription.Text.Replace("%version%", parent.updateInfoFile.VersionString);
+            txtDescription.Text = txtDescription.Text.Replace("%AppName%", parent.updateInfoFile.ApplicationName);
+            txtDescription.Text = txtDescription.Text.Replace("%version%", parent.updateInfoFile.VersionString);
         }
 
         public UserControl Conent
@@ -89,6 +89,13 @@ namespace MatthiWare.UpdateLib.UI.Components
             }
         }
 
+        public bool NeedsRollBack { get { return false; } }
+
+        public bool HasErrors
+        {
+            get; set;
+        }
+
         public event EventHandler PageUpdate;
 
         public void Cancel()
@@ -104,6 +111,11 @@ namespace MatthiWare.UpdateLib.UI.Components
         private void cbRestart_CheckedChanged(object sender, EventArgs e)
         {
             UpdaterForm.NeedsRestart = cbRestart.Checked;
+        }
+
+        public void Rollback()
+        {
+
         }
     }
 }

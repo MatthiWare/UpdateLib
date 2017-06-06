@@ -89,7 +89,14 @@ namespace MatthiWare.UpdateLib.UI.Components
             }
         }
 
+        public bool HasErrors
+        {
+            get; set;
+        }
+
         public event EventHandler PageUpdate;
+
+        public bool NeedsRollBack { get { return false; } }
 
         public void Cancel()
         {
@@ -99,6 +106,11 @@ namespace MatthiWare.UpdateLib.UI.Components
         public void Execute()
         {
             throw new NotImplementedException();
+        }
+
+        public void Rollback()
+        {
+
         }
     }
 }
