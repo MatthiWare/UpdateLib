@@ -190,7 +190,13 @@ namespace MatthiWare.UpdateLib.UI.Components
 
         public void Cancel()
         {
-            Console.WriteLine("Cancel preseed");
+            if (HasErrors && NeedsRollBack)
+                Rollback();
+
+            IsDone = true;
+
+
+            PageUpdate?.Invoke(this, EventArgs.Empty);
         }
 
         public void Execute()
@@ -232,19 +238,11 @@ namespace MatthiWare.UpdateLib.UI.Components
         }
 
         public bool NeedsRollBack { get { return true; } }
-
-        private bool _isbusy;
+        
         public bool IsBusy
         {
-            get
-            {
-                return _isbusy;
-            }
-
-            set
-            {
-                _isbusy = value;
-            }
+            get;set;
+            
         }
 
         public void PageEntered()
@@ -252,8 +250,15 @@ namespace MatthiWare.UpdateLib.UI.Components
 
         }
 
+        public void UpdateState()
+        {
+
+        }
+
         public void Rollback()
         {
+            IsBusy = true;
+
             foreach (DownloadTask task in downloadTasks)
             {
                 if (!task.IsCancelled)
@@ -264,23 +269,15 @@ namespace MatthiWare.UpdateLib.UI.Components
                 SetImageKey(task.Item, "status_warning");
             }
 
+            IsBusy = false;
             HasErrors = false;
 
             PageUpdate?.Invoke(this, EventArgs.Empty);
         }
 
-        private bool _isdone;
         public bool IsDone
         {
-            get
-            {
-                return _isdone;
-            }
-
-            set
-            {
-                _isdone = value;
-            }
+            get; set;
         }
 
         public string Title

@@ -20,7 +20,7 @@ namespace MatthiWare.UpdateLib.UI.Components
             }
         }
 
-        
+
 
         public bool NeedsCancel
         {
@@ -68,24 +68,14 @@ namespace MatthiWare.UpdateLib.UI.Components
                 _isbusy = value;
             }
         }
-
-        private bool _isdone;
+        
         public bool IsDone
-        {
-            get
-            {
-                return _isdone;
-            }
-
-            set
-            {
-                _isdone = value;
-            }
+        {get;set;
         }
 
         public bool HasErrors
         {
-            get;set;
+            get; set;
         }
 
         public void PageEntered()
@@ -97,9 +87,14 @@ namespace MatthiWare.UpdateLib.UI.Components
 
         public bool NeedsRollBack { get { return false; } }
 
+        public void UpdateState()
+        {
+
+        }
+
         public void Cancel()
         {
-            throw new NotImplementedException();
+            IsDone = true;
         }
 
         public void Execute()

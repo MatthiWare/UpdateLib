@@ -49,6 +49,8 @@ namespace MatthiWare.UpdateLib.Files
                     entry.Ticks = ticks;
                     entry.Hash = hash;
                 }
+
+                Updater.Instance.Logger.Debug(nameof(HashCacheFile), nameof(AddOrUpdateEntry), $"Cache updated for file -> '{entry.FilePath}'");
             }
         }
 

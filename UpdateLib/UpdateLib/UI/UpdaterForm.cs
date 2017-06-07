@@ -11,6 +11,8 @@ namespace MatthiWare.UpdateLib.UI
     {
         internal UpdateFile updateInfoFile;
         internal bool NeedsRestart = true;
+        internal bool hasHadErrors = false;
+        internal bool UserCancelled = false;
 
         private WizardPageCollection pages;
 
@@ -74,9 +76,17 @@ namespace MatthiWare.UpdateLib.UI
 
                 if (page.HasErrors && page.NeedsRollBack)
                 {
+                    hasHadErrors = true;
                     btnNext.Enabled = true;
                     btnPrevious.Enabled = false;
+                    btnCancel.Enabled = false;
                     btnNext.Text = "Rollback";
+                }
+
+                if (!pages.CurrentPage.HasErrors && pages.CurrentPage.NeedsRollBack && hasHadErrors)
+                {
+                    foreach (IWizardPage wp in pages)
+                        wp.UpdateState();
                 }
 
             });
@@ -86,13 +96,14 @@ namespace MatthiWare.UpdateLib.UI
         {
             IWizardPage currentPage = pages.CurrentPage;
             IWizardPage page = pages.Previous();
+
             if (page == null)
                 return;
 
             if (!btnNext.Enabled)
                 btnNext.Enabled = true;
 
-            if (currentPage.NeedsExecution)
+            if (page.NeedsExecution)
                 btnNext.Text = "Next >";
 
             if (page == pages.FirstPage)
@@ -157,9 +168,12 @@ namespace MatthiWare.UpdateLib.UI
             else
             {
                 pages.Clear();
-                pages.Add(new FinishPage(this));
-                SetContentPage(pages.CurrentPage);
+                FinishPage page = new FinishPage(this);
+                page.UpdateState();
+                pages.Add(page);
+                SetContentPage(page);
                 btnPrevious.Enabled = false;
+                btnCancel.Enabled = false;
                 Close();
             }
         }
@@ -171,27 +185,43 @@ namespace MatthiWare.UpdateLib.UI
 
         private bool Cancel()
         {
-            bool result = MessageDialog.Show(
+            bool cancelled = MessageDialog.Show(
                 this,
                 "Cancel",
                 "Cancel updating?",
                 "Press Yes to cancel the updating process.\nPress no to keep updating.",
                 SystemIcons.Exclamation) == DialogResult.Yes;
 
-            //if (result)
-            //    StartRollback();
+            if (cancelled)
+                UserCancelled = true;
 
-            return result;
+            return cancelled;
         }
 
         private void UpdaterForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (!pages.AllDone())
+            if (pages.AllDone())
+                return;
+
+            if (Cancel())
             {
-                bool cancel = Cancel();
-                if (!cancel)
-                    e.Cancel = true;
+                foreach (IWizardPage page in pages)
+                {
+                    page.Cancel();
+                    page.UpdateState();
+                }
+
+                pages.CurrentPage = pages.LastPage;
+                SetContentPage(pages.CurrentPage);
+
+                btnNext.Text = "Finish";
+                btnPrevious.Enabled = true;
+
+                OnPageUpdate(pages.CurrentPage);
             }
+
+            if (e.CloseReason == CloseReason.UserClosing || e.CloseReason == CloseReason.None)
+                e.Cancel = true;
         }
 
         private void linkSite_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)

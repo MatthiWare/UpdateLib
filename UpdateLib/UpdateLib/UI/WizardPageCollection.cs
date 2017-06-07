@@ -17,6 +17,10 @@ namespace MatthiWare.UpdateLib.UI
             {
                 return this[index];
             }
+            set
+            {
+                index = store.IndexOf(value);
+            }
         }
 
         public IWizardPage FirstPage { get { return this.First(); } }

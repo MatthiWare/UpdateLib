@@ -19,5 +19,6 @@ namespace MatthiWare.UpdateLib.UI
         void Rollback();
         bool HasErrors { get; set; }
         bool NeedsRollBack { get; }
+        void UpdateState();
     }
 }
