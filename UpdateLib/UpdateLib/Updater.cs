@@ -98,8 +98,6 @@ namespace MatthiWare.UpdateLib
             }
         }
 
-        public bool UpdateRequiresAdmin { get; set; } = true;
-
         /// <summary>
         /// Gets the logger for the application.
         /// </summary>
@@ -275,13 +273,6 @@ namespace MatthiWare.UpdateLib
             return this;
         }
 
-        public Updater ConfigureUpdateNeedsAdmin(bool needsAdmin)
-        {
-            UpdateRequiresAdmin = needsAdmin;
-
-            return this;
-        }
-
         /// <summary>
         /// Configures the update silently command switch
         /// </summary>
@@ -450,6 +441,7 @@ namespace MatthiWare.UpdateLib
                 bool error = e.Error != null;
                 bool cancelled = e.Cancelled;
                 bool update = task.Result.UpdateAvailable;
+                bool adminReq = task.Result.AdminRightsNeeded;
 
                 CheckForUpdatesCompleted?.Invoke(task, new CheckForUpdatesCompletedEventArgs(task.Result, e));
 
@@ -477,8 +469,8 @@ namespace MatthiWare.UpdateLib
 
                 if (result == DialogResult.Yes)
                 {
-                    if ((!StartUpdating && NeedsRestartBeforeUpdate) || (UpdateRequiresAdmin && !PermissionUtil.IsProcessElevated))
-                        if (!RestartApp(true, UpdateSilently, true, UpdateRequiresAdmin))
+                    if ((!StartUpdating && NeedsRestartBeforeUpdate) || (adminReq && !PermissionUtil.IsProcessElevated))
+                        if (!RestartApp(true, UpdateSilently, true, adminReq))
                             return;
 
                     if (UpdateSilently)

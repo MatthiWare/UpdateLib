@@ -50,6 +50,8 @@ namespace MatthiWare.UpdateLib.Tasks
             Result.UpdateFile = UpdateFile.Load(localFile);
             Result.Version = Result.UpdateFile.VersionString;
 
+            CheckRequiredPrivilegesTask privilegesCheckTask = CheckPrivileges(Result.UpdateFile);
+
             // lets wait for the Cache update to complete and get the task
             HashCacheFile cache = updater.GetCache();
 
@@ -63,7 +65,10 @@ namespace MatthiWare.UpdateLib.Tasks
              * Start a task to get all the files that need to be updated
              * Returns if there is anything to update
              */
-            Result.UpdateAvailable = CheckForUpdatedFiles(Result.UpdateFile, cache).AwaitTask().Result;
+            CheckForUpdatedFilesTask updatedFilesTask = CheckForUpdatedFiles(Result.UpdateFile, cache);
+
+            Result.AdminRightsNeeded = privilegesCheckTask.AwaitTask().Result;
+            Result.UpdateAvailable = updatedFilesTask.AwaitTask().Result;
         }
 
         private bool IsUpdateFileInvalid(string localFile)
@@ -86,11 +91,19 @@ namespace MatthiWare.UpdateLib.Tasks
             return task;
         }
 
+        private CheckRequiredPrivilegesTask CheckPrivileges(UpdateFile file)
+        {
+            CheckRequiredPrivilegesTask task = new CheckRequiredPrivilegesTask(file);
+            task.ConfigureAwait(false).Start();
+            return task;
+        }
+
         public class Data
         {
             public string Version { get; set; } = string.Empty;
             public bool UpdateAvailable { get; set; } = false;
             public UpdateFile UpdateFile { get; set; }
+            public bool AdminRightsNeeded { get; set; } = false;
         }
     }
 }

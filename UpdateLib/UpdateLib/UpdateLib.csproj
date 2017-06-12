@@ -75,6 +75,7 @@
     <Compile Include="Tasks\AsyncTaskFactory.cs" />
     <Compile Include="Tasks\CheckForUpdatesCompletedEventArgs.cs" />
     <Compile Include="Tasks\CheckForUpdatesTask.cs" />
+    <Compile Include="Tasks\CheckRequiredPrivilegesTask.cs" />
     <Compile Include="Tasks\DownloadManager.cs" />
     <Compile Include="Tasks\UpdateFileProcessorTask.cs" />
     <Compile Include="Security\HashUtil.cs" />

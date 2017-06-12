@@ -19,7 +19,7 @@ namespace TestApp
         {
             try
             {
-
+                // for testing
                 Application.ThreadException += Application_ThreadException;
 
                 // we still want our updater to have visual styles in case of update cmd argument switch
@@ -34,7 +34,6 @@ namespace TestApp
                     .ConfigureLogger((logger) => logger.Writers.Add(new FileLogWriter()))
                     .ConfigureUnsafeConnections(true)
                     .ConfigureCacheInvalidation(TimeSpan.FromSeconds(30))
-                    .ConfigureUpdateNeedsAdmin(false)
                     .ConfigureNeedsRestartBeforeUpdate(false)
                     .ConfigureInstallationMode(InstallationMode.Shared)
                     .Initialize();
@@ -43,6 +42,7 @@ namespace TestApp
             }
             catch (Exception e)
             {
+                //for testing
                 Console.WriteLine(e.ToString());
                 MessageBox.Show(e.ToString());
             }

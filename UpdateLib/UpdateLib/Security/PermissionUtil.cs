@@ -4,8 +4,10 @@ using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Text;
 
@@ -130,5 +132,32 @@ namespace MatthiWare.UpdateLib.Security
             }
         });
 
+
+        public static bool DirectoryHasPermission(string dir, FileSystemRights accessRights)
+        {
+            if (string.IsNullOrEmpty(dir))
+                return false;
+
+            try
+            {
+                AuthorizationRuleCollection rules = Directory.GetAccessControl(dir).GetAccessRules(true, true, typeof(SecurityIdentifier));
+                WindowsIdentity identity = WindowsIdentity.GetCurrent();
+
+                foreach (FileSystemAccessRule rule in rules)
+                {
+                    if (identity.Groups.Contains(rule.IdentityReference) || rule.IdentityReference == identity.User)
+                    {
+                        if ((accessRights & rule.FileSystemRights) == accessRights && rule.AccessControlType == AccessControlType.Allow)
+                            return true;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Updater.Instance.Logger.Warn(nameof(PermissionUtil), nameof(DirectoryHasPermission), $"Current user has no access rights to: '{dir}'{Environment.NewLine}{e.ToString()}");
+            }
+
+            return false;
+        }
     }
 }
