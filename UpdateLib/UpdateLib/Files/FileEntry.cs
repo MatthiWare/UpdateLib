@@ -20,30 +20,8 @@ namespace MatthiWare.UpdateLib.Files
             {
                 StringBuilder sb = new StringBuilder();
 
-                Stack<string> items = new Stack<string>();
-
-                items.Push(Name);
-                items.Push(@"/");
-
-                DirectoryEntry dir = Parent;
-                while (true)
-                {
-                    items.Push(dir.Name);
-
-                    dir = dir.Parent;
-                    if (dir == null)
-                    {
-                        items.Pop();
-                        break;
-                    }
-                    else
-                        items.Push(@"/");
-                }
-
-                items.Pop();
-
-                while (items.Count > 0)
-                    sb.Append(items.Pop());
+                sb.Append(Parent?.SourceLocation ?? "");
+                sb.Append(Name);
 
                 return sb.ToString();
             }
@@ -54,25 +32,8 @@ namespace MatthiWare.UpdateLib.Files
             {
                 StringBuilder sb = new StringBuilder();
 
-                Stack<string> items = new Stack<string>();
-
-                items.Push(Name);
-                items.Push(@"\");
-
-                DirectoryEntry dir = Parent;
-                while (true)
-                {
-                    items.Push(dir.Name);
-
-                    dir = dir.Parent;
-                    if (dir == null)
-                        break;
-                    else
-                        items.Push(@"\");
-                }
-
-                while (items.Count > 0)
-                    sb.Append(items.Pop());
+                sb.Append(Parent?.DestinationLocation ?? "");
+                sb.Append(Name);
 
                 return sb.ToString();
             }
