@@ -34,12 +34,14 @@ namespace MatthiWare.UpdateLib.Tasks
                 }
             }
 
-            foreach (RegistryFolderEntry dir in File.Registry)
+            foreach (RegistryDirectoryEntry dir in File.Registry)
                 if (!CheckHasSufficientPermissionForRegistry(dir))
                 {
                     Result = true;
                     return;
                 }
+
+            Updater.Instance.Logger.Info(nameof(CheckRequiredPrivilegesTask), nameof(DoWork), $"Elavation required: {Result}");
         }
 
         private bool CheckHasSufficientPermissionsForDirectory(DirectoryEntry dir)
@@ -56,13 +58,13 @@ namespace MatthiWare.UpdateLib.Tasks
             return true;
         }
 
-        private bool CheckHasSufficientPermissionForRegistry(RegistryFolderEntry dir)
+        private bool CheckHasSufficientPermissionForRegistry(RegistryDirectoryEntry dir)
         {
             foreach (RegistryKeyEntry key in dir.Keys)
                 if (!PermissionUtil.CheckRegPermission(key))
                     return false;
 
-            foreach (RegistryFolderEntry subDir in dir.Folders)
+            foreach (RegistryDirectoryEntry subDir in dir.Directories)
                 if (!CheckHasSufficientPermissionForRegistry(dir))
                     return false;
 

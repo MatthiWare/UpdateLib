@@ -31,7 +31,7 @@ namespace MatthiWare.UpdateLib.Files
         }
 
         [XmlIgnore]
-        public RegistryFolderEntry Parent { get; set; }
+        public RegistryDirectoryEntry Parent { get; set; }
 
     }
 }

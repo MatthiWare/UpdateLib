@@ -18,13 +18,13 @@ namespace UpdateLib.Tests.Files
             DirectoryEntry entry = MakeDirWithSubDirs(2, 3, 5);
             Assert.AreEqual(2 * 3 * 5, entry.Count);
 
-            entry = MakeDirWithSubDirs(5,5,1);
-            Assert.AreEqual(5*5*1, entry.Count);
+            entry = MakeDirWithSubDirs(5, 5, 1);
+            Assert.AreEqual(5 * 5 * 1, entry.Count);
         }
 
         private DirectoryEntry MakeDirWithSubDirs(int subDirs, int depth, int childsPerSubDir)
         {
-            DirectoryEntry root = new DirectoryEntry();
+            DirectoryEntry root = new DirectoryEntry("test");
 
             DirectoryEntry dir = root;
             for (int d = 0; d < depth; d++)

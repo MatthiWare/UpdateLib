@@ -34,13 +34,13 @@ namespace MatthiWare.UpdateLib.Files
         /// Gets the list of <see cref="DirectoryEntry">subdirectories</see>.
         /// </summary>
         [XmlArray("Directories"), XmlArrayItem("Directory")]
-        public List<DirectoryEntry> Directories { get; set; }
+        public List<DirectoryEntry> Directories { get; set; } = new List<DirectoryEntry>();
 
         /// <summary>
         /// Gets the list of <see cref="FileEntry">files</see> in this directory.
         /// </summary>
         [XmlArray("Files"), XmlArrayItem("File")]
-        public List<FileEntry> Files { get; set; }
+        public List<FileEntry> Files { get; set; } = new List<FileEntry>();
 
         /// <summary>
         /// Gets or Sets the Parent of this Directory
@@ -81,21 +81,41 @@ namespace MatthiWare.UpdateLib.Files
             }
         }
 
-
-        public DirectoryEntry()
-        {
-            Files = new List<FileEntry>();
-            Directories = new List<DirectoryEntry>();
-        }
+        /// <summary>
+        /// .ctor of <see cref="DirectoryEntry"/>
+        /// </summary>
+        public DirectoryEntry() { }
 
         /// <summary>
         /// .ctor of <see cref="DirectoryEntry"/>
         /// </summary>
         public DirectoryEntry(string name)
         {
-            this.Name = name;
-            Files = new List<FileEntry>();
-            Directories = new List<DirectoryEntry>();
+            Name = name;
+        }
+
+        public void Add(DirectoryEntry folder)
+        {
+            folder.Parent = folder;
+            Directories.Add(folder);
+        }
+
+        public void Add(FileEntry file)
+        {
+            file.Parent = this;
+            Files.Add(file);
+        }
+
+        public void Remove(DirectoryEntry folder)
+        {
+            folder.Parent = this;
+            Directories.Remove(folder);
+        }
+
+        public void Remove(FileEntry file)
+        {
+            file.Parent = this;
+            Files.Remove(file);
         }
     }
 }

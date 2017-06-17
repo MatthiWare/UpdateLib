@@ -43,7 +43,7 @@ namespace MatthiWare.UpdateLib.Files
         [XmlIgnore]
         public int RegistryKeyCount { get { return Registry.Select(r => r.Count).Sum(); } }
 
-        public List<RegistryFolderEntry> Registry { get; set; } = new List<RegistryFolderEntry>();
+        public List<RegistryDirectoryEntry> Registry { get; set; } = new List<RegistryDirectoryEntry>();
 
         public UpdateFile()
         {
