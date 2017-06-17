@@ -54,7 +54,7 @@ namespace MatthiWare.UpdateLib.UI.Components
 
         private void FillListView()
         {
-            amountToDownload.Value = UpdateFile.Count;
+            amountToDownload.Value = UpdateFile.FileCount;
 
             lvItems.BeginUpdate();
 

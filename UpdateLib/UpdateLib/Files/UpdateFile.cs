@@ -5,6 +5,7 @@ using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
 using System.Linq;
+using Microsoft.Win32;
 
 namespace MatthiWare.UpdateLib.Files
 {
@@ -36,7 +37,13 @@ namespace MatthiWare.UpdateLib.Files
         /// Gets the count of all the files in the <see cref="Folders"/>
         /// and their subdirectories.
         /// </summary>
-        public int Count { get { return Folders.Select(d => d.Count).Sum(); } }
+        [XmlIgnore]
+        public int FileCount { get { return Folders.Select(d => d.Count).Sum(); } }
+
+        [XmlIgnore]
+        public int RegistryKeyCount { get { return Registry.Select(r => r.Count).Sum(); } }
+
+        public List<RegistryFolderEntry> Registry { get; set; } = new List<RegistryFolderEntry>();
 
         public UpdateFile()
         {

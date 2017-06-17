@@ -30,7 +30,7 @@ namespace UpdateLib.Tests.Files
 
             Assert.AreEqual(file.ApplicationName, loadedFile.ApplicationName);
             Assert.AreEqual(file.VersionString, loadedFile.VersionString);
-            Assert.AreEqual(file.Count, loadedFile.Count);
+            Assert.AreEqual(file.FileCount, loadedFile.FileCount);
         }
 
         [Test]
@@ -99,7 +99,7 @@ namespace UpdateLib.Tests.Files
             file.Folders.Add(appSubFolder);
             file.Folders.Add(otherSubFolder);
 
-            Assert.AreEqual(2, file.Count);
+            Assert.AreEqual(2, file.FileCount);
 
             return file;
         }

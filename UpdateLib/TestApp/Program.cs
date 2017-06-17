@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using MatthiWare.UpdateLib.Utils;
+using MatthiWare.UpdateLib.Files;
 
 namespace TestApp
 {
@@ -19,6 +20,8 @@ namespace TestApp
         {
             try
             {
+
+
                 // for testing
                 Application.ThreadException += Application_ThreadException;
 
@@ -34,7 +37,7 @@ namespace TestApp
                     .ConfigureLogger((logger) => logger.Writers.Add(new FileLogWriter()))
                     .ConfigureUnsafeConnections(true)
                     .ConfigureCacheInvalidation(TimeSpan.FromSeconds(30))
-                    .ConfigureNeedsRestartBeforeUpdate(false)
+                    //.ConfigureNeedsRestartBeforeUpdate(false)
                     .ConfigureInstallationMode(InstallationMode.Shared)
                     .Initialize();
 
@@ -46,7 +49,7 @@ namespace TestApp
                 Console.WriteLine(e.ToString());
                 MessageBox.Show(e.ToString());
             }
-            
+
         }
 
         private static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)

@@ -1,4 +1,5 @@
-﻿using MatthiWare.UpdateLib.Logging;
+﻿using MatthiWare.UpdateLib.Files;
+using MatthiWare.UpdateLib.Logging;
 using MatthiWare.UpdateLib.Utils;
 using Microsoft.Win32;
 using System;
@@ -7,7 +8,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security;
 using System.Security.AccessControl;
+using System.Security.Permissions;
 using System.Security.Principal;
 using System.Text;
 
@@ -133,7 +136,7 @@ namespace MatthiWare.UpdateLib.Security
         });
 
 
-        public static bool DirectoryHasPermission(string dir, FileSystemRights accessRights)
+        public static bool DirectoryHasPermission(string dir, FileSystemRights accessRights = FileSystemRights.Modify)
         {
             if (string.IsNullOrEmpty(dir))
                 return false;
@@ -158,6 +161,20 @@ namespace MatthiWare.UpdateLib.Security
             }
 
             return false;
+        }
+
+        public static bool CheckRegPermission(RegistryKeyEntry key, RegistryPermissionAccess permission = RegistryPermissionAccess.AllAccess, AccessControlActions access = AccessControlActions.Change)
+        {
+            try
+            {
+                new RegistryPermission(permission, access, key.FullName).Demand();
+                return true;
+            }
+            catch (SecurityException secEx)
+            {
+                Updater.Instance.Logger.Error(nameof(PermissionUtil), nameof(CheckRegPermission), secEx);
+                return false;
+            }
         }
     }
 }

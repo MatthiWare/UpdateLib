@@ -23,10 +23,7 @@ namespace MatthiWare.UpdateLib.Tasks
             Result = false;
 
             if (PermissionUtil.IsProcessElevated)
-            {
-                Result = true;
                 return;
-            }
 
             foreach (DirectoryEntry dir in File.Folders)
             {
@@ -37,22 +34,37 @@ namespace MatthiWare.UpdateLib.Tasks
                 }
             }
 
-
-            // TODO add more checks for registry for example
+            foreach (RegistryFolderEntry dir in File.Registry)
+                if (!CheckHasSufficientPermissionForRegistry(dir))
+                {
+                    Result = true;
+                    return;
+                }
         }
 
         private bool CheckHasSufficientPermissionsForDirectory(DirectoryEntry dir)
         {
             string localPath = Updater.Instance.Converter.Replace(dir.DestinationLocation);
 
-            if (!PermissionUtil.DirectoryHasPermission(localPath, (FileSystemRights.Modify)))
+            if (!PermissionUtil.DirectoryHasPermission(localPath))
                 return false;
 
             foreach (DirectoryEntry subDir in dir.Directories)
-            {
                 if (!CheckHasSufficientPermissionsForDirectory(subDir))
                     return false;
-            }
+
+            return true;
+        }
+
+        private bool CheckHasSufficientPermissionForRegistry(RegistryFolderEntry dir)
+        {
+            foreach (RegistryKeyEntry key in dir.Keys)
+                if (!PermissionUtil.CheckRegPermission(key))
+                    return false;
+
+            foreach (RegistryFolderEntry subDir in dir.Folders)
+                if (!CheckHasSufficientPermissionForRegistry(dir))
+                    return false;
 
             return true;
         }

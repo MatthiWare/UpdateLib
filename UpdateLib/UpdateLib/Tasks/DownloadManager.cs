@@ -22,7 +22,7 @@ namespace MatthiWare.UpdateLib.Tasks
 
         public DownloadManager(UpdateFile file)
         {
-            amountToDownload.Value = file.Count;
+            amountToDownload.Value = file.FileCount;
             this.file = file;
         }
 

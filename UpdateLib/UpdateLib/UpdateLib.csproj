@@ -62,6 +62,8 @@
     <Compile Include="Files\HashCacheFile.cs" />
     <Compile Include="Files\FileEntry.cs" />
     <Compile Include="Files\PathVariableConverter.cs" />
+    <Compile Include="Files\RegistryKeyEntry.cs" />
+    <Compile Include="Files\RegistryFolderEntry.cs" />
     <Compile Include="Files\UpdateFile.cs" />
     <Compile Include="InstallationMode.cs" />
     <Compile Include="Logging\ILogger.cs" />
@@ -136,6 +138,7 @@
     <Compile Include="Utils\ExtensionMethods.cs" />
     <Compile Include="Utils\IOUtils.cs" />
     <Compile Include="Utils\Lazy.cs" />
+    <Compile Include="Utils\RegistryHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\status_working.png" />

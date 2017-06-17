@@ -29,7 +29,7 @@ namespace MatthiWare.UpdateLib.Tasks
 
             AwaitWorkers();
 
-            Result = m_updateFile.Count > 0;
+            Result = m_updateFile.FileCount > 0 || m_updateFile.RegistryKeyCount > 0;
         }
 
         private void RecursiveCheck(DirectoryEntry dir)

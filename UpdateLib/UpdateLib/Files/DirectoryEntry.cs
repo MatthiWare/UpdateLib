@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Xml.Serialization;
+using System.Linq;
 
 namespace MatthiWare.UpdateLib.Files
 {
@@ -25,12 +26,7 @@ namespace MatthiWare.UpdateLib.Files
         {
             get
             {
-                int _count = Files.Count;
-
-                foreach (DirectoryEntry di in Directories)
-                    _count += di.Count;
-
-                return _count;
+                return Files.Count + Directories.Select(d => d.Count).Sum();
             }
         }
 
