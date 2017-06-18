@@ -56,7 +56,7 @@ namespace MatthiWare.UpdateLib.Files
                 StringBuilder sb = new StringBuilder();
 
                 if (Parent == null)
-                    return "";
+                    return string.Empty;
 
                 sb.Append(Parent.SourceLocation);
                 sb.Append(Name);
@@ -73,7 +73,7 @@ namespace MatthiWare.UpdateLib.Files
             {
                 StringBuilder sb = new StringBuilder();
 
-                sb.Append(Parent?.DestinationLocation ?? "");
+                sb.Append(Parent?.DestinationLocation ?? string.Empty);
                 sb.Append(Name);
                 sb.Append(@"\");
 

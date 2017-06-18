@@ -40,14 +40,14 @@ namespace UpdateLib.Tests.Files
         [Test]
         public void AddingNullOrEmptyKeyAndOrValueThrowsArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => { converter.Add("", ""); });
-            Assert.Throws<ArgumentNullException>(() => { converter.Add(null, ""); });
-            Assert.Throws<ArgumentNullException>(() => { converter.Add("", null); });
+            Assert.Throws<ArgumentNullException>(() => { converter.Add(string.Empty, string.Empty); });
+            Assert.Throws<ArgumentNullException>(() => { converter.Add(null, string.Empty); });
+            Assert.Throws<ArgumentNullException>(() => { converter.Add(string.Empty, null); });
             Assert.Throws<ArgumentNullException>(() => { converter.Add(null, null); });
             Assert.Throws<ArgumentNullException>(() => { converter.Add("test", null); });
-            Assert.Throws<ArgumentNullException>(() => { converter.Add("test", ""); });
+            Assert.Throws<ArgumentNullException>(() => { converter.Add("test", string.Empty); });
             Assert.Throws<ArgumentNullException>(() => { converter.Add(null, "test"); });
-            Assert.Throws<ArgumentNullException>(() => { converter.Add("", "test"); });
+            Assert.Throws<ArgumentNullException>(() => { converter.Add(string.Empty, "test"); });
         }
 
         [Test]
@@ -83,7 +83,7 @@ namespace UpdateLib.Tests.Files
         public void GetEmptyKeyShouldThrowArgumentNullException()
         {
             Assert.Throws<ArgumentNullException>(() => { string val = converter[null]; });
-            Assert.Throws<ArgumentNullException>(() => { string val = converter[""]; });
+            Assert.Throws<ArgumentNullException>(() => { string val = converter[string.Empty]; });
         }
 
         [Test]
@@ -115,7 +115,7 @@ namespace UpdateLib.Tests.Files
         [Test]
         public void ContainsReturnsFalseForEmptyOrNullKey()
         {
-            Assert.False(converter.Contains(""));
+            Assert.False(converter.Contains(string.Empty));
             Assert.False(converter.Contains(null));
         }
 
@@ -143,7 +143,7 @@ namespace UpdateLib.Tests.Files
         [Test]
         public void RemoveThrowsArgumentNullExceptionForEmptyOrNullKey()
         {
-            Assert.Throws<ArgumentNullException>(() => { converter.Remove(""); });
+            Assert.Throws<ArgumentNullException>(() => { converter.Remove(string.Empty); });
             Assert.Throws<ArgumentNullException>(() => { converter.Remove(null); });
         }
 

@@ -47,7 +47,7 @@ namespace MatthiWare.UpdateLib
         #region Fields
 
         private int m_pid;
-        private string m_updateUrl = "";
+        private string m_updateUrl = string.Empty;
         private string m_argUpdateSilent = "--silent";
         private string m_argUpdate = "--update";
         private string m_argWait = "--wait";

@@ -41,7 +41,7 @@ namespace UpdateLib.Tests.Files
             UpdateFile file = new UpdateFile();
 
             Assert.Catch<ArgumentNullException>(() => { file.Save(nullStream); });
-            Assert.Catch<ArgumentNullException>(() => { file.Save(""); });
+            Assert.Catch<ArgumentNullException>(() => { file.Save(string.Empty); });
 
             Mock<Stream> unwritableStream = new Mock<Stream>();
             unwritableStream.SetupGet(s => s.CanWrite).Returns(false);
@@ -55,7 +55,7 @@ namespace UpdateLib.Tests.Files
             Stream nullStream = null;
 
             Assert.Catch<ArgumentNullException>(() => { UpdateFile.Load(nullStream); });
-            Assert.Catch<ArgumentNullException>(() => { UpdateFile.Load(""); });
+            Assert.Catch<ArgumentNullException>(() => { UpdateFile.Load(string.Empty); });
 
             CleanUp();
 

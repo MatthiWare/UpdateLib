@@ -20,7 +20,7 @@ namespace MatthiWare.UpdateLib.Files
             {
                 StringBuilder sb = new StringBuilder();
 
-                sb.Append(Parent?.SourceLocation ?? "");
+                sb.Append(Parent?.SourceLocation ?? string.Empty);
                 sb.Append(Name);
 
                 return sb.ToString();
@@ -32,7 +32,7 @@ namespace MatthiWare.UpdateLib.Files
             {
                 StringBuilder sb = new StringBuilder();
 
-                sb.Append(Parent?.DestinationLocation ?? "");
+                sb.Append(Parent?.DestinationLocation ?? string.Empty);
                 sb.Append(Name);
 
                 return sb.ToString();

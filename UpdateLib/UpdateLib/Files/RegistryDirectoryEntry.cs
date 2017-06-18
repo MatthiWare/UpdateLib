@@ -35,7 +35,7 @@ namespace MatthiWare.UpdateLib.Files
                 StringBuilder sb = new StringBuilder();
 
                 if (IsRoot)
-                    return "";
+                    return string.Empty;
 
                 sb.Append(Parent.FullName);
                 sb.Append(Name);

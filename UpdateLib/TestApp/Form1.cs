@@ -103,7 +103,7 @@ namespace TestApp
         private void button1_Click(object sender, EventArgs e)
         {
             DummyTask task = new DummyTask();
-            task.TaskCompleted += (o, ex) => Updater.Instance.Logger.Debug(nameof(DummyTask),"", "Callback task completed!");
+            task.TaskCompleted += (o, ex) => Updater.Instance.Logger.Debug(nameof(DummyTask), string.Empty, "Callback task completed!");
             task.Start();
         }
 
