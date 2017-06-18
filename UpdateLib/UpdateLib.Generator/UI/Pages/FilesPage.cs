@@ -287,7 +287,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             ResumeLayout();
         }
 
-        private void tvFolders_BeforeSelect(object sender, TreeViewCancelEventArgs e)
+        private void tvFolders_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             TreeViewFolderNode node = e.Node as TreeViewFolderNode;
 
