@@ -33,6 +33,7 @@
             this.SidebarPanel = new System.Windows.Forms.Panel();
             this.ContentPanel = new System.Windows.Forms.Panel();
             this.btnTabBuild = new MatthiWare.UpdateLib.Generator.UI.FlatButton();
+            this.btnTabRegistry = new MatthiWare.UpdateLib.Generator.UI.FlatButton();
             this.btnTabFiles = new MatthiWare.UpdateLib.Generator.UI.FlatButton();
             this.btnTabInformation = new MatthiWare.UpdateLib.Generator.UI.FlatButton();
             this.HeaderPanel = new MatthiWare.UpdateLib.Generator.UI.MoveablePanel();
@@ -55,6 +56,7 @@
             this.SidebarPanel.BackColor = System.Drawing.Color.DarkGray;
             this.SidebarPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.SidebarPanel.Controls.Add(this.btnTabBuild);
+            this.SidebarPanel.Controls.Add(this.btnTabRegistry);
             this.SidebarPanel.Controls.Add(this.btnTabFiles);
             this.SidebarPanel.Controls.Add(this.btnTabInformation);
             this.SidebarPanel.Dock = System.Windows.Forms.DockStyle.Left;
@@ -82,12 +84,27 @@
             this.btnTabBuild.Dock = System.Windows.Forms.DockStyle.Top;
             this.btnTabBuild.Font = new System.Drawing.Font("Century Gothic", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnTabBuild.InfoImage = ((System.Drawing.Image)(resources.GetObject("btnTabBuild.InfoImage")));
-            this.btnTabBuild.Location = new System.Drawing.Point(0, 126);
+            this.btnTabBuild.Location = new System.Drawing.Point(0, 189);
             this.btnTabBuild.Name = "btnTabBuild";
             this.btnTabBuild.Size = new System.Drawing.Size(231, 63);
-            this.btnTabBuild.TabIndex = 2;
+            this.btnTabBuild.TabIndex = 3;
             this.btnTabBuild.Text = "Build";
             this.btnTabBuild.Click += new System.EventHandler(this.btnTabBuild_Click);
+            // 
+            // btnTabRegistry
+            // 
+            this.btnTabRegistry.ActiveItem = false;
+            this.btnTabRegistry.BackHoverColor = System.Drawing.Color.LightGray;
+            this.btnTabRegistry.BackSelectedColor = System.Drawing.Color.DimGray;
+            this.btnTabRegistry.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnTabRegistry.Font = new System.Drawing.Font("Century Gothic", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnTabRegistry.InfoImage = global::MatthiWare.UpdateLib.Generator.Properties.Resources.Registry_Editor_16px;
+            this.btnTabRegistry.Location = new System.Drawing.Point(0, 126);
+            this.btnTabRegistry.Name = "btnTabRegistry";
+            this.btnTabRegistry.Size = new System.Drawing.Size(231, 63);
+            this.btnTabRegistry.TabIndex = 2;
+            this.btnTabRegistry.Text = "Registry";
+            this.btnTabRegistry.Click += new System.EventHandler(this.btnTabRegistry_Click);
             // 
             // btnTabFiles
             // 
@@ -242,5 +259,6 @@
         private UI.FlatButton btnTabFiles;
         private UI.FlatButton btnTabBuild;
         internal System.Windows.Forms.Panel ContentPanel;
+        private UI.FlatButton btnTabRegistry;
     }
 }

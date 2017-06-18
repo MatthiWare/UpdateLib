@@ -1,6 +1,6 @@
 ﻿namespace MatthiWare.UpdateLib.Generator.UI.Pages
 {
-    partial class FilesPage
+    partial class RegistryPage
     {
         /// <summary> 
         /// Required designer variable.
@@ -39,11 +39,10 @@
             this.existingFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.lvFiles = new System.Windows.Forms.ListView();
+            this.lvRegistry = new System.Windows.Forms.ListView();
             this.clmnName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.clmnDate = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.clmnType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.clmnSize = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.clmnValue = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.contextMenuRightClick.SuspendLayout();
@@ -55,9 +54,9 @@
             this.label1.Font = new System.Drawing.Font("Century Gothic", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.Location = new System.Drawing.Point(14, 16);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(128, 20);
+            this.label1.Size = new System.Drawing.Size(65, 20);
             this.label1.TabIndex = 1;
-            this.label1.Text = " Files and folders";
+            this.label1.Text = "Registry";
             // 
             // tvFolders
             // 
@@ -135,48 +134,42 @@
             this.deleteToolStripMenuItem.Text = "Delete";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
             // 
-            // lvFiles
+            // lvRegistry
             // 
-            this.lvFiles.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.lvRegistry.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.lvFiles.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.lvRegistry.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.clmnName,
-            this.clmnDate,
             this.clmnType,
-            this.clmnSize});
-            this.lvFiles.ContextMenuStrip = this.contextMenuRightClick;
-            this.lvFiles.FullRowSelect = true;
-            this.lvFiles.Location = new System.Drawing.Point(215, 53);
-            this.lvFiles.MultiSelect = false;
-            this.lvFiles.Name = "lvFiles";
-            this.lvFiles.Size = new System.Drawing.Size(577, 332);
-            this.lvFiles.SmallImageList = this.ilIcons;
-            this.lvFiles.TabIndex = 3;
-            this.lvFiles.UseCompatibleStateImageBehavior = false;
-            this.lvFiles.View = System.Windows.Forms.View.Details;
-            this.lvFiles.SelectedIndexChanged += new System.EventHandler(this.lvFiles_SelectedIndexChanged);
-            this.lvFiles.DoubleClick += new System.EventHandler(this.lvFiles_DoubleClick);
+            this.clmnValue});
+            this.lvRegistry.ContextMenuStrip = this.contextMenuRightClick;
+            this.lvRegistry.FullRowSelect = true;
+            this.lvRegistry.Location = new System.Drawing.Point(215, 53);
+            this.lvRegistry.MultiSelect = false;
+            this.lvRegistry.Name = "lvRegistry";
+            this.lvRegistry.Size = new System.Drawing.Size(577, 332);
+            this.lvRegistry.SmallImageList = this.ilIcons;
+            this.lvRegistry.TabIndex = 3;
+            this.lvRegistry.UseCompatibleStateImageBehavior = false;
+            this.lvRegistry.View = System.Windows.Forms.View.Details;
+            this.lvRegistry.SelectedIndexChanged += new System.EventHandler(this.lvFiles_SelectedIndexChanged);
+            this.lvRegistry.DoubleClick += new System.EventHandler(this.lvFiles_DoubleClick);
             // 
             // clmnName
             // 
             this.clmnName.Text = "Name";
-            this.clmnName.Width = 109;
-            // 
-            // clmnDate
-            // 
-            this.clmnDate.Text = "Last Modified";
-            this.clmnDate.Width = 147;
+            this.clmnName.Width = 150;
             // 
             // clmnType
             // 
             this.clmnType.Text = "Type";
             this.clmnType.Width = 93;
             // 
-            // clmnSize
+            // clmnValue
             // 
-            this.clmnSize.Text = "Size";
-            this.clmnSize.Width = 71;
+            this.clmnValue.Text = "Value";
+            this.clmnValue.Width = 250;
             // 
             // folderBrowserDialog
             // 
@@ -188,18 +181,18 @@
             this.openFileDialog.ReadOnlyChecked = true;
             this.openFileDialog.Title = "Add files to be included in the updater";
             // 
-            // FilesPage
+            // RegistryPage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.lvFiles);
+            this.Controls.Add(this.lvRegistry);
             this.Controls.Add(this.tvFolders);
             this.Controls.Add(this.label1);
             this.DoubleBuffered = true;
             this.Font = new System.Drawing.Font("Century Gothic", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.MinimumSize = new System.Drawing.Size(589, 233);
-            this.Name = "FilesPage";
+            this.Name = "RegistryPage";
             this.Size = new System.Drawing.Size(810, 403);
             this.contextMenuRightClick.ResumeLayout(false);
             this.ResumeLayout(false);
@@ -211,11 +204,10 @@
 
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TreeView tvFolders;
-        private System.Windows.Forms.ListView lvFiles;
+        private System.Windows.Forms.ListView lvRegistry;
         private System.Windows.Forms.ColumnHeader clmnName;
-        private System.Windows.Forms.ColumnHeader clmnDate;
         private System.Windows.Forms.ColumnHeader clmnType;
-        private System.Windows.Forms.ColumnHeader clmnSize;
+        private System.Windows.Forms.ColumnHeader clmnValue;
         private System.Windows.Forms.ImageList ilIcons;
         private System.Windows.Forms.ContextMenuStrip contextMenuRightClick;
         private System.Windows.Forms.ToolStripMenuItem menuAddFiles;

@@ -195,5 +195,10 @@ namespace MatthiWare.UpdateLib.Generator
         {
             LoadPage(nameof(BuilderPage));
         }
+
+        private void btnTabRegistry_Click(object sender, EventArgs e)
+        {
+            LoadPage(nameof(RegistryPage));
+        }
     }
 }

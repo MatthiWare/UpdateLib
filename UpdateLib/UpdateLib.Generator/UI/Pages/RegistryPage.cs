@@ -15,7 +15,7 @@ using MatthiWare.UpdateLib.Generator.Data.FilesPage;
 
 namespace MatthiWare.UpdateLib.Generator.UI.Pages
 {
-    public partial class FilesPage : PageControlBase
+    public partial class RegistryPage : PageControlBase
     {
         private const string PROJECT_IMAGE_KEY = "project_key";
 
@@ -44,7 +44,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             }
         }
 
-        public FilesPage()
+        public RegistryPage()
         {
             InitializeComponent();
         }
@@ -128,7 +128,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             folder.FolderTreeView.ContextMenuStrip = contextMenuRightClick;
 
             if (addToUI)
-                this.InvokeOnUI(() => lvFiles.Items.Add(folder.FolderListView));
+                this.InvokeOnUI(() => lvRegistry.Items.Add(folder.FolderListView));
 
             foreach (DirectoryInfo subDir in dir.GetDirectories())
                 AddExistingFolder(subDir, folder);
@@ -160,7 +160,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             folder.Files.Add(file);
 
             if (addToUI)
-                this.InvokeOnUI(() => lvFiles.Items.Add(file.FileListView));
+                this.InvokeOnUI(() => lvRegistry.Items.Add(file.FileListView));
 
         }
 
@@ -194,27 +194,27 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
                 menuAddFolder.Enabled = true;
             }
 
-            lvFiles.SuspendLayout();
+            lvRegistry.SuspendLayout();
 
-            lvFiles.Items.Clear();
+            lvRegistry.Items.Clear();
 
             foreach (GenFolder subFolder in folder.Directories)
-                lvFiles.Items.Add(subFolder.FolderListView);
+                lvRegistry.Items.Add(subFolder.FolderListView);
 
             foreach (GenFile subFile in folder.Files)
-                lvFiles.Items.Add(subFile.FileListView);
+                lvRegistry.Items.Add(subFile.FileListView);
 
-            lvFiles.ResumeLayout();
+            lvRegistry.ResumeLayout();
 
             folder.FolderTreeView.Expand();
         }
 
         private void lvFiles_DoubleClick(object sender, EventArgs e)
         {
-            if (lvFiles.SelectedItems.Count == 0)
+            if (lvRegistry.SelectedItems.Count == 0)
                 return;
 
-            ListViewItemFolder item = lvFiles.SelectedItems[0] as ListViewItemFolder;
+            ListViewItemFolder item = lvRegistry.SelectedItems[0] as ListViewItemFolder;
             if (item == null)
                 return;
 
@@ -243,16 +243,16 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             this.InvokeOnUI(() =>
             {
                 SelectedFolder.FolderTreeView.Nodes.Add(folder.FolderTreeView);
-                lvFiles.Items.Add(folder.FolderListView);
+                lvRegistry.Items.Add(folder.FolderListView);
             });
         }
 
         private void lvFiles_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (lvFiles.SelectedItems.Count == 0)
+            if (lvRegistry.SelectedItems.Count == 0)
                 return;
 
-            ListViewItemFile item = lvFiles.SelectedItems[0] as ListViewItemFile;
+            ListViewItemFile item = lvRegistry.SelectedItems[0] as ListViewItemFile;
             if (item == null)
                 return;
 
@@ -268,7 +268,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             if (SelectedFile != null)
             {
                 SelectedFile.ParentFolder.Files.Remove(SelectedFile);
-                lvFiles.Items.Remove(SelectedFile.FileListView);
+                lvRegistry.Items.Remove(SelectedFile.FileListView);
                 SelectedFile = null;
             }
             else if (SelectedFolder != null && SelectedFolder != Root && !SelectedFolder.ProtectedFolder)
@@ -276,7 +276,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
                 SelectedFolder.ParentFolder.Directories.Remove(SelectedFolder);
                 tvFolders.Nodes.Remove(SelectedFolder.FolderTreeView);
                 
-                lvFiles.Items.Clear();
+                lvRegistry.Items.Clear();
 
                 SelectedFolder = null;
             }

@@ -104,6 +104,12 @@
     <Compile Include="UI\Pages\BuilderPage.Designer.cs">
       <DependentUpon>BuilderPage.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\Pages\RegistryPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\Pages\RegistryPage.Designer.cs">
+      <DependentUpon>RegistryPage.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\Pages\FilesPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -144,6 +150,9 @@
     <EmbeddedResource Include="UI\Pages\BuilderPage.resx">
       <DependentUpon>BuilderPage.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="UI\Pages\RegistryPage.resx">
+      <DependentUpon>RegistryPage.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\Pages\FilesPage.resx">
       <DependentUpon>FilesPage.cs</DependentUpon>
     </EmbeddedResource>
@@ -171,6 +180,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Generator_logo.ico" />
+    <None Include="Resources\Registry Editor_16px.png" />
     <None Include="Resources\project_16px.png" />
     <None Include="Resources\cross.png" />
     <None Include="Resources\image_transparent_16px.png" />

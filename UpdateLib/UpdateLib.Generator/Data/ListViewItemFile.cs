@@ -17,7 +17,7 @@ namespace MatthiWare.UpdateLib.Generator.Data
         { }
 
         public ListViewItemFile(FileInfo file)
-            : this(new string[] { "", file.Name, file.LastWriteTime.ToString(), "File", ConvertBytesToSizeString(file.Length)}, file.Extension)
+            : this(new string[] { file.Name, file.LastWriteTime.ToString(), "File", ConvertBytesToSizeString(file.Length)}, file.Extension)
         {
         }
 
