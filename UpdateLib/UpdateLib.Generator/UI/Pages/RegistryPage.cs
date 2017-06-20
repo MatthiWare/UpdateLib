@@ -73,77 +73,6 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             ResumeLayout();
         }
 
-        private AsyncTask AddExistingFolderAsync(DirectoryInfo dir)
-        {
-            ShowLoader();
-
-            AsyncTask task = AsyncTaskFactory.From(new Action(() =>
-            {
-                this.InvokeOnUI(() => SuspendLayout());
-
-                AddExistingFolder(dir, SelectedFolder, true);
-
-                this.InvokeOnUI(() => ResumeLayout());
-
-            }), null);
-
-            task.TaskCompleted += (o, e) => HideLoader();
-
-            return task.Start();
-        }
-
-        private void AddExistingFolder(DirectoryInfo dir, GenFolder parentFolder, bool addToUI = false)
-        {
-            GenFolder folder = new GenFolder(dir.Name, contextMenuRightClick);
-            parentFolder.Add(folder);
-
-            if (addToUI)
-                this.InvokeOnUI(() => lvRegistry.Items.Add(folder.FolderListView));
-
-            foreach (DirectoryInfo subDir in dir.GetDirectories())
-                AddExistingFolder(subDir, folder);
-
-            foreach (FileInfo f in dir.GetFiles())
-                AddExistingFile(f, folder);
-
-            this.InvokeOnUI(() => parentFolder.FolderTreeView.Nodes.Add(folder.FolderTreeView));
-        }
-
-        private AsyncTask AddExistingFileAsync(IEnumerable<FileInfo> files)
-        {
-            return AsyncTaskFactory.StartNew(new Action(() =>
-            {
-                GenFolder s = SelectedFolder;
-
-                foreach (FileInfo file in files)
-                    AddExistingFile(file, s, true);
-
-            }), null);
-        }
-
-        private void AddExistingFile(FileInfo f, GenFolder folder, bool addToUI = false)
-        {
-            GenReg file = new GenReg("test");
-
-            EnsureExtensionIconExists(f);
-
-            folder.Items.Add(file);
-
-            if (addToUI)
-                this.InvokeOnUI(() => lvRegistry.Items.Add(file.View));
-
-        }
-
-        private void EnsureExtensionIconExists(FileInfo file)
-        {
-            if (ilIcons.Images.ContainsKey(file.Extension))
-                return;
-
-            Icon extensionIcon = Icon.ExtractAssociatedIcon(file.FullName);
-
-            this.InvokeOnUI(() => ilIcons.Images.Add(file.Extension, extensionIcon));
-        }
-
         private void UpdateSelectedFolder(GenFolder folder)
         {
             if (folder == null || folder == SelectedFolder)
@@ -213,7 +142,11 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 
                 lvRegistry.Items.Clear();
 
-                SelectedFolder = null;
+                GenFolder temp = SelectedFolder;
+
+                UpdateSelectedFolder(SelectedFolder.ParentFolder);
+
+                temp = null;
             }
 
             ResumeLayout();

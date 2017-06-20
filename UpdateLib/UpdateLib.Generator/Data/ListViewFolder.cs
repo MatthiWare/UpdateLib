@@ -18,7 +18,7 @@ namespace MatthiWare.UpdateLib.Generator.Data
         { }
 
         public ListViewFolder(string folderName, GenFolder folder)
-            : this(new string[] { folderName, string.Empty, "Folder", string.Empty }, FOLDER_KEY)
+            : this(new string[] { folderName, "Folder", string.Empty, string.Empty }, FOLDER_KEY)
         {
             Folder = folder;
         }

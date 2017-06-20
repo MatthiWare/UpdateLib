@@ -142,8 +142,8 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lvFiles.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.clmnName,
-            this.clmnDate,
             this.clmnType,
+            this.clmnDate,
             this.clmnSize});
             this.lvFiles.ContextMenuStrip = this.contextMenuRightClick;
             this.lvFiles.FullRowSelect = true;
@@ -165,11 +165,13 @@
             // 
             // clmnDate
             // 
+            this.clmnDate.DisplayIndex = 1;
             this.clmnDate.Text = "Last Modified";
             this.clmnDate.Width = 147;
             // 
             // clmnType
             // 
+            this.clmnType.DisplayIndex = 2;
             this.clmnType.Text = "Type";
             this.clmnType.Width = 93;
             // 

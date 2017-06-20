@@ -37,7 +37,7 @@ namespace MatthiWare.UpdateLib.Generator.Data.FilesPage
 
         public string[] GetListViewItems()
         {
-            return new string[] { Name, FileInfo.LastWriteTime.ToString(), "File", Size };
+            return new string[] { Name, "File", FileInfo.LastWriteTime.ToString(), Size };
         }
         public string GetListViewImageKey()
         {

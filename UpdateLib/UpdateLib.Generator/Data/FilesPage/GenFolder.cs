@@ -46,7 +46,7 @@ namespace MatthiWare.UpdateLib.Generator.Data.FilesPage
 
         public void Add(GenFolder folder)
         {
-            folder.ParentFolder = folder;
+            folder.ParentFolder = this;
             Directories.Add(folder);
             FolderTreeView.Nodes.Add(folder.FolderTreeView);
         }

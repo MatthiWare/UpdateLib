@@ -270,7 +270,11 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 
                 lvFiles.Items.Clear();
 
-                SelectedFolder = null;
+                GenFolder temp = SelectedFolder;
+
+                UpdateSelectedFolder(SelectedFolder.ParentFolder);
+
+                temp = null;
             }
             ResumeLayout();
         }
