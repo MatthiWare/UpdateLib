@@ -133,6 +133,26 @@ namespace MatthiWare.UpdateLib.Generator.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap reg_bin_16px {
+            get {
+                object obj = ResourceManager.GetObject("reg_bin_16px", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap reg_string_16px {
+            get {
+                object obj = ResourceManager.GetObject("reg_string_16px", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Registry_Editor_16px {
             get {
                 object obj = ResourceManager.GetObject("Registry_Editor_16px", resourceCulture);

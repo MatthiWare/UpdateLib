@@ -56,7 +56,7 @@ namespace MatthiWare.UpdateLib.Generator.Tasks
         {
            // Logger.Debug(GetType().Name, $"Thread: {Thread.CurrentThread.ManagedThreadId}");
 
-            List<GenFile> files = dir.Files;
+            List<IGenItem> files = dir.Items;
             foreach (GenFile genFile in files)
             {
                 FileInfo fi = genFile.FileInfo;

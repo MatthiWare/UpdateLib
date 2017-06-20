@@ -142,4 +142,10 @@
   <data name="Registry_Editor_16px" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Registry Editor_16px.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="reg_bin_16px" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\reg_bin_16px.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="reg_string_16px" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\reg_string_16px.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

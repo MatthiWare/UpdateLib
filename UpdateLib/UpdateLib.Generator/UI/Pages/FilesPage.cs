@@ -56,20 +56,18 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             ilIcons.Images.Add(TreeViewFolderNode.FOLDER_KEY, Properties.Resources.folder_transparent_16px);
             ilIcons.Images.Add(PROJECT_IMAGE_KEY, Properties.Resources.project_16px);
 
-            Root = new GenFolder("Update Project", null);
+            Root = new GenFolder("Update Project", contextMenuRightClick);
             Root.ProtectedFolder = true;
             Root.FolderTreeView.SelectedImageKey = PROJECT_IMAGE_KEY;
             Root.FolderTreeView.ImageKey = PROJECT_IMAGE_KEY;
-            Root.FolderTreeView.ContextMenuStrip = contextMenuRightClick;
 
-            tvFolders.Nodes.Add(Root.FolderTreeView);
-
-            GenFolder appFolder = new GenFolder("Application Folder", Root);
+            GenFolder appFolder = new GenFolder("Application Folder", contextMenuRightClick);
             appFolder.ProtectedFolder = true;
             appFolder.PathVariable = "%appdir%";
-            appFolder.FolderTreeView.ContextMenuStrip = contextMenuRightClick;
 
-            Root.FolderTreeView.Nodes.Add(appFolder.FolderTreeView);
+            Root.Add(appFolder);
+
+            tvFolders.Nodes.Add(Root.FolderTreeView);
 
             folderBrowserDialog.Description = "Please select the folder to import";
 
@@ -124,8 +122,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 
         private void AddExistingFolder(DirectoryInfo dir, GenFolder parentFolder, bool addToUI = false)
         {
-            GenFolder folder = new GenFolder(dir.Name, parentFolder);
-            folder.FolderTreeView.ContextMenuStrip = contextMenuRightClick;
+            GenFolder folder = new GenFolder(dir.Name, contextMenuRightClick);
 
             if (addToUI)
                 this.InvokeOnUI(() => lvFiles.Items.Add(folder.FolderListView));
@@ -136,7 +133,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             foreach (FileInfo f in dir.GetFiles())
                 AddExistingFile(f, folder);
 
-            this.InvokeOnUI(() => parentFolder.FolderTreeView.Nodes.Add(folder.FolderTreeView));
+            this.InvokeOnUI(() => parentFolder.Add(folder));
         }
 
         private AsyncTask AddExistingFileAsync(IEnumerable<FileInfo> files)
@@ -157,10 +154,10 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 
             EnsureExtensionIconExists(f);
 
-            folder.Files.Add(file);
+            folder.Items.Add(file);
 
             if (addToUI)
-                this.InvokeOnUI(() => lvFiles.Items.Add(file.FileListView));
+                this.InvokeOnUI(() => lvFiles.Items.Add(file.View));
 
         }
 
@@ -201,8 +198,8 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             foreach (GenFolder subFolder in folder.Directories)
                 lvFiles.Items.Add(subFolder.FolderListView);
 
-            foreach (GenFile subFile in folder.Files)
-                lvFiles.Items.Add(subFile.FileListView);
+            foreach (GenFile subFile in folder.Items)
+                lvFiles.Items.Add(subFile.View);
 
             lvFiles.ResumeLayout();
 
@@ -214,7 +211,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             if (lvFiles.SelectedItems.Count == 0)
                 return;
 
-            ListViewItemFolder item = lvFiles.SelectedItems[0] as ListViewItemFolder;
+            ListViewFolder item = lvFiles.SelectedItems[0] as ListViewFolder;
             if (item == null)
                 return;
 
@@ -234,15 +231,11 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 
             var name = inputDlg.Input;
 
-            GenFolder folder = new GenFolder(name, SelectedFolder);
-
-            folder.FolderTreeView.ContextMenuStrip = contextMenuRightClick;
-
-            SelectedFolder.Directories.Add(folder);
+            GenFolder folder = new GenFolder(name, contextMenuRightClick);
 
             this.InvokeOnUI(() =>
             {
-                SelectedFolder.FolderTreeView.Nodes.Add(folder.FolderTreeView);
+                SelectedFolder.Add(folder);
                 lvFiles.Items.Add(folder.FolderListView);
             });
         }
@@ -252,11 +245,11 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             if (lvFiles.SelectedItems.Count == 0)
                 return;
 
-            ListViewItemFile item = lvFiles.SelectedItems[0] as ListViewItemFile;
+            ListViewGenItem item = lvFiles.SelectedItems[0] as ListViewGenItem;
             if (item == null)
                 return;
 
-            SelectedFile = item.File;
+            SelectedFile = item.Item as GenFile;
         }
 
         private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
@@ -267,15 +260,14 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 
             if (SelectedFile != null)
             {
-                SelectedFile.ParentFolder.Files.Remove(SelectedFile);
-                lvFiles.Items.Remove(SelectedFile.FileListView);
+                SelectedFile.Parent.Remove(SelectedFile);
+                lvFiles.Items.Remove(SelectedFile.View);
                 SelectedFile = null;
             }
             else if (SelectedFolder != null && SelectedFolder != Root && !SelectedFolder.ProtectedFolder)
             {
-                SelectedFolder.ParentFolder.Directories.Remove(SelectedFolder);
-                tvFolders.Nodes.Remove(SelectedFolder.FolderTreeView);
-                
+                SelectedFolder.ParentFolder.Remove(SelectedFolder);
+
                 lvFiles.Items.Clear();
 
                 SelectedFolder = null;

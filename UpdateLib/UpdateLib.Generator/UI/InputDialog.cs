@@ -29,6 +29,8 @@ namespace MatthiWare.UpdateLib.Generator.UI
             Text = title;
 
             SetUpButtons(buttons);
+
+            txtInput.Focus();
         }
 
         private void SetUpButtons(MessageBoxButtons buttons)

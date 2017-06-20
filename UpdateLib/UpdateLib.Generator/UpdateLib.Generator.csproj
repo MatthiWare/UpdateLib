@@ -51,8 +51,10 @@
   <ItemGroup>
     <Compile Include="Data\FilesPage\GenFile.cs" />
     <Compile Include="Data\FilesPage\GenFolder.cs" />
-    <Compile Include="Data\ListViewItemFile.cs" />
-    <Compile Include="Data\ListViewItemFolder.cs" />
+    <Compile Include="Data\FilesPage\GenReg.cs" />
+    <Compile Include="Data\FilesPage\IGenItem.cs" />
+    <Compile Include="Data\ListViewGenItem.cs" />
+    <Compile Include="Data\ListViewFolder.cs" />
     <Compile Include="Data\TreeViewFolderNode.cs" />
     <Compile Include="Files\ProjectFile.cs" />
     <Compile Include="MainForm.cs">
@@ -180,6 +182,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Generator_logo.ico" />
+    <None Include="Resources\reg_string_16px.png" />
+    <None Include="Resources\reg_bin_16px.png" />
     <None Include="Resources\Registry Editor_16px.png" />
     <None Include="Resources\project_16px.png" />
     <None Include="Resources\cross.png" />

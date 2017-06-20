@@ -29,22 +29,25 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(RegistryPage));
             this.label1 = new System.Windows.Forms.Label();
             this.tvFolders = new System.Windows.Forms.TreeView();
             this.ilIcons = new System.Windows.Forms.ImageList(this.components);
             this.contextMenuRightClick = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.menuAddFiles = new System.Windows.Forms.ToolStripMenuItem();
             this.menuAddFolder = new System.Windows.Forms.ToolStripMenuItem();
-            this.newFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.existingFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lvRegistry = new System.Windows.Forms.ListView();
             this.clmnName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.clmnType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.clmnValue = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
-            this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.stringValueToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.binaryValueToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.dWORDValueToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.qWORDValueToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.multiStringValueToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.expandableStringValueToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuRightClick.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -86,51 +89,41 @@
             this.toolStripSeparator1,
             this.deleteToolStripMenuItem});
             this.contextMenuRightClick.Name = "menuTV";
-            this.contextMenuRightClick.Size = new System.Drawing.Size(142, 76);
+            this.contextMenuRightClick.Size = new System.Drawing.Size(153, 98);
             // 
             // menuAddFiles
             // 
+            this.menuAddFiles.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.stringValueToolStripMenuItem,
+            this.binaryValueToolStripMenuItem,
+            this.dWORDValueToolStripMenuItem,
+            this.qWORDValueToolStripMenuItem,
+            this.multiStringValueToolStripMenuItem,
+            this.expandableStringValueToolStripMenuItem});
             this.menuAddFiles.Image = global::MatthiWare.UpdateLib.Generator.Properties.Resources.image_transparent_16px;
             this.menuAddFiles.Name = "menuAddFiles";
-            this.menuAddFiles.Size = new System.Drawing.Size(141, 22);
-            this.menuAddFiles.Text = "Add File(s)";
-            this.menuAddFiles.Click += new System.EventHandler(this.menuAddFiles_Click);
+            this.menuAddFiles.Size = new System.Drawing.Size(152, 22);
+            this.menuAddFiles.Text = "Add Value";
             // 
             // menuAddFolder
             // 
-            this.menuAddFolder.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.newFolderToolStripMenuItem,
-            this.existingFolderToolStripMenuItem});
             this.menuAddFolder.Image = global::MatthiWare.UpdateLib.Generator.Properties.Resources.folder_transparent_16px;
             this.menuAddFolder.Name = "menuAddFolder";
-            this.menuAddFolder.Size = new System.Drawing.Size(141, 22);
-            this.menuAddFolder.Text = "Add Folder";
-            // 
-            // newFolderToolStripMenuItem
-            // 
-            this.newFolderToolStripMenuItem.Name = "newFolderToolStripMenuItem";
-            this.newFolderToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
-            this.newFolderToolStripMenuItem.Text = "New Folder";
-            this.newFolderToolStripMenuItem.Click += new System.EventHandler(this.newFolderToolStripMenuItem_Click);
-            // 
-            // existingFolderToolStripMenuItem
-            // 
-            this.existingFolderToolStripMenuItem.Name = "existingFolderToolStripMenuItem";
-            this.existingFolderToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
-            this.existingFolderToolStripMenuItem.Text = "Existing Folder";
-            this.existingFolderToolStripMenuItem.Click += new System.EventHandler(this.existingFolderToolStripMenuItem_Click);
+            this.menuAddFolder.Size = new System.Drawing.Size(152, 22);
+            this.menuAddFolder.Text = "Add Key";
+            this.menuAddFolder.Click += new System.EventHandler(this.menuAddFolder_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(138, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
             // 
             // deleteToolStripMenuItem
             // 
             this.deleteToolStripMenuItem.Enabled = false;
             this.deleteToolStripMenuItem.Image = global::MatthiWare.UpdateLib.Generator.Properties.Resources.cross;
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.deleteToolStripMenuItem.Text = "Delete";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
             // 
@@ -171,15 +164,53 @@
             this.clmnValue.Text = "Value";
             this.clmnValue.Width = 250;
             // 
-            // folderBrowserDialog
+            // stringValueToolStripMenuItem
             // 
-            this.folderBrowserDialog.ShowNewFolderButton = false;
+            this.stringValueToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("stringValueToolStripMenuItem.Image")));
+            this.stringValueToolStripMenuItem.Name = "stringValueToolStripMenuItem";
+            this.stringValueToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
+            this.stringValueToolStripMenuItem.Text = "String Value";
+            this.stringValueToolStripMenuItem.Click += new System.EventHandler(this.stringValueToolStripMenuItem_Click);
             // 
-            // openFileDialog
+            // binaryValueToolStripMenuItem
             // 
-            this.openFileDialog.Multiselect = true;
-            this.openFileDialog.ReadOnlyChecked = true;
-            this.openFileDialog.Title = "Add files to be included in the updater";
+            this.binaryValueToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("binaryValueToolStripMenuItem.Image")));
+            this.binaryValueToolStripMenuItem.Name = "binaryValueToolStripMenuItem";
+            this.binaryValueToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
+            this.binaryValueToolStripMenuItem.Text = "Binary Value";
+            this.binaryValueToolStripMenuItem.Click += new System.EventHandler(this.binaryValueToolStripMenuItem_Click);
+            // 
+            // dWORDValueToolStripMenuItem
+            // 
+            this.dWORDValueToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("dWORDValueToolStripMenuItem.Image")));
+            this.dWORDValueToolStripMenuItem.Name = "dWORDValueToolStripMenuItem";
+            this.dWORDValueToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
+            this.dWORDValueToolStripMenuItem.Text = "DWORD (32-bit) Value";
+            this.dWORDValueToolStripMenuItem.Click += new System.EventHandler(this.dWORDValueToolStripMenuItem_Click);
+            // 
+            // qWORDValueToolStripMenuItem
+            // 
+            this.qWORDValueToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("qWORDValueToolStripMenuItem.Image")));
+            this.qWORDValueToolStripMenuItem.Name = "qWORDValueToolStripMenuItem";
+            this.qWORDValueToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
+            this.qWORDValueToolStripMenuItem.Text = "QWORD (64-bit) Value";
+            this.qWORDValueToolStripMenuItem.Click += new System.EventHandler(this.qWORDValueToolStripMenuItem_Click);
+            // 
+            // multiStringValueToolStripMenuItem
+            // 
+            this.multiStringValueToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("multiStringValueToolStripMenuItem.Image")));
+            this.multiStringValueToolStripMenuItem.Name = "multiStringValueToolStripMenuItem";
+            this.multiStringValueToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
+            this.multiStringValueToolStripMenuItem.Text = "Multi String Value";
+            this.multiStringValueToolStripMenuItem.Click += new System.EventHandler(this.multiStringValueToolStripMenuItem_Click);
+            // 
+            // expandableStringValueToolStripMenuItem
+            // 
+            this.expandableStringValueToolStripMenuItem.Image = global::MatthiWare.UpdateLib.Generator.Properties.Resources.reg_string_16px;
+            this.expandableStringValueToolStripMenuItem.Name = "expandableStringValueToolStripMenuItem";
+            this.expandableStringValueToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
+            this.expandableStringValueToolStripMenuItem.Text = "Expandable String Value";
+            this.expandableStringValueToolStripMenuItem.Click += new System.EventHandler(this.expandableStringValueToolStripMenuItem_Click);
             // 
             // RegistryPage
             // 
@@ -212,11 +243,13 @@
         private System.Windows.Forms.ContextMenuStrip contextMenuRightClick;
         private System.Windows.Forms.ToolStripMenuItem menuAddFiles;
         private System.Windows.Forms.ToolStripMenuItem menuAddFolder;
-        private System.Windows.Forms.ToolStripMenuItem newFolderToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem existingFolderToolStripMenuItem;
-        private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog;
-        private System.Windows.Forms.OpenFileDialog openFileDialog;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem stringValueToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem binaryValueToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem dWORDValueToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem qWORDValueToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem multiStringValueToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem expandableStringValueToolStripMenuItem;
     }
 }
