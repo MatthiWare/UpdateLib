@@ -98,7 +98,7 @@
             this.btnTabRegistry.BackSelectedColor = System.Drawing.Color.DimGray;
             this.btnTabRegistry.Dock = System.Windows.Forms.DockStyle.Top;
             this.btnTabRegistry.Font = new System.Drawing.Font("Century Gothic", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnTabRegistry.InfoImage = global::MatthiWare.UpdateLib.Generator.Properties.Resources.Registry_Editor_16px;
+            this.btnTabRegistry.InfoImage = global::MatthiWare.UpdateLib.Generator.Properties.Resources.Registry_Editor_32px;
             this.btnTabRegistry.Location = new System.Drawing.Point(0, 126);
             this.btnTabRegistry.Name = "btnTabRegistry";
             this.btnTabRegistry.Size = new System.Drawing.Size(231, 63);

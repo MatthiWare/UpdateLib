@@ -35,7 +35,7 @@ namespace MatthiWare.UpdateLib.Generator.Data.FilesPage
             FolderTreeView = new TreeViewFolderNode(name, this);
 
             FolderTreeView.ContextMenuStrip = menu;
-
+            
         }
 
         public void Add(IGenItem item)

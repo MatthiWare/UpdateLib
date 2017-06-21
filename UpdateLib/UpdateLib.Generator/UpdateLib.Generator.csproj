@@ -182,6 +182,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Generator_logo.ico" />
+    <None Include="Resources\Registry Editor_32px.png" />
     <None Include="Resources\reg_string_16px.png" />
     <None Include="Resources\reg_bin_16px.png" />
     <None Include="Resources\Registry Editor_16px.png" />
