@@ -23,7 +23,7 @@ namespace MatthiWare.UpdateLib.Generator.Data.FilesPage
         {
             get
             {
-                return Directories.Sum(d => d.Count);
+                return Items.Count + Directories.Sum(d => d.Count);
             }
         }
 
@@ -35,7 +35,7 @@ namespace MatthiWare.UpdateLib.Generator.Data.FilesPage
             FolderTreeView = new TreeViewFolderNode(name, this);
 
             FolderTreeView.ContextMenuStrip = menu;
-            
+
         }
 
         public void Add(IGenItem item)
@@ -54,12 +54,14 @@ namespace MatthiWare.UpdateLib.Generator.Data.FilesPage
         public void Remove(IGenItem item)
         {
             Items.Remove(item);
+            item.View.Remove();
         }
 
         public void Remove(GenFolder folder)
         {
             Directories.Remove(folder);
             FolderTreeView.Nodes.Remove(folder.FolderTreeView);
+            folder.FolderListView.Remove();
         }
 
     }

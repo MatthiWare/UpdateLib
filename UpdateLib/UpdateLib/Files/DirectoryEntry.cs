@@ -26,7 +26,7 @@ namespace MatthiWare.UpdateLib.Files
         {
             get
             {
-                return Files.Count + Directories.Select(d => d.Count).Sum();
+                return Files.Count + Directories.Sum(d => d.Count);
             }
         }
 

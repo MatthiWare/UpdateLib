@@ -154,7 +154,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 
             EnsureExtensionIconExists(f);
 
-            folder.Items.Add(file);
+            folder.Add(file);
 
             if (addToUI)
                 this.InvokeOnUI(() => lvFiles.Items.Add(file.View));
@@ -203,6 +203,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 
             lvFiles.ResumeLayout();
 
+            tvFolders.SelectedNode = folder.FolderTreeView;
             folder.FolderTreeView.Expand();
         }
 
@@ -245,11 +246,15 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             if (lvFiles.SelectedItems.Count == 0)
                 return;
 
-            ListViewGenItem item = lvFiles.SelectedItems[0] as ListViewGenItem;
+            ListViewItem item = lvFiles.SelectedItems[0];
+
             if (item == null)
                 return;
 
-            SelectedFile = item.Item as GenFile;
+            if (item is ListViewGenItem)
+                SelectedFile = (item as ListViewGenItem).Item as GenFile;
+            else if (item is ListViewFolder)
+                SelectedFolder = (item as ListViewFolder).Folder;
         }
 
         private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
@@ -261,7 +266,6 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             if (SelectedFile != null)
             {
                 SelectedFile.Parent.Remove(SelectedFile);
-                lvFiles.Items.Remove(SelectedFile.View);
                 SelectedFile = null;
             }
             else if (SelectedFolder != null && SelectedFolder != Root && !SelectedFolder.ProtectedFolder)

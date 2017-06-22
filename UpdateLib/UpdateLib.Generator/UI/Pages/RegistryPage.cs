@@ -43,6 +43,8 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             }
         }
 
+        public IList<GenFolder> Folders { get; set; }
+
         public RegistryPage()
         {
             InitializeComponent();
@@ -51,6 +53,8 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
         protected override void OnPageInitialize()
         {
             SuspendLayout();
+
+            Folders = new List<GenFolder>();
 
             ilIcons.Images.Add("REG_BIN", Properties.Resources.reg_bin_16px);
             ilIcons.Images.Add("REG_SZ", Properties.Resources.reg_string_16px);
@@ -67,6 +71,12 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             tvFolders.Nodes.Add(hkey_local_machine.FolderTreeView);
             tvFolders.Nodes.Add(hkey_users.FolderTreeView);
             tvFolders.Nodes.Add(hkey_current_config.FolderTreeView);
+
+            Folders.Add(hkey_classes_root);
+            Folders.Add(hkey_current_user);
+            Folders.Add(hkey_local_machine);
+            Folders.Add(hkey_users);
+            Folders.Add(hkey_current_config);
 
             UpdateSelectedFolder(hkey_classes_root);
 
@@ -96,6 +106,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 
             lvRegistry.ResumeLayout();
 
+            tvFolders.SelectedNode = folder.FolderTreeView;
             folder.FolderTreeView.Expand();
         }
 
@@ -117,11 +128,15 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             if (lvRegistry.SelectedItems.Count == 0)
                 return;
 
-            ListViewGenItem item = lvRegistry.SelectedItems[0] as ListViewGenItem;
+            ListViewItem item = lvRegistry.SelectedItems[0];
+
             if (item == null)
                 return;
 
-            SelectedRegEntry = item.Item as GenReg;
+            if (item is ListViewGenItem)
+                SelectedRegEntry = (item as ListViewGenItem).Item as GenReg;
+            else if (item is ListViewFolder)
+                SelectedFolder = (item as ListViewFolder).Folder;
         }
 
         private void deleteToolStripMenuItem_Click(object sender, EventArgs e)

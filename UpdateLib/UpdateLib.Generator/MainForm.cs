@@ -47,7 +47,7 @@ namespace MatthiWare.UpdateLib.Generator
         private void Generate()
         {
 
-            UpdateGeneratorTask generator = new UpdateGeneratorTask(null, null);
+            UpdateGeneratorTask generator = new UpdateGeneratorTask(null, null, null);
 
             generator.TaskCompleted += Generator_TaskCompleted;
             generator.TaskProgressChanged += Generator_TaskProgressChanged;

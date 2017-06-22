@@ -11,9 +11,10 @@ namespace MatthiWare.UpdateLib.Files
     [Serializable]
     public class RegistryKeyEntry
     {
-
+        [XmlAttribute]
         public RegistryValueKind Type { get; set; }
         public object Value { get; set; }
+        [XmlAttribute]
         public string Name { get; set; }
 
         [XmlIgnore]

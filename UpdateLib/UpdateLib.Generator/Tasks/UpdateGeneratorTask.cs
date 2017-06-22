@@ -1,6 +1,7 @@
 ﻿using MatthiWare.UpdateLib.Files;
 using MatthiWare.UpdateLib.Security;
 using System;
+using System.Linq;
 using System.Threading;
 using System.IO;
 using MatthiWare.UpdateLib.Tasks;
@@ -22,7 +23,9 @@ namespace MatthiWare.UpdateLib.Generator.Tasks
 
         private InformationPage infoPage;
 
-        public UpdateGeneratorTask(GenFolder dir, InformationPage info)
+        private IList<GenFolder> registryFolders;
+
+        public UpdateGeneratorTask(GenFolder dir, InformationPage info, IList<GenFolder> registry)
         {
             if (dir == null)
                 throw new ArgumentNullException("dir", "The directory cannot be null");
@@ -30,8 +33,9 @@ namespace MatthiWare.UpdateLib.Generator.Tasks
             Result = new UpdateFile();
 
             baseDir = dir;
+            registryFolders = registry;
 
-            total = dir.Count;
+            total = dir.Count + registry.Sum(g => g.Count);
 
             infoPage = info;
         }
@@ -40,6 +44,9 @@ namespace MatthiWare.UpdateLib.Generator.Tasks
         {
             foreach (GenFolder subfolder in baseDir.Directories)
             {
+                if (subfolder.Count == 0)
+                    return;
+
                 DirectoryEntry entry = new DirectoryEntry(string.IsNullOrEmpty(subfolder.PathVariable) ? subfolder.Name : subfolder.PathVariable);
 
                 Result.Folders.Add(entry);
@@ -47,15 +54,65 @@ namespace MatthiWare.UpdateLib.Generator.Tasks
                 AddDirRecursive(subfolder, entry);
             }
 
+            Enqueue(new Action(AddRegistryItems), null);
 
             Result.ApplicationName = infoPage.ApplicationName;
             Result.VersionString = infoPage.ApplicationVersion;
         }
 
+        private void AddRegistryItems()
+        {
+            foreach (GenFolder registry in registryFolders)
+            {
+                if (registry.Count == 0)
+                    continue;
+
+                RegistryDirectoryEntry dir = new RegistryDirectoryEntry(registry.Name);
+
+                Result.Registry.Add(dir);
+
+                AddRegistryRecursive(registry, dir);
+            }
+        }
+
+        private void AddRegistryRecursive(GenFolder dir, RegistryDirectoryEntry entry)
+        {
+            List<IGenItem> keys = dir.Items;
+            foreach (GenReg key in keys)
+            {
+                entry.Keys.Add(new RegistryKeyEntry()
+                {
+                    Name = key.Name,
+                    Type = key.Type,
+                    Value = key.Value
+                });
+
+                Interlocked.Increment(ref done);
+            }
+
+            if (keys.Count > 0)
+                OnTaskProgressChanged(done, total);
+
+            IEnumerable<GenFolder> dirsLeft = dir.Directories.Where(g => g.Count > 0);
+            int left = dirsLeft.Count();
+
+            foreach (GenFolder subDir in dirsLeft)
+            {
+                RegistryDirectoryEntry dirEntry = new RegistryDirectoryEntry(subDir.Name);
+                entry.Directories.Add(dirEntry);
+
+                left--;
+
+                if (left == 0)
+                    AddRegistryRecursive(subDir, dirEntry);
+                else
+                    Enqueue(new Action<GenFolder, RegistryDirectoryEntry>(AddRegistryRecursive), subDir, dirEntry);
+            }
+
+        }
+
         private void AddDirRecursive(GenFolder dir, DirectoryEntry entry)
         {
-           // Logger.Debug(GetType().Name, $"Thread: {Thread.CurrentThread.ManagedThreadId}");
-
             List<IGenItem> files = dir.Items;
             foreach (GenFile genFile in files)
             {
@@ -71,18 +128,20 @@ namespace MatthiWare.UpdateLib.Generator.Tasks
             if (files.Count > 0)
                 OnTaskProgressChanged(done, total);
 
-            foreach (GenFolder newDir in dir.Directories)
+            IEnumerable<GenFolder> dirsLeft = dir.Directories.Where(g => g.Count > 0);
+            int left = dirsLeft.Count();
+
+            foreach (GenFolder subDir in dirsLeft)
             {
-                if (newDir.Count == 0)
-                    continue;
+                DirectoryEntry dirEntry = new DirectoryEntry(string.IsNullOrEmpty(subDir.PathVariable) ? subDir.Name : subDir.PathVariable);
+                entry.Directories.Add(dirEntry);
 
-                DirectoryEntry newEntry = new DirectoryEntry(string.IsNullOrEmpty(newDir.PathVariable) ? newDir.Name : newDir.PathVariable);
-                entry.Directories.Add(newEntry);
+                left--;
 
-                AddDirRecursiveDelegate caller = new AddDirRecursiveDelegate(AddDirRecursive);
-                Enqueue(caller, newDir, newEntry);
-
-                //AddDirRecursive(newDir, newEntry);
+                if (left == 0)
+                    AddDirRecursive(subDir, dirEntry);
+                else
+                    Enqueue(new Action<GenFolder, DirectoryEntry>(AddDirRecursive), subDir, dirEntry);
             }
         }
     }
