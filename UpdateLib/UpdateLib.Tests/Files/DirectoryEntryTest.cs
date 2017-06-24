@@ -35,7 +35,7 @@ namespace UpdateLib.Tests.Files
 
                     for (int f = 0; f < childsPerSubDir; f++)
                     {
-                        entry.Files.Add(new FileEntry($"file_{f}.txt"));
+                        entry.Items.Add(new FileEntry($"file_{f}.txt"));
                     }
 
                     dir.Directories.Add(entry);

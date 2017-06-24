@@ -77,29 +77,36 @@ namespace UpdateLib.Tests.Files
             DirectoryEntry appSubFolder = new DirectoryEntry("AppSubFolder");
             DirectoryEntry otherSubFolder = new DirectoryEntry("OtherSubFolder");
 
-            FileEntry appFile = new FileEntry()
+            EntryBase appFile = new FileEntry()
             {
                 Name = "application.exe",
                 Description = "my desc",
-                Hash = "AAA",
-                Parent = appSubFolder
+                Hash = "AAA"
             };
 
-            FileEntry otherFile = new FileEntry()
+            EntryBase otherFile = new FileEntry()
             {
                 Name = "data.xml",
                 Description = "my data file",
-                Hash = "BBB",
-                Parent = otherSubFolder
+                Hash = "BBB"
             };
 
-            appSubFolder.Files.Add(appFile);
-            otherSubFolder.Files.Add(otherFile);
+            appSubFolder.Add(appFile);
+            otherSubFolder.Add(otherFile);
 
             file.Folders.Add(appSubFolder);
             file.Folders.Add(otherSubFolder);
 
+            DirectoryEntry regDir = new DirectoryEntry("HKEY_LOCAL_MACHINE");
+
+            EntryBase regEntry = new RegistryKeyEntry("test", Microsoft.Win32.RegistryValueKind.String, null);
+
+            regDir.Add(regEntry);
+
+            file.Registry.Add(regDir);
+
             Assert.AreEqual(2, file.FileCount);
+            Assert.AreEqual(1, file.RegistryKeyCount);
 
             return file;
         }

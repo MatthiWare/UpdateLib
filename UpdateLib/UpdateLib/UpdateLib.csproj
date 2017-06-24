@@ -58,12 +58,12 @@
     </Compile>
     <Compile Include="Encoders\IEncoder.cs" />
     <Compile Include="Files\DirectoryEntry.cs" />
+    <Compile Include="Files\EntryBase.cs" />
     <Compile Include="Files\HashCacheEntry.cs" />
     <Compile Include="Files\HashCacheFile.cs" />
     <Compile Include="Files\FileEntry.cs" />
     <Compile Include="Files\PathVariableConverter.cs" />
     <Compile Include="Files\RegistryKeyEntry.cs" />
-    <Compile Include="Files\RegistryDirectoryEntry.cs" />
     <Compile Include="Files\UpdateFile.cs" />
     <Compile Include="InstallationMode.cs" />
     <Compile Include="Logging\ILogger.cs" />

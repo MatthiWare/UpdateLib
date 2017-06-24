@@ -34,7 +34,7 @@ namespace MatthiWare.UpdateLib.Tasks
                 }
             }
 
-            foreach (RegistryDirectoryEntry dir in File.Registry)
+            foreach (DirectoryEntry dir in File.Registry)
                 if (!CheckHasSufficientPermissionForRegistry(dir))
                 {
                     Result = true;
@@ -58,13 +58,13 @@ namespace MatthiWare.UpdateLib.Tasks
             return true;
         }
 
-        private bool CheckHasSufficientPermissionForRegistry(RegistryDirectoryEntry dir)
+        private bool CheckHasSufficientPermissionForRegistry(DirectoryEntry dir)
         {
-            foreach (RegistryKeyEntry key in dir.Keys)
+            foreach (RegistryKeyEntry key in dir.Items)
                 if (!PermissionUtil.CheckRegPermission(key))
                     return false;
 
-            foreach (RegistryDirectoryEntry subDir in dir.Directories)
+            foreach (DirectoryEntry subDir in dir.Directories)
                 if (!CheckHasSufficientPermissionForRegistry(dir))
                     return false;
 

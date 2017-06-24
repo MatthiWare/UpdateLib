@@ -1,5 +1,7 @@
 ﻿using MatthiWare.UpdateLib.Files;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
@@ -22,10 +24,8 @@ namespace MatthiWare.UpdateLib.Tasks
 
         protected override void DoWork()
         {
-            Action<DirectoryEntry> call = new Action<DirectoryEntry>(RecursiveCheck);
-
             foreach (DirectoryEntry dir in m_updateFile.Folders)
-                Enqueue(call, dir);
+                Enqueue(new Action<DirectoryEntry>(RecursiveCheck), dir);
 
             AwaitWorkers();
 
@@ -34,7 +34,7 @@ namespace MatthiWare.UpdateLib.Tasks
 
         private void RecursiveCheck(DirectoryEntry dir)
         {
-            dir.Files.RemoveAll(fe =>
+            dir.Items.RemoveAll(fe =>
             {
                 string convertedPath = m_converter.Replace(fe.DestinationLocation);
                 HashCacheEntry cacheEntry = m_cacheFile.Items.Find(hash => hash.FilePath.Equals(convertedPath));
@@ -42,14 +42,20 @@ namespace MatthiWare.UpdateLib.Tasks
                 if (cacheEntry == null)
                     return false;
 
-                bool val = fe.Hash.Equals(cacheEntry.Hash);
+                bool val = (fe as FileEntry).Hash.Equals(cacheEntry.Hash);
                 return val;
             });
 
-            Action<DirectoryEntry> call = new Action<DirectoryEntry>(RecursiveCheck);
+            IEnumerable<DirectoryEntry> dirsToCheck = dir.Directories.Where(d => d.Count > 0);
+            int left = dirsToCheck.Count();
 
             foreach (DirectoryEntry de in dir.Directories)
-                Enqueue(call, de);
+            {
+                if (--left == 0)
+                    RecursiveCheck(de);
+                else
+                    Enqueue(new Action<DirectoryEntry>(RecursiveCheck), de);
+            }
         }
     }
 }

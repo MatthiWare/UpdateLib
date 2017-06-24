@@ -26,7 +26,7 @@ namespace MatthiWare.UpdateLib.Files
         {
             get
             {
-                return Files.Count + Directories.Sum(d => d.Count);
+                return Items.Count + Directories.Sum(d => d.Count);
             }
         }
 
@@ -37,10 +37,11 @@ namespace MatthiWare.UpdateLib.Files
         public List<DirectoryEntry> Directories { get; set; } = new List<DirectoryEntry>();
 
         /// <summary>
-        /// Gets the list of <see cref="FileEntry">files</see> in this directory.
+        /// Gets the list of <see cref="EntryBase">files</see> in this directory.
         /// </summary>
-        [XmlArray("Files"), XmlArrayItem("File")]
-        public List<FileEntry> Files { get; set; } = new List<FileEntry>();
+        [XmlElement(typeof(FileEntry))]
+        [XmlElement(typeof(RegistryKeyEntry))]
+        public List<EntryBase> Items { get; set; } = new List<EntryBase>();
 
         /// <summary>
         /// Gets or Sets the Parent of this Directory
@@ -90,6 +91,7 @@ namespace MatthiWare.UpdateLib.Files
         /// .ctor of <see cref="DirectoryEntry"/>
         /// </summary>
         public DirectoryEntry(string name)
+            : this()
         {
             Name = name;
         }
@@ -100,22 +102,22 @@ namespace MatthiWare.UpdateLib.Files
             Directories.Add(folder);
         }
 
-        public void Add(FileEntry file)
+        public void Add(EntryBase file)
         {
             file.Parent = this;
-            Files.Add(file);
+            Items.Add(file);
         }
 
         public void Remove(DirectoryEntry folder)
         {
-            folder.Parent = this;
+            folder.Parent = null;
             Directories.Remove(folder);
         }
 
-        public void Remove(FileEntry file)
+        public void Remove(EntryBase file)
         {
-            file.Parent = this;
-            Files.Remove(file);
+            file.Parent = null;
+            Items.Remove(file);
         }
     }
 }

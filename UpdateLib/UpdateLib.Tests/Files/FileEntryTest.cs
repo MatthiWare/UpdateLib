@@ -21,7 +21,7 @@ namespace UpdateLib.Tests.Files
             root.Directories.Add(subFolder);
             subFolder.Parent = root;
 
-            subFolder.Files.Add(file);
+            subFolder.Items.Add(file);
             file.Parent = subFolder;
 
             string outputSource = "sub/myfile.txt";

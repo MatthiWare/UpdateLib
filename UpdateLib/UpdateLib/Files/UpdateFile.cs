@@ -43,7 +43,7 @@ namespace MatthiWare.UpdateLib.Files
         [XmlIgnore]
         public int RegistryKeyCount { get { return Registry.Select(r => r.Count).Sum(); } }
 
-        public List<RegistryDirectoryEntry> Registry { get; set; } = new List<RegistryDirectoryEntry>();
+        public List<DirectoryEntry> Registry { get; set; } = new List<DirectoryEntry>();
 
         public UpdateFile()
         {
@@ -62,7 +62,7 @@ namespace MatthiWare.UpdateLib.Files
                 throw new ArgumentException("Stream is not writable", nameof(output));
 
             XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
-            ns.Add(string.Empty, string.Empty);
+           // ns.Add(string.Empty, string.Empty);
 
             XmlSerializer serializer = new XmlSerializer(typeof(UpdateFile), string.Empty);
             serializer.Serialize(output, this, ns);

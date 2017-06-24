@@ -9,30 +9,28 @@ using System.Xml.Serialization;
 namespace MatthiWare.UpdateLib.Files
 {
     [Serializable]
-    public class RegistryKeyEntry
+    public class RegistryKeyEntry : EntryBase
     {
+        /// <summary>
+        /// The type of registry key
+        /// </summary>
         [XmlAttribute]
         public RegistryValueKind Type { get; set; }
+
+        /// <summary>
+        /// The value of the key
+        /// </summary>
         public object Value { get; set; }
-        [XmlAttribute]
-        public string Name { get; set; }
 
-        [XmlIgnore]
-        public string FullName
+        public RegistryKeyEntry()
+            : this(string.Empty, RegistryValueKind.String, null)
+        { }
+
+        public RegistryKeyEntry(string name, RegistryValueKind type, object value)
         {
-            get
-            {
-                StringBuilder sb = new StringBuilder();
-
-                sb.Append(Parent?.FullName ?? string.Empty);
-                sb.Append(Name);
-
-                return sb.ToString();
-            }
+            Name = name;
+            Type = type;
+            Value = value;
         }
-
-        [XmlIgnore]
-        public RegistryDirectoryEntry Parent { get; set; }
-
     }
 }

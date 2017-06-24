@@ -147,13 +147,9 @@ namespace MatthiWare.UpdateLib.Security
                 WindowsIdentity identity = WindowsIdentity.GetCurrent();
 
                 foreach (FileSystemAccessRule rule in rules)
-                {
                     if (identity.Groups.Contains(rule.IdentityReference) || rule.IdentityReference == identity.User)
-                    {
                         if ((accessRights & rule.FileSystemRights) == accessRights && rule.AccessControlType == AccessControlType.Allow)
                             return true;
-                    }
-                }
             }
             catch (Exception e)
             {
@@ -167,7 +163,7 @@ namespace MatthiWare.UpdateLib.Security
         {
             try
             {
-                new RegistryPermission(permission, access, key.FullName).Demand();
+                new RegistryPermission(permission, access, key.DestinationLocation).Demand();
                 return true;
             }
             catch (SecurityException secEx)

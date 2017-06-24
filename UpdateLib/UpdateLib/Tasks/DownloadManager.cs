@@ -34,7 +34,7 @@ namespace MatthiWare.UpdateLib.Tasks
 
         private void UpdateFilesFromDirectoryEntry(DirectoryEntry dir)
         {
-            foreach (FileEntry f in dir.Files)
+            foreach (FileEntry f in dir.Items)
                 UpdateEntry(f);
 
             foreach (DirectoryEntry d in dir.Directories)

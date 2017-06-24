@@ -67,7 +67,7 @@ namespace MatthiWare.UpdateLib.Generator.Tasks
                 if (registry.Count == 0)
                     continue;
 
-                RegistryDirectoryEntry dir = new RegistryDirectoryEntry(registry.Name);
+                DirectoryEntry dir = new DirectoryEntry(registry.Name);
 
                 Result.Registry.Add(dir);
 
@@ -75,17 +75,12 @@ namespace MatthiWare.UpdateLib.Generator.Tasks
             }
         }
 
-        private void AddRegistryRecursive(GenFolder dir, RegistryDirectoryEntry entry)
+        private void AddRegistryRecursive(GenFolder dir, DirectoryEntry entry)
         {
             List<IGenItem> keys = dir.Items;
             foreach (GenReg key in keys)
             {
-                entry.Keys.Add(new RegistryKeyEntry()
-                {
-                    Name = key.Name,
-                    Type = key.Type,
-                    Value = key.Value
-                });
+                entry.Items.Add(new RegistryKeyEntry(key.Name, key.Type, key.Value));
 
                 Interlocked.Increment(ref done);
             }
@@ -98,7 +93,7 @@ namespace MatthiWare.UpdateLib.Generator.Tasks
 
             foreach (GenFolder subDir in dirsLeft)
             {
-                RegistryDirectoryEntry dirEntry = new RegistryDirectoryEntry(subDir.Name);
+                DirectoryEntry dirEntry = new DirectoryEntry(subDir.Name);
                 entry.Directories.Add(dirEntry);
 
                 left--;
@@ -106,7 +101,7 @@ namespace MatthiWare.UpdateLib.Generator.Tasks
                 if (left == 0)
                     AddRegistryRecursive(subDir, dirEntry);
                 else
-                    Enqueue(new Action<GenFolder, RegistryDirectoryEntry>(AddRegistryRecursive), subDir, dirEntry);
+                    Enqueue(new Action<GenFolder, DirectoryEntry>(AddRegistryRecursive), subDir, dirEntry);
             }
 
         }
@@ -120,7 +115,7 @@ namespace MatthiWare.UpdateLib.Generator.Tasks
                 FileEntry newEntry = new FileEntry(fi.Name);
                 newEntry.Hash = HashUtil.GetHash(fi.FullName);
 
-                entry.Files.Add(newEntry);
+                entry.Items.Add(newEntry);
 
                 Interlocked.Increment(ref done);
             }

@@ -69,7 +69,7 @@ namespace MatthiWare.UpdateLib.UI.Components
 
         private void AddDirectoryToListView(DirectoryEntry dir)
         {
-            foreach (FileEntry file in dir.Files)
+            foreach (FileEntry file in dir.Items)
             {
 
                 ListViewItem item = new ListViewItem(new string[] { string.Empty, file.Name, "Ready to download", "0%", file.Description, Updater.Instance.Converter.Replace(file.DestinationLocation) });
