@@ -235,6 +235,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
                 return;
 
             GenReg item = new GenReg("New Item", type);
+            item.Value = "Test";
 
             this.InvokeOnUI(() =>
             {

@@ -12,7 +12,7 @@ namespace MatthiWare.UpdateLib.Files
     public class RegistryKeyEntry : EntryBase
     {
         /// <summary>
-        /// The type of registry key
+        /// The type of registry key  
         /// </summary>
         [XmlAttribute]
         public RegistryValueKind Type { get; set; }
@@ -20,7 +20,7 @@ namespace MatthiWare.UpdateLib.Files
         /// <summary>
         /// The value of the key
         /// </summary>
-        public object Value { get; set; }
+        public object Value { get; set; } = "Test";
 
         public RegistryKeyEntry()
             : this(string.Empty, RegistryValueKind.String, null)

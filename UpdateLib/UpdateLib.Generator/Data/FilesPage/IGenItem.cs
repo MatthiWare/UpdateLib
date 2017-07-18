@@ -7,6 +7,7 @@ namespace MatthiWare.UpdateLib.Generator.Data.FilesPage
 {
     public interface IGenItem
     {
+        event EventHandler Changed;
 
         string Name { get; set; }
         GenFolder Parent { get; set; }

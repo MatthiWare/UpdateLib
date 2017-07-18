@@ -8,10 +8,41 @@ namespace MatthiWare.UpdateLib.Generator.Data.FilesPage
 {
     public class GenReg : IGenItem
     {
-        public RegistryValueKind Type { get; set; }
-        public object Value { get; set; }
+        public event EventHandler Changed;
 
-        public string Name { get; set; }
+        private RegistryValueKind m_type;
+        public RegistryValueKind Type
+        {
+            get { return m_type; }
+            set
+            {
+                m_type = value;
+                Changed?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        private string m_name;
+        public string Name
+        {
+            get { return m_name; }
+            set
+            {
+                m_name = value;
+                Changed?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        private object m_value;
+        public object Value
+        {
+            get { return m_value; }
+            set
+            {
+                m_value = value;
+                Changed?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
         public GenFolder Parent { get; set; }
         public ListViewGenItem View { get; set; }
 

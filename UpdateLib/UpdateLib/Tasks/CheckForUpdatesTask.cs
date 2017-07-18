@@ -65,7 +65,7 @@ namespace MatthiWare.UpdateLib.Tasks
              * Start a task to get all the files that need to be updated
              * Returns if there is anything to update
              */
-            CheckForUpdatedFilesTask updatedFilesTask = CheckForUpdatedFiles(Result.UpdateFile, cache);
+            CheckForUpdatedItemsTask updatedFilesTask = CheckForUpdatedFiles(Result.UpdateFile, cache);
 
             Result.AdminRightsNeeded = privilegesCheckTask.AwaitTask().Result;
             Result.UpdateAvailable = updatedFilesTask.AwaitTask().Result;
@@ -84,9 +84,9 @@ namespace MatthiWare.UpdateLib.Tasks
             return false;
         }
 
-        private CheckForUpdatedFilesTask CheckForUpdatedFiles(UpdateFile file, HashCacheFile cache)
+        private CheckForUpdatedItemsTask CheckForUpdatedFiles(UpdateFile file, HashCacheFile cache)
         {
-            CheckForUpdatedFilesTask task = new CheckForUpdatedFilesTask(file, cache, Updater.Instance.Converter);
+            CheckForUpdatedItemsTask task = new CheckForUpdatedItemsTask(file, cache, Updater.Instance.Converter);
             task.ConfigureAwait(false).Start();
             return task;
         }

@@ -80,7 +80,7 @@ namespace MatthiWare.UpdateLib.Generator.Tasks
             List<IGenItem> keys = dir.Items;
             foreach (GenReg key in keys)
             {
-                entry.Items.Add(new RegistryKeyEntry(key.Name, key.Type, key.Value));
+                entry.Add(new RegistryKeyEntry(key.Name, key.Type, key.Value));
 
                 Interlocked.Increment(ref done);
             }
@@ -94,7 +94,7 @@ namespace MatthiWare.UpdateLib.Generator.Tasks
             foreach (GenFolder subDir in dirsLeft)
             {
                 DirectoryEntry dirEntry = new DirectoryEntry(subDir.Name);
-                entry.Directories.Add(dirEntry);
+                entry.Add(dirEntry);
 
                 left--;
 
@@ -115,7 +115,7 @@ namespace MatthiWare.UpdateLib.Generator.Tasks
                 FileEntry newEntry = new FileEntry(fi.Name);
                 newEntry.Hash = HashUtil.GetHash(fi.FullName);
 
-                entry.Items.Add(newEntry);
+                entry.Add(newEntry);
 
                 Interlocked.Increment(ref done);
             }
@@ -129,7 +129,7 @@ namespace MatthiWare.UpdateLib.Generator.Tasks
             foreach (GenFolder subDir in dirsLeft)
             {
                 DirectoryEntry dirEntry = new DirectoryEntry(string.IsNullOrEmpty(subDir.PathVariable) ? subDir.Name : subDir.PathVariable);
-                entry.Directories.Add(dirEntry);
+                entry.Add(dirEntry);
 
                 left--;
 

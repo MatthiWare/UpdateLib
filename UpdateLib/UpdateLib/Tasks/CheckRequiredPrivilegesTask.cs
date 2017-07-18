@@ -26,13 +26,12 @@ namespace MatthiWare.UpdateLib.Tasks
                 return;
 
             foreach (DirectoryEntry dir in File.Folders)
-            {
                 if (!CheckHasSufficientPermissionsForDirectory(dir))
                 {
                     Result = true;
                     return;
                 }
-            }
+
 
             foreach (DirectoryEntry dir in File.Registry)
                 if (!CheckHasSufficientPermissionForRegistry(dir))
@@ -65,7 +64,7 @@ namespace MatthiWare.UpdateLib.Tasks
                     return false;
 
             foreach (DirectoryEntry subDir in dir.Directories)
-                if (!CheckHasSufficientPermissionForRegistry(dir))
+                if (!CheckHasSufficientPermissionForRegistry(subDir))
                     return false;
 
             return true;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml.Serialization;
 using System.Linq;
+using System.Diagnostics;
 
 namespace MatthiWare.UpdateLib.Files
 {
@@ -11,12 +12,14 @@ namespace MatthiWare.UpdateLib.Files
     /// Directories can contain files and subdirectories.
     /// </summary>
     [Serializable]
+
     public class DirectoryEntry
     {
         /// <summary>
         /// Gets or sets the name of the <see cref="DirectoryEntry">directory</see>. 
         /// </summary>
         [XmlAttribute]
+        [DebuggerDisplay("{DestinationLocation}")]
         public string Name { get; set; }
 
         /// <summary>
@@ -98,26 +101,43 @@ namespace MatthiWare.UpdateLib.Files
 
         public void Add(DirectoryEntry folder)
         {
-            folder.Parent = folder;
+            if (folder == null) throw new ArgumentNullException(nameof(folder));
+
+            folder.Parent = this;
             Directories.Add(folder);
         }
 
         public void Add(EntryBase file)
         {
+            if (file == null) throw new ArgumentNullException(nameof(file));
+
             file.Parent = this;
             Items.Add(file);
         }
 
-        public void Remove(DirectoryEntry folder)
+        public bool Remove(DirectoryEntry folder)
         {
+            if (folder == null) throw new ArgumentNullException(nameof(folder));
+
             folder.Parent = null;
-            Directories.Remove(folder);
+            return Directories.Remove(folder);
         }
 
-        public void Remove(EntryBase file)
+        public bool Remove(EntryBase file)
         {
+            if (file == null) throw new ArgumentNullException(nameof(file));
+
             file.Parent = null;
-            Items.Remove(file);
+            return Items.Remove(file);
+        }
+
+        /// <summary>
+        /// Gets all the items including the items of childs
+        /// </summary>
+        /// <returns>A list of items</returns>
+        public IEnumerable<EntryBase> GetItems()
+        {
+            return Items.Concat(Directories.SelectMany(d => d.GetItems()));
         }
     }
 }

@@ -35,6 +35,9 @@ namespace MatthiWare.UpdateLib.Tasks
             foreach (DirectoryEntry dir in file.Folders)
                 PostProcessDirectory(dir);
 
+            foreach (DirectoryEntry dir in file.Registry)
+                PostProcessDirectory(dir);
+
             AwaitWorkers();
         }
     }

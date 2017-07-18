@@ -8,9 +8,16 @@ namespace MatthiWare.UpdateLib.Generator.Data.FilesPage
 {
     public class GenFile : IGenItem
     {
-        public FileInfo FileInfo { get; set; }
+        public event EventHandler Changed;
 
-        public string Name { get { return FileInfo?.Name ?? string.Empty; } set { } }
+        private FileInfo m_fileInfo;
+        public FileInfo FileInfo
+        {
+            get { return m_fileInfo; }
+            set { m_fileInfo = value; Changed?.Invoke(this, EventArgs.Empty); }
+        }
+
+        public string Name { get { return FileInfo?.Name ?? string.Empty; } set { Changed?.Invoke(this, EventArgs.Empty); } }
         public string RealPath { get { return FileInfo?.FullName ?? string.Empty; } }
         public string Extension { get { return FileInfo?.Extension ?? string.Empty; } }
         public string Size { get { return ConvertBytesToSizeString(FileInfo?.Length ?? 0); } }

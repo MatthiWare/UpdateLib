@@ -18,11 +18,9 @@ namespace UpdateLib.Tests.Files
             DirectoryEntry subFolder = new DirectoryEntry("sub");
             FileEntry file = new FileEntry("myfile.txt");
 
-            root.Directories.Add(subFolder);
-            subFolder.Parent = root;
+            root.Add(subFolder);
 
-            subFolder.Items.Add(file);
-            file.Parent = subFolder;
+            subFolder.Add(file);
 
             string outputSource = "sub/myfile.txt";
             string outputDest = "%root%\\sub\\myfile.txt";

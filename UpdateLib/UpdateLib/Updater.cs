@@ -631,6 +631,9 @@ namespace MatthiWare.UpdateLib
 
         private void SetAndVerifyCmdArgument(ref string reference, string value)
         {
+            if (string.IsNullOrEmpty(value))
+                throw new ArgumentNullException(nameof(value));
+
             if (value.Contains(' '))
                 throw new ArgumentException("Command line argument can not contain spaces");
 

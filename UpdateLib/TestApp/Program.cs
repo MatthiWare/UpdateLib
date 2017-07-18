@@ -7,6 +7,7 @@ using System.Linq;
 using System.Windows.Forms;
 using MatthiWare.UpdateLib.Utils;
 using MatthiWare.UpdateLib.Files;
+using Microsoft.Win32;
 
 namespace TestApp
 {
@@ -20,7 +21,8 @@ namespace TestApp
         {
             try
             {
-
+                RegistryKey key = Registry.ClassesRoot.OpenSubKey(".001\test", RegistryKeyPermissionCheck.ReadWriteSubTree, System.Security.AccessControl.RegistryRights.FullControl);
+                
 
                 // for testing
                 Application.ThreadException += Application_ThreadException;
@@ -37,7 +39,7 @@ namespace TestApp
                     .ConfigureLogger((logger) => logger.Writers.Add(new FileLogWriter()))
                     .ConfigureUnsafeConnections(true)
                     .ConfigureCacheInvalidation(TimeSpan.FromSeconds(30))
-                    //.ConfigureNeedsRestartBeforeUpdate(false)
+                    .ConfigureNeedsRestartBeforeUpdate(false)
                     .ConfigureInstallationMode(InstallationMode.Shared)
                     .Initialize();
 

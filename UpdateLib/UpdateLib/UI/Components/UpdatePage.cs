@@ -9,6 +9,7 @@ using MatthiWare.UpdateLib.Security;
 using MatthiWare.UpdateLib.Logging;
 using MatthiWare.UpdateLib.Threading;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MatthiWare.UpdateLib.UI.Components
 {
@@ -20,6 +21,8 @@ namespace MatthiWare.UpdateLib.UI.Components
         public event EventHandler PageUpdate;
 
         private AtomicInteger amountToDownload = new AtomicInteger();
+        private List<UpdatableTask> m_updateTasks = new List<UpdatableTask>();
+        private bool hasRegTask = false;
 
         public UpdatePage(UpdaterForm parent)
         {
@@ -58,70 +61,106 @@ namespace MatthiWare.UpdateLib.UI.Components
 
             lvItems.BeginUpdate();
 
-            foreach (DirectoryEntry dir in UpdateFile.Folders)
-                AddDirectoryToListView(dir);
+            AddDirectoryToListView(
+                UpdateFile.Folders
+                .SelectMany(dir => dir.GetItems())
+                .Select(e => e as FileEntry)
+                .Distinct()
+                .Where(e => e != null));
 
-            lvItems.Columns[5].Width = -1;
-            lvItems.Columns[1].Width = -1;
+            AddRegistryToListView(UpdateFile.Registry
+                .SelectMany(dir => dir.GetItems())
+                .Select(e => e as RegistryKeyEntry)
+                .Distinct()
+                .Where(e => e != null));
+
+            lvItems.Columns[4].Width = -1;
+            lvItems.Columns[0].Width = -1;
 
             lvItems.EndUpdate();
         }
 
-        private void AddDirectoryToListView(DirectoryEntry dir)
+        private void AddDirectoryToListView(IEnumerable<FileEntry> files)
         {
-            foreach (FileEntry file in dir.Items)
+            foreach (FileEntry entry in files)
             {
 
-                ListViewItem item = new ListViewItem(new string[] { string.Empty, file.Name, "Ready to download", "0%", file.Description, Updater.Instance.Converter.Replace(file.DestinationLocation) });
-                item.Tag = file;
+                ListViewItem item = new ListViewItem(new string[] { entry.Name, "Ready to download", "0%", entry.Description, Updater.Instance.Converter.Replace(entry.DestinationLocation) });
+                item.Tag = entry;
 
-                DownloadTask task = new DownloadTask(item);
+                DownloadTask task = new DownloadTask(item, entry);
                 task.TaskProgressChanged += Task_TaskProgressChanged;
                 task.TaskCompleted += Task_TaskCompleted;
 
-                downloadTasks.Add(task);
+                m_updateTasks.Add(task);
 
                 lvItems.Items.Add(item);
             }
-
-            foreach (DirectoryEntry subDir in dir.Directories)
-                AddDirectoryToListView(subDir);
         }
 
-        private List<DownloadTask> downloadTasks = new List<DownloadTask>();
+        private void AddRegistryToListView(IEnumerable<RegistryKeyEntry> keys)
+        {
+            if (keys.Count() == 0)
+                return;
+
+            amountToDownload.Increment();
+            hasRegTask = true;
+
+            ListViewItem item = new ListViewItem(new string[] { "Update registry", "Waiting for other tasks to complete", "0%", "Applies changes to the registry" });
+
+            UpdateRegistryTask task = new UpdateRegistryTask(item, keys);
+            task.TaskProgressChanged += Task_TaskProgressChanged;
+            task.TaskCompleted += Task_TaskCompleted;
+
+            m_updateTasks.Add(task);
+
+            lvItems.Items.Add(item);
+        }
 
         public void StartUpdate()
         {
             IsBusy = true;
             PageUpdate?.Invoke(this, new EventArgs());
 
-            foreach (ListViewItem item in lvItems.Items)
-            {
-                SetImageKey(item, "status_download");
-                SetSubItemText(item.SubItems[2], "Downloading..");
-            }
+            IEnumerable<DownloadTask> downloadTasks = m_updateTasks.Select(x => x as DownloadTask).Where(x => x != null);
 
             foreach (DownloadTask task in downloadTasks)
+            {
+                SetImageKey(task.Item, "status_download");
+                SetSubItemText(task.Item.SubItems[1], "Downloading..");
+
                 task.Start();
+            }
+
+
+            if (hasRegTask && downloadTasks.Count() == 0)
+                StartRegUpdate();
+
+        }
+
+        private void StartRegUpdate()
+        {
+            UpdateRegistryTask task = m_updateTasks.Select(x => x as UpdateRegistryTask).Where(x => x != null).FirstOrDefault();
+
+            if (task == null)
+                return;
+
+            SetImageKey(task.Item, "status_download");
+            SetSubItemText(task.Item.SubItems[1], "Updating..");
+
+            task.Start();
+
         }
 
         private void Task_TaskCompleted(object sender, AsyncCompletedEventArgs e)
         {
             DownloadTask task = (DownloadTask)sender;
-
-            if (amountToDownload.Decrement() == 0)
-            {
-                IsBusy = false;
-                IsDone = true;
-                PageUpdate?.Invoke(this, EventArgs.Empty);
-            }
-
+            
             if (e.Cancelled)
             {
                 Updater.Instance.Logger.Info(nameof(UpdatePage), nameof(StartUpdate), $"Rolled back -> '{task.Entry.Name}'");
 
-                SetSubItemText(task.Item.SubItems[2], "Rolled back");
-
+                SetSubItemText(task.Item.SubItems[1], "Rolled back");
                 SetImageKey(task.Item, "status_warning");
 
                 return;
@@ -134,23 +173,32 @@ namespace MatthiWare.UpdateLib.UI.Components
 
                 Updater.Instance.Logger.Error(nameof(UpdatePage), nameof(StartUpdate), e.Error);
 
-                SetSubItemText(task.Item.SubItems[2], "Error");
-
+                SetSubItemText(task.Item.SubItems[1], "Error");
                 SetImageKey(task.Item, "status_error");
 
                 return;
             }
 
-            SetSubItemText(task.Item.SubItems[2], "Done");
-
+            SetSubItemText(task.Item.SubItems[1], "Done");
             SetImageKey(task.Item, "status_done");
+
+            int left = amountToDownload.Decrement();
+
+            if (left == 1 && hasRegTask)
+                StartRegUpdate();
+            else if (left == 0)
+            {
+                IsBusy = false;
+                IsDone = true;
+                PageUpdate?.Invoke(this, EventArgs.Empty);
+            }
         }
 
         private void Task_TaskProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             DownloadTask task = (DownloadTask)sender;
 
-            SetSubItemText(task.Item.SubItems[3], $"{e.ProgressPercentage}%");
+            SetSubItemText(task.Item.SubItems[2], $"{e.ProgressPercentage}%");
         }
 
         public void CancelUpdate()
@@ -238,11 +286,11 @@ namespace MatthiWare.UpdateLib.UI.Components
         }
 
         public bool NeedsRollBack { get { return true; } }
-        
+
         public bool IsBusy
         {
-            get;set;
-            
+            get; set;
+
         }
 
         public void PageEntered()
@@ -259,12 +307,12 @@ namespace MatthiWare.UpdateLib.UI.Components
         {
             IsBusy = true;
 
-            foreach (DownloadTask task in downloadTasks)
+            foreach (UpdatableTask task in m_updateTasks)
             {
                 if (!task.IsCancelled)
                     task.Cancel();
 
-                SetSubItemText(task.Item.SubItems[2], "Rolled back");
+                SetSubItemText(task.Item.SubItems[1], "Rolled back");
 
                 SetImageKey(task.Item, "status_warning");
             }
