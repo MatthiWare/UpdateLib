@@ -154,12 +154,10 @@ namespace MatthiWare.UpdateLib.UI.Components
 
         private void Task_TaskCompleted(object sender, AsyncCompletedEventArgs e)
         {
-            DownloadTask task = (DownloadTask)sender;
-            
+            UpdatableTask task = (UpdatableTask)sender;
+
             if (e.Cancelled)
             {
-                Updater.Instance.Logger.Info(nameof(UpdatePage), nameof(StartUpdate), $"Rolled back -> '{task.Entry.Name}'");
-
                 SetSubItemText(task.Item.SubItems[1], "Rolled back");
                 SetImageKey(task.Item, "status_warning");
 
@@ -196,7 +194,7 @@ namespace MatthiWare.UpdateLib.UI.Components
 
         private void Task_TaskProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            DownloadTask task = (DownloadTask)sender;
+            UpdatableTask task = (UpdatableTask)sender;
 
             SetSubItemText(task.Item.SubItems[2], $"{e.ProgressPercentage}%");
         }
@@ -238,7 +236,7 @@ namespace MatthiWare.UpdateLib.UI.Components
 
         public void Cancel()
         {
-            if (HasErrors && NeedsRollBack)
+            if (NeedsRollBack)
                 Rollback();
 
             IsDone = true;
@@ -309,8 +307,17 @@ namespace MatthiWare.UpdateLib.UI.Components
 
             foreach (UpdatableTask task in m_updateTasks)
             {
-                if (!task.IsCancelled)
-                    task.Cancel();
+                if (task.IsCancelled || (!task.IsCompleted && !task.IsRunning))
+                {
+                    SetSubItemText(task.Item.SubItems[1], "No action");
+
+                    SetImageKey(task.Item, "status_warning");
+
+                    continue;
+                }
+
+
+                task.Cancel();
 
                 SetSubItemText(task.Item.SubItems[1], "Rolled back");
 
@@ -319,6 +326,7 @@ namespace MatthiWare.UpdateLib.UI.Components
 
             IsBusy = false;
             HasErrors = false;
+            IsDone = true;
 
             PageUpdate?.Invoke(this, EventArgs.Empty);
         }

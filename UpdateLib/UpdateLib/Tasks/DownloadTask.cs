@@ -85,7 +85,7 @@ namespace MatthiWare.UpdateLib.Tasks
 
             Updater.Instance.GetCache().AddOrUpdateEntry(localFile);
 
-            Updater.Instance.Logger.Warn(nameof(DownloadTask), nameof(Cancel), $"Rolled back {Entry.Name}");
+            Updater.Instance.Logger.Warn(nameof(DownloadTask), nameof(Cancel), $"Rolled back -> {Entry.Name}");
 
             OnTaskProgressChanged(100);
         }

@@ -47,7 +47,14 @@ namespace MatthiWare.UpdateLib.Utils
 
         private static RegistryKey OpenSubKey(RegistryKey key, string path)
         {
-            return key.OpenSubKey(path, RegistryKeyPermissionCheck.ReadWriteSubTree, RegistryRights.FullControl);
+            RegistryKey reg = key.OpenSubKey(path, RegistryKeyPermissionCheck.ReadWriteSubTree, RegistryRights.FullControl);
+
+            if (reg != null)
+                return reg;
+
+            key.CreateSubKey(path, RegistryKeyPermissionCheck.ReadWriteSubTree);
+
+            return OpenSubKey(key, path);
         }
 
 
@@ -86,7 +93,7 @@ namespace MatthiWare.UpdateLib.Utils
             {
                 value = Registry.GetValue(path, key.Name, null);
 
-                return true;
+                return value != null;
             }
             catch (Exception e)
             {
@@ -102,7 +109,8 @@ namespace MatthiWare.UpdateLib.Utils
 
             RegistryKey key = GetOrMakeKey(logicalKey);
 
-            rollback.type = key.GetValueKind(logicalKey.Name);
+            if (key?.GetValueNames().Contains(logicalKey.Name) ?? false)
+                rollback.type = key.GetValueKind(logicalKey.Name);
 
             key.SetValue(logicalKey.Name, logicalKey.Value, logicalKey.Type);
         }

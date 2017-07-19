@@ -31,6 +31,7 @@ namespace MatthiWare.UpdateLib.Files
         /// <summary>
         /// Gets the folders of the project
         /// </summary>
+        [XmlArray("Folders"), XmlArrayItem("Directory")]
         public List<DirectoryEntry> Folders { get; set; } = new List<DirectoryEntry>();
 
         /// <summary>
@@ -43,6 +44,7 @@ namespace MatthiWare.UpdateLib.Files
         [XmlIgnore]
         public int RegistryKeyCount { get { return Registry.Select(r => r.Count).Sum(); } }
 
+        [XmlArray("Registry"), XmlArrayItem("Directory")]
         public List<DirectoryEntry> Registry { get; set; } = new List<DirectoryEntry>();
 
         public UpdateFile()

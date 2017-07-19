@@ -13,7 +13,7 @@ namespace MatthiWare.UpdateLib.Tasks
     {
 
         public IEnumerable<RegistryKeyEntry> Keys { get; set; }
-        
+
 
         private List<RollbackData> cachedUpdates = new List<RollbackData>();
 
@@ -78,11 +78,18 @@ namespace MatthiWare.UpdateLib.Tasks
 
                 if (!data.existed)
                 {
-                    key.DeleteValue(key.Name);
+                    key.DeleteValue(data.key);
+
+                    Updater.Instance.Logger.Warn(nameof(UpdateRegistryTask), nameof(Rollback),
+                $"Deleted ->  {data.path}\\{data.key}");
+
                     return;
                 }
 
                 key.SetValue(data.key, data.cachedValue, data.type);
+
+                Updater.Instance.Logger.Warn(nameof(UpdateRegistryTask), nameof(Rollback),
+                $"Rolled back ->  {data.path}\\{data.key}");
             }
             catch (Exception e)
             {

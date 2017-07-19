@@ -89,6 +89,9 @@ namespace MatthiWare.UpdateLib.UI
                         wp.UpdateState();
                 }
 
+                if (pages.AllDone())
+                    btnCancel.Enabled = false;
+
             });
         }
 
@@ -151,7 +154,11 @@ namespace MatthiWare.UpdateLib.UI
                 btnNext.Text = "Rollback";
 
             if (page == pages.LastPage)
+            {
                 btnNext.Text = "Finish";
+                btnCancel.Enabled = false;
+            }
+
 
             SetContentPage(page);
 
@@ -180,22 +187,38 @@ namespace MatthiWare.UpdateLib.UI
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            Close();
+            Cancel();
         }
 
-        private bool Cancel()
+        private void Cancel()
         {
             bool cancelled = MessageDialog.Show(
                 this,
                 "Cancel",
                 "Cancel updating?",
-                "Press Yes to cancel the updating process.\nPress no to keep updating.",
+                "Press Yes to cancel the updating process.\nPress No to keep updating.",
                 SystemIcons.Exclamation) == DialogResult.Yes;
 
             if (cancelled)
                 UserCancelled = true;
 
-            return cancelled;
+            if (!cancelled)
+                return;
+
+            foreach (IWizardPage page in pages)
+            {
+                page.Cancel();
+                page.UpdateState();
+            }
+
+            pages.CurrentPage = pages.LastPage;
+            SetContentPage(pages.CurrentPage);
+
+            btnNext.Text = "Finish";
+            btnPrevious.Enabled = true;
+
+            OnPageUpdate(pages.CurrentPage);
+
         }
 
         private void UpdaterForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -203,22 +226,7 @@ namespace MatthiWare.UpdateLib.UI
             if (pages.AllDone())
                 return;
 
-            if (Cancel())
-            {
-                foreach (IWizardPage page in pages)
-                {
-                    page.Cancel();
-                    page.UpdateState();
-                }
-
-                pages.CurrentPage = pages.LastPage;
-                SetContentPage(pages.CurrentPage);
-
-                btnNext.Text = "Finish";
-                btnPrevious.Enabled = true;
-
-                OnPageUpdate(pages.CurrentPage);
-            }
+            Cancel();
 
             if (e.CloseReason == CloseReason.UserClosing || e.CloseReason == CloseReason.None)
                 e.Cancel = true;
