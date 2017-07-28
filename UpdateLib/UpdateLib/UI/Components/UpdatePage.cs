@@ -10,6 +10,7 @@ using MatthiWare.UpdateLib.Logging;
 using MatthiWare.UpdateLib.Threading;
 using System.Collections.Generic;
 using System.Linq;
+using MatthiWare.UpdateLib.Utils;
 
 namespace MatthiWare.UpdateLib.UI.Components
 {
@@ -66,13 +67,13 @@ namespace MatthiWare.UpdateLib.UI.Components
                 .SelectMany(dir => dir.GetItems())
                 .Select(e => e as FileEntry)
                 .Distinct()
-                .Where(e => e != null));
+                .NotNull());
 
             AddRegistryToListView(UpdateFile.Registry
                 .SelectMany(dir => dir.GetItems())
                 .Select(e => e as RegistryKeyEntry)
                 .Distinct()
-                .Where(e => e != null));
+                .NotNull());
 
             lvItems.Columns[4].Width = -1;
             lvItems.Columns[0].Width = -1;
@@ -122,7 +123,7 @@ namespace MatthiWare.UpdateLib.UI.Components
             IsBusy = true;
             PageUpdate?.Invoke(this, new EventArgs());
 
-            IEnumerable<DownloadTask> downloadTasks = m_updateTasks.Select(x => x as DownloadTask).Where(x => x != null);
+            IEnumerable<DownloadTask> downloadTasks = m_updateTasks.Select(x => x as DownloadTask).NotNull();
 
             foreach (DownloadTask task in downloadTasks)
             {
@@ -140,7 +141,7 @@ namespace MatthiWare.UpdateLib.UI.Components
 
         private void StartRegUpdate()
         {
-            UpdateRegistryTask task = m_updateTasks.Select(x => x as UpdateRegistryTask).Where(x => x != null).FirstOrDefault();
+            UpdateRegistryTask task = m_updateTasks.Select(x => x as UpdateRegistryTask).NotNull().FirstOrDefault();
 
             if (task == null)
                 return;

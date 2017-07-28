@@ -573,6 +573,8 @@ namespace MatthiWare.UpdateLib
 
         internal bool RestartApp(bool update = false, bool silent = false, bool waitForPid = true, bool asAdmin = false)
         {
+            Logger.Info(nameof(Updater), nameof(RestartApp), $"Restarting app: update={update} silent={silent} waitForPid={waitForPid} asAdmin={asAdmin}");
+
             List<string> args = new List<string>(Environment.GetCommandLineArgs());
 
             for (int i = 0; i < args.Count; i++)

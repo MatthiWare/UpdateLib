@@ -37,6 +37,21 @@ namespace UpdateLib.Tests.Util
                 obj.Verify(mock => mock.Start(), Times.Once);
         }
 
+        [Test]
+        public void TestNotNullMethod()
+        {
+            List<TestObject> objs = new List<TestObject>();
+
+            objs.Add(new TestObject(0));
+            objs.Add(null);
+            objs.Add(null);
+            objs.Add(new TestObject(1));
+            objs.Add(null);
+            objs.Add(new TestObject(2));
+
+            Assert.AreEqual(3, objs.NotNull().Count());
+        }
+
         [DebuggerDisplay("{Id}")]
         public class TestObject
         {

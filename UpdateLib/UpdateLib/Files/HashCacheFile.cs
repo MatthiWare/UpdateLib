@@ -26,6 +26,11 @@ namespace MatthiWare.UpdateLib.Files
             Items = new List<HashCacheEntry>();
         }
 
+        /// <summary>
+        /// Adds or updates an entry in the file.
+        /// </summary>
+        /// <param name="fullPath">The full path to the file</param>
+        /// <param name="hash">[Optional]: If the hash has already been calculated you can pass it in here so we don't need to recalculate it.</param>
         public void AddOrUpdateEntry(string fullPath, string hash = "")
         {
             lock (sync)
@@ -39,16 +44,12 @@ namespace MatthiWare.UpdateLib.Files
                 {
                     entry = new HashCacheEntry();
                     entry.FilePath = fullPath;
-                    entry.Hash = hash;
-                    entry.Ticks = ticks;
 
                     Items.Add(entry);
                 }
-                else
-                {
-                    entry.Ticks = ticks;
-                    entry.Hash = hash;
-                }
+
+                entry.Ticks = ticks;
+                entry.Hash = hash;
 
                 Updater.Instance.Logger.Debug(nameof(HashCacheFile), nameof(AddOrUpdateEntry), $"Cache updated for file -> '{entry.FilePath}'");
             }
@@ -62,21 +63,47 @@ namespace MatthiWare.UpdateLib.Files
             return $@"{path}\{CACHE_FOLDER_NAME}\{FILE_NAME}";
         }
 
+        /// <summary>
+        /// Loads the <see cref="HashCacheFile"/> from the default storage location 
+        /// </summary>
+        /// <returns>The loaded <see cref="HashCacheFile"/> or null if it doesn't exist </returns>
         public static HashCacheFile Load()
         {
-            if (!File.Exists(GetStoragePath()))
+            return Load(GetStoragePath());
+        }
+
+        /// <summary>
+        /// Loads the <see cref="HashCacheFile"/> from the given storage location 
+        /// </summary>
+        /// <param name="path">The storage location</param>
+        /// <returns>The loaded <see cref="HashCacheFile"/> or null if it doesn't exist </returns>
+        public static HashCacheFile Load(string path)
+        {
+            if (!File.Exists(path))
                 return null;
 
-            using (Stream stream = File.Open(GetStoragePath(), FileMode.Open, FileAccess.Read))
+            using (Stream stream = File.Open(path, FileMode.Open, FileAccess.Read))
             {
                 XmlSerializer serializer = new XmlSerializer(typeof(HashCacheFile));
                 return (HashCacheFile)serializer.Deserialize(stream);
             }
         }
 
+        /// <summary>
+        /// Saves the <see cref="HashCacheFile"/> in the default storage location 
+        /// </summary>
         public void Save()
         {
-            FileInfo fi = new FileInfo(GetStoragePath());
+            Save(GetStoragePath());
+        }
+
+        /// <summary>
+        /// Saves the <see cref="HashCacheFile"/> in the given storage location 
+        /// </summary>
+        /// <param name="path">The storage location</param>
+        public void Save(string path)
+        {
+            FileInfo fi = new FileInfo(path);
 
             if (!fi.Directory.Exists)
                 fi.Directory.Create();

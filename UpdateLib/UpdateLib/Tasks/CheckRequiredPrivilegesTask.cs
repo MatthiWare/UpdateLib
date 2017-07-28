@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.AccessControl;
 using System.Text;
+using MatthiWare.UpdateLib.Utils;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
@@ -59,12 +60,8 @@ namespace MatthiWare.UpdateLib.Tasks
 
         private bool CheckHasSufficientPermissionForRegistry(DirectoryEntry dir)
         {
-            foreach (RegistryKeyEntry key in dir.Items)
+            foreach (RegistryKeyEntry key in dir.GetItems().Select(e => e as RegistryKeyEntry).NotNull())
                 if (!PermissionUtil.CheckRegPermission(key))
-                    return false;
-
-            foreach (DirectoryEntry subDir in dir.Directories)
-                if (!CheckHasSufficientPermissionForRegistry(subDir))
                     return false;
 
             return true;

@@ -158,17 +158,17 @@ namespace MatthiWare.UpdateLib.Security
 
             return false;
         }
-
-        public static bool CheckRegPermission(RegistryKeyEntry key, RegistryPermissionAccess permission = RegistryPermissionAccess.AllAccess, AccessControlActions access = AccessControlActions.Change)
+        
+        public static bool CheckRegPermission(RegistryKeyEntry key)
         {
             try
             {
-                new RegistryPermission(permission, access, key.DestinationLocation).Demand();
+                RegistryHelper.InternalOpenSubKey(key.Parent.DestinationLocation, key.Name);
                 return true;
             }
-            catch (SecurityException secEx)
+            catch (Exception ex)
             {
-                Updater.Instance.Logger.Error(nameof(PermissionUtil), nameof(CheckRegPermission), secEx);
+                Updater.Instance.Logger.Error(nameof(PermissionUtil), nameof(CheckRegPermission), ex);
                 return false;
             }
         }

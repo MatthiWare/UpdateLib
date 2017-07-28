@@ -18,7 +18,7 @@ namespace MatthiWare.UpdateLib.Tasks
         private UpdateFile file;
 
         private List<UpdatableTask> tasks = new List<UpdatableTask>();
-        private bool hasRegUpdate = false;
+        private bool hasRegUpdate, hasErrors = false;
 
         public DownloadManager(UpdateFile file)
         {
@@ -30,6 +30,7 @@ namespace MatthiWare.UpdateLib.Tasks
         {
             tasks.Clear();
             hasRegUpdate = false;
+            hasErrors = false;
         }
 
         public void Update()
@@ -42,7 +43,7 @@ namespace MatthiWare.UpdateLib.Tasks
 
         private void StartUpdate()
         {
-            IEnumerable<DownloadTask> _tasks = tasks.Select(task => task as DownloadTask).Where(task => task != null);
+            IEnumerable<DownloadTask> _tasks = tasks.Select(task => task as DownloadTask).NotNull();
 
             _tasks.ForEach(task => task.Start());
 
@@ -52,7 +53,7 @@ namespace MatthiWare.UpdateLib.Tasks
 
         private void StartRegUpdate()
         {
-            tasks.Select(task => task as UpdateRegistryTask).Where(task => task != null).FirstOrDefault()?.Start();
+            tasks.Select(task => task as UpdateRegistryTask).NotNull().FirstOrDefault()?.Start();
         }
 
         private void AddUpdates()
@@ -61,7 +62,7 @@ namespace MatthiWare.UpdateLib.Tasks
                 .SelectMany(dir => dir.GetItems())
                 .Select(e => e as FileEntry)
                 .Distinct()
-                .Where(e => e != null))
+                .NotNull())
             {
                 DownloadTask task = new DownloadTask(file);
                 task.TaskCompleted += Task_TaskCompleted;
@@ -73,7 +74,7 @@ namespace MatthiWare.UpdateLib.Tasks
                 .SelectMany(dir => dir.GetItems())
                 .Select(e => e as RegistryKeyEntry)
                 .Distinct()
-                .Where(e => e != null);
+                .NotNull();
 
             if (keys.Count() == 0)
                 return;
@@ -81,19 +82,25 @@ namespace MatthiWare.UpdateLib.Tasks
             hasRegUpdate = true;
             amountToDownload.Increment();
 
-            tasks.Add(new UpdateRegistryTask(keys));
+            UpdateRegistryTask regTask = new UpdateRegistryTask(keys);
+            regTask.TaskCompleted += Task_TaskCompleted;
+
+            tasks.Add(regTask);
         }
 
         private void Task_TaskCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
         {
             if (e.Error != null)
             {
-                CancelOtherTasks();
+                hasErrors = true;
 
-                Updater.Instance.Logger.Error(nameof(DownloadManager), nameof(Update), e.Error);
+                CancelOtherTasks();
             }
 
             int left = amountToDownload.Decrement();
+
+            if (hasErrors)
+                return;
 
             if (hasRegUpdate && left == 1)
                 StartRegUpdate();
