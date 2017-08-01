@@ -22,7 +22,7 @@ namespace MatthiWare.UpdateLib.Tasks
                 Result = null;
             }
 
-            DirectoryInfo dir = new DirectoryInfo(".");
+            DirectoryInfo dir = new DirectoryInfo(Updater.Instance.Converter.Replace("%appdir%"));
             IEnumerable<FileInfo> files = dir.GetFiles("*", SearchOption.AllDirectories).Where(f => !f.FullName.Contains(".old.tmp"));
 
             Updater.Instance.Logger.Debug(nameof(UpdateCacheTask), nameof(DoWork), $"found {files.Count()} files to recheck.");

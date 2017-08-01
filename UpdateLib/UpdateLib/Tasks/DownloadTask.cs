@@ -44,10 +44,16 @@ namespace MatthiWare.UpdateLib.Tasks
             Updater.Instance.Logger.Debug(nameof(DownloadTask), nameof(DoWork), $"LocalFile => {localFile}");
             Updater.Instance.Logger.Debug(nameof(DownloadTask), nameof(DoWork), $"RemoteFile => {remoteFile}");
 
-            if (File.Exists(localFile))
-                File.Move(localFile, $"{localFile}.old.tmp");
+            FileInfo fi = new FileInfo(localFile);
 
-            webClient.DownloadFileAsync(new Uri(remoteFile), localFile);
+            if (fi.Exists)
+                fi.MoveTo($"{localFile}.old.tmp");
+
+            if (!fi.Directory.Exists)
+                fi.Directory.Create();
+
+            Uri uri = new Uri(remoteFile);
+            webClient.DownloadFileAsync(uri, localFile);
 
             wait.WaitOne();
             wait.Close();

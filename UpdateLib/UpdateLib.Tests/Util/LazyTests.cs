@@ -14,15 +14,51 @@ namespace UpdateLib.Tests.Util
         [Test]
         public void TestLazyInitializesCorreclty()
         {
-            MatthiWare.UpdateLib.Utils.Lazy<string> myObject = new MatthiWare.UpdateLib.Utils.Lazy<string>(GetMyInitValue);
+            MatthiWare.UpdateLib.Utils.Lazy<string> myObject = new MatthiWare.UpdateLib.Utils.Lazy<string>(() => "test");
 
             Assert.AreEqual("test", myObject.Value);
         }
 
-        private string GetMyInitValue()
+        [Test]
+        public void TestLaszySet()
         {
-            return "test";
+            MatthiWare.UpdateLib.Utils.Lazy<string> myObj = new MatthiWare.UpdateLib.Utils.Lazy<string>(() => "test");
+            myObj.Value = "new";
+
+            Assert.AreEqual("new", myObj.Value);
         }
 
+        [Test]
+        public void TestLazyReset()
+        {
+            SwitchObject switcher = new SwitchObject();
+
+            MatthiWare.UpdateLib.Utils.Lazy<string> myLazy = new MatthiWare.UpdateLib.Utils.Lazy<string>(switcher.Get);
+
+            Assert.AreEqual(switcher.Get(), myLazy.Value);
+
+            switcher.Toggle();
+
+            Assert.AreNotEqual(switcher.Get(), myLazy.Value);
+
+            myLazy.Reset();
+
+            Assert.AreEqual(switcher.Get(), myLazy.Value);
+        }
+
+        private class SwitchObject
+        {
+            private bool m_state = false;
+
+            public void Toggle()
+            {
+                m_state = !m_state;
+            }
+
+            public string Get()
+            {
+                return m_state ? "true" : "false";
+            }
+        }
     }
 }

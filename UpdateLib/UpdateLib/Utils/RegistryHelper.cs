@@ -52,11 +52,14 @@ namespace MatthiWare.UpdateLib.Utils
 
         private static RegistryKey OpenSubKey(RegistryKey key, string path)
         {
+            if (key == null)
+                return null;
+
             RegistryKey reg = key?.OpenSubKey(path, RegistryKeyPermissionCheck.ReadWriteSubTree, RegistryRights.FullControl);
 
             if (reg != null)
                 return reg;
-
+            
             key.CreateSubKey(path, RegistryKeyPermissionCheck.ReadWriteSubTree);
 
             return OpenSubKey(key, path);
@@ -66,7 +69,7 @@ namespace MatthiWare.UpdateLib.Utils
         {
             RegistryKey key = GetRootKey(root);
 
-            foreach (string item in root.Split(char.Parse(@"\")).Skip(1).Where(item => !string.IsNullOrEmpty(item)))
+            foreach (string item in root.Split(char.Parse(@"\")).Skip(1).NotEmpty())
             {
                 RegistryKey tmp = key?.OpenSubKey(item, RegistryKeyPermissionCheck.ReadWriteSubTree, RegistryRights.FullControl);
                 key?.Close();

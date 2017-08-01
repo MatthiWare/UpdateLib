@@ -46,6 +46,15 @@ namespace MatthiWare.UpdateLib.Utils
         }
 
         /// <summary>
+        /// Resets the lazy function
+        /// </summary>
+        public void Reset()
+        {
+            lock (sync)
+                m_initialized = false;
+        }
+
+        /// <summary>
         /// Makes a new instance of an lazy initializer
         /// </summary>
         /// <param name="initFunction">The lazy initialization function</param>

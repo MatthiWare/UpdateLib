@@ -65,13 +65,16 @@
     <Compile Include="Security\HashUtilTest.cs" />
     <Compile Include="Tasks\AsyncTaskTest.cs" />
     <Compile Include="Tasks\CleanUpTaskTest.cs" />
+    <Compile Include="Tasks\DownloadManagerTests.cs" />
     <Compile Include="Tasks\DownloadTaskTest.cs" />
     <Compile Include="Threading\AtomicIntegerTest.cs" />
     <Compile Include="Threading\ConcurrentQueueTests.cs" />
     <Compile Include="UI\WizardPageCollectionTest.cs" />
     <Compile Include="UpdaterTest.cs" />
     <Compile Include="Util\ExtensionMethodsTest.cs" />
+    <Compile Include="Util\IOUtilsTest.cs" />
     <Compile Include="Util\LazyTests.cs" />
+    <Compile Include="Util\RegistryHelperTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

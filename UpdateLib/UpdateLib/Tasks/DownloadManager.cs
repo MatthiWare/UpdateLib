@@ -20,6 +20,8 @@ namespace MatthiWare.UpdateLib.Tasks
         private List<UpdatableTask> tasks = new List<UpdatableTask>();
         private bool hasRegUpdate, hasErrors = false;
 
+        public event EventHandler Completed;
+
         public DownloadManager(UpdateFile file)
         {
             amountToDownload.Value = file.FileCount;
@@ -105,10 +107,7 @@ namespace MatthiWare.UpdateLib.Tasks
             if (hasRegUpdate && left == 1)
                 StartRegUpdate();
             else if (left == 0)
-            {
-                Updater.Instance.GetCache().Save();
-                Updater.Instance.RestartApp();
-            }
+                Completed?.Invoke(this, EventArgs.Empty);
 
         }
 

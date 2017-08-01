@@ -54,16 +54,21 @@ namespace MatthiWare.UpdateLib
         private Lazy<PathVariableConverter> m_lazyPathVarConv = new Lazy<PathVariableConverter>(() => new PathVariableConverter());
         private TimeSpan m_cacheInvalidation = TimeSpan.FromMinutes(5);
         private Lazy<Logger> m_lazyLogger = new Lazy<Logger>(() => new Logger());
+        private InstallationMode m_installationMode = InstallationMode.Shared;
 
         private static Lazy<string> m_lazyProductName = new Lazy<string>(() =>
         {
-            AssemblyProductAttribute attr = Attribute.GetCustomAttribute(Assembly.GetEntryAssembly(), typeof(AssemblyProductAttribute)) as AssemblyProductAttribute;
+            AssemblyProductAttribute attr = Assembly.GetEntryAssembly()?.GetCustomAttributes(typeof(AssemblyProductAttribute), true).FirstOrDefault() as AssemblyProductAttribute;
+
+            //AssemblyProductAttribute attr = Attribute.GetCustomAttribute(Assembly.GetEntryAssembly(), ) as AssemblyProductAttribute;
             return attr?.Product ?? "UpdateLib";
         });
 
         private static Lazy<string> m_lazyUpdaterName = new Lazy<string>(() =>
         {
-            AssemblyProductAttribute attr = Attribute.GetCustomAttribute(Assembly.GetAssembly(typeof(Updater)), typeof(AssemblyProductAttribute)) as AssemblyProductAttribute;
+            AssemblyProductAttribute attr = Assembly.GetAssembly(typeof(Updater))?.GetCustomAttributes(typeof(AssemblyProductAttribute), true).FirstOrDefault() as AssemblyProductAttribute;
+
+            //AssemblyProductAttribute attr = Attribute.GetCustomAttribute(), typeof(AssemblyProductAttribute)) as AssemblyProductAttribute;
             return attr?.Product ?? "UpdateLib";
         });
 
@@ -106,7 +111,19 @@ namespace MatthiWare.UpdateLib
         /// <summary>
         /// Gets or sets the Updater Installation mode
         /// </summary>
-        public InstallationMode InstallationMode { get; set; } = InstallationMode.Shared;
+        public InstallationMode InstallationMode
+        {
+            get { return m_installationMode; }
+            set
+            {
+                if (m_installationMode != value)
+                {
+                    m_installationMode = value;
+                    IOUtils.ReinitializeAppData();
+                }
+            }
+        }
+
 
         /// <summary>
         /// Gets or sets if we want to check for updates before the actual program is loaded.
@@ -352,7 +369,7 @@ namespace MatthiWare.UpdateLib
         /// </summary>
         private void StartInitializationTasks()
         {
-            CleanUpTask = new CleanUpTask(".");
+            CleanUpTask = new CleanUpTask("%appdir%");
             CleanUpTask.ConfigureAwait(false).Start();
 
             UpdateCacheTask = new UpdateCacheTask();
@@ -556,8 +573,6 @@ namespace MatthiWare.UpdateLib
         /// <returns>The <see cref="HashCacheFile"/> of the current application</returns>
         public HashCacheFile GetCache()
         {
-            if (!IsInitialized) throw new InvalidOperationException("Updater has not been initialized yet!");
-
             return UpdateCacheTask.AwaitTask().Result;
         }
 
@@ -568,6 +583,12 @@ namespace MatthiWare.UpdateLib
         private void UpdateWithoutGUI(UpdateFile file)
         {
             DownloadManager downloader = new DownloadManager(file);
+            downloader.Completed += (o, e) =>
+            {
+                GetCache().Save();
+                RestartApp();
+            };
+
             downloader.Update();
         }
 
@@ -603,7 +624,7 @@ namespace MatthiWare.UpdateLib
             if (silent && !string.IsNullOrEmpty(instance.UpdateSilentlyCmdArg) && !args.Contains(instance.UpdateSilentlyCmdArg))
                 args.Add(instance.UpdateSilentlyCmdArg);
 
-            string arguments = args.Where(a => !string.IsNullOrEmpty(a)).Distinct().AppendAll(" ");
+            string arguments = args.NotEmpty().Distinct().AppendAll(" ");
 
             ProcessStartInfo startInfo = new ProcessStartInfo(Assembly.GetEntryAssembly().Location, arguments);
 
