@@ -42,7 +42,7 @@ namespace UpdateLib.Tests.Tasks
         }
 
         [Test]
-        public void Test()
+        public void TestDownloadManager()
         {
 
 

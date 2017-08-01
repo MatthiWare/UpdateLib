@@ -99,17 +99,5 @@ namespace TestApp
 
             return text;
         }
-        
-        private void button1_Click(object sender, EventArgs e)
-        {
-            DummyTask task = new DummyTask();
-            task.TaskCompleted += (o, ex) => Updater.Instance.Logger.Debug(nameof(DummyTask), string.Empty, "Callback task completed!");
-            task.Start();
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            //Updater.Instance.RestartApp(false, false, true, true);
-        }
     }
 }

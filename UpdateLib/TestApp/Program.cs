@@ -19,38 +19,24 @@ namespace TestApp
         [STAThread]
         static void Main()
         {
-            try
-            {
-                RegistryKey key = Registry.ClassesRoot.OpenSubKey(".001\test", RegistryKeyPermissionCheck.ReadWriteSubTree, System.Security.AccessControl.RegistryRights.FullControl);
-                
+            // we still want our updater to have visual styles in case of update cmd argument switch
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
 
-                // for testing
-                Application.ThreadException += Application_ThreadException;
+            Updater.Instance
+                .ConfigureUpdateUrl("https://raw.githubusercontent.com/MatthiWare/UpdateLib.TestApp.UpdateExample/master/Dev/updatefile.xml")
+                //.ConfigureUpdateUrl("http://matthiware.dev/UpdateLib/Dev/updatefile.xml")
+                .ConfigureLogger((logger) => logger.LogLevel = LoggingLevel.Debug)
+                .ConfigureLogger((logger) => logger.Writers.Add(new ConsoleLogWriter()))
+                .ConfigureLogger((logger) => logger.Writers.Add(new FileLogWriter()))
+                .ConfigureUnsafeConnections(true)
+                .ConfigureCacheInvalidation(TimeSpan.FromSeconds(30))
+                .ConfigureNeedsRestartBeforeUpdate(true)
+                .ConfigureInstallationMode(InstallationMode.Shared)
+                .Initialize();
 
-                // we still want our updater to have visual styles in case of update cmd argument switch
-                Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new Form1());
 
-                Updater.Instance
-                    //.ConfigureUpdateUrl("https://raw.githubusercontent.com/MatthiWare/UpdateLib.TestApp.UpdateExample/master/Dev/updatefile.xml")
-                    .ConfigureUpdateUrl("http://matthiware.dev/UpdateLib/Dev/updatefile.xml")
-                    .ConfigureLogger((logger) => logger.LogLevel = LoggingLevel.Debug)
-                    .ConfigureLogger((logger) => logger.Writers.Add(new ConsoleLogWriter()))
-                    .ConfigureLogger((logger) => logger.Writers.Add(new FileLogWriter()))
-                    .ConfigureUnsafeConnections(true)
-                    .ConfigureCacheInvalidation(TimeSpan.FromSeconds(30))
-                    .ConfigureNeedsRestartBeforeUpdate(false)
-                    .ConfigureInstallationMode(InstallationMode.Shared)
-                    .Initialize();
-
-                Application.Run(new Form1());
-            }
-            catch (Exception e)
-            {
-                //for testing
-                Console.WriteLine(e.ToString());
-                MessageBox.Show(e.ToString());
-            }
 
         }
 
