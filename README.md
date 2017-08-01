@@ -7,8 +7,18 @@
 <a href="https://gitter.im/MatthiWare/UpdateLib?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge"><img src="https://badges.gitter.im/MatthiWare/UpdateLib.svg" alt="Join the chat at https://gitter.im/MatthiWare/UpdateLib"></a>
 </p>
 
-# UpdateLib v0.1.1
+# UpdateLib v0.4-alpha
 A .Net auto update library made in C#
 
+### Disclaimer 
+UpdateLib is currently <b>in development</b> and is <b>not</b> yet ready for use in production environment.
+UpdateLib should only be used for testing purposes untill the first stable release.
+Use UpdateLib at your own risk while it is still in development. 
+
 ## Features
-[Still in development]
+- Generator for the update file with GUI
+- Updating files
+- Updating registry
+- Fail-safe rollback feature
+- Caching system
+- FluentAPI to configure the client-side application
