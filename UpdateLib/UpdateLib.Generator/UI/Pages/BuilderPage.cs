@@ -21,6 +21,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
     {
         private FilesPage filesPage;
         private InformationPage infoPage;
+        private RegistryPage registryPage;
 
         public BuilderPage()
         {
@@ -46,11 +47,21 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 
             infoPage = page as InformationPage;
 
+            if (!TestForm.TryGetPage(nameof(RegistryPage), out page))
+            {
+                throw new KeyNotFoundException($"Unable to get {nameof(RegistryPage)}");
+            }
+
+            registryPage = page as RegistryPage;
+
             if (!filesPage.IsPageInitialized)
                 filesPage.InitializePage(null);
 
             if (!infoPage.IsPageInitialized)
                 infoPage.InitializePage(null);
+
+            if (!registryPage.IsPageInitialized)
+                registryPage.InitializePage(null);
         }
 
         private void btnBuild_Click(object sender, EventArgs e)
@@ -68,7 +79,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 
         private AsyncTask<UpdateFile> Build(Stream s)
         {
-            UpdateGeneratorTask task = new UpdateGeneratorTask(filesPage.Root, infoPage);
+            UpdateGeneratorTask task = new UpdateGeneratorTask(filesPage.Root, infoPage,registryPage.Folders);
 
             btnBuild.Enabled = false;
 
@@ -83,9 +94,9 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             {
                 sw.Stop();
 
-                Updater.Instance.Logger.Debug(GetType().Name, $"File generation completed in {sw.ElapsedMilliseconds} ms.");
+                Updater.Instance.Logger.Debug(nameof(BuilderPage), nameof(Build), $"File generation completed in {sw.ElapsedMilliseconds} ms.");
 
-                
+
 
                 btnBuild.Enabled = true;
 

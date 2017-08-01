@@ -85,7 +85,7 @@ namespace UpdateLib.Tests.Tasks
         [Test, Parallelizable]
         public void CheckDoubleWait()
         {
-            TestTask task = new TestTask(500);
+            TestTask task = new TestTask(100);
             task.Start();
             task.AwaitTask();
             task.AwaitTask();
@@ -171,7 +171,7 @@ namespace UpdateLib.Tests.Tasks
                     Result = returnObj;
                 });
 
-                Enqueue(call, 200);
+                Enqueue(call, 50);
             }
         }
 

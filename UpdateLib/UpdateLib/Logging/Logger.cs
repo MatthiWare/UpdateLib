@@ -20,32 +20,32 @@ namespace MatthiWare.UpdateLib.Logging
             Writers
                 .Where(w => w.LoggingLevel >= LogLevel && level >= w.LoggingLevel)
                 .ToList()
-                .ForEach(w => w.Log(string.Format(TEMPLATE, DateTime.Now, level, tag, msg))); 
+                .ForEach(w => w.Log(string.Format(TEMPLATE, DateTime.Now, level, tag, msg)));
         }
 
-        public void Debug(string tag, string msg)
+        public void Debug(string className, string methodName, string msg)
         {
-            Log(tag, msg, LoggingLevel.Debug);
+            Log($"{className}::{methodName}", msg, LoggingLevel.Debug);
         }
 
-        public void Info(string tag, string msg)
+        public void Info(string className, string methodName, string msg)
         {
-            Log(tag, msg, LoggingLevel.Info);
+            Log($"{className}::{methodName}", msg, LoggingLevel.Info);
         }
 
-        public void Warn(string tag, string msg)
+        public void Warn(string className, string methodName, string msg)
         {
-            Log(tag, msg, LoggingLevel.Warn);
+            Log($"{className}::{methodName}", msg, LoggingLevel.Warn);
         }
 
-        public void Error(string tag, string msg)
+        public void Error(string className, string methodName, string msg)
         {
-            Log(tag, msg, LoggingLevel.Error);
+            Log($"{className}::{methodName}", msg, LoggingLevel.Error);
         }
 
-        public void Error(string tag, Exception e)
+        public void Error(string className, string methodName, Exception e)
         {
-            Error(tag, e.ToString());
+            Error(className, string.IsNullOrEmpty(methodName) ? e.TargetSite.Name : methodName, e.ToString());
         }
     }
 }

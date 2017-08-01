@@ -16,5 +16,9 @@ namespace MatthiWare.UpdateLib.UI
         bool IsDone { get; set; }
         string Title { get; }
         void PageEntered();
+        void Rollback();
+        bool HasErrors { get; set; }
+        bool NeedsRollBack { get; }
+        void UpdateState();
     }
 }

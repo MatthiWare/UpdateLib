@@ -29,6 +29,8 @@ namespace MatthiWare.UpdateLib.Generator.UI
             Text = title;
 
             SetUpButtons(buttons);
+
+            txtInput.Focus();
         }
 
         private void SetUpButtons(MessageBoxButtons buttons)
@@ -72,6 +74,19 @@ namespace MatthiWare.UpdateLib.Generator.UI
 
             if (defaultButton)
                 button.TabIndex = 0;
+        }
+
+        private void txtInput_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                if (btn1.Visible)
+                    btn1.PerformClick();
+                else if (btn2.Visible)
+                    btn2.PerformClick();
+                else if (btn3.Visible)
+                    btn3.PerformClick();
+            }
         }
     }
 }

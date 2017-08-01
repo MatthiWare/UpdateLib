@@ -56,7 +56,7 @@
             this.btn2.Location = new System.Drawing.Point(227, 11);
             this.btn2.Name = "btn2";
             this.btn2.Size = new System.Drawing.Size(75, 23);
-            this.btn2.TabIndex = 3;
+            this.btn2.TabIndex = 2;
             this.btn2.UseVisualStyleBackColor = true;
             this.btn2.Visible = false;
             // 
@@ -66,7 +66,7 @@
             this.btn1.Location = new System.Drawing.Point(146, 11);
             this.btn1.Name = "btn1";
             this.btn1.Size = new System.Drawing.Size(75, 23);
-            this.btn1.TabIndex = 2;
+            this.btn1.TabIndex = 1;
             this.btn1.UseVisualStyleBackColor = true;
             this.btn1.Visible = false;
             // 
@@ -76,7 +76,7 @@
             this.btn3.Location = new System.Drawing.Point(308, 11);
             this.btn3.Name = "btn3";
             this.btn3.Size = new System.Drawing.Size(75, 23);
-            this.btn3.TabIndex = 1;
+            this.btn3.TabIndex = 3;
             this.btn3.UseVisualStyleBackColor = true;
             this.btn3.Visible = false;
             // 
@@ -98,7 +98,8 @@
             this.txtInput.Location = new System.Drawing.Point(17, 52);
             this.txtInput.Name = "txtInput";
             this.txtInput.Size = new System.Drawing.Size(366, 22);
-            this.txtInput.TabIndex = 3;
+            this.txtInput.TabIndex = 0;
+            this.txtInput.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtInput_KeyDown);
             // 
             // InputDialog
             // 

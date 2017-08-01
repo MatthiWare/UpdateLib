@@ -11,6 +11,8 @@ namespace MatthiWare.UpdateLib.UI
     {
         internal UpdateFile updateInfoFile;
         internal bool NeedsRestart = true;
+        internal bool hasHadErrors = false;
+        internal bool UserCancelled = false;
 
         private WizardPageCollection pages;
 
@@ -72,6 +74,24 @@ namespace MatthiWare.UpdateLib.UI
                         btnNext.Text = "Next >";
                 }
 
+                if (page.HasErrors && page.NeedsRollBack)
+                {
+                    hasHadErrors = true;
+                    btnNext.Enabled = true;
+                    btnPrevious.Enabled = false;
+                    btnCancel.Enabled = false;
+                    btnNext.Text = "Rollback";
+                }
+
+                if (!pages.CurrentPage.HasErrors && pages.CurrentPage.NeedsRollBack && hasHadErrors)
+                {
+                    foreach (IWizardPage wp in pages)
+                        wp.UpdateState();
+                }
+
+                if (pages.AllDone())
+                    btnCancel.Enabled = false;
+
             });
         }
 
@@ -79,13 +99,14 @@ namespace MatthiWare.UpdateLib.UI
         {
             IWizardPage currentPage = pages.CurrentPage;
             IWizardPage page = pages.Previous();
+
             if (page == null)
                 return;
 
             if (!btnNext.Enabled)
                 btnNext.Enabled = true;
 
-            if (currentPage.NeedsExecution)
+            if (page.NeedsExecution)
                 btnNext.Text = "Next >";
 
             if (page == pages.FirstPage)
@@ -96,6 +117,13 @@ namespace MatthiWare.UpdateLib.UI
 
         private void btnNext_Click(object sender, EventArgs e)
         {
+            if (pages.CurrentPage.HasErrors && pages.CurrentPage.NeedsRollBack)
+            {
+                btnNext.Enabled = false;
+                pages.CurrentPage.Rollback();
+                return;
+            }
+
             if (pages.CurrentPage.NeedsExecution && !pages.CurrentPage.IsDone)
             {
                 pages.CurrentPage.Execute();
@@ -122,8 +150,15 @@ namespace MatthiWare.UpdateLib.UI
             if (page.NeedsExecution && !page.IsDone && page.IsBusy)
                 btnNext.Enabled = false;
 
+            if (page.HasErrors && page.NeedsRollBack)
+                btnNext.Text = "Rollback";
+
             if (page == pages.LastPage)
+            {
                 btnNext.Text = "Finish";
+                btnCancel.Enabled = false;
+            }
+
 
             SetContentPage(page);
 
@@ -140,38 +175,61 @@ namespace MatthiWare.UpdateLib.UI
             else
             {
                 pages.Clear();
-                pages.Add(new FinishPage(this));
-                SetContentPage(pages.CurrentPage);
+                FinishPage page = new FinishPage(this);
+                page.UpdateState();
+                pages.Add(page);
+                SetContentPage(page);
                 btnPrevious.Enabled = false;
+                btnCancel.Enabled = false;
                 Close();
             }
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            Close();
+            Cancel();
         }
 
-        private bool Cancel()
+        private void Cancel()
         {
-            DialogResult result = MessageDialog.Show(
+            bool cancelled = MessageDialog.Show(
                 this,
                 "Cancel",
                 "Cancel updating?",
-                "Press Yes to cancel the updating process.\nPress no to keep updating.",
-                SystemIcons.Exclamation);
+                "Press Yes to cancel the updating process.\nPress No to keep updating.",
+                SystemIcons.Exclamation) == DialogResult.Yes;
 
-            return result == DialogResult.Yes;
+            if (cancelled)
+                UserCancelled = true;
+
+            if (!cancelled)
+                return;
+
+            foreach (IWizardPage page in pages)
+            {
+                page.Cancel();
+                page.UpdateState();
+            }
+
+            pages.CurrentPage = pages.LastPage;
+            SetContentPage(pages.CurrentPage);
+
+            btnNext.Text = "Finish";
+            btnPrevious.Enabled = true;
+
+            OnPageUpdate(pages.CurrentPage);
+
         }
 
         private void UpdaterForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (!pages.AllDone())
-            {
-                bool cancel = Cancel();
-                if (!cancel)
-                    e.Cancel = true;
-            }
+            if (pages.AllDone())
+                return;
+
+            Cancel();
+
+            if (e.CloseReason == CloseReason.UserClosing || e.CloseReason == CloseReason.None)
+                e.Cancel = true;
         }
 
         private void linkSite_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)

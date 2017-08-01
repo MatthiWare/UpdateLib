@@ -15,21 +15,27 @@ namespace MatthiWare.UpdateLib.Tasks
 
         private void PostProcessDirectory(DirectoryEntry dir)
         {
-            Action<DirectoryEntry> call = new Action<DirectoryEntry>(PostProcessDirectory);
-
-            foreach (FileEntry file in dir.Files)
+            foreach (EntryBase file in dir.Items)
                 file.Parent = dir;
 
+            int left = dir.Directories.Count;
             foreach (DirectoryEntry subDir in dir.Directories)
             {
                 subDir.Parent = dir;
-                Enqueue(call, subDir);
+
+                if (--left == 0)
+                    PostProcessDirectory(subDir);
+                else
+                    Enqueue(new Action<DirectoryEntry>(PostProcessDirectory), subDir);
             }
         }
 
         protected override void DoWork()
         {
             foreach (DirectoryEntry dir in file.Folders)
+                PostProcessDirectory(dir);
+
+            foreach (DirectoryEntry dir in file.Registry)
                 PostProcessDirectory(dir);
 
             AwaitWorkers();

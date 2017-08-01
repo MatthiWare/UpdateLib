@@ -199,7 +199,7 @@ namespace MatthiWare.UpdateLib.Tasks
                 {
                     LastException = ex;
 
-                    Updater.Instance.Logger.Error(GetType().Name, ex);
+                    Updater.Instance.Logger.Error(GetType().Name, null, ex);
                 }
                 finally
                 {
@@ -217,7 +217,7 @@ namespace MatthiWare.UpdateLib.Tasks
             {
 #if DEBUG
                 m_sw.Stop();
-                Updater.Instance.Logger.Debug(GetType().Name, $"Completed in {m_sw.ElapsedMilliseconds}ms");
+                Updater.Instance.Logger.Debug(GetType().Name, nameof(Start), $"Completed in {m_sw.ElapsedMilliseconds}ms");
 #endif
                 worker.EndInvoke(r);
 
@@ -263,7 +263,7 @@ namespace MatthiWare.UpdateLib.Tasks
                 {
                     LastException = e.Error?.InnerException ?? e.Error;
 
-                    Updater.Instance.Logger.Error(GetType().Name, LastException);
+                    Updater.Instance.Logger.Error(GetType().Name, null, LastException);
                 }
             };
 

@@ -89,16 +89,33 @@ namespace MatthiWare.UpdateLib.UI.Components
             }
         }
 
+        public bool HasErrors
+        {
+            get; set;
+        }
+
         public event EventHandler PageUpdate;
+
+        public void UpdateState()
+        {
+
+        }
+
+        public bool NeedsRollBack { get { return false; } }
 
         public void Cancel()
         {
-            throw new NotImplementedException();
+            IsDone = true;
         }
 
         public void Execute()
         {
             throw new NotImplementedException();
+        }
+
+        public void Rollback()
+        {
+
         }
     }
 }

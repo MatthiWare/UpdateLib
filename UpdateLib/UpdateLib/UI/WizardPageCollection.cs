@@ -17,13 +17,17 @@ namespace MatthiWare.UpdateLib.UI
             {
                 return this[index];
             }
+            set
+            {
+                index = store.IndexOf(value);
+            }
         }
 
         public IWizardPage FirstPage { get { return this.First(); } }
 
         public IWizardPage LastPage { get { return this.Last(); } }
 
-        
+
 
         public WizardPageCollection() { store = new List<IWizardPage>(5); }
 
@@ -39,7 +43,7 @@ namespace MatthiWare.UpdateLib.UI
 
             if (CurrentPage.IsBusy || !CurrentPage.IsDone)
                 return null;
-            
+
             index++;
             return CurrentPage;
         }
@@ -60,7 +64,7 @@ namespace MatthiWare.UpdateLib.UI
         {
             foreach (IWizardPage page in store)
             {
-                if (!page.IsDone)
+                if (!page.IsDone || page.HasErrors)
                     return false;
             }
             return true;
@@ -139,7 +143,7 @@ namespace MatthiWare.UpdateLib.UI
 
         public bool Remove(IWizardPage item)
         {
-           return store.Remove(item);
+            return store.Remove(item);
         }
 
         public IEnumerator<IWizardPage> GetEnumerator()

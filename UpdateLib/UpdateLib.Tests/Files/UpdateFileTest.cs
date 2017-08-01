@@ -30,7 +30,7 @@ namespace UpdateLib.Tests.Files
 
             Assert.AreEqual(file.ApplicationName, loadedFile.ApplicationName);
             Assert.AreEqual(file.VersionString, loadedFile.VersionString);
-            Assert.AreEqual(file.Count, loadedFile.Count);
+            Assert.AreEqual(file.FileCount, loadedFile.FileCount);
         }
 
         [Test]
@@ -41,7 +41,7 @@ namespace UpdateLib.Tests.Files
             UpdateFile file = new UpdateFile();
 
             Assert.Catch<ArgumentNullException>(() => { file.Save(nullStream); });
-            Assert.Catch<ArgumentNullException>(() => { file.Save(""); });
+            Assert.Catch<ArgumentNullException>(() => { file.Save(string.Empty); });
 
             Mock<Stream> unwritableStream = new Mock<Stream>();
             unwritableStream.SetupGet(s => s.CanWrite).Returns(false);
@@ -55,7 +55,7 @@ namespace UpdateLib.Tests.Files
             Stream nullStream = null;
 
             Assert.Catch<ArgumentNullException>(() => { UpdateFile.Load(nullStream); });
-            Assert.Catch<ArgumentNullException>(() => { UpdateFile.Load(""); });
+            Assert.Catch<ArgumentNullException>(() => { UpdateFile.Load(string.Empty); });
 
             CleanUp();
 
@@ -77,29 +77,36 @@ namespace UpdateLib.Tests.Files
             DirectoryEntry appSubFolder = new DirectoryEntry("AppSubFolder");
             DirectoryEntry otherSubFolder = new DirectoryEntry("OtherSubFolder");
 
-            FileEntry appFile = new FileEntry()
+            EntryBase appFile = new FileEntry()
             {
                 Name = "application.exe",
                 Description = "my desc",
-                Hash = "AAA",
-                Parent = appSubFolder
+                Hash = "AAA"
             };
 
-            FileEntry otherFile = new FileEntry()
+            EntryBase otherFile = new FileEntry()
             {
                 Name = "data.xml",
                 Description = "my data file",
-                Hash = "BBB",
-                Parent = otherSubFolder
+                Hash = "BBB"
             };
 
-            appSubFolder.Files.Add(appFile);
-            otherSubFolder.Files.Add(otherFile);
+            appSubFolder.Add(appFile);
+            otherSubFolder.Add(otherFile);
 
             file.Folders.Add(appSubFolder);
             file.Folders.Add(otherSubFolder);
 
-            Assert.AreEqual(2, file.Count);
+            DirectoryEntry regDir = new DirectoryEntry("HKEY_LOCAL_MACHINE");
+
+            EntryBase regEntry = new RegistryKeyEntry("test", Microsoft.Win32.RegistryValueKind.String, null);
+
+            regDir.Add(regEntry);
+
+            file.Registry.Add(regDir);
+
+            Assert.AreEqual(2, file.FileCount);
+            Assert.AreEqual(1, file.RegistryKeyCount);
 
             return file;
         }

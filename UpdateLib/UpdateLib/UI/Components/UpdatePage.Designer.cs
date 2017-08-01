@@ -32,13 +32,12 @@
             this.lblHeader = new System.Windows.Forms.Label();
             this.lblSubheader = new System.Windows.Forms.Label();
             this.lvItems = new System.Windows.Forms.ListView();
-            this.clmnImg = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.clmnName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.clmnStatus = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.clmnProgress = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.clmnDescription = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.clmnPath = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ilIcons = new System.Windows.Forms.ImageList(this.components);
-            this.clmnDescription = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SuspendLayout();
             // 
             // lblHeader
@@ -67,12 +66,12 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lvItems.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.clmnImg,
             this.clmnName,
             this.clmnStatus,
             this.clmnProgress,
             this.clmnDescription,
             this.clmnPath});
+            this.lvItems.FullRowSelect = true;
             this.lvItems.Location = new System.Drawing.Point(17, 72);
             this.lvItems.Name = "lvItems";
             this.lvItems.Size = new System.Drawing.Size(505, 255);
@@ -80,15 +79,10 @@
             this.lvItems.UseCompatibleStateImageBehavior = false;
             this.lvItems.View = System.Windows.Forms.View.Details;
             // 
-            // clmnImg
-            // 
-            this.clmnImg.Text = "";
-            this.clmnImg.Width = 25;
-            // 
             // clmnName
             // 
             this.clmnName.Text = "File name";
-            this.clmnName.Width = 107;
+            this.clmnName.Width = 125;
             // 
             // clmnStatus
             // 
@@ -100,6 +94,11 @@
             this.clmnProgress.Text = "Progress";
             this.clmnProgress.Width = 85;
             // 
+            // clmnDescription
+            // 
+            this.clmnDescription.Text = "Description";
+            this.clmnDescription.Width = 100;
+            // 
             // clmnPath
             // 
             this.clmnPath.Text = "Path";
@@ -110,11 +109,6 @@
             this.ilIcons.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
             this.ilIcons.ImageSize = new System.Drawing.Size(16, 16);
             this.ilIcons.TransparentColor = System.Drawing.Color.Transparent;
-            // 
-            // clmnDescription
-            // 
-            this.clmnDescription.Text = "Description";
-            this.clmnDescription.Width = 100;
             // 
             // UpdatePage
             // 
@@ -139,7 +133,6 @@
         private System.Windows.Forms.Label lblSubheader;
         private System.Windows.Forms.ListView lvItems;
         private System.Windows.Forms.ImageList ilIcons;
-        private System.Windows.Forms.ColumnHeader clmnImg;
         private System.Windows.Forms.ColumnHeader clmnName;
         private System.Windows.Forms.ColumnHeader clmnStatus;
         private System.Windows.Forms.ColumnHeader clmnProgress;

@@ -57,17 +57,24 @@
     <Compile Include="Files\DirectoryEntryTest.cs" />
     <Compile Include="Files\FileEntryTest.cs" />
     <Compile Include="Files\HashCacheEntryTest.cs" />
+    <Compile Include="Files\HashCacheFileTest.cs" />
     <Compile Include="Files\PathVariableConverterTest.cs" />
     <Compile Include="Files\UpdateFileTest.cs" />
     <Compile Include="Logging\LoggingTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Security\HashUtilTest.cs" />
     <Compile Include="Tasks\AsyncTaskTest.cs" />
+    <Compile Include="Tasks\CleanUpTaskTest.cs" />
+    <Compile Include="Tasks\DownloadManagerTests.cs" />
+    <Compile Include="Tasks\DownloadTaskTest.cs" />
     <Compile Include="Threading\AtomicIntegerTest.cs" />
     <Compile Include="Threading\ConcurrentQueueTests.cs" />
     <Compile Include="UI\WizardPageCollectionTest.cs" />
     <Compile Include="UpdaterTest.cs" />
+    <Compile Include="Util\ExtensionMethodsTest.cs" />
+    <Compile Include="Util\IOUtilsTest.cs" />
     <Compile Include="Util\LazyTests.cs" />
+    <Compile Include="Util\RegistryHelperTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

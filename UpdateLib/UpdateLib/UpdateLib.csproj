@@ -58,10 +58,12 @@
     </Compile>
     <Compile Include="Encoders\IEncoder.cs" />
     <Compile Include="Files\DirectoryEntry.cs" />
+    <Compile Include="Files\EntryBase.cs" />
     <Compile Include="Files\HashCacheEntry.cs" />
     <Compile Include="Files\HashCacheFile.cs" />
     <Compile Include="Files\FileEntry.cs" />
     <Compile Include="Files\PathVariableConverter.cs" />
+    <Compile Include="Files\RegistryKeyEntry.cs" />
     <Compile Include="Files\UpdateFile.cs" />
     <Compile Include="InstallationMode.cs" />
     <Compile Include="Logging\ILogger.cs" />
@@ -71,14 +73,17 @@
     <Compile Include="Logging\Writers\ConsoleLogWriter.cs" />
     <Compile Include="Logging\Writers\FileLogWriter.cs" />
     <Compile Include="Security\InvalidHashException.cs" />
+    <Compile Include="Security\PermissionUtil.cs" />
     <Compile Include="Tasks\AsyncTaskFactory.cs" />
     <Compile Include="Tasks\CheckForUpdatesCompletedEventArgs.cs" />
     <Compile Include="Tasks\CheckForUpdatesTask.cs" />
+    <Compile Include="Tasks\CheckRequiredPrivilegesTask.cs" />
     <Compile Include="Tasks\DownloadManager.cs" />
+    <Compile Include="Tasks\UpdatableTask.cs" />
     <Compile Include="Tasks\UpdateFileProcessorTask.cs" />
     <Compile Include="Security\HashUtil.cs" />
     <Compile Include="Tasks\AsyncTask.cs" />
-    <Compile Include="Tasks\CheckForUpdatedFilesTask.cs" />
+    <Compile Include="Tasks\CheckForUpdatedItemsTask.cs" />
     <Compile Include="Tasks\CleanUpTask.cs" />
     <Compile Include="Tasks\DownloadTask.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -87,6 +92,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Tasks\UpdateCacheTask.cs" />
+    <Compile Include="Tasks\UpdateRegistryTask.cs" />
     <Compile Include="Tasks\WorkerScheduler.cs" />
     <Compile Include="Threading\AtomicInteger.cs" />
     <Compile Include="Threading\ConcurrentQueue.cs" />
@@ -134,6 +140,7 @@
     <Compile Include="Utils\ExtensionMethods.cs" />
     <Compile Include="Utils\IOUtils.cs" />
     <Compile Include="Utils\Lazy.cs" />
+    <Compile Include="Utils\RegistryHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\status_working.png" />

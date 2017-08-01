@@ -19,7 +19,7 @@ namespace MatthiWare.UpdateLib.Files
             variables.Add("appdir", new DirectoryInfo(".").FullName);
             variables.Add("appdata", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
             variables.Add("temp", Path.GetTempPath());
-            variables.Add("otherdir", "");
+            variables.Add("otherdir", string.Empty);
         }
 
         /// <summary>

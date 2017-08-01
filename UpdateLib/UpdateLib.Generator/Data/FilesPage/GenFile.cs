@@ -6,24 +6,31 @@ using System.Text;
 
 namespace MatthiWare.UpdateLib.Generator.Data.FilesPage
 {
-    public class GenFile
+    public class GenFile : IGenItem
     {
-        public FileInfo FileInfo { get; set; }
+        public event EventHandler Changed;
 
-        public string Name { get { return FileInfo.Name; } }
-        public string RealPath { get { return FileInfo.FullName; } }
-        public string Extension { get { return FileInfo.Extension; } }
-        public string Size { get { return ConvertBytesToSizeString(FileInfo.Length); } }
+        private FileInfo m_fileInfo;
+        public FileInfo FileInfo
+        {
+            get { return m_fileInfo; }
+            set { m_fileInfo = value; Changed?.Invoke(this, EventArgs.Empty); }
+        }
 
-        public GenFolder ParentFolder { get; set; }
+        public string Name { get { return FileInfo?.Name ?? string.Empty; } set { Changed?.Invoke(this, EventArgs.Empty); } }
+        public string RealPath { get { return FileInfo?.FullName ?? string.Empty; } }
+        public string Extension { get { return FileInfo?.Extension ?? string.Empty; } }
+        public string Size { get { return ConvertBytesToSizeString(FileInfo?.Length ?? 0); } }
 
-        public ListViewItemFile FileListView { get; set; }
+        public GenFolder Parent { get; set; }
+
+        public ListViewGenItem View { get; set; }
 
         public GenFile(FileInfo file)
         {
             FileInfo = file;
 
-            FileListView = new ListViewItemFile(file);
+            View = new ListViewGenItem(this);
         }
 
         private static string ConvertBytesToSizeString(long size)
@@ -33,6 +40,15 @@ namespace MatthiWare.UpdateLib.Generator.Data.FilesPage
             double kb = Math.Ceiling(size / 1024.0);
 
             return $"{kb.ToString("N0")} kB";
+        }
+
+        public string[] GetListViewItems()
+        {
+            return new string[] { Name, "File", FileInfo.LastWriteTime.ToString(), Size };
+        }
+        public string GetListViewImageKey()
+        {
+            return Extension;
         }
     }
 }

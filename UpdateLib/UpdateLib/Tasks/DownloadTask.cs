@@ -10,16 +10,15 @@ using System.Windows.Forms;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
-    public class DownloadTask : AsyncTask
+    public class DownloadTask : UpdatableTask
     {
         private WebClient webClient;
         private ManualResetEvent wait;
 
-        public ListViewItem Item { get; private set; }
         public FileEntry Entry { get; private set; }
 
-        public DownloadTask(ListViewItem item)
-            : this((FileEntry)item.Tag)
+        public DownloadTask(ListViewItem item, FileEntry entry)
+            : this(entry)
         {
             Item = item;
         }
@@ -42,13 +41,19 @@ namespace MatthiWare.UpdateLib.Tasks
             string localFile = Updater.Instance.Converter.Replace(Entry.DestinationLocation);
             string remoteFile = string.Concat(Updater.Instance.RemoteBasePath, Entry.SourceLocation);
 
-            Updater.Instance.Logger.Debug(GetType().Name, $"LocalFile => {localFile}");
-            Updater.Instance.Logger.Debug(GetType().Name, $"RemoteFile => {remoteFile}");
+            Updater.Instance.Logger.Debug(nameof(DownloadTask), nameof(DoWork), $"LocalFile => {localFile}");
+            Updater.Instance.Logger.Debug(nameof(DownloadTask), nameof(DoWork), $"RemoteFile => {remoteFile}");
 
-            if (File.Exists(localFile))
-                File.Move(localFile, $"{localFile}.old.tmp");
+            FileInfo fi = new FileInfo(localFile);
 
-            webClient.DownloadFileAsync(new Uri(remoteFile), localFile);
+            if (fi.Exists)
+                fi.MoveTo($"{localFile}.old.tmp");
+
+            if (!fi.Directory.Exists)
+                fi.Directory.Create();
+
+            Uri uri = new Uri(remoteFile);
+            webClient.DownloadFileAsync(uri, localFile);
 
             wait.WaitOne();
             wait.Close();
@@ -62,9 +67,9 @@ namespace MatthiWare.UpdateLib.Tasks
             Updater.Instance.GetCache().AddOrUpdateEntry(localFile, hash);
         }
 
-        public override void Cancel()
+        public override void Rollback()
         {
-            base.Cancel();
+            OnTaskProgressChanged(0);
 
             webClient.CancelAsync();
 
@@ -72,13 +77,23 @@ namespace MatthiWare.UpdateLib.Tasks
             string localTempFile = $"{localFile}.old.tmp";
 
             if (!File.Exists(localTempFile))
+            {
+                OnTaskProgressChanged(100);
                 return;
+            }
 
             if (File.Exists(localFile))
                 File.Delete(localFile);
 
             File.Move(localTempFile, localFile);
 
+            OnTaskProgressChanged(50);
+
+            Updater.Instance.GetCache().AddOrUpdateEntry(localFile);
+
+            Updater.Instance.Logger.Warn(nameof(DownloadTask), nameof(Cancel), $"Rolled back -> {Entry.Name}");
+
+            OnTaskProgressChanged(100);
         }
     }
 }

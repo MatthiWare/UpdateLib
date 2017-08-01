@@ -9,34 +9,42 @@ namespace MatthiWare.UpdateLib.Utils
     public static class IOUtils
     {
         private static Lazy<string> m_getAppDataPath = new Lazy<string>(GetAppDataPath);
-        
+
+        internal static void ReinitializeAppData()
+        {
+            m_getAppDataPath.Reset();
+        }
+
         public static string AppDataPath { get { return m_getAppDataPath.Value; } }
 
         public static string GetRemoteBasePath(string url)
         {
             if (string.IsNullOrEmpty(url)) throw new ArgumentNullException(nameof(url));
 
-            const char splitter = '/';
+            const char slash = '/';
+            const char backslash = '\\';
 
-            string[] tokens = url.Split(splitter);
             StringBuilder builder = new StringBuilder();
 
-            for (int i = 0; i < tokens.Length - 1; i++)
+            foreach (var s in url.Split(slash, backslash).SkipLast(1))
             {
-                builder.Append(tokens[i]);
-                builder.Append(splitter);
+                builder.Append(s);
+                builder.Append(slash);
+
             }
 
             return builder.ToString();
+
+            //return .AppendAll(splitter.ToString());
         }
 
         private static string GetAppDataPath()
         {
             string path = GetPathPrefix();
+            string updaterName = Updater.UpdaterName;
             string productName = Updater.ProductName;
-            string name = Assembly.GetEntryAssembly().GetName().Name;
 
-            return $@"{path}\{name}\{productName}";
+            return $@"{path}\{productName}\{updaterName}";
         }
 
         private static string GetPathPrefix()
@@ -50,7 +58,7 @@ namespace MatthiWare.UpdateLib.Utils
                     return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             }
 
-           
+
         }
 
     }

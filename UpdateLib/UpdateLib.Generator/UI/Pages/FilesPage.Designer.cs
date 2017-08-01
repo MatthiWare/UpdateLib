@@ -40,7 +40,6 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lvFiles = new System.Windows.Forms.ListView();
-            this.clmnIcon = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.clmnName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.clmnDate = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.clmnType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -71,7 +70,7 @@
             this.tvFolders.SelectedImageIndex = 0;
             this.tvFolders.Size = new System.Drawing.Size(191, 332);
             this.tvFolders.TabIndex = 2;
-            this.tvFolders.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.tvFolders_BeforeSelect);
+            this.tvFolders.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.tvFolders_NodeMouseClick);
             // 
             // ilIcons
             // 
@@ -142,10 +141,9 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lvFiles.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.clmnIcon,
             this.clmnName,
-            this.clmnDate,
             this.clmnType,
+            this.clmnDate,
             this.clmnSize});
             this.lvFiles.ContextMenuStrip = this.contextMenuRightClick;
             this.lvFiles.FullRowSelect = true;
@@ -160,11 +158,6 @@
             this.lvFiles.SelectedIndexChanged += new System.EventHandler(this.lvFiles_SelectedIndexChanged);
             this.lvFiles.DoubleClick += new System.EventHandler(this.lvFiles_DoubleClick);
             // 
-            // clmnIcon
-            // 
-            this.clmnIcon.Text = "";
-            this.clmnIcon.Width = 24;
-            // 
             // clmnName
             // 
             this.clmnName.Text = "Name";
@@ -172,11 +165,13 @@
             // 
             // clmnDate
             // 
+            this.clmnDate.DisplayIndex = 1;
             this.clmnDate.Text = "Last Modified";
             this.clmnDate.Width = 147;
             // 
             // clmnType
             // 
+            this.clmnType.DisplayIndex = 2;
             this.clmnType.Text = "Type";
             this.clmnType.Width = 93;
             // 
@@ -219,7 +214,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TreeView tvFolders;
         private System.Windows.Forms.ListView lvFiles;
-        private System.Windows.Forms.ColumnHeader clmnIcon;
         private System.Windows.Forms.ColumnHeader clmnName;
         private System.Windows.Forms.ColumnHeader clmnDate;
         private System.Windows.Forms.ColumnHeader clmnType;

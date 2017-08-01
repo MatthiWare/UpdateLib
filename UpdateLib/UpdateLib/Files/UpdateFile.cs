@@ -5,6 +5,7 @@ using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
 using System.Linq;
+using Microsoft.Win32;
 
 namespace MatthiWare.UpdateLib.Files
 {
@@ -30,13 +31,21 @@ namespace MatthiWare.UpdateLib.Files
         /// <summary>
         /// Gets the folders of the project
         /// </summary>
+        [XmlArray("Folders"), XmlArrayItem("Directory")]
         public List<DirectoryEntry> Folders { get; set; } = new List<DirectoryEntry>();
 
         /// <summary>
         /// Gets the count of all the files in the <see cref="Folders"/>
         /// and their subdirectories.
         /// </summary>
-        public int Count { get { return Folders.Select(d => d.Count).Sum(); } }
+        [XmlIgnore]
+        public int FileCount { get { return Folders.Select(d => d.Count).Sum(); } }
+
+        [XmlIgnore]
+        public int RegistryKeyCount { get { return Registry.Select(r => r.Count).Sum(); } }
+
+        [XmlArray("Registry"), XmlArrayItem("Directory")]
+        public List<DirectoryEntry> Registry { get; set; } = new List<DirectoryEntry>();
 
         public UpdateFile()
         {
@@ -55,7 +64,7 @@ namespace MatthiWare.UpdateLib.Files
                 throw new ArgumentException("Stream is not writable", nameof(output));
 
             XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
-            ns.Add(string.Empty, string.Empty);
+           // ns.Add(string.Empty, string.Empty);
 
             XmlSerializer serializer = new XmlSerializer(typeof(UpdateFile), string.Empty);
             serializer.Serialize(output, this, ns);

@@ -78,7 +78,7 @@ namespace MatthiWare.UpdateLib.Tasks
 
                     m_waitForAvailableWorker.WaitOne();
 
-                    Updater.Instance.Logger.Debug(GetType().Name, $"Current worker count: {m_currentWorkerCount.Increment()} | Current queue count: {m_taskQueue.Count}");
+                    Updater.Instance.Logger.Debug(nameof(WorkerScheduler), nameof(Dispatcher), $"Current worker count: {m_currentWorkerCount.Increment()} | Current queue count: {m_taskQueue.Count}");
 
                     task.ConfigureAwait(false).Start();
                 }
@@ -93,7 +93,7 @@ namespace MatthiWare.UpdateLib.Tasks
                 if (m_currentWorkerCount.Decrement() < MAX_WORKERS)
                     m_waitForAvailableWorker.Set();
 
-                Updater.Instance.Logger.Debug(GetType().Name, $"Current worker count: {m_currentWorkerCount}");
+                Updater.Instance.Logger.Debug(nameof(WorkerScheduler), nameof(Dispatcher), $"Current worker count: {m_currentWorkerCount}");
             };
         }
 

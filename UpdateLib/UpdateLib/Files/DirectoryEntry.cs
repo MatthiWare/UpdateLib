@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Xml.Serialization;
+using System.Linq;
+using System.Diagnostics;
 
 namespace MatthiWare.UpdateLib.Files
 {
@@ -9,12 +12,14 @@ namespace MatthiWare.UpdateLib.Files
     /// Directories can contain files and subdirectories.
     /// </summary>
     [Serializable]
+
     public class DirectoryEntry
     {
         /// <summary>
         /// Gets or sets the name of the <see cref="DirectoryEntry">directory</see>. 
         /// </summary>
         [XmlAttribute]
+        [DebuggerDisplay("{DestinationLocation}")]
         public string Name { get; set; }
 
         /// <summary>
@@ -24,12 +29,7 @@ namespace MatthiWare.UpdateLib.Files
         {
             get
             {
-                int _count = Files.Count;
-
-                foreach(DirectoryEntry di in Directories)
-                    _count += di.Count;
-
-                return _count;
+                return Items.Count + Directories.Sum(d => d.Count);
             }
         }
 
@@ -37,13 +37,14 @@ namespace MatthiWare.UpdateLib.Files
         /// Gets the list of <see cref="DirectoryEntry">subdirectories</see>.
         /// </summary>
         [XmlArray("Directories"), XmlArrayItem("Directory")]
-        public List<DirectoryEntry> Directories { get;  set; }
+        public List<DirectoryEntry> Directories { get; set; } = new List<DirectoryEntry>();
 
         /// <summary>
-        /// Gets the list of <see cref="FileEntry">files</see> in this directory.
+        /// Gets the list of <see cref="EntryBase">files</see> in this directory.
         /// </summary>
-        [XmlArray("Files"), XmlArrayItem("File")]
-        public List<FileEntry> Files { get;  set; }
+        [XmlElement(typeof(FileEntry))]
+        [XmlElement(typeof(RegistryKeyEntry))]
+        public List<EntryBase> Items { get; set; } = new List<EntryBase>();
 
         /// <summary>
         /// Gets or Sets the Parent of this Directory
@@ -51,20 +52,92 @@ namespace MatthiWare.UpdateLib.Files
         [XmlIgnore]
         public DirectoryEntry Parent { get; set; }
 
-        public DirectoryEntry()
+        [XmlIgnore]
+        public string SourceLocation
         {
-            Files = new List<FileEntry>();
-            Directories = new List<DirectoryEntry>();
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+
+                if (Parent == null)
+                    return string.Empty;
+
+                sb.Append(Parent.SourceLocation);
+                sb.Append(Name);
+                sb.Append(@"/");
+
+                return sb.ToString();
+            }
+        }
+
+        [XmlIgnore]
+        public string DestinationLocation
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+
+                sb.Append(Parent?.DestinationLocation ?? string.Empty);
+                sb.Append(Name);
+                sb.Append(@"\");
+
+                return sb.ToString();
+            }
         }
 
         /// <summary>
         /// .ctor of <see cref="DirectoryEntry"/>
         /// </summary>
+        public DirectoryEntry() { }
+
+        /// <summary>
+        /// .ctor of <see cref="DirectoryEntry"/>
+        /// </summary>
         public DirectoryEntry(string name)
+            : this()
         {
-            this.Name = name;
-            Files = new List<FileEntry>();
-            Directories = new List<DirectoryEntry>();
+            Name = name;
+        }
+
+        public void Add(DirectoryEntry folder)
+        {
+            if (folder == null) throw new ArgumentNullException(nameof(folder));
+
+            folder.Parent = this;
+            Directories.Add(folder);
+        }
+
+        public void Add(EntryBase file)
+        {
+            if (file == null) throw new ArgumentNullException(nameof(file));
+
+            file.Parent = this;
+            Items.Add(file);
+        }
+
+        public bool Remove(DirectoryEntry folder)
+        {
+            if (folder == null) throw new ArgumentNullException(nameof(folder));
+
+            folder.Parent = null;
+            return Directories.Remove(folder);
+        }
+
+        public bool Remove(EntryBase file)
+        {
+            if (file == null) throw new ArgumentNullException(nameof(file));
+
+            file.Parent = null;
+            return Items.Remove(file);
+        }
+
+        /// <summary>
+        /// Gets all the items including the items of childs
+        /// </summary>
+        /// <returns>A list of items</returns>
+        public IEnumerable<EntryBase> GetItems()
+        {
+            return Items.Concat(Directories.SelectMany(d => d.GetItems()));
         }
     }
 }
