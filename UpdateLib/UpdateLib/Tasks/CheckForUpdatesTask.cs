@@ -86,7 +86,7 @@ namespace MatthiWare.UpdateLib.Tasks
 
         private CheckForUpdatedItemsTask CheckForUpdatedFiles(UpdateFile file, HashCacheFile cache)
         {
-            CheckForUpdatedItemsTask task = new CheckForUpdatedItemsTask(file, cache, Updater.Instance.Converter);
+            CheckForUpdatedItemsTask task = new CheckForUpdatedItemsTask(file, cache);
             task.ConfigureAwait(false).Start();
             return task;
         }

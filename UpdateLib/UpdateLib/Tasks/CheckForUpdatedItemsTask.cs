@@ -15,7 +15,6 @@ namespace MatthiWare.UpdateLib.Tasks
         {
             if (update == null) throw new ArgumentNullException(nameof(update));
             if (cache == null) throw new ArgumentNullException(nameof(cache));
-            if (converter == null) throw new ArgumentNullException(nameof(converter));
 
             m_updateFile = update;
             m_cacheFile = cache;
