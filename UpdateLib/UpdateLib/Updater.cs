@@ -229,6 +229,18 @@ namespace MatthiWare.UpdateLib
         #region Fluent API
 
         /// <summary>
+        /// Configures the path variable converter
+        /// </summary>
+        /// <param name="action">the action to perform on the <see cref="PathVariableConverter"/> </param>
+        /// <returns><see cref="Updater"/> </returns>
+        public Updater ConfigurePathConverter(Action<PathVariableConverter> action)
+        {
+            action(Converter);
+
+            return this;
+        }
+
+        /// <summary>
         /// Configures if unsafe connections are allowed
         /// </summary>
         /// <remarks>Do not enable this unless you know what you are doing</remarks>
@@ -244,11 +256,11 @@ namespace MatthiWare.UpdateLib
         /// <summary>
         /// Configures the logger
         /// </summary>
-        /// <param name="logAction">Action to perform on the logger</param>
+        /// <param name="action">Action to perform on the logger</param>
         /// <returns><see cref="Updater"/> </returns>
-        public Updater ConfigureLogger(Action<ILogger> logAction)
+        public Updater ConfigureLogger(Action<ILogger> action)
         {
-            logAction(Logger);
+            action(Logger);
 
             return this;
         }

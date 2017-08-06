@@ -10,9 +10,8 @@ namespace MatthiWare.UpdateLib.Tasks
     {
         private UpdateFile m_updateFile;
         private HashCacheFile m_cacheFile;
-        private PathVariableConverter m_converter;
 
-        public CheckForUpdatedItemsTask(UpdateFile update, HashCacheFile cache, PathVariableConverter converter)
+        public CheckForUpdatedItemsTask(UpdateFile update, HashCacheFile cache)
         {
             if (update == null) throw new ArgumentNullException(nameof(update));
             if (cache == null) throw new ArgumentNullException(nameof(cache));
@@ -20,7 +19,6 @@ namespace MatthiWare.UpdateLib.Tasks
 
             m_updateFile = update;
             m_cacheFile = cache;
-            m_converter = converter;
         }
 
         protected override void DoWork()
@@ -40,7 +38,7 @@ namespace MatthiWare.UpdateLib.Tasks
         {
             dir.Items.RemoveAll(fe =>
             {
-                string convertedPath = m_converter.Replace(fe.DestinationLocation);
+                string convertedPath = Updater.Instance.Converter.Convert(fe.DestinationLocation);
                 HashCacheEntry cacheEntry = m_cacheFile.Items.Find(hash => hash.FilePath.Equals(convertedPath));
 
                 if (cacheEntry == null)

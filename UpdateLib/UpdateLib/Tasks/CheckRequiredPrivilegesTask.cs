@@ -46,7 +46,7 @@ namespace MatthiWare.UpdateLib.Tasks
 
         private bool CheckHasSufficientPermissionsForDirectory(DirectoryEntry dir)
         {
-            string localPath = Updater.Instance.Converter.Replace(dir.DestinationLocation);
+            string localPath = Updater.Instance.Converter.Convert(dir.DestinationLocation);
 
             if (!PermissionUtil.DirectoryHasPermission(localPath))
                 return false;

@@ -38,7 +38,7 @@ namespace MatthiWare.UpdateLib.Tasks
 
             wait = new ManualResetEvent(false);
 
-            string localFile = Updater.Instance.Converter.Replace(Entry.DestinationLocation);
+            string localFile = Updater.Instance.Converter.Convert(Entry.DestinationLocation);
             string remoteFile = string.Concat(Updater.Instance.RemoteBasePath, Entry.SourceLocation);
 
             Updater.Instance.Logger.Debug(nameof(DownloadTask), nameof(DoWork), $"LocalFile => {localFile}");
@@ -73,7 +73,7 @@ namespace MatthiWare.UpdateLib.Tasks
 
             webClient.CancelAsync();
 
-            string localFile = Updater.Instance.Converter.Replace(Entry.DestinationLocation);
+            string localFile = Updater.Instance.Converter.Convert(Entry.DestinationLocation);
             string localTempFile = $"{localFile}.old.tmp";
 
             if (!File.Exists(localTempFile))

@@ -12,7 +12,7 @@ namespace MatthiWare.UpdateLib.Tasks
 
         public CleanUpTask(string pathToCleanUp, string searchPattern = "*.old.tmp", bool includeSubDirs = true)
         {
-            PathToClean = Updater.Instance.Converter.Replace(pathToCleanUp);
+            PathToClean = Updater.Instance.Converter.Convert(pathToCleanUp);
             SearchPattern = searchPattern;
             IncludeSubDirectories = includeSubDirs;
         }

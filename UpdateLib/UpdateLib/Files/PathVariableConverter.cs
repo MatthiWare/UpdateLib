@@ -12,8 +12,10 @@ namespace MatthiWare.UpdateLib.Files
     {
         private Dictionary<string, string> variables;
 
+        private readonly object sync = new object();
+
         public PathVariableConverter()
-        { 
+        {
             variables = new Dictionary<string, string>();
 
             variables.Add("appdir", new DirectoryInfo(".").FullName);
@@ -23,7 +25,7 @@ namespace MatthiWare.UpdateLib.Files
         }
 
         /// <summary>
-        /// Gets the full path of a key
+        /// Gets or sets the full path of a key
         /// </summary>
         /// <param name="key">The variable name</param>
         /// <returns>The full path of the variable as a <see cref="string"/> </returns>
@@ -31,10 +33,22 @@ namespace MatthiWare.UpdateLib.Files
         {
             get
             {
-                if (string.IsNullOrEmpty(key))
-                    throw new ArgumentNullException(nameof(key));
+                return Get(key);
+            }
+            set
+            {
+                Add(key, value);
+            }
+        }
 
-                if (!variables.ContainsKey(key.ToLower()))
+        public string Get(string key)
+        {
+            if (string.IsNullOrEmpty(key))
+                throw new ArgumentNullException(nameof(key));
+
+            lock (sync)
+            {
+                if (!ContainsInternal(key))
                     return null;
 
                 return variables[key.ToLower()];
@@ -49,10 +63,13 @@ namespace MatthiWare.UpdateLib.Files
             if (string.IsNullOrEmpty(val))
                 throw new ArgumentNullException(nameof(val));
 
-            if (variables.ContainsKey(key.ToLower()))
-                throw new ArgumentException("Duplicate key entry", nameof(key));
-
-            variables.Add(key.ToLower(), val);
+            lock (sync)
+            {
+                if (ContainsInternal(key))
+                    variables[key.ToLower()] = val;
+                else
+                    variables.Add(key.ToLower(), val);
+            }
         }
 
         /// <summary>
@@ -61,6 +78,12 @@ namespace MatthiWare.UpdateLib.Files
         /// <param name="key">The variable name</param>
         /// <returns>True if the converter contains the key and False if not</returns>
         public bool Contains(string key)
+        {
+            lock (sync)
+                return ContainsInternal(key);
+        }
+
+        private bool ContainsInternal(string key)
         {
             if (string.IsNullOrEmpty(key))
                 return false;
@@ -78,13 +101,14 @@ namespace MatthiWare.UpdateLib.Files
             if (string.IsNullOrEmpty(key))
                 throw new ArgumentNullException(nameof(key));
 
-            if (!variables.ContainsKey(key.ToLower()))
+            if (!ContainsInternal(key))
                 return false;
 
-            return variables.Remove(key.ToLower());
+            lock (sync)
+                return variables.Remove(key.ToLower());
         }
 
-        public string Replace(string input)
+        public string Convert(string input)
         {
             string[] tokens = input.Split('%');
             StringBuilder sb = new StringBuilder();

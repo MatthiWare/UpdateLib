@@ -34,8 +34,7 @@ namespace UpdateLib.Tests.Tasks
                 sw.Write("test");
             }
 
-            Updater.Instance.Converter.Remove("appdir");
-            Updater.Instance.Converter.Add("appdir", $@"{Path.GetTempPath()}dl_test");
+            Updater.Instance.ConfigurePathConverter(c => c["appdir"] = $@"{Path.GetTempPath()}dl_test");
             Updater.Instance.ConfigureUpdateUrl(m_path + "\\update.xml");
 
             Updater.Instance.Initialize();
@@ -62,7 +61,7 @@ namespace UpdateLib.Tests.Tasks
 
             Assert.IsTrue(wait.WaitOne(TimeSpan.FromSeconds(20)), "The async download timed-out after 10 seconds");
 
-            string localFile = Updater.Instance.Converter.Replace("%appdir%/testfile.txt");
+            string localFile = Updater.Instance.Converter.Convert("%appdir%/testfile.txt");
             Assert.IsTrue(File.Exists(localFile), "File didn't exist");
 
             using (StreamReader sr = new StreamReader(File.Open(localFile, FileMode.Open, FileAccess.Read)))

@@ -86,7 +86,7 @@ namespace MatthiWare.UpdateLib.UI.Components
             foreach (FileEntry entry in files)
             {
 
-                ListViewItem item = new ListViewItem(new string[] { entry.Name, "Ready to download", "0%", entry.Description, Updater.Instance.Converter.Replace(entry.DestinationLocation) });
+                ListViewItem item = new ListViewItem(new string[] { entry.Name, "Ready to download", "0%", entry.Description, Updater.Instance.Converter.Convert(entry.DestinationLocation) });
                 item.Tag = entry;
 
                 DownloadTask task = new DownloadTask(item, entry);
