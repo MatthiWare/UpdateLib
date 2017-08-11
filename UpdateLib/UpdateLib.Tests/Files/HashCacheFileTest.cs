@@ -77,6 +77,8 @@ namespace UpdateLib.Tests.Files
             using (StreamWriter sw = new StreamWriter(File.Open(m_tempFile, FileMode.OpenOrCreate, FileAccess.Write), Encoding.Default))
             {
                 sw.WriteLine("edited");
+
+                sw.Flush();
             }
         }
 
