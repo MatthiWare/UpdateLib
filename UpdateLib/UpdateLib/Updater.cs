@@ -424,7 +424,7 @@ namespace MatthiWare.UpdateLib
         /// Starting the update process
         /// </summary>
         /// <returns>Whether or not there is an update available and the latest version</returns>
-        public CheckForUpdatesTask.Data CheckForUpdates()
+        public CheckForUpdatesTask.CheckForUpdatesResult CheckForUpdates()
         {
             return CheckForUpdatesAsync().AwaitTask().Result;
         }
@@ -434,7 +434,7 @@ namespace MatthiWare.UpdateLib
         /// </summary>
         /// <param name="owner">The owner window</param>
         /// <returns>Whether or not there is an update available and the latest version</returns>
-        public CheckForUpdatesTask.Data CheckForUpdates(IWin32Window owner)
+        public CheckForUpdatesTask.CheckForUpdatesResult CheckForUpdates(IWin32Window owner)
         {
             return CheckForUpdatesAsync(owner).AwaitTask().Result;
         }

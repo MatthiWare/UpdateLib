@@ -67,8 +67,8 @@ namespace UpdateLib.Tests.Files
 
         private void CheckEntries(HashCacheEntry expected, HashCacheEntry actual)
         {
-            Assert.AreEqual(expected.FilePath, actual.FilePath);
-            Assert.AreEqual(expected.Hash, actual.Hash);
+            Assert.AreEqual(expected.FilePath.Trim(), actual.FilePath.Trim());
+            Assert.AreEqual(expected.Hash.Trim(), actual.Hash.Trim());
             Assert.AreEqual(expected.Ticks, actual.Ticks);
         }
 

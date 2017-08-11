@@ -11,7 +11,7 @@ using MatthiWare.UpdateLib.Utils;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
-    public class CheckForUpdatesTask : AsyncTask<Data>
+    public class CheckForUpdatesTask : AsyncTask<CheckForUpdatesResult>
     {
         public string Url { get; set; }
 
@@ -30,7 +30,7 @@ namespace MatthiWare.UpdateLib.Tasks
         {
             if (string.IsNullOrEmpty(Url)) throw new WebException("Invalid Url", WebExceptionStatus.NameResolutionFailure);
 
-            Result = new Data();
+            Result = new CheckForUpdatesResult();
 
             Updater updater = Updater.Instance;
 
@@ -44,7 +44,7 @@ namespace MatthiWare.UpdateLib.Tasks
 
             if (IsUpdateFileInvalid(localFile))
             {
-                Updater.Instance.Logger.Warn(nameof(CheckForUpdatesTask), nameof(DoWork), "Cached update file validity expired, downloading new one..");
+                updater.Logger.Warn(nameof(CheckForUpdatesTask), nameof(DoWork), "Cached update file validity expired, downloading new one..");
                 wcDownloader.DownloadFile(Url, localFile);
             }
 
@@ -100,7 +100,7 @@ namespace MatthiWare.UpdateLib.Tasks
             return task;
         }
 
-        public class Data
+        public class CheckForUpdatesResult
         {
             public string Version { get; set; } = string.Empty;
             public bool UpdateAvailable { get; set; } = false;

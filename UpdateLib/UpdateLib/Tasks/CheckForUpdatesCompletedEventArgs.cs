@@ -8,14 +8,14 @@ namespace MatthiWare.UpdateLib.Tasks
         public string LatestVersion { get; set; }
         public bool UpdateAvailable { get; set; }
 
-        public CheckForUpdatesCompletedEventArgs(CheckForUpdatesTask.Data result, Exception error, bool cancelled, object userState) 
+        public CheckForUpdatesCompletedEventArgs(CheckForUpdatesTask.CheckForUpdatesResult result, Exception error, bool cancelled, object userState) 
             : base(error, cancelled, userState)
         {
             LatestVersion = result.Version;
             UpdateAvailable = result.UpdateAvailable;
         }
 
-        public CheckForUpdatesCompletedEventArgs(CheckForUpdatesTask.Data result, AsyncCompletedEventArgs e)
+        public CheckForUpdatesCompletedEventArgs(CheckForUpdatesTask.CheckForUpdatesResult result, AsyncCompletedEventArgs e)
               : this(result, e.Error, e.Cancelled, e.UserState)
         {
 
