@@ -34,6 +34,8 @@ namespace MatthiWare.UpdateLib.Tasks
 
             Updater updater = Updater.Instance;
 
+            if (!NetworkUtils.HasConnection()) throw new WebException("No internet available", WebExceptionStatus.ConnectFailure);
+
             // Getting the file name from the url
             string localFile = $@"{IOUtils.AppDataPath}\Update.xml";
 

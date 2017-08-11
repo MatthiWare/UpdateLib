@@ -23,17 +23,17 @@ namespace MatthiWare.UpdateLib.Tasks
         protected override void DoWork()
         {
             foreach (DirectoryEntry dir in m_updateFile.Folders)
-                Enqueue(new Action<DirectoryEntry>(RecursiveFileCheck), dir);
+                Enqueue(new Action<DirectoryEntry>(CheckFiles), dir);
 
             foreach (DirectoryEntry dir in m_updateFile.Registry)
-                Enqueue(new Action<DirectoryEntry>(RecursiveRegCheck), dir);
+                Enqueue(new Action<DirectoryEntry>(CheckRegister), dir);
 
             AwaitWorkers();
 
             Result = m_updateFile.FileCount > 0 || m_updateFile.RegistryKeyCount > 0;
         }
 
-        private void RecursiveFileCheck(DirectoryEntry dir)
+        private void CheckFiles(DirectoryEntry dir)
         {
             dir.Items.RemoveAll(fe =>
             {
@@ -53,13 +53,13 @@ namespace MatthiWare.UpdateLib.Tasks
             foreach (DirectoryEntry subDir in dir.Directories)
             {
                 if (--left == 0)
-                    RecursiveFileCheck(subDir);
+                    CheckFiles(subDir);
                 else
-                    Enqueue(new Action<DirectoryEntry>(RecursiveFileCheck), subDir);
+                    Enqueue(new Action<DirectoryEntry>(CheckFiles), subDir);
             }
         }
 
-        private void RecursiveRegCheck(DirectoryEntry dir)
+        private void CheckRegister(DirectoryEntry dir)
         {
             dir.Items.RemoveAll(entry =>
             {
@@ -77,9 +77,9 @@ namespace MatthiWare.UpdateLib.Tasks
             foreach (DirectoryEntry subDir in dir.Directories)
             {
                 if (--left == 0)
-                    RecursiveRegCheck(subDir);
+                    CheckRegister(subDir);
                 else
-                    Enqueue(new Action<DirectoryEntry>(RecursiveRegCheck), dir);
+                    Enqueue(new Action<DirectoryEntry>(CheckRegister), dir);
             }
         }
     }

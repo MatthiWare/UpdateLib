@@ -8,8 +8,6 @@ namespace MatthiWare.UpdateLib.Tasks
 {
     public abstract class UpdatableTask : AsyncTask
     {
-        public ListViewItem Item { get; set; }
-
         private new void Start()
         {
             base.Start();

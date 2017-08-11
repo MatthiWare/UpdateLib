@@ -41,11 +41,13 @@ namespace MatthiWare.UpdateLib.Tasks
         private readonly ManualResetEvent m_waitForAvailableWorker;
         private readonly object sync = new object();
 
+        public const long MIN_WORKERS = 8;
+
         #endregion
 
         private WorkerScheduler()
         {
-            MAX_WORKERS = Environment.ProcessorCount;
+            MAX_WORKERS = Math.Max(Environment.ProcessorCount, MIN_WORKERS);
             m_taskQueue = new ConcurrentQueue<AsyncTask>();
             m_dispatcherTask = AsyncTaskFactory.From(new Action(Dispatcher), null);
             m_waitForAvailableWorker = new ManualResetEvent(true);

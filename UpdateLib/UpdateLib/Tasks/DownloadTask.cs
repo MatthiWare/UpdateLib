@@ -16,13 +16,7 @@ namespace MatthiWare.UpdateLib.Tasks
         private ManualResetEvent wait;
 
         public FileEntry Entry { get; private set; }
-
-        public DownloadTask(ListViewItem item, FileEntry entry)
-            : this(entry)
-        {
-            Item = item;
-        }
-
+        
         public DownloadTask(FileEntry entry)
         {
             Entry = entry;

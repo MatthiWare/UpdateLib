@@ -13,16 +13,9 @@ namespace MatthiWare.UpdateLib.Tasks
     {
 
         public IEnumerable<RegistryKeyEntry> Keys { get; set; }
-
-
+        
         private List<RollbackData> cachedUpdates = new List<RollbackData>();
-
-        public UpdateRegistryTask(ListViewItem item, IEnumerable<RegistryKeyEntry> keys)
-            : this(keys)
-        {
-            Item = item;
-        }
-
+        
         public UpdateRegistryTask(IEnumerable<RegistryKeyEntry> keys)
         {
             Keys = keys;

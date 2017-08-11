@@ -22,7 +22,7 @@ namespace MatthiWare.UpdateLib.UI.Components
         public event EventHandler PageUpdate;
 
         private AtomicInteger amountToDownload = new AtomicInteger();
-        private List<UpdatableTask> m_updateTasks = new List<UpdatableTask>();
+        private Dictionary<UpdatableTask, ListViewItem> m_items = new Dictionary<UpdatableTask, ListViewItem>();
         private bool hasRegTask = false;
 
         public UpdatePage(UpdaterForm parent)
@@ -85,15 +85,14 @@ namespace MatthiWare.UpdateLib.UI.Components
         {
             foreach (FileEntry entry in files)
             {
-
                 ListViewItem item = new ListViewItem(new string[] { entry.Name, "Ready to download", "0%", entry.Description, Updater.Instance.Converter.Convert(entry.DestinationLocation) });
                 item.Tag = entry;
 
-                DownloadTask task = new DownloadTask(item, entry);
+                DownloadTask task = new DownloadTask(entry);
                 task.TaskProgressChanged += Task_TaskProgressChanged;
                 task.TaskCompleted += Task_TaskCompleted;
 
-                m_updateTasks.Add(task);
+                m_items.Add(task, item);
 
                 lvItems.Items.Add(item);
             }
@@ -109,11 +108,11 @@ namespace MatthiWare.UpdateLib.UI.Components
 
             ListViewItem item = new ListViewItem(new string[] { "Update registry", "Waiting for other tasks to complete", "0%", "Applies changes to the registry" });
 
-            UpdateRegistryTask task = new UpdateRegistryTask(item, keys);
+            UpdateRegistryTask task = new UpdateRegistryTask(keys);
             task.TaskProgressChanged += Task_TaskProgressChanged;
             task.TaskCompleted += Task_TaskCompleted;
 
-            m_updateTasks.Add(task);
+            m_items.Add(task, item);
 
             lvItems.Items.Add(item);
         }
@@ -123,44 +122,47 @@ namespace MatthiWare.UpdateLib.UI.Components
             IsBusy = true;
             PageUpdate?.Invoke(this, new EventArgs());
 
-            IEnumerable<DownloadTask> downloadTasks = m_updateTasks.Select(x => x as DownloadTask).NotNull();
+            var items = m_items.Where(x => (x.Key as DownloadTask != null));
 
-            foreach (DownloadTask task in downloadTasks)
+            foreach (var kvp in items)
             {
-                SetImageKey(task.Item, "status_download");
-                SetSubItemText(task.Item.SubItems[1], "Downloading..");
+                SetImageKey(kvp.Value, "status_download");
+                SetSubItemText(kvp.Value.SubItems[1], "Downloading..");
 
-                task.Start();
+                kvp.Key.Start();
             }
 
 
-            if (hasRegTask && downloadTasks.Count() == 0)
+            if (hasRegTask && items.Count() == 0)
                 StartRegUpdate();
 
         }
 
         private void StartRegUpdate()
         {
-            UpdateRegistryTask task = m_updateTasks.Select(x => x as UpdateRegistryTask).NotNull().FirstOrDefault();
+            var kvp = m_items.Where(x => (x.Key as UpdateRegistryTask) != null).NotNull().FirstOrDefault();
 
-            if (task == null)
+            if (kvp.Key == null || kvp.Value == null)
                 return;
 
-            SetImageKey(task.Item, "status_download");
-            SetSubItemText(task.Item.SubItems[1], "Updating..");
+            var view = kvp.Value;
 
-            task.Start();
+            SetImageKey(view, "status_download");
+            SetSubItemText(view.SubItems[1], "Updating..");
+
+            kvp.Key.Start();
 
         }
 
         private void Task_TaskCompleted(object sender, AsyncCompletedEventArgs e)
         {
-            UpdatableTask task = (UpdatableTask)sender;
+            var task = (UpdatableTask)sender;
+            var view = m_items[task];
 
             if (e.Cancelled)
             {
-                SetSubItemText(task.Item.SubItems[1], "Rolled back");
-                SetImageKey(task.Item, "status_warning");
+                SetSubItemText(view.SubItems[1], "Rolled back");
+                SetImageKey(view, "status_warning");
 
                 return;
             }
@@ -172,14 +174,14 @@ namespace MatthiWare.UpdateLib.UI.Components
 
                 Updater.Instance.Logger.Error(nameof(UpdatePage), nameof(StartUpdate), e.Error);
 
-                SetSubItemText(task.Item.SubItems[1], "Error");
-                SetImageKey(task.Item, "status_error");
+                SetSubItemText(view.SubItems[1], "Error");
+                SetImageKey(view, "status_error");
 
                 return;
             }
 
-            SetSubItemText(task.Item.SubItems[1], "Done");
-            SetImageKey(task.Item, "status_done");
+            SetSubItemText(view.SubItems[1], "Done");
+            SetImageKey(view, "status_done");
 
             int left = amountToDownload.Decrement();
 
@@ -197,7 +199,7 @@ namespace MatthiWare.UpdateLib.UI.Components
         {
             UpdatableTask task = (UpdatableTask)sender;
 
-            SetSubItemText(task.Item.SubItems[2], $"{e.ProgressPercentage}%");
+            SetSubItemText(m_items[task].SubItems[2], $"{e.ProgressPercentage}%");
         }
 
         public void CancelUpdate()
@@ -306,13 +308,16 @@ namespace MatthiWare.UpdateLib.UI.Components
         {
             IsBusy = true;
 
-            foreach (UpdatableTask task in m_updateTasks)
+            foreach (var item in m_items)
             {
+                UpdatableTask task = item.Key;
+                ListViewItem view = item.Value;
+
                 if (task.IsCancelled || (!task.IsCompleted && !task.IsRunning))
                 {
-                    SetSubItemText(task.Item.SubItems[1], "No action");
+                    SetSubItemText(view.SubItems[1], "No action");
 
-                    SetImageKey(task.Item, "status_warning");
+                    SetImageKey(view, "status_warning");
 
                     continue;
                 }
@@ -320,9 +325,9 @@ namespace MatthiWare.UpdateLib.UI.Components
 
                 task.Cancel();
 
-                SetSubItemText(task.Item.SubItems[1], "Rolled back");
+                SetSubItemText(view.SubItems[1], "Rolled back");
 
-                SetImageKey(task.Item, "status_warning");
+                SetImageKey(view, "status_warning");
             }
 
             IsBusy = false;

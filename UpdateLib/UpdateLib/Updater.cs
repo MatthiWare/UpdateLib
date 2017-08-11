@@ -640,6 +640,7 @@ namespace MatthiWare.UpdateLib
 
             ProcessStartInfo startInfo = new ProcessStartInfo(Assembly.GetEntryAssembly().Location, arguments);
 
+            startInfo.WindowStyle = ProcessWindowStyle.Normal;
             startInfo.UseShellExecute = true;
 
             if (asAdmin)

@@ -140,9 +140,12 @@
     <Compile Include="Utils\ExtensionMethods.cs" />
     <Compile Include="Utils\IOUtils.cs" />
     <Compile Include="Utils\Lazy.cs" />
+    <Compile Include="Utils\NetworkUtils.cs" />
     <Compile Include="Utils\RegistryHelper.cs" />
+    <Compile Include="Win32\NativeMethods.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
     <None Include="Resources\status_working.png" />
     <None Include="Resources\status_update.png" />
     <None Include="Resources\status_warning.png" />
