@@ -35,21 +35,15 @@ namespace MatthiWare.UpdateLib.Files
         {
             lock (sync)
             {
-                long ticks = File.GetLastWriteTime(fullPath).Ticks;
-                hash = string.IsNullOrEmpty(hash) ? HashUtil.GetHash(fullPath) : hash;
-
                 HashCacheEntry entry = Items.FirstOrDefault(f => f.FilePath == fullPath);
 
                 if (entry == null)
                 {
-                    entry = new HashCacheEntry();
-                    entry.FilePath = fullPath;
-
+                    entry = new HashCacheEntry(fullPath);
                     Items.Add(entry);
                 }
-
-                entry.Ticks = ticks;
-                entry.Hash = hash;
+                else
+                    entry.Recalculate();
 
                 Updater.Instance.Logger.Debug(nameof(HashCacheFile), nameof(AddOrUpdateEntry), $"Cache updated for file -> '{entry.FilePath}'");
             }

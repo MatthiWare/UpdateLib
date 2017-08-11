@@ -59,8 +59,8 @@ namespace UpdateLib.Tests.Files
 
             file.AddOrUpdateEntry(m_tempFile);
 
-            Assert.AreEqual(file.Items.FirstOrDefault().FilePath, hash.FilePath);
-            Assert.AreNotEqual(file.Items.FirstOrDefault().Hash, hash.Hash);
+            Assert.AreEqual(file.Items.FirstOrDefault().FilePath.Trim(), hash.FilePath.Trim());
+            Assert.AreNotEqual(file.Items.FirstOrDefault().Hash.Trim(), hash.Hash.Trim());
             Assert.AreNotEqual(file.Items.FirstOrDefault().Ticks, hash.Ticks);
         }
 

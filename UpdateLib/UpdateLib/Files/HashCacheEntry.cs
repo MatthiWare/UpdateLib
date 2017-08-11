@@ -35,7 +35,7 @@ namespace MatthiWare.UpdateLib.Files
             Ticks = File.GetLastWriteTime(FilePath).Ticks;
         }
 
-        public void Recalculate()
+        public void Recalculate(string hash = "")
         {
             try
             {
@@ -43,7 +43,7 @@ namespace MatthiWare.UpdateLib.Files
 
                 if (Ticks == -1 || tick != Ticks)
                 {
-                    Hash = HashUtil.GetHash(FilePath);
+                    Hash = string.IsNullOrEmpty(hash) ? HashUtil.GetHash(FilePath) : hash;
                     Ticks = tick;
 
                     Updater.Instance.Logger.Debug(nameof(HashCacheEntry), nameof(Recalculate), $"Recalculated Time: {DateTime.FromBinary(Ticks).ToString()} Name: {FilePath} Hash: {Hash}");
@@ -54,7 +54,7 @@ namespace MatthiWare.UpdateLib.Files
                 Hash = string.Empty;
                 Ticks = -1;
 
-                Updater.Instance.Logger.Error(nameof(HashCacheEntry), nameof(Recalculate),  ex);
+                Updater.Instance.Logger.Error(nameof(HashCacheEntry), nameof(Recalculate), ex);
             }
         }
 
