@@ -16,12 +16,12 @@ namespace MatthiWare.UpdateLib.Tasks
         private ManualResetEvent wait;
 
         public FileEntry Entry { get; private set; }
-        
+
         public DownloadTask(FileEntry entry)
         {
             Entry = entry;
             webClient = new WebClient();
-            webClient.DownloadProgressChanged += (o, e) => { OnTaskProgressChanged(e); };
+            webClient.DownloadProgressChanged += (o, e) => { OnTaskProgressChanged(e.ProgressPercentage, 110); };
             webClient.DownloadFileCompleted += (o, e) => { wait.Set(); };
         }
 
@@ -59,6 +59,8 @@ namespace MatthiWare.UpdateLib.Tasks
                 throw new InvalidHashException($"Calculated hash doesn't match provided hash for file: {localFile}");
 
             Updater.Instance.GetCache().AddOrUpdateEntry(localFile, hash);
+
+            OnTaskProgressChanged(100);
         }
 
         public override void Rollback()

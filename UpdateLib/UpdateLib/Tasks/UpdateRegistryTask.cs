@@ -98,11 +98,11 @@ namespace MatthiWare.UpdateLib.Tasks
             public object cachedValue;
             public RegistryValueKind type;
 
-            public RollbackData(RegistryKeyEntry _key)
+            public RollbackData(RegistryKeyEntry l_key)
             {
-                key = _key.Name;
-                path = _key.Parent.DestinationLocation;
-                existed = RegistryHelper.Exists(_key, out cachedValue);
+                key = l_key.Name;
+                path = l_key.Parent.DestinationLocation;
+                existed = RegistryHelper.Exists(l_key, out cachedValue);
                 type = RegistryValueKind.Unknown;
             }
         }
