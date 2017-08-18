@@ -16,6 +16,7 @@
  */
 
 using MatthiWare.UpdateLib.Generator.Data.FilesPage;
+using System;
 using System.Windows.Forms;
 
 namespace MatthiWare.UpdateLib.Generator.Data
