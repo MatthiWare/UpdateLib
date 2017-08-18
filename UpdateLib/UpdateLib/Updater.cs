@@ -1,11 +1,26 @@
-﻿using System;
-using System.Text;
+﻿/*  UpdateLib - .Net auto update library
+ *  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as published
+ *  by the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+using System;
 using MatthiWare.UpdateLib.Files;
 using System.Windows.Forms;
 using MatthiWare.UpdateLib.UI;
 using System.Drawing;
 using MatthiWare.UpdateLib.Tasks;
-using MatthiWare.UpdateLib.Logging.Writers;
 using MatthiWare.UpdateLib.Logging;
 using System.Security;
 using System.Diagnostics;
@@ -13,8 +28,6 @@ using System.Linq;
 using MatthiWare.UpdateLib.Utils;
 using System.Collections.Generic;
 using System.Reflection;
-using System.IO;
-using System.Threading;
 using System.Net;
 using MatthiWare.UpdateLib.Security;
 using System.ComponentModel;
@@ -496,23 +509,22 @@ namespace MatthiWare.UpdateLib
                         "Update now?\nPress yes to update or no to cancel.",
                         SystemIcons.Question);
 
-                if (result == DialogResult.Yes)
-                {
-                    if ((!StartUpdating && NeedsRestartBeforeUpdate) || (adminReq && !PermissionUtil.IsProcessElevated))
-                        if (!RestartApp(true, UpdateSilently, true, adminReq))
-                            return;
+                if (result != DialogResult.Yes)
+                    return;
 
-                    if (UpdateSilently)
-                    {
-                        UpdateWithoutGUI(task.Result.UpdateFile);
-                    }
-                    else
-                    {
-                        //UpdateWithoutGUI(task.Result.UpdateFile);
-                        UpdaterForm updateForm = new UpdaterForm(task.Result.UpdateFile);
-                        updateForm.ShowDialog(owner);
-                    }
+                if ((!StartUpdating && NeedsRestartBeforeUpdate) 
+                    || (adminReq && !PermissionUtil.IsProcessElevated))
+                    if (!RestartApp(true, UpdateSilently, true, adminReq))
+                        return;
+
+                if (UpdateSilently)
+                    UpdateWithoutGUI(task.Result.UpdateFile);
+                else
+                {
+                    UpdaterForm updateForm = new UpdaterForm(task.Result.UpdateFile);
+                    updateForm.ShowDialog(owner);
                 }
+
 
 
             };

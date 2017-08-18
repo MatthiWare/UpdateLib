@@ -145,7 +145,6 @@
     <Compile Include="Win32\NativeMethods.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ClassDiagram1.cd" />
     <None Include="Resources\status_working.png" />
     <None Include="Resources\status_update.png" />
     <None Include="Resources\status_warning.png" />
