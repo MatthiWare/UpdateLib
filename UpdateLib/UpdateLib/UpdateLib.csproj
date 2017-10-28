@@ -137,6 +137,7 @@
     <Compile Include="UI\WizardPageCollection.cs" />
     <Compile Include="Updater.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\CmdLineParser.cs" />
     <Compile Include="Utils\ExtensionMethods.cs" />
     <Compile Include="Utils\IOUtils.cs" />
     <Compile Include="Utils\Lazy.cs" />
