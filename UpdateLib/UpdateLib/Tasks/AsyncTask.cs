@@ -37,7 +37,7 @@ namespace MatthiWare.UpdateLib.Tasks
         private bool m_useSyncContext = true;
         private SynchronizationContext m_syncContext;
 
-        public bool IsChildTask { get; internal set; } = false;
+        internal bool IsChildTask { get; set; } = false;
 
 #if DEBUG
         public Stopwatch m_sw = new Stopwatch();
