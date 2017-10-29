@@ -16,6 +16,7 @@
  */
 
 using MatthiWare.UpdateLib;
+using MatthiWare.UpdateLib.Common;
 using MatthiWare.UpdateLib.Files;
 using System.IO;
 

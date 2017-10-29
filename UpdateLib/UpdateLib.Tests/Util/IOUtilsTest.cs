@@ -16,6 +16,7 @@
  */
 
 using MatthiWare.UpdateLib;
+using MatthiWare.UpdateLib.Common;
 using MatthiWare.UpdateLib.Utils;
 using NUnit.Framework;
 using System;

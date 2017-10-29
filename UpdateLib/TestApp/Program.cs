@@ -16,9 +16,11 @@
  */
 
 using MatthiWare.UpdateLib;
+using MatthiWare.UpdateLib.Common;
 using MatthiWare.UpdateLib.Logging;
 using MatthiWare.UpdateLib.Logging.Writers;
 using System;
+using System.Text;
 using System.Windows.Forms;
 
 namespace TestApp
@@ -31,6 +33,14 @@ namespace TestApp
         [STAThread]
         static void Main()
         {
+            //Console.WriteLine(Environment.CommandLine);
+            //StringBuilder sb = new StringBuilder();
+            //foreach (var s in Environment.GetCommandLineArgs())
+            //    sb.Append(s + " ");
+            //Console.WriteLine(sb.ToString());
+
+            //Application.Exit();
+
             // we still want our updater to have visual styles in case of update cmd argument switch
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

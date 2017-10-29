@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MatthiWare.UpdateLib.Common;
 
 namespace MatthiWare.UpdateLib.Logging
 {

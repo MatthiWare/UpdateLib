@@ -50,6 +50,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\Enums.cs" />
+    <Compile Include="Common\ParameterDefinition.cs" />
     <Compile Include="Controls\UpdaterControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -65,9 +67,7 @@
     <Compile Include="Files\PathVariableConverter.cs" />
     <Compile Include="Files\RegistryKeyEntry.cs" />
     <Compile Include="Files\UpdateFile.cs" />
-    <Compile Include="InstallationMode.cs" />
     <Compile Include="Logging\ILogger.cs" />
-    <Compile Include="Logging\LoggingLevel.cs" />
     <Compile Include="Logging\ILogWriter.cs" />
     <Compile Include="Logging\Logger.cs" />
     <Compile Include="Logging\Writers\ConsoleLogWriter.cs" />

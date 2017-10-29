@@ -14,7 +14,9 @@
  *  You should have received a copy of the GNU Affero General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+using MatthiWare.UpdateLib.Common;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -24,91 +26,59 @@ namespace MatthiWare.UpdateLib.Utils
 {
     public class CmdLineParser
     {
-        private SortedDictionary<string, ParamDef> m_wantedParameters = new SortedDictionary<string, ParamDef>();
-        private StringDictionary m_foundParameters = new StringDictionary();
+        private SortedDictionary<string, ParameterDefinition> m_params = new SortedDictionary<string, ParameterDefinition>();
 
         public string ParameterPrefix { get; set; } = "--";
 
         public void AddParameter(string paramName, ParamMandatoryType mandatoryType = ParamMandatoryType.Required, ParamValueType valueType = ParamValueType.String, string help = "")
         {
             if (string.IsNullOrEmpty(paramName)) throw new ArgumentNullException(nameof(paramName));
+            if (m_params.ContainsKey(paramName)) throw new ArgumentException("Key already exists", nameof(paramName));
 
-            var param = new ParamDef(paramName, mandatoryType, valueType, help);
-            m_wantedParameters.Add(paramName, param);
+            var param = new ParameterDefinition(paramName, mandatoryType, valueType, help);
+            m_params.Add(paramName, param);
         }
 
-        public string this[string paramName]
+        public ParameterDefinition this[string paramName]
         {
             get
             {
-                return m_foundParameters.ContainsKey(paramName) ? m_foundParameters[paramName] : null;
+                return m_params.ContainsKey(paramName) ? m_params[paramName] : null;
             }
         }
 
-        public void Parse()
-        {
-            Parse(Environment.GetCommandLineArgs());
+        public void Parse() => Parse(Environment.GetCommandLineArgs());
 
-            CheckAllMandatoryParamsFound();
-        }
 
-        private void Parse(string[] args)
+        public void Parse(string[] args)
         {
+            m_params.ForEach(kvp => kvp.Value.Reset());
+
             for (int i = 0; i < args.Length; i++)
             {
                 string data = args[i];
 
-                var def = m_wantedParameters.Where(p => p.Key == data).Select(p => p.Value).FirstOrDefault();
+                var def = m_params.Where(p => p.Key == ParameterPrefix + data).Select(p => p.Value).FirstOrDefault();
 
                 if (def == null)
                     continue;
-
-                
             }
+
+            CheckAllMandatoryParamsFound();
         }
 
         private void CheckAllMandatoryParamsFound()
         {
-            m_wantedParameters
-                .Where(param => param.Value.MandatoryType == ParamMandatoryType.Required)
+            m_params
+                .Where(kvp => kvp.Value.MandatoryType == ParamMandatoryType.Required)
+                .Select(kvp => kvp.Value)
                 .ForEach(param =>
                 {
-                    if (!m_foundParameters.ContainsKey(param.Key))
-                        throw new KeyNotFoundException($"Mandatory parameter '{param.Key}' is missing");
+                    if (!param.IsFound)
+                        throw new KeyNotFoundException($"Mandatory parameter '{param.ParameterName}' is missing");
                 });
         }
-
-        private class ParamDef
-        {
-            public string ParameterName { get; set; }
-            public ParamMandatoryType MandatoryType { get; set; }
-            public ParamValueType ValueType { get; set; }
-            public string HelpMessage { get; set; }
-
-            public ParamDef(string paramName, ParamMandatoryType mandatoryType, ParamValueType valueType, string help)
-            {
-                ParameterName = paramName;
-                MandatoryType = mandatoryType;
-                ValueType = valueType;
-                HelpMessage = help;
-            }
-        }
     }
 
-    public enum ParamValueType
-    {
-        String,
-        OptionalString,
-        Int,
-        OptionalInt,
-        Bool,
-        OptionalBool,
-        MultipleInts
-    }
 
-    public enum ParamMandatoryType
-    {
-        Optional,
-        Required
-    }
 }

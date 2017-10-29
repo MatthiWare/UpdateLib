@@ -24,6 +24,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MatthiWare.UpdateLib.Logging.Writers;
+using MatthiWare.UpdateLib.Common;
 
 namespace UpdateLib.Tests.Logging
 {

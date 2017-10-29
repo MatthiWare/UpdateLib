@@ -31,6 +31,7 @@ using System.Reflection;
 using System.Net;
 using MatthiWare.UpdateLib.Security;
 using System.ComponentModel;
+using MatthiWare.UpdateLib.Common;
 
 namespace MatthiWare.UpdateLib
 {
@@ -59,6 +60,8 @@ namespace MatthiWare.UpdateLib
 
         #region Fields
 
+        private const string m_strUpdateLib = "UpdateLib";
+
         private int m_pid;
         private string m_updateUrl = string.Empty;
         private string m_argUpdateSilent = "--silent";
@@ -74,7 +77,7 @@ namespace MatthiWare.UpdateLib
             AssemblyProductAttribute attr = Assembly.GetEntryAssembly()?.GetCustomAttributes(typeof(AssemblyProductAttribute), true).FirstOrDefault() as AssemblyProductAttribute;
 
             //AssemblyProductAttribute attr = Attribute.GetCustomAttribute(Assembly.GetEntryAssembly(), ) as AssemblyProductAttribute;
-            return attr?.Product ?? "UpdateLib";
+            return attr?.Product ?? m_strUpdateLib;
         });
 
         private static Lazy<string> m_lazyUpdaterName = new Lazy<string>(() =>
@@ -82,7 +85,7 @@ namespace MatthiWare.UpdateLib
             AssemblyProductAttribute attr = Assembly.GetAssembly(typeof(Updater))?.GetCustomAttributes(typeof(AssemblyProductAttribute), true).FirstOrDefault() as AssemblyProductAttribute;
 
             //AssemblyProductAttribute attr = Attribute.GetCustomAttribute(), typeof(AssemblyProductAttribute)) as AssemblyProductAttribute;
-            return attr?.Product ?? "UpdateLib";
+            return attr?.Product ?? m_strUpdateLib;
         });
 
         #endregion
