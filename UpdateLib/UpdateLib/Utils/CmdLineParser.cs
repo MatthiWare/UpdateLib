@@ -33,8 +33,9 @@ namespace MatthiWare.UpdateLib.Utils
         public void AddParameter(string paramName, ParamMandatoryType mandatoryType = ParamMandatoryType.Optional, ParamValueType valueType = ParamValueType.None)
         {
             if (string.IsNullOrEmpty(paramName)) throw new ArgumentNullException(nameof(paramName));
+            if (paramName.Contains(' ')) throw new ArgumentException("Parameter cannot contain spaces", nameof(paramName));
             if (m_params.ContainsKey(paramName)) throw new ArgumentException("Key already exists", nameof(paramName));
-
+            
             var param = new ParameterDefinition(paramName, mandatoryType, valueType);
             m_params.Add(paramName, param);
         }
@@ -126,7 +127,7 @@ namespace MatthiWare.UpdateLib.Utils
                 --index;
 
                 if (param.ValueType != ParamValueType.OptionalBool &&
-                    param.ValueType != ParamValueType.OptionalInt && 
+                    param.ValueType != ParamValueType.OptionalInt &&
                     param.ValueType != ParamValueType.OptionalString)
                     param.Count = 0;
             }

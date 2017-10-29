@@ -15,7 +15,6 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using MatthiWare.UpdateLib;
 using MatthiWare.UpdateLib.Common;
 using MatthiWare.UpdateLib.Utils;
 using NUnit.Framework;
@@ -115,9 +114,42 @@ namespace UpdateLib.Tests.Util
         }
 
         [Test]
+        public void TestDoubleParse()
+        {
+            string[] args = {
+                @"C:\Dev\TestApp.exe",
+                "--test1",
+                "10",
+                "--test2"
+            };
+
+            cmd.AddParameter("test1", ParamMandatoryType.Required, ParamValueType.Int);
+            cmd.AddParameter("test2", ParamMandatoryType.Optional, ParamValueType.None);
+
+            cmd.Parse(args);
+
+            Assert.IsTrue(cmd["test1"].IsFound);
+            Assert.AreEqual(10, cmd["test1"].Value);
+            Assert.IsTrue(cmd["test2"].IsFound);
+
+            args[2] = "11";
+
+            Array.Resize<string>(ref args, 3);
+
+            cmd.Parse(args);
+
+            Assert.IsTrue(cmd["test1"].IsFound);
+            Assert.AreEqual(11, cmd["test1"].Value);
+            Assert.IsFalse(cmd["test2"].IsFound);
+        }
+
+        [Test]
         public void AddingFaultyParameterThrowsException()
         {
+            cmd.ParameterPrefix = string.Empty;
             Assert.Catch<ArgumentNullException>(() => cmd.AddParameter(null));
+            Assert.Catch<ArgumentException>(() => cmd.AddParameter("test 123"));
+            Assert.Catch<ArgumentNullException>(() => cmd.Parse());
         }
 
         [Test]
