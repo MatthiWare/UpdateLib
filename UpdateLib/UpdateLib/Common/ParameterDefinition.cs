@@ -11,20 +11,17 @@ namespace MatthiWare.UpdateLib.Common
         public string ParameterName { get; private set; }
         public ParamMandatoryType MandatoryType { get; private set; }
         public ParamValueType ValueType { get; private set; }
-        public string HelpMessage { get; private set; }
-
         public object Value { get; internal set; }
 
         public int Count { get; internal set; }
 
         public bool IsFound { get { return Count > 0; } } 
 
-        public ParameterDefinition(string paramName, ParamMandatoryType mandatoryType, ParamValueType valueType, string help)
+        public ParameterDefinition(string paramName, ParamMandatoryType mandatoryType = ParamMandatoryType.Optional, ParamValueType valueType = ParamValueType.None)
         {
             ParameterName = paramName;
             MandatoryType = mandatoryType;
             ValueType = valueType;
-            HelpMessage = help;
         }
 
         internal void Reset()

@@ -33,13 +33,11 @@ namespace TestApp
         [STAThread]
         static void Main()
         {
-            //Console.WriteLine(Environment.CommandLine);
-            //StringBuilder sb = new StringBuilder();
-            //foreach (var s in Environment.GetCommandLineArgs())
-            //    sb.Append(s + " ");
-            //Console.WriteLine(sb.ToString());
+            Console.WriteLine(Environment.CommandLine);
+            foreach (var s in Environment.GetCommandLineArgs())
+                Console.WriteLine(s);
 
-            //Application.Exit();
+            Environment.Exit(0);
 
             // we still want our updater to have visual styles in case of update cmd argument switch
             Application.EnableVisualStyles();

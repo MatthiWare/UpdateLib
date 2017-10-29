@@ -23,6 +23,7 @@ namespace MatthiWare.UpdateLib.Common
 
     public enum ParamValueType
     {
+        None,
         String,
         OptionalString,
         Int,

@@ -30,12 +30,12 @@ namespace MatthiWare.UpdateLib.Utils
 
         public string ParameterPrefix { get; set; } = "--";
 
-        public void AddParameter(string paramName, ParamMandatoryType mandatoryType = ParamMandatoryType.Required, ParamValueType valueType = ParamValueType.String, string help = "")
+        public void AddParameter(string paramName, ParamMandatoryType mandatoryType = ParamMandatoryType.Optional, ParamValueType valueType = ParamValueType.None)
         {
             if (string.IsNullOrEmpty(paramName)) throw new ArgumentNullException(nameof(paramName));
             if (m_params.ContainsKey(paramName)) throw new ArgumentException("Key already exists", nameof(paramName));
 
-            var param = new ParameterDefinition(paramName, mandatoryType, valueType, help);
+            var param = new ParameterDefinition(paramName, mandatoryType, valueType);
             m_params.Add(paramName, param);
         }
 
@@ -52,19 +52,85 @@ namespace MatthiWare.UpdateLib.Utils
 
         public void Parse(string[] args)
         {
+            if (string.IsNullOrEmpty(ParameterPrefix)) throw new ArgumentNullException(nameof(ParameterPrefix));
+
             m_params.ForEach(kvp => kvp.Value.Reset());
 
             for (int i = 0; i < args.Length; i++)
             {
                 string data = args[i];
 
-                var def = m_params.Where(p => p.Key == ParameterPrefix + data).Select(p => p.Value).FirstOrDefault();
+                var def = m_params.Where(p => ParameterPrefix + p.Key == data).Select(p => p.Value).FirstOrDefault();
 
                 if (def == null)
                     continue;
+
+                def.Count++;
+
+                if (def.ValueType == ParamValueType.None)
+                    continue;
+
+                FindParameterValue(def, args, ref i);
             }
 
             CheckAllMandatoryParamsFound();
+        }
+
+        private void FindParameterValue(ParameterDefinition param, string[] args, ref int index)
+        {
+            string data = args[++index];
+            bool succes = true;
+
+            if (param.ValueType == ParamValueType.Int || param.ValueType == ParamValueType.OptionalInt)
+            {
+                int value;
+                succes = int.TryParse(data, out value);
+
+                if (succes)
+                    param.Value = value;
+            }
+            else if (param.ValueType == ParamValueType.Bool || param.ValueType == ParamValueType.OptionalBool)
+            {
+                bool value;
+                succes = bool.TryParse(data, out value);
+
+                if (succes)
+                    param.Value = value;
+            }
+            else if (param.ValueType == ParamValueType.String || param.ValueType == ParamValueType.OptionalString)
+            {
+                succes = !data.StartsWith(ParameterPrefix);
+
+                if (succes)
+                    param.Value = data;
+            }
+            else if (param.ValueType == ParamValueType.MultipleInts)
+            {
+                List<int> values = new List<int>();
+                int outValue;
+
+                while (index < args.Length && int.TryParse(args[index], out outValue))
+                {
+                    values.Add(outValue);
+                    index++;
+                }
+
+                succes = values.Count >= 2;
+
+                if (succes)
+                    param.Value = values.ToArray();
+            }
+
+            if (!succes)
+            {
+                --index;
+
+                if (param.ValueType != ParamValueType.OptionalBool &&
+                    param.ValueType != ParamValueType.OptionalInt && 
+                    param.ValueType != ParamValueType.OptionalString)
+                    param.Count = 0;
+            }
+
         }
 
         private void CheckAllMandatoryParamsFound()
