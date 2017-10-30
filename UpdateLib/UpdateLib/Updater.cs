@@ -604,7 +604,7 @@ namespace MatthiWare.UpdateLib
 
             try
             {
-                Process.Start(startInfo);
+                Process proc = Process.Start(startInfo);
 
                 Environment.Exit(0);
             }
