@@ -37,15 +37,15 @@ namespace TestApp
             foreach (var s in Environment.GetCommandLineArgs())
                 Console.WriteLine(s);
 
-            Environment.Exit(0);
+           // Environment.Exit(0);
 
             // we still want our updater to have visual styles in case of update cmd argument switch
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
             Updater.Instance
-                .ConfigureUpdateUrl("https://raw.githubusercontent.com/MatthiWare/UpdateLib.TestApp.UpdateExample/master/Dev/updatefile.xml")
-                //.ConfigureUpdateUrl("http://matthiware.dev/UpdateLib/Dev/updatefile.xml")
+                //.ConfigureUpdateUrl("https://raw.githubusercontent.com/MatthiWare/UpdateLib.TestApp.UpdateExample/master/Dev/updatefile.xml")
+                .ConfigureUpdateUrl("http://matthiware.dev/UpdateLib/Dev/updatefile.xml")
                 .ConfigureLogger((logger) => logger.LogLevel = LoggingLevel.Debug)
                 .ConfigureLogger((logger) => logger.Writers.Add(new ConsoleLogWriter()))
                 .ConfigureLogger((logger) => logger.Writers.Add(new FileLogWriter()))

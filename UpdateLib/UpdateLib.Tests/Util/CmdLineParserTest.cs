@@ -134,7 +134,7 @@ namespace UpdateLib.Tests.Util
 
             args[2] = "11";
 
-            Array.Resize<string>(ref args, 3);
+            Array.Resize(ref args, 3);
 
             cmd.Parse(args);
 
