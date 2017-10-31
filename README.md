@@ -7,7 +7,7 @@
 <a href="https://gitter.im/MatthiWare/UpdateLib?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge"><img src="https://badges.gitter.im/MatthiWare/UpdateLib.svg" alt="Join the chat at https://gitter.im/MatthiWare/UpdateLib"></a>
 </p>
 
-# UpdateLib v0.4-alpha
+# UpdateLib v0.4.4
 A .Net auto update library made in C#
 
 ### Disclaimer 
@@ -22,3 +22,8 @@ Use UpdateLib at your own risk while it is still in development.
 - Fail-safe rollback feature
 - Caching system
 - FluentAPI to configure the client-side application
+
+## Future
+- Creation of binary patches
+- Rework update generator
+- Extend rollback feature
