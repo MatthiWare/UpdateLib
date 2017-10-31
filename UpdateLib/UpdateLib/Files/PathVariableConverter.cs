@@ -1,4 +1,21 @@
-﻿using System;
+﻿/*  UpdateLib - .Net auto update library
+ *  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as published
+ *  by the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -12,8 +29,10 @@ namespace MatthiWare.UpdateLib.Files
     {
         private Dictionary<string, string> variables;
 
+        private readonly object sync = new object();
+
         public PathVariableConverter()
-        { 
+        {
             variables = new Dictionary<string, string>();
 
             variables.Add("appdir", new DirectoryInfo(".").FullName);
@@ -23,7 +42,7 @@ namespace MatthiWare.UpdateLib.Files
         }
 
         /// <summary>
-        /// Gets the full path of a key
+        /// Gets or sets the full path of a key
         /// </summary>
         /// <param name="key">The variable name</param>
         /// <returns>The full path of the variable as a <see cref="string"/> </returns>
@@ -31,10 +50,22 @@ namespace MatthiWare.UpdateLib.Files
         {
             get
             {
-                if (string.IsNullOrEmpty(key))
-                    throw new ArgumentNullException(nameof(key));
+                return Get(key);
+            }
+            set
+            {
+                Add(key, value);
+            }
+        }
 
-                if (!variables.ContainsKey(key.ToLower()))
+        public string Get(string key)
+        {
+            if (string.IsNullOrEmpty(key))
+                throw new ArgumentNullException(nameof(key));
+
+            lock (sync)
+            {
+                if (!ContainsInternal(key))
                     return null;
 
                 return variables[key.ToLower()];
@@ -49,10 +80,13 @@ namespace MatthiWare.UpdateLib.Files
             if (string.IsNullOrEmpty(val))
                 throw new ArgumentNullException(nameof(val));
 
-            if (variables.ContainsKey(key.ToLower()))
-                throw new ArgumentException("Duplicate key entry", nameof(key));
-
-            variables.Add(key.ToLower(), val);
+            lock (sync)
+            {
+                if (ContainsInternal(key))
+                    variables[key.ToLower()] = val;
+                else
+                    variables.Add(key.ToLower(), val);
+            }
         }
 
         /// <summary>
@@ -61,6 +95,12 @@ namespace MatthiWare.UpdateLib.Files
         /// <param name="key">The variable name</param>
         /// <returns>True if the converter contains the key and False if not</returns>
         public bool Contains(string key)
+        {
+            lock (sync)
+                return ContainsInternal(key);
+        }
+
+        private bool ContainsInternal(string key)
         {
             if (string.IsNullOrEmpty(key))
                 return false;
@@ -78,13 +118,14 @@ namespace MatthiWare.UpdateLib.Files
             if (string.IsNullOrEmpty(key))
                 throw new ArgumentNullException(nameof(key));
 
-            if (!variables.ContainsKey(key.ToLower()))
+            if (!ContainsInternal(key))
                 return false;
 
-            return variables.Remove(key.ToLower());
+            lock (sync)
+                return variables.Remove(key.ToLower());
         }
 
-        public string Replace(string input)
+        public string Convert(string input)
         {
             string[] tokens = input.Split('%');
             StringBuilder sb = new StringBuilder();

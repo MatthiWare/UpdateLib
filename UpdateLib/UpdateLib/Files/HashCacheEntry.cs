@@ -1,4 +1,20 @@
-﻿using MatthiWare.UpdateLib.Logging;
+﻿/*  UpdateLib - .Net auto update library
+ *  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as published
+ *  by the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 using MatthiWare.UpdateLib.Security;
 using System;
 using System.IO;
@@ -35,7 +51,7 @@ namespace MatthiWare.UpdateLib.Files
             Ticks = File.GetLastWriteTime(FilePath).Ticks;
         }
 
-        public void Recalculate()
+        public void Recalculate(string hash = "")
         {
             try
             {
@@ -43,7 +59,7 @@ namespace MatthiWare.UpdateLib.Files
 
                 if (Ticks == -1 || tick != Ticks)
                 {
-                    Hash = HashUtil.GetHash(FilePath);
+                    Hash = string.IsNullOrEmpty(hash) ? HashUtil.GetHash(FilePath) : hash;
                     Ticks = tick;
 
                     Updater.Instance.Logger.Debug(nameof(HashCacheEntry), nameof(Recalculate), $"Recalculated Time: {DateTime.FromBinary(Ticks).ToString()} Name: {FilePath} Hash: {Hash}");
@@ -54,7 +70,7 @@ namespace MatthiWare.UpdateLib.Files
                 Hash = string.Empty;
                 Ticks = -1;
 
-                Updater.Instance.Logger.Error(nameof(HashCacheEntry), nameof(Recalculate),  ex);
+                Updater.Instance.Logger.Error(nameof(HashCacheEntry), nameof(Recalculate), ex);
             }
         }
 

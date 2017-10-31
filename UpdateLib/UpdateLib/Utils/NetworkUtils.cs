@@ -15,21 +15,17 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using MatthiWare.UpdateLib.Common;
-using System;
-using System.Collections.Generic;
+using MatthiWare.UpdateLib.Win32;
 
-namespace MatthiWare.UpdateLib.Logging
+namespace MatthiWare.UpdateLib.Utils
 {
-    public interface ILogger
+    public static class NetworkUtils
     {
-        LoggingLevel LogLevel { get; set; }
-        ICollection<ILogWriter> Writers { get; }
-        void Log(string tag, string msg, LoggingLevel level);
-        void Debug(string className, string methodName, string msg);
-        void Info(string className, string methodName, string msg);
-        void Warn(string className, string methodName, string msg);
-        void Error(string className, string methodName, string msg);
-        void Error(string className, string methodName, Exception e);
+        public static bool HasConnection()
+        {
+            int desc;
+            return NativeMethods.InternetGetConnectedState(out desc, 0);
+        }
+
     }
 }

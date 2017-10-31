@@ -1,11 +1,26 @@
-﻿using MatthiWare.UpdateLib.Files;
+﻿/*  UpdateLib - .Net auto update library
+ *  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as published
+ *  by the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+using MatthiWare.UpdateLib.Files;
 using MatthiWare.UpdateLib.Utils;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Windows.Forms;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
@@ -13,16 +28,9 @@ namespace MatthiWare.UpdateLib.Tasks
     {
 
         public IEnumerable<RegistryKeyEntry> Keys { get; set; }
-
-
+        
         private List<RollbackData> cachedUpdates = new List<RollbackData>();
-
-        public UpdateRegistryTask(ListViewItem item, IEnumerable<RegistryKeyEntry> keys)
-            : this(keys)
-        {
-            Item = item;
-        }
-
+        
         public UpdateRegistryTask(IEnumerable<RegistryKeyEntry> keys)
         {
             Keys = keys;
@@ -105,11 +113,11 @@ namespace MatthiWare.UpdateLib.Tasks
             public object cachedValue;
             public RegistryValueKind type;
 
-            public RollbackData(RegistryKeyEntry _key)
+            public RollbackData(RegistryKeyEntry l_key)
             {
-                key = _key.Name;
-                path = _key.Parent.DestinationLocation;
-                existed = RegistryHelper.Exists(_key, out cachedValue);
+                key = l_key.Name;
+                path = l_key.Parent.DestinationLocation;
+                existed = RegistryHelper.Exists(l_key, out cachedValue);
                 type = RegistryValueKind.Unknown;
             }
         }

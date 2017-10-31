@@ -1,4 +1,21 @@
-﻿using MatthiWare.UpdateLib.Files;
+﻿/*  UpdateLib - .Net auto update library
+ *  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as published
+ *  by the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+using MatthiWare.UpdateLib.Files;
 using MatthiWare.UpdateLib.Utils;
 using System;
 using System.Collections.Generic;
@@ -10,37 +27,34 @@ namespace MatthiWare.UpdateLib.Tasks
     {
         private UpdateFile m_updateFile;
         private HashCacheFile m_cacheFile;
-        private PathVariableConverter m_converter;
 
-        public CheckForUpdatedItemsTask(UpdateFile update, HashCacheFile cache, PathVariableConverter converter)
+        public CheckForUpdatedItemsTask(UpdateFile update, HashCacheFile cache)
         {
             if (update == null) throw new ArgumentNullException(nameof(update));
             if (cache == null) throw new ArgumentNullException(nameof(cache));
-            if (converter == null) throw new ArgumentNullException(nameof(converter));
 
             m_updateFile = update;
             m_cacheFile = cache;
-            m_converter = converter;
         }
 
         protected override void DoWork()
         {
             foreach (DirectoryEntry dir in m_updateFile.Folders)
-                Enqueue(new Action<DirectoryEntry>(RecursiveFileCheck), dir);
+                Enqueue(new Action<DirectoryEntry>(CheckFiles), dir);
 
             foreach (DirectoryEntry dir in m_updateFile.Registry)
-                Enqueue(new Action<DirectoryEntry>(RecursiveRegCheck), dir);
+                Enqueue(new Action<DirectoryEntry>(CheckRegister), dir);
 
             AwaitWorkers();
 
             Result = m_updateFile.FileCount > 0 || m_updateFile.RegistryKeyCount > 0;
         }
 
-        private void RecursiveFileCheck(DirectoryEntry dir)
+        private void CheckFiles(DirectoryEntry dir)
         {
             dir.Items.RemoveAll(fe =>
             {
-                string convertedPath = m_converter.Replace(fe.DestinationLocation);
+                string convertedPath = Updater.Instance.Converter.Convert(fe.DestinationLocation);
                 HashCacheEntry cacheEntry = m_cacheFile.Items.Find(hash => hash.FilePath.Equals(convertedPath));
 
                 if (cacheEntry == null)
@@ -56,13 +70,13 @@ namespace MatthiWare.UpdateLib.Tasks
             foreach (DirectoryEntry subDir in dir.Directories)
             {
                 if (--left == 0)
-                    RecursiveFileCheck(subDir);
+                    CheckFiles(subDir);
                 else
-                    Enqueue(new Action<DirectoryEntry>(RecursiveFileCheck), subDir);
+                    Enqueue(new Action<DirectoryEntry>(CheckFiles), subDir);
             }
         }
 
-        private void RecursiveRegCheck(DirectoryEntry dir)
+        private void CheckRegister(DirectoryEntry dir)
         {
             dir.Items.RemoveAll(entry =>
             {
@@ -80,9 +94,9 @@ namespace MatthiWare.UpdateLib.Tasks
             foreach (DirectoryEntry subDir in dir.Directories)
             {
                 if (--left == 0)
-                    RecursiveRegCheck(subDir);
+                    CheckRegister(subDir);
                 else
-                    Enqueue(new Action<DirectoryEntry>(RecursiveRegCheck), dir);
+                    Enqueue(new Action<DirectoryEntry>(CheckRegister), dir);
             }
         }
     }

@@ -1,4 +1,21 @@
-﻿using MatthiWare.UpdateLib.Files;
+﻿/*  UpdateLib - .Net auto update library
+ *  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as published
+ *  by the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+using MatthiWare.UpdateLib.Files;
 using NUnit.Framework;
 using System;
 using System.IO;
@@ -15,7 +32,7 @@ namespace UpdateLib.Tests.Files
         {
             converter = new PathVariableConverter();
         }
-        
+
         [Test]
         public void GettingAVariableReturnsTheCorrectPath()
         {
@@ -63,7 +80,7 @@ namespace UpdateLib.Tests.Files
             string input = $"C:\\mypath\\%{key}%\\test";
             string output = $"C:\\mypath\\{val}\\test";
 
-            Assert.AreEqual(output, converter.Replace(input));
+            Assert.AreEqual(output, converter.Convert(input));
         }
 
         [Test]
@@ -76,7 +93,7 @@ namespace UpdateLib.Tests.Files
             string input = $"C:\\mypath\\%{key}%\\test";
             string ouput = $"C:\\mypath\\{key}\\test";
 
-            Assert.AreEqual(ouput, converter.Replace(input));
+            Assert.AreEqual(ouput, converter.Convert(input));
         }
 
         [Test]
@@ -97,19 +114,22 @@ namespace UpdateLib.Tests.Files
         }
 
         [Test]
-        public void AddDuplicateKeyThrowsArgumentException()
+        public void AddDuplicateKeyOverrides()
         {
             string key = "myrandomtestkey";
             string val = "value";
+            string val2 = "val2";
 
             if (converter.Contains(key))
                 converter.Remove(key);
 
-            converter.Add(key, val);
+            converter[key] = val;
 
             Assert.AreEqual(val, converter[key]);
 
-            Assert.Throws<ArgumentException>(() => { converter.Add(key, val); });
+            converter[key] = val2;
+
+            Assert.AreEqual(val2, converter[key]);
         }
 
         [Test]

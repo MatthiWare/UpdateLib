@@ -120,7 +120,7 @@
   <data name="txtDescription.Text" xml:space="preserve">
     <value>%AppName% has been succesfully updated to version %version%.
 
-The application need to restart for the changes to take effect.
+%AppName% needs to restart for the changes to take effect.
 
 If you do not want this you can uncheck the Restart application checkbox.
 

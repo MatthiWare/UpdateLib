@@ -15,21 +15,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using MatthiWare.UpdateLib.Common;
-using System;
-using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
-namespace MatthiWare.UpdateLib.Logging
+namespace MatthiWare.UpdateLib.Win32
 {
-    public interface ILogger
+    internal static class NativeMethods
     {
-        LoggingLevel LogLevel { get; set; }
-        ICollection<ILogWriter> Writers { get; }
-        void Log(string tag, string msg, LoggingLevel level);
-        void Debug(string className, string methodName, string msg);
-        void Info(string className, string methodName, string msg);
-        void Warn(string className, string methodName, string msg);
-        void Error(string className, string methodName, string msg);
-        void Error(string className, string methodName, Exception e);
+        [DllImport("wininet.dll")]
+        internal static extern bool InternetGetConnectedState(out int connDescription, int reservedValue);
+
     }
 }

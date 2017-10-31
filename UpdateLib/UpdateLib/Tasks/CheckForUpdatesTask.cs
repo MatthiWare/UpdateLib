@@ -1,17 +1,30 @@
-﻿using System;
+﻿/*  UpdateLib - .Net auto update library
+ *  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as published
+ *  by the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+using System;
 using System.Net;
 using MatthiWare.UpdateLib.Files;
-using System.Windows.Forms;
-using System.Drawing;
-using MatthiWare.UpdateLib.UI;
-using static MatthiWare.UpdateLib.Tasks.CheckForUpdatesTask;
-using MatthiWare.UpdateLib.Logging;
 using System.IO;
 using MatthiWare.UpdateLib.Utils;
+using static MatthiWare.UpdateLib.Tasks.CheckForUpdatesTask;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
-    public class CheckForUpdatesTask : AsyncTask<Data>
+    public class CheckForUpdatesTask : AsyncTask<CheckForUpdatesResult>
     {
         public string Url { get; set; }
 
@@ -30,9 +43,11 @@ namespace MatthiWare.UpdateLib.Tasks
         {
             if (string.IsNullOrEmpty(Url)) throw new WebException("Invalid Url", WebExceptionStatus.NameResolutionFailure);
 
-            Result = new Data();
+            Result = new CheckForUpdatesResult();
 
             Updater updater = Updater.Instance;
+
+            if (!NetworkUtils.HasConnection()) throw new WebException("No internet available", WebExceptionStatus.ConnectFailure);
 
             // Getting the file name from the url
             string localFile = $@"{IOUtils.AppDataPath}\Update.xml";
@@ -42,7 +57,7 @@ namespace MatthiWare.UpdateLib.Tasks
 
             if (IsUpdateFileInvalid(localFile))
             {
-                Updater.Instance.Logger.Warn(nameof(CheckForUpdatesTask), nameof(DoWork), "Cached update file validity expired, downloading new one..");
+                updater.Logger.Warn(nameof(CheckForUpdatesTask), nameof(DoWork), "Cached update file validity expired, downloading new one..");
                 wcDownloader.DownloadFile(Url, localFile);
             }
 
@@ -86,7 +101,7 @@ namespace MatthiWare.UpdateLib.Tasks
 
         private CheckForUpdatedItemsTask CheckForUpdatedFiles(UpdateFile file, HashCacheFile cache)
         {
-            CheckForUpdatedItemsTask task = new CheckForUpdatedItemsTask(file, cache, Updater.Instance.Converter);
+            CheckForUpdatedItemsTask task = new CheckForUpdatedItemsTask(file, cache);
             task.ConfigureAwait(false).Start();
             return task;
         }
@@ -98,7 +113,7 @@ namespace MatthiWare.UpdateLib.Tasks
             return task;
         }
 
-        public class Data
+        public class CheckForUpdatesResult
         {
             public string Version { get; set; } = string.Empty;
             public bool UpdateAvailable { get; set; } = false;

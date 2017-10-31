@@ -50,6 +50,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\Enums.cs" />
+    <Compile Include="Common\ParameterDefinition.cs" />
     <Compile Include="Controls\UpdaterControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -65,9 +67,7 @@
     <Compile Include="Files\PathVariableConverter.cs" />
     <Compile Include="Files\RegistryKeyEntry.cs" />
     <Compile Include="Files\UpdateFile.cs" />
-    <Compile Include="InstallationMode.cs" />
     <Compile Include="Logging\ILogger.cs" />
-    <Compile Include="Logging\LoggingLevel.cs" />
     <Compile Include="Logging\ILogWriter.cs" />
     <Compile Include="Logging\Logger.cs" />
     <Compile Include="Logging\Writers\ConsoleLogWriter.cs" />
@@ -137,10 +137,13 @@
     <Compile Include="UI\WizardPageCollection.cs" />
     <Compile Include="Updater.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\CmdLineParser.cs" />
     <Compile Include="Utils\ExtensionMethods.cs" />
     <Compile Include="Utils\IOUtils.cs" />
     <Compile Include="Utils\Lazy.cs" />
+    <Compile Include="Utils\NetworkUtils.cs" />
     <Compile Include="Utils\RegistryHelper.cs" />
+    <Compile Include="Win32\NativeMethods.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\status_working.png" />

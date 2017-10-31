@@ -1,11 +1,26 @@
-﻿using System;
-using System.Text;
+﻿/*  UpdateLib - .Net auto update library
+ *  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as published
+ *  by the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+using System;
 using MatthiWare.UpdateLib.Files;
 using System.Windows.Forms;
 using MatthiWare.UpdateLib.UI;
 using System.Drawing;
 using MatthiWare.UpdateLib.Tasks;
-using MatthiWare.UpdateLib.Logging.Writers;
 using MatthiWare.UpdateLib.Logging;
 using System.Security;
 using System.Diagnostics;
@@ -13,11 +28,10 @@ using System.Linq;
 using MatthiWare.UpdateLib.Utils;
 using System.Collections.Generic;
 using System.Reflection;
-using System.IO;
-using System.Threading;
 using System.Net;
 using MatthiWare.UpdateLib.Security;
 using System.ComponentModel;
+using MatthiWare.UpdateLib.Common;
 
 namespace MatthiWare.UpdateLib
 {
@@ -46,11 +60,12 @@ namespace MatthiWare.UpdateLib
 
         #region Fields
 
-        private int m_pid;
+        private const string m_strUpdateLib = "UpdateLib";
+        
         private string m_updateUrl = string.Empty;
-        private string m_argUpdateSilent = "--silent";
-        private string m_argUpdate = "--update";
-        private string m_argWait = "--wait";
+        private const string m_argUpdateSilent = "silent";
+        private const string m_argUpdate = "update";
+        private const string m_argWait = "wait";
         private Lazy<PathVariableConverter> m_lazyPathVarConv = new Lazy<PathVariableConverter>(() => new PathVariableConverter());
         private TimeSpan m_cacheInvalidation = TimeSpan.FromMinutes(5);
         private Lazy<Logger> m_lazyLogger = new Lazy<Logger>(() => new Logger());
@@ -61,7 +76,7 @@ namespace MatthiWare.UpdateLib
             AssemblyProductAttribute attr = Assembly.GetEntryAssembly()?.GetCustomAttributes(typeof(AssemblyProductAttribute), true).FirstOrDefault() as AssemblyProductAttribute;
 
             //AssemblyProductAttribute attr = Attribute.GetCustomAttribute(Assembly.GetEntryAssembly(), ) as AssemblyProductAttribute;
-            return attr?.Product ?? "UpdateLib";
+            return attr?.Product ?? m_strUpdateLib;
         });
 
         private static Lazy<string> m_lazyUpdaterName = new Lazy<string>(() =>
@@ -69,7 +84,7 @@ namespace MatthiWare.UpdateLib
             AssemblyProductAttribute attr = Assembly.GetAssembly(typeof(Updater))?.GetCustomAttributes(typeof(AssemblyProductAttribute), true).FirstOrDefault() as AssemblyProductAttribute;
 
             //AssemblyProductAttribute attr = Attribute.GetCustomAttribute(), typeof(AssemblyProductAttribute)) as AssemblyProductAttribute;
-            return attr?.Product ?? "UpdateLib";
+            return attr?.Product ?? m_strUpdateLib;
         });
 
         #endregion
@@ -88,6 +103,8 @@ namespace MatthiWare.UpdateLib
         internal static string ProductName { get { return m_lazyProductName.Value; } }
 
         internal static string UpdaterName { get { return m_lazyUpdaterName.Value; } }
+
+        public CmdLineParser CommandLine { get; } = new CmdLineParser();
 
         /// <summary>
         /// Gets or sets the url to update from
@@ -128,49 +145,19 @@ namespace MatthiWare.UpdateLib
         /// <summary>
         /// Gets or sets if we want to check for updates before the actual program is loaded.
         /// </summary>
-        public bool StartUpdating { get; set; } = false;
+        public bool StartUpdating { get; private set; } = false;
 
         /// <summary>
         /// Gets or sets if we want to update silently (no UI interaction).
         /// </summary>
-        public bool UpdateSilently { get; set; } = false;
-
-        /// <summary>
-        /// Gets or sets the command line argument for the silent switch
-        /// If this argument has been set and is passed in the command line it will set <see cref="UpdateSilently"/> to <c>True</c> 
-        /// </summary>
-        public string UpdateSilentlyCmdArg
-        {
-            get { return m_argUpdateSilent; }
-            set { SetAndVerifyCmdArgument(ref m_argUpdateSilent, value); }
-        }
-
-        /// <summary>
-        /// Gets or sets the command line argument for the update switch
-        /// If this argument has been set and is passed in the command line it will set <see cref="StartUpdating"/> to <c>True</c> 
-        /// </summary>
-        public string StartUpdatingCmdArg
-        {
-            get { return m_argUpdate; }
-            set { SetAndVerifyCmdArgument(ref m_argUpdate, value); }
-        }
-
-        /// <summary>
-        /// Gets or sets the command line argument for the wait switch
-        /// If this argument has been set and passed in the command line followed by an <see cref="Process.Id"/> it will set <see cref="WaitForProcessExit"/> to <c>True</c>
-        /// </summary>
-        public string WaitForProcessCmdArg
-        {
-            get { return m_argWait; }
-            set { SetAndVerifyCmdArgument(ref m_argWait, value); }
-        }
+        public bool UpdateSilently { get; private set; } = false;
 
         /// <summary>
         /// Indicates if we want to wait for the given process to wait
         /// See <seealso cref="WaitForProcessCmdArg"/> and <seealso cref="ConfigureWaitForProcessCmdArg(string)"/>
         /// If this property has been set to true it will wait for the <see cref="Process.Id"/> to exit before continuing when <see cref="Initialize"/> has been called.  
         /// </summary>
-        public bool WaitForProcessExit { get; set; }
+        public bool WaitForProcessExit { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="PathVariableConverter"/>.
@@ -229,6 +216,18 @@ namespace MatthiWare.UpdateLib
         #region Fluent API
 
         /// <summary>
+        /// Configures the path variable converter
+        /// </summary>
+        /// <param name="action">the action to perform on the <see cref="PathVariableConverter"/> </param>
+        /// <returns><see cref="Updater"/> </returns>
+        public Updater ConfigurePathConverter(Action<PathVariableConverter> action)
+        {
+            action(Converter);
+
+            return this;
+        }
+
+        /// <summary>
         /// Configures if unsafe connections are allowed
         /// </summary>
         /// <remarks>Do not enable this unless you know what you are doing</remarks>
@@ -244,11 +243,23 @@ namespace MatthiWare.UpdateLib
         /// <summary>
         /// Configures the logger
         /// </summary>
-        /// <param name="logAction">Action to perform on the logger</param>
+        /// <param name="action">Action to perform on the logger</param>
         /// <returns><see cref="Updater"/> </returns>
-        public Updater ConfigureLogger(Action<ILogger> logAction)
+        public Updater ConfigureLogger(Action<ILogger> action)
         {
-            logAction(Logger);
+            action(Logger);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Configures the command line parser
+        /// </summary>
+        /// <param name="action">Action to perform on the command line parser</param>
+        /// <returns><see cref="Updater"/> </returns>
+        public Updater ConfigureCommandLineParser(Action<CmdLineParser> action)
+        {
+            action(CommandLine);
 
             return this;
         }
@@ -291,42 +302,6 @@ namespace MatthiWare.UpdateLib
         }
 
         /// <summary>
-        /// Configures the update silently command switch
-        /// </summary>
-        /// <param name="cmdArg">Command name</param>
-        /// <returns><see cref="Updater"/></returns>
-        public Updater ConfigureSilentCmdArg(string cmdArg)
-        {
-            UpdateSilentlyCmdArg = cmdArg;
-
-            return this;
-        }
-
-        /// <summary>
-        /// Configures the update command switch
-        /// </summary>
-        /// <param name="cmdArg">Command name</param>
-        /// <returns><see cref="Updater"/></returns>
-        public Updater ConfigureUpdateCmdArg(string cmdArg)
-        {
-            StartUpdatingCmdArg = cmdArg;
-
-            return this;
-        }
-
-        /// <summary>
-        /// Configures the wait for process to exit command switch
-        /// </summary>
-        /// <param name="cmdArg">Command name</param>
-        /// <returns><see cref="Updater"/></returns>
-        public Updater ConfigureWaitForProcessCmdArg(string cmdArg)
-        {
-            WaitForProcessCmdArg = cmdArg;
-
-            return this;
-        }
-
-        /// <summary>
         /// Configures the update url
         /// </summary>
         /// <remarks>To use HTTP you should enable <see cref="AllowUnsafeConnection"/> </remarks>
@@ -344,7 +319,12 @@ namespace MatthiWare.UpdateLib
         /// <summary>
         /// Initializes a new instance of <see cref="Updater"/> with the default settings. 
         /// </summary>
-        private Updater() { }
+        private Updater()
+        {
+            CommandLine.AddParameter(m_argUpdateSilent);
+            CommandLine.AddParameter(m_argUpdate);
+            CommandLine.AddParameter(m_argWait, ParamMandatoryType.Optional, ParamValueType.Int);
+        }
 
         /// <summary>
         /// Initializes the updater
@@ -353,10 +333,16 @@ namespace MatthiWare.UpdateLib
         {
             StartInitializationTasks();
 
-            ParseCmdArguments(Environment.GetCommandLineArgs());
+            // parse the command line
+            CommandLine.Parse();
+
+
+            WaitForProcessExit = CommandLine[m_argWait]?.IsFound ?? false;
+            StartUpdating = CommandLine[m_argUpdate]?.IsFound ?? false;
+            UpdateSilently = CommandLine[m_argUpdateSilent]?.IsFound ?? false;
 
             if (WaitForProcessExit)
-                WaitForProcessToExit(m_pid);
+                WaitForProcessToExit((int)CommandLine[m_argWait].Value);
 
             IsInitialized = true;
 
@@ -374,23 +360,6 @@ namespace MatthiWare.UpdateLib
 
             UpdateCacheTask = new UpdateCacheTask();
             UpdateCacheTask.ConfigureAwait(false).Start();
-        }
-
-        /// <summary>
-        /// Parses the given arguments
-        /// </summary>
-        /// <param name="args">The arguments to parse</param>
-        private void ParseCmdArguments(string[] args)
-        {
-            for (int i = 0; i < args.Length; i++)
-            {
-                if (!string.IsNullOrEmpty(StartUpdatingCmdArg) && args[i] == StartUpdatingCmdArg)
-                    StartUpdating = true;
-                else if (!string.IsNullOrEmpty(UpdateSilentlyCmdArg) && args[i] == UpdateSilentlyCmdArg)
-                    UpdateSilently = true;
-                else if (!string.IsNullOrEmpty(WaitForProcessCmdArg) && args[i] == WaitForProcessCmdArg && i + 1 < args.Length && int.TryParse(args[++i], out m_pid))
-                    WaitForProcessExit = true;
-            }
         }
 
         /// <summary>
@@ -412,7 +381,7 @@ namespace MatthiWare.UpdateLib
         /// Starting the update process
         /// </summary>
         /// <returns>Whether or not there is an update available and the latest version</returns>
-        public CheckForUpdatesTask.Data CheckForUpdates()
+        public CheckForUpdatesTask.CheckForUpdatesResult CheckForUpdates()
         {
             return CheckForUpdatesAsync().AwaitTask().Result;
         }
@@ -422,7 +391,7 @@ namespace MatthiWare.UpdateLib
         /// </summary>
         /// <param name="owner">The owner window</param>
         /// <returns>Whether or not there is an update available and the latest version</returns>
-        public CheckForUpdatesTask.Data CheckForUpdates(IWin32Window owner)
+        public CheckForUpdatesTask.CheckForUpdatesResult CheckForUpdates(IWin32Window owner)
         {
             return CheckForUpdatesAsync(owner).AwaitTask().Result;
         }
@@ -484,23 +453,22 @@ namespace MatthiWare.UpdateLib
                         "Update now?\nPress yes to update or no to cancel.",
                         SystemIcons.Question);
 
-                if (result == DialogResult.Yes)
-                {
-                    if ((!StartUpdating && NeedsRestartBeforeUpdate) || (adminReq && !PermissionUtil.IsProcessElevated))
-                        if (!RestartApp(true, UpdateSilently, true, adminReq))
-                            return;
+                if (result != DialogResult.Yes)
+                    return;
 
-                    if (UpdateSilently)
-                    {
-                        UpdateWithoutGUI(task.Result.UpdateFile);
-                    }
-                    else
-                    {
-                        //UpdateWithoutGUI(task.Result.UpdateFile);
-                        UpdaterForm updateForm = new UpdaterForm(task.Result.UpdateFile);
-                        updateForm.ShowDialog(owner);
-                    }
+                if ((!StartUpdating && NeedsRestartBeforeUpdate)
+                    || (adminReq && !PermissionUtil.IsProcessElevated))
+                    if (!RestartApp(true, UpdateSilently, true, adminReq))
+                        return;
+
+                if (UpdateSilently)
+                    UpdateWithoutGUI(task.Result.UpdateFile);
+                else
+                {
+                    UpdaterForm updateForm = new UpdaterForm(task.Result.UpdateFile);
+                    updateForm.ShowDialog(owner);
                 }
+
 
 
             };
@@ -600,11 +568,11 @@ namespace MatthiWare.UpdateLib
 
             for (int i = 0; i < args.Count; i++)
             {
-                if ((!update && args[i] == StartUpdatingCmdArg) || (!silent && args[i] == UpdateSilentlyCmdArg))
+                if ((!update && args[i] == CommandLine.ParameterPrefix + m_argUpdate) || (!silent && args[i] == CommandLine.ParameterPrefix + m_argUpdateSilent))
                 {
                     args[i] = string.Empty;
                 }
-                else if (args[i] == WaitForProcessCmdArg)
+                else if (args[i] == CommandLine.ParameterPrefix + m_argWait)
                 {
                     args[i] = string.Empty;
                     if (i + 1 < args.Count)
@@ -612,22 +580,23 @@ namespace MatthiWare.UpdateLib
                 }
             }
 
-            if (waitForPid && !string.IsNullOrEmpty(instance.WaitForProcessCmdArg))
+            if (waitForPid && !args.Contains(CommandLine.ParameterPrefix + m_argWait))
             {
-                args.Add(instance.WaitForProcessCmdArg);
+                args.Add(CommandLine.ParameterPrefix + m_argWait);
                 args.Add(Process.GetCurrentProcess().Id.ToString());
             }
 
-            if (update && !string.IsNullOrEmpty(instance.StartUpdatingCmdArg) && !args.Contains(instance.StartUpdatingCmdArg))
-                args.Add(instance.StartUpdatingCmdArg);
+            if (update  && !args.Contains(CommandLine.ParameterPrefix + m_argUpdate))
+                args.Add(CommandLine.ParameterPrefix + m_argUpdate);
 
-            if (silent && !string.IsNullOrEmpty(instance.UpdateSilentlyCmdArg) && !args.Contains(instance.UpdateSilentlyCmdArg))
-                args.Add(instance.UpdateSilentlyCmdArg);
+            if (silent && !args.Contains(CommandLine.ParameterPrefix + m_argUpdateSilent))
+                args.Add(CommandLine.ParameterPrefix + m_argUpdateSilent);
 
             string arguments = args.NotEmpty().Distinct().AppendAll(" ");
 
             ProcessStartInfo startInfo = new ProcessStartInfo(Assembly.GetEntryAssembly().Location, arguments);
 
+            startInfo.WindowStyle = ProcessWindowStyle.Normal;
             startInfo.UseShellExecute = true;
 
             if (asAdmin)
@@ -635,7 +604,7 @@ namespace MatthiWare.UpdateLib
 
             try
             {
-                Process.Start(startInfo);
+                Process proc = Process.Start(startInfo);
 
                 Environment.Exit(0);
             }
@@ -650,17 +619,6 @@ namespace MatthiWare.UpdateLib
 
             // we will never reach this part of the code
             return true;
-        }
-
-        private void SetAndVerifyCmdArgument(ref string reference, string value)
-        {
-            if (string.IsNullOrEmpty(value))
-                throw new ArgumentNullException(nameof(value));
-
-            if (value.Contains(' '))
-                throw new ArgumentException("Command line argument can not contain spaces");
-
-            reference = value;
         }
     }
 }

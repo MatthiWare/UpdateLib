@@ -1,12 +1,26 @@
 ﻿using MatthiWare.UpdateLib.Files;
-using MatthiWare.UpdateLib.Utils;
+/*  UpdateLib - .Net auto update library
+ *  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as published
+ *  by the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace UpdateLib.Tests.Files
 {
@@ -59,16 +73,16 @@ namespace UpdateLib.Tests.Files
 
             file.AddOrUpdateEntry(m_tempFile);
 
-            Assert.AreEqual(file.Items.FirstOrDefault().FilePath, hash.FilePath);
-            Assert.AreNotEqual(file.Items.FirstOrDefault().Hash, hash.Hash);
+            Assert.AreEqual(file.Items.FirstOrDefault().FilePath.Trim(), hash.FilePath.Trim());
+            Assert.AreNotEqual(file.Items.FirstOrDefault().Hash.Trim(), hash.Hash.Trim());
             Assert.AreNotEqual(file.Items.FirstOrDefault().Ticks, hash.Ticks);
         }
 
 
         private void CheckEntries(HashCacheEntry expected, HashCacheEntry actual)
         {
-            Assert.AreEqual(expected.FilePath, actual.FilePath);
-            Assert.AreEqual(expected.Hash, actual.Hash);
+            Assert.AreEqual(expected.FilePath.Trim(), actual.FilePath.Trim());
+            Assert.AreEqual(expected.Hash.Trim(), actual.Hash.Trim());
             Assert.AreEqual(expected.Ticks, actual.Ticks);
         }
 
@@ -77,6 +91,8 @@ namespace UpdateLib.Tests.Files
             using (StreamWriter sw = new StreamWriter(File.Open(m_tempFile, FileMode.OpenOrCreate, FileAccess.Write), Encoding.Default))
             {
                 sw.WriteLine("edited");
+
+                sw.Flush();
             }
         }
 

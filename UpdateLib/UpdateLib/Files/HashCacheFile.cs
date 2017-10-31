@@ -1,9 +1,24 @@
-﻿using MatthiWare.UpdateLib.Security;
+﻿/*  UpdateLib - .Net auto update library
+ *  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as published
+ *  by the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 using MatthiWare.UpdateLib.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Xml.Serialization;
 using System.Linq;
 
@@ -35,21 +50,15 @@ namespace MatthiWare.UpdateLib.Files
         {
             lock (sync)
             {
-                long ticks = File.GetLastWriteTime(fullPath).Ticks;
-                hash = string.IsNullOrEmpty(hash) ? HashUtil.GetHash(fullPath) : hash;
-
                 HashCacheEntry entry = Items.FirstOrDefault(f => f.FilePath == fullPath);
 
                 if (entry == null)
                 {
-                    entry = new HashCacheEntry();
-                    entry.FilePath = fullPath;
-
+                    entry = new HashCacheEntry(fullPath);
                     Items.Add(entry);
                 }
-
-                entry.Ticks = ticks;
-                entry.Hash = hash;
+                else
+                    entry.Recalculate();
 
                 Updater.Instance.Logger.Debug(nameof(HashCacheFile), nameof(AddOrUpdateEntry), $"Cache updated for file -> '{entry.FilePath}'");
             }

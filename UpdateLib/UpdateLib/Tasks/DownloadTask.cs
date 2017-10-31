@@ -1,12 +1,26 @@
-﻿using MatthiWare.UpdateLib.Files;
-using MatthiWare.UpdateLib.Logging;
+﻿/*  UpdateLib - .Net auto update library
+ *  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as published
+ *  by the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+using MatthiWare.UpdateLib.Files;
 using MatthiWare.UpdateLib.Security;
 using System;
 using System.IO;
 using System.Net;
-using System.Security;
 using System.Threading;
-using System.Windows.Forms;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
@@ -17,17 +31,11 @@ namespace MatthiWare.UpdateLib.Tasks
 
         public FileEntry Entry { get; private set; }
 
-        public DownloadTask(ListViewItem item, FileEntry entry)
-            : this(entry)
-        {
-            Item = item;
-        }
-
         public DownloadTask(FileEntry entry)
         {
             Entry = entry;
             webClient = new WebClient();
-            webClient.DownloadProgressChanged += (o, e) => { OnTaskProgressChanged(e); };
+            webClient.DownloadProgressChanged += (o, e) => { OnTaskProgressChanged(e.ProgressPercentage, 110); };
             webClient.DownloadFileCompleted += (o, e) => { wait.Set(); };
         }
 
@@ -38,7 +46,7 @@ namespace MatthiWare.UpdateLib.Tasks
 
             wait = new ManualResetEvent(false);
 
-            string localFile = Updater.Instance.Converter.Replace(Entry.DestinationLocation);
+            string localFile = Updater.Instance.Converter.Convert(Entry.DestinationLocation);
             string remoteFile = string.Concat(Updater.Instance.RemoteBasePath, Entry.SourceLocation);
 
             Updater.Instance.Logger.Debug(nameof(DownloadTask), nameof(DoWork), $"LocalFile => {localFile}");
@@ -65,6 +73,8 @@ namespace MatthiWare.UpdateLib.Tasks
                 throw new InvalidHashException($"Calculated hash doesn't match provided hash for file: {localFile}");
 
             Updater.Instance.GetCache().AddOrUpdateEntry(localFile, hash);
+
+            OnTaskProgressChanged(100);
         }
 
         public override void Rollback()
@@ -73,7 +83,7 @@ namespace MatthiWare.UpdateLib.Tasks
 
             webClient.CancelAsync();
 
-            string localFile = Updater.Instance.Converter.Replace(Entry.DestinationLocation);
+            string localFile = Updater.Instance.Converter.Convert(Entry.DestinationLocation);
             string localTempFile = $"{localFile}.old.tmp";
 
             if (!File.Exists(localTempFile))
