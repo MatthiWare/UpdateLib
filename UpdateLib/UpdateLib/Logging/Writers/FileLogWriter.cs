@@ -16,6 +16,8 @@
  */
 
 using MatthiWare.UpdateLib.Common;
+using MatthiWare.UpdateLib.Tasks;
+using MatthiWare.UpdateLib.Threading;
 using MatthiWare.UpdateLib.Utils;
 using System;
 using System.IO;
@@ -25,20 +27,21 @@ namespace MatthiWare.UpdateLib.Logging.Writers
 {
     public class FileLogWriter : ILogWriter
     {
-        public const string LOG_FOLDER_NAME = "Log";
-
         public LoggingLevel LoggingLevel { get { return LoggingLevel.Debug; } }
 
         private Lazy<FileInfo> m_logFile = new Lazy<FileInfo>(GetLogFile);
 
-        private readonly object sync = new object();
+        private ConcurrentQueue<string> m_logQueue = new ConcurrentQueue<string>();
+        private AsyncTask m_logTask;
+
+        public FileLogWriter()
+        {
+            m_logTask = AsyncTaskFactory.From(new Action(Log));
+        }
 
         private static FileInfo GetLogFile()
         {
-            string path = IOUtils.AppDataPath;
-            string name = Assembly.GetEntryAssembly().GetName().Name;
-
-            FileInfo m_logFile = new FileInfo($@"{path}\{LOG_FOLDER_NAME}\log_{DateTime.Now.ToString("yyyyMMdd")}.log");
+            FileInfo m_logFile = new FileInfo($@"{IOUtils.LogPath}\log_{DateTime.Now.ToString("yyyyMMdd")}.log");
 
             if (!m_logFile.Directory.Exists)
                 m_logFile.Directory.Create();
@@ -48,20 +51,23 @@ namespace MatthiWare.UpdateLib.Logging.Writers
 
         public void Log(string text)
         {
-            Action<string> logAction = new Action<string>(LogAsync);
-            logAction.BeginInvoke(text, new AsyncCallback(r => logAction.EndInvoke(r)), null);
+            m_logQueue.Enqueue(text);
+
+            if (!m_logTask.IsRunning)
+                m_logTask.Start();
         }
 
-        private void LogAsync(string text)
+        private void Log()
         {
-            lock (sync)
-            {
-                using (StreamWriter writer = new StreamWriter(m_logFile.Value.Open(FileMode.OpenOrCreate, FileAccess.Write)))
+            string text;
+            using (StreamWriter writer = new StreamWriter(m_logFile.Value.Open(FileMode.OpenOrCreate, FileAccess.Write)))
+                while (m_logQueue.TryDequeue(out text))
                 {
                     writer.BaseStream.Seek(0, SeekOrigin.End);
                     writer.WriteLine(text);
                 }
-            }
+
         }
     }
 }
+
