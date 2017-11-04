@@ -34,7 +34,7 @@ namespace UpdateLib.Tests.Tasks
             Updater.Instance
                 .ConfigureUpdateUrl($@"file:///{path}")
                 .ConfigureInstallationMode(InstallationMode.Local)
-                .ConfigureUnsafeConnections(true)
+                .ConfigureAllowUnsafeConnections(true)
                 .Initialize();
         }
 

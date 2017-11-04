@@ -49,7 +49,7 @@ namespace TestApp
                 .ConfigureLogger((logger) => logger.LogLevel = LoggingLevel.Debug)
                 .ConfigureLogger((logger) => logger.Writers.Add(new ConsoleLogWriter()))
                 .ConfigureLogger((logger) => logger.Writers.Add(new FileLogWriter()))
-                .ConfigureUnsafeConnections(true)
+                .ConfigureAllowUnsafeConnections(true)
                 .ConfigureCacheInvalidation(TimeSpan.FromSeconds(30))
                 .ConfigureNeedsRestartBeforeUpdate(true)
                 .ConfigureInstallationMode(InstallationMode.Shared)

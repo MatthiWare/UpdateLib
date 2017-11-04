@@ -61,11 +61,12 @@ namespace MatthiWare.UpdateLib
         #region Fields
 
         private const string m_strUpdateLib = "UpdateLib";
-        
+
         private string m_updateUrl = string.Empty;
         private const string m_argUpdateSilent = "silent";
         private const string m_argUpdate = "update";
         private const string m_argWait = "wait";
+        private const string m_rollback = "rollback";
         private Lazy<PathVariableConverter> m_lazyPathVarConv = new Lazy<PathVariableConverter>(() => new PathVariableConverter());
         private TimeSpan m_cacheInvalidation = TimeSpan.FromMinutes(5);
         private Lazy<Logger> m_lazyLogger = new Lazy<Logger>(() => new Logger());
@@ -159,6 +160,8 @@ namespace MatthiWare.UpdateLib
         /// </summary>
         public bool WaitForProcessExit { get; private set; }
 
+        public bool Rollback { get; private set; }
+
         /// <summary>
         /// Gets the <see cref="PathVariableConverter"/>.
         /// This property is only initialized when called.
@@ -233,7 +236,7 @@ namespace MatthiWare.UpdateLib
         /// <remarks>Do not enable this unless you know what you are doing</remarks>
         /// <param name="allow">Allowed?</param>
         /// <returns><see cref="Updater"/></returns>
-        public Updater ConfigureUnsafeConnections(bool allow)
+        public Updater ConfigureAllowUnsafeConnections(bool allow)
         {
             AllowUnsafeConnection = allow;
 
@@ -324,6 +327,7 @@ namespace MatthiWare.UpdateLib
             CommandLine.AddParameter(m_argUpdateSilent);
             CommandLine.AddParameter(m_argUpdate);
             CommandLine.AddParameter(m_argWait, ParamMandatoryType.Optional, ParamValueType.Int);
+            CommandLine.AddParameter(m_rollback);
         }
 
         /// <summary>
@@ -340,6 +344,7 @@ namespace MatthiWare.UpdateLib
             WaitForProcessExit = CommandLine[m_argWait]?.IsFound ?? false;
             StartUpdating = CommandLine[m_argUpdate]?.IsFound ?? false;
             UpdateSilently = CommandLine[m_argUpdateSilent]?.IsFound ?? false;
+            Rollback = CommandLine[m_rollback]?.IsFound ?? false;
 
             if (WaitForProcessExit)
                 WaitForProcessToExit((int)CommandLine[m_argWait].Value);
@@ -586,7 +591,7 @@ namespace MatthiWare.UpdateLib
                 args.Add(Process.GetCurrentProcess().Id.ToString());
             }
 
-            if (update  && !args.Contains(CommandLine.ParameterPrefix + m_argUpdate))
+            if (update && !args.Contains(CommandLine.ParameterPrefix + m_argUpdate))
                 args.Add(CommandLine.ParameterPrefix + m_argUpdate);
 
             if (silent && !args.Contains(CommandLine.ParameterPrefix + m_argUpdateSilent))

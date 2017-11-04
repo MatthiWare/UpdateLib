@@ -27,8 +27,7 @@ namespace MatthiWare.UpdateLib.Files
     [Serializable]
     public class HashCacheFile
     {
-        public const string CACHE_FOLDER_NAME = "Cache";
-        public const string FILE_NAME = "HashCacheFile.xml";
+        public const string FILE_NAME = "Cache.xml";
 
         [XmlArray("Items")]
         [XmlArrayItem("Entry")]
@@ -52,25 +51,21 @@ namespace MatthiWare.UpdateLib.Files
             {
                 HashCacheEntry entry = Items.FirstOrDefault(f => f.FilePath == fullPath);
 
+                entry?.Recalculate();
+
                 if (entry == null)
                 {
                     entry = new HashCacheEntry(fullPath);
                     Items.Add(entry);
                 }
-                else
-                    entry.Recalculate();
 
                 Updater.Instance.Logger.Debug(nameof(HashCacheFile), nameof(AddOrUpdateEntry), $"Cache updated for file -> '{entry.FilePath}'");
             }
         }
 
         #region Save/Load
-        private static string GetStoragePath()
-        {
-            string path = IOUtils.AppDataPath;
-
-            return $@"{path}\{CACHE_FOLDER_NAME}\{FILE_NAME}";
-        }
+        private static string GetStoragePath()=> $@"{IOUtils.AppDataPath}\{FILE_NAME}";
+        
 
         /// <summary>
         /// Loads the <see cref="HashCacheFile"/> from the default storage location 

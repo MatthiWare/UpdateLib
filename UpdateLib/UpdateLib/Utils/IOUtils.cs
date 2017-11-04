@@ -24,6 +24,8 @@ namespace MatthiWare.UpdateLib.Utils
     public static class IOUtils
     {
         private static Lazy<string> m_getAppDataPath = new Lazy<string>(GetAppDataPath);
+        private static Lazy<string> m_getCachePath = new Lazy<string>(() => $"{AppDataPath}\\Cache");
+        private static Lazy<string> m_getLogPath = new Lazy<string>(() => $"{AppDataPath}\\Log");
 
         internal static void ReinitializeAppData()
         {
@@ -31,6 +33,8 @@ namespace MatthiWare.UpdateLib.Utils
         }
 
         public static string AppDataPath { get { return m_getAppDataPath.Value; } }
+        public static string CachePath { get { return m_getCachePath.Value; } }
+        public static string LogPath { get { return m_getLogPath.Value; } }
 
         public static string GetRemoteBasePath(string url)
         {
@@ -72,8 +76,6 @@ namespace MatthiWare.UpdateLib.Utils
                 default:
                     return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             }
-
-
         }
 
     }

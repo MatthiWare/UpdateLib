@@ -17,6 +17,7 @@
 
 using MatthiWare.UpdateLib.Files;
 using MatthiWare.UpdateLib.Security;
+using MatthiWare.UpdateLib.Utils;
 using System;
 using System.IO;
 using System.Net;
@@ -49,13 +50,18 @@ namespace MatthiWare.UpdateLib.Tasks
             string localFile = Updater.Instance.Converter.Convert(Entry.DestinationLocation);
             string remoteFile = string.Concat(Updater.Instance.RemoteBasePath, Entry.SourceLocation);
 
+
             Updater.Instance.Logger.Debug(nameof(DownloadTask), nameof(DoWork), $"LocalFile => {localFile}");
             Updater.Instance.Logger.Debug(nameof(DownloadTask), nameof(DoWork), $"RemoteFile => {remoteFile}");
 
             FileInfo fi = new FileInfo(localFile);
+            string cacheFile = $"{IOUtils.CachePath}\\{fi.Name}";
+
+            if (File.Exists(cacheFile))
+                File.Delete(cacheFile);
 
             if (fi.Exists)
-                fi.MoveTo($"{localFile}.old.tmp");
+                fi.MoveTo(cacheFile);
 
             if (!fi.Directory.Exists)
                 fi.Directory.Create();
@@ -83,23 +89,23 @@ namespace MatthiWare.UpdateLib.Tasks
 
             webClient.CancelAsync();
 
-            string localFile = Updater.Instance.Converter.Convert(Entry.DestinationLocation);
-            string localTempFile = $"{localFile}.old.tmp";
+            FileInfo localFile = new FileInfo(Updater.Instance.Converter.Convert(Entry.DestinationLocation));
+            FileInfo cacheFile = new FileInfo($"{IOUtils.CachePath}\\{localFile.Name}");
 
-            if (!File.Exists(localTempFile))
+            if (!cacheFile.Exists)
             {
                 OnTaskProgressChanged(100);
                 return;
             }
 
-            if (File.Exists(localFile))
-                File.Delete(localFile);
+            if (localFile.Exists)
+                localFile.Delete();
 
-            File.Move(localTempFile, localFile);
+            cacheFile.MoveTo(localFile.FullName);
 
             OnTaskProgressChanged(50);
 
-            Updater.Instance.GetCache().AddOrUpdateEntry(localFile);
+            Updater.Instance.GetCache().AddOrUpdateEntry(localFile.FullName);
 
             Updater.Instance.Logger.Warn(nameof(DownloadTask), nameof(Cancel), $"Rolled back -> {Entry.Name}");
 
