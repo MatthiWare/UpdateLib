@@ -15,6 +15,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+using MatthiWare.UpdateLib.Common;
 using System;
 using System.ComponentModel;
 
@@ -22,7 +23,7 @@ namespace MatthiWare.UpdateLib.Tasks
 {
     public class CheckForUpdatesCompletedEventArgs : AsyncCompletedEventArgs
     {
-        public Version LatestVersion { get; set; }
+        public UpdateVersion LatestVersion { get; set; }
         public bool UpdateAvailable { get; set; }
 
         public CheckForUpdatesCompletedEventArgs(CheckForUpdatesTask.CheckForUpdatesResult result, Exception error, bool cancelled, object userState) 

@@ -86,7 +86,7 @@ namespace UpdateLib.Tests.Files
             UpdateFile file = new UpdateFile();
 
             file.ApplicationName = nameof(UpdateFileTest);
-            file.Version = new Version("9.9.9.9");
+            file.Version = new UpdateVersion(9, 9, 9);
 
             DirectoryEntry appSubFolder = new DirectoryEntry("AppSubFolder");
             DirectoryEntry otherSubFolder = new DirectoryEntry("OtherSubFolder");

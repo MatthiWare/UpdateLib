@@ -43,7 +43,7 @@ namespace MatthiWare.UpdateLib.Files
         /// The versionstring should be parsable by the <see cref="System.Version"/> to be valid. 
         /// </summary>
         [XmlAttribute]
-        public VersionXml Version { get; set; } = new Version("1.0.0.0");
+        public UpdateVersion Version { get; set; } = new UpdateVersion(1);
 
         /// <summary>
         /// Gets the folders of the project

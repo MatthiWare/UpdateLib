@@ -21,6 +21,7 @@ using MatthiWare.UpdateLib.Files;
 using System.IO;
 using MatthiWare.UpdateLib.Utils;
 using static MatthiWare.UpdateLib.Tasks.CheckForUpdatesTask;
+using MatthiWare.UpdateLib.Common;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
@@ -115,7 +116,7 @@ namespace MatthiWare.UpdateLib.Tasks
 
         public class CheckForUpdatesResult
         {
-            public Version Version { get; set; } 
+            public UpdateVersion Version { get; set; } 
             public bool UpdateAvailable { get; set; } = false;
             public UpdateFile UpdateFile { get; set; }
             public bool AdminRightsNeeded { get; set; } = false;

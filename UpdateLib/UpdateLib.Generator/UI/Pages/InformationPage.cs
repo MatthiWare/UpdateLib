@@ -15,6 +15,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+using MatthiWare.UpdateLib.Common;
 using System;
 
 namespace MatthiWare.UpdateLib.Generator.UI.Pages
@@ -34,11 +35,11 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             }
         }
 
-        public Version Version
+        public UpdateVersion Version
         {
             get
             {
-                return new Version(txtAppVersion.Text);
+                return new UpdateVersion(txtAppVersion.Text);
             }
             set
             {

@@ -81,4 +81,12 @@
         Warn = 2,
         Error = 3
     }
+
+    public enum VersionLabel : byte
+    {
+        Alpha=0,
+        Beta=1,
+        RC=2,
+        None=3
+    }
 }
