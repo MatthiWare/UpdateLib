@@ -7,6 +7,7 @@ using MatthiWare.UpdateLib.Properties;
 namespace MatthiWare.UpdateLib.Controls
 {
     [ToolboxBitmap(typeof(UpdaterControl), "UpdaterControl.bmp")]
+    [Obsolete("We will no longer be supporting the UpdaterControl")]
     public partial class UpdaterControl : UserControl
     {
         private const int ICON_SIZE = 16;
