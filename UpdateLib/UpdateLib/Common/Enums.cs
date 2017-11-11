@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace MatthiWare.UpdateLib.Common
+﻿namespace MatthiWare.UpdateLib.Common
 {
     /// <summary>
     /// Indicates the how the underlaying application is installed. 

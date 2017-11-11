@@ -18,12 +18,6 @@
 using MatthiWare.UpdateLib.Logging;
 using NUnit.Framework;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MatthiWare.UpdateLib.Logging.Writers;
 using MatthiWare.UpdateLib.Common;
 
 namespace UpdateLib.Tests.Logging

@@ -16,7 +16,6 @@
  */
 
 using MatthiWare.UpdateLib.Common;
-using MatthiWare.UpdateLib.Files;
 using MatthiWare.UpdateLib.Utils;
 using Microsoft.Win32;
 using System;

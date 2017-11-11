@@ -1,6 +1,4 @@
 ﻿using MatthiWare.UpdateLib.Generator.Data.FilesPage;
-using System;
-using System.Collections.Generic;
 /*  UpdateLib - .Net auto update library
  *  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
  *

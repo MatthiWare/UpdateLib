@@ -1,10 +1,4 @@
-﻿using MatthiWare.UpdateLib.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace MatthiWare.UpdateLib.Common
+﻿namespace MatthiWare.UpdateLib.Common
 {
     public class ParameterDefinition
     {

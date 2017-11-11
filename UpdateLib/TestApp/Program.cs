@@ -17,10 +17,8 @@
 
 using MatthiWare.UpdateLib;
 using MatthiWare.UpdateLib.Common;
-using MatthiWare.UpdateLib.Logging;
 using MatthiWare.UpdateLib.Logging.Writers;
 using System;
-using System.Text;
 using System.Windows.Forms;
 
 namespace TestApp

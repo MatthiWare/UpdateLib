@@ -21,7 +21,6 @@ using MatthiWare.UpdateLib.Threading;
 using MatthiWare.UpdateLib.Utils;
 using System;
 using System.IO;
-using System.Reflection;
 
 namespace MatthiWare.UpdateLib.Logging.Writers
 {
