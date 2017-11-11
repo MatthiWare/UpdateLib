@@ -19,6 +19,7 @@ using MatthiWare.UpdateLib.Files;
 using MatthiWare.UpdateLib.Security;
 using System.Linq;
 using MatthiWare.UpdateLib.Utils;
+using MatthiWare.UpdateLib.Common;
 
 namespace MatthiWare.UpdateLib.Tasks
 {

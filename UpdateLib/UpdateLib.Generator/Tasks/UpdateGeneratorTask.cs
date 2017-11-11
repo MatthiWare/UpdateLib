@@ -25,6 +25,7 @@ using MatthiWare.UpdateLib.Tasks;
 using MatthiWare.UpdateLib.Generator.Data.FilesPage;
 using System.Collections.Generic;
 using MatthiWare.UpdateLib.Generator.UI.Pages;
+using MatthiWare.UpdateLib.Common;
 
 namespace MatthiWare.UpdateLib.Generator.Tasks
 {
@@ -73,7 +74,7 @@ namespace MatthiWare.UpdateLib.Generator.Tasks
             Enqueue(new Action(AddRegistryItems), null);
 
             Result.ApplicationName = infoPage.ApplicationName;
-            Result.VersionString = infoPage.ApplicationVersion;
+            Result.Version = infoPage.Version;
         }
 
         private void AddRegistryItems()

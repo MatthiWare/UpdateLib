@@ -63,7 +63,7 @@ namespace MatthiWare.UpdateLib.Tasks
 
             // load the updatefile from disk
             Result.UpdateFile = UpdateFile.Load(localFile);
-            Result.Version = Result.UpdateFile.VersionString;
+            Result.Version = Result.UpdateFile.Version;
 
             CheckRequiredPrivilegesTask privilegesCheckTask = CheckPrivileges(Result.UpdateFile);
 
@@ -115,7 +115,7 @@ namespace MatthiWare.UpdateLib.Tasks
 
         public class CheckForUpdatesResult
         {
-            public string Version { get; set; } = string.Empty;
+            public Version Version { get; set; } 
             public bool UpdateAvailable { get; set; } = false;
             public UpdateFile UpdateFile { get; set; }
             public bool AdminRightsNeeded { get; set; } = false;

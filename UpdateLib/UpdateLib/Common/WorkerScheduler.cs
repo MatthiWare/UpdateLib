@@ -15,11 +15,12 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+using MatthiWare.UpdateLib.Tasks;
 using MatthiWare.UpdateLib.Threading;
 using System;
 using System.Threading;
 
-namespace MatthiWare.UpdateLib.Tasks
+namespace MatthiWare.UpdateLib.Common
 {
     internal class WorkerScheduler
     {

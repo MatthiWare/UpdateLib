@@ -15,6 +15,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+using System;
+
 namespace MatthiWare.UpdateLib.Generator.UI.Pages
 {
     public partial class InformationPage : PageControlBase
@@ -32,15 +34,15 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
             }
         }
 
-        public string ApplicationVersion
+        public Version Version
         {
             get
             {
-                return txtAppVersion.Text;
+                return new Version(txtAppVersion.Text);
             }
             set
             {
-                txtAppVersion.Text = value;
+                txtAppVersion.Text = value.ToString();
             }
         }
 

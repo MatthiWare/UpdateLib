@@ -30,7 +30,7 @@ namespace MatthiWare.UpdateLib.UI.Components
             _updaterForm = parent;
 
             txtDescription.Text = txtDescription.Text.Replace("%AppName%", parent.updateInfoFile.ApplicationName);
-            txtDescription.Text = txtDescription.Text.Replace("%version%", parent.updateInfoFile.VersionString);
+            txtDescription.Text = txtDescription.Text.Replace("%version%", parent.updateInfoFile.Version.Value);
         }
 
         public void UpdateState()
@@ -42,7 +42,7 @@ namespace MatthiWare.UpdateLib.UI.Components
 
                 UpdateFile file = _updaterForm.updateInfoFile;
 
-                txtDescription.Text = $"{file.ApplicationName} was unable to update to version {file.VersionString}!\n\n" +
+                txtDescription.Text = $"{file.ApplicationName} was unable to update to version {file.Version}!\n\n" +
                     "Check the log files for more information!\n\n" +
                     "Press Finish to close this wizard.";
 
@@ -55,7 +55,7 @@ namespace MatthiWare.UpdateLib.UI.Components
 
                 UpdateFile file = _updaterForm.updateInfoFile;
 
-                txtDescription.Text = $"{file.ApplicationName} was unable to update to version {file.VersionString}!\n\n" +
+                txtDescription.Text = $"{file.ApplicationName} was unable to update to version {file.Version}!\n\n" +
                     "Update process cancelled by the user.\n\n" +
                     "Press Finish to close this wizard.";
 

@@ -1,5 +1,4 @@
-﻿using MatthiWare.UpdateLib.Files;
-/*  UpdateLib - .Net auto update library
+﻿/*  UpdateLib - .Net auto update library
  *  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -16,6 +15,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+using MatthiWare.UpdateLib.Common;
+using MatthiWare.UpdateLib.Files;
 using NUnit.Framework;
 using System;
 using System.IO;
@@ -35,7 +36,7 @@ namespace UpdateLib.Tests.Files
         {
             var path = Path.GetTempPath();
 
-            m_path = $@"{path}\{HashCacheFile.CACHE_FOLDER_NAME}_{Guid.NewGuid().ToString()}\{HashCacheFile.FILE_NAME}";
+            m_path = $@"{path}\\Cache_{Guid.NewGuid().ToString()}\{HashCacheFile.FILE_NAME}";
 
             m_tempFile = Path.GetTempPath() + Guid.NewGuid().ToString() + "hash_cache_file_test.tmp";
             using (StreamWriter sw = new StreamWriter(File.Open(m_tempFile, FileMode.OpenOrCreate, FileAccess.Write), Encoding.Default))

@@ -22,7 +22,7 @@ using System.Xml.Serialization;
 using System.Linq;
 using System.Diagnostics;
 
-namespace MatthiWare.UpdateLib.Files
+namespace MatthiWare.UpdateLib.Common
 {
     /// <summary>
     /// Represents a directory in the update file.

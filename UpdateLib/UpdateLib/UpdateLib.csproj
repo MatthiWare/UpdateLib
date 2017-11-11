@@ -52,20 +52,20 @@
   <ItemGroup>
     <Compile Include="Common\Enums.cs" />
     <Compile Include="Common\ParameterDefinition.cs" />
+    <Compile Include="Common\VersionXml.cs" />
     <Compile Include="Controls\UpdaterControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Controls\UpdaterControl.Designer.cs">
       <DependentUpon>UpdaterControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="Encoders\IEncoder.cs" />
-    <Compile Include="Files\DirectoryEntry.cs" />
-    <Compile Include="Files\EntryBase.cs" />
-    <Compile Include="Files\HashCacheEntry.cs" />
+    <Compile Include="Common\DirectoryEntry.cs" />
+    <Compile Include="Common\EntryBase.cs" />
+    <Compile Include="Common\HashCacheEntry.cs" />
     <Compile Include="Files\HashCacheFile.cs" />
-    <Compile Include="Files\FileEntry.cs" />
-    <Compile Include="Files\PathVariableConverter.cs" />
-    <Compile Include="Files\RegistryKeyEntry.cs" />
+    <Compile Include="Common\FileEntry.cs" />
+    <Compile Include="Common\PathVariableConverter.cs" />
+    <Compile Include="Common\RegistryKeyEntry.cs" />
     <Compile Include="Files\UpdateFile.cs" />
     <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Logging\ILogWriter.cs" />
@@ -93,7 +93,7 @@
     </Compile>
     <Compile Include="Tasks\UpdateCacheTask.cs" />
     <Compile Include="Tasks\UpdateRegistryTask.cs" />
-    <Compile Include="Tasks\WorkerScheduler.cs" />
+    <Compile Include="Common\WorkerScheduler.cs" />
     <Compile Include="Threading\AtomicInteger.cs" />
     <Compile Include="Threading\ConcurrentQueue.cs" />
     <Compile Include="UI\Components\ChangelogPage.cs">
@@ -113,6 +113,12 @@
     </Compile>
     <Compile Include="UI\Components\IntroPage.Designer.cs">
       <DependentUpon>IntroPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Components\RollbackPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\Components\RollbackPage.Designer.cs">
+      <DependentUpon>RollbackPage.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\Components\UpdatePage.cs">
       <SubType>UserControl</SubType>
@@ -173,6 +179,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\Components\IntroPage.resx">
       <DependentUpon>IntroPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\Components\RollbackPage.resx">
+      <DependentUpon>RollbackPage.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\Components\UpdatePage.resx">
       <DependentUpon>UpdatePage.cs</DependentUpon>

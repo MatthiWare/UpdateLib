@@ -512,7 +512,7 @@ namespace MatthiWare.UpdateLib
                    MessageBoxButtons.OK);
         }
 
-        private void HandleNoUpdate(IWin32Window owner, string latest)
+        private void HandleNoUpdate(IWin32Window owner, Version latest)
         {
             Logger.Info(nameof(Updater), nameof(CheckForUpdatesAsync), "No update available");
 

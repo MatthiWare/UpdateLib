@@ -23,7 +23,8 @@ using System.Xml.Serialization;
 namespace MatthiWare.UpdateLib.Common
 {
     /// <summary>
-    /// Serialize System.Version to XML: https://stackoverflow.com/a/18962224/6058174
+    /// Version proxy class to serialize to XML
+    /// https://stackoverflow.com/a/18962224/6058174
     /// </summary>
     [Serializable]
     [XmlType("Version")]

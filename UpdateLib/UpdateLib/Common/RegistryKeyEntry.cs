@@ -15,55 +15,37 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+using Microsoft.Win32;
 using System;
-using System.Text;
+using System.Diagnostics;
 using System.Xml.Serialization;
 
-namespace MatthiWare.UpdateLib.Files
+namespace MatthiWare.UpdateLib.Common
 {
     [Serializable]
-    public abstract class EntryBase
+    [DebuggerDisplay("RegistryKeyEntry: {DestinationLocation}")]
+    public class RegistryKeyEntry : EntryBase
     {
-        public EntryBase()
-        {
-
-        }
-
+        /// <summary>
+        /// The type of registry key  
+        /// </summary>
         [XmlAttribute]
-        public string Name { get; set; }
-
-        public string Description { get; set; }
+        public RegistryValueKind Type { get; set; }
 
         /// <summary>
-        /// Gets or Sets the parent of this File.
+        /// The value of the key
         /// </summary>
-        [XmlIgnore]
-        public DirectoryEntry Parent { get; set; }
+        public object Value { get; set; } = "Test";
 
-        public string SourceLocation
+        public RegistryKeyEntry()
+            : this(string.Empty, RegistryValueKind.String, null)
+        { }
+
+        public RegistryKeyEntry(string name, RegistryValueKind type, object value)
         {
-            get
-            {
-                StringBuilder sb = new StringBuilder();
-
-                sb.Append(Parent?.SourceLocation ?? string.Empty);
-                sb.Append(Name);
-
-                return sb.ToString();
-            }
-        }
-
-        public string DestinationLocation
-        {
-            get
-            {
-                StringBuilder sb = new StringBuilder();
-
-                sb.Append(Parent?.DestinationLocation ?? string.Empty);
-                sb.Append(Name);
-
-                return sb.ToString();
-            }
+            Name = name;
+            Type = type;
+            Value = value;
         }
     }
 }

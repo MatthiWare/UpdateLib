@@ -22,6 +22,7 @@ using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
 using System.Linq;
+using MatthiWare.UpdateLib.Common;
 
 namespace MatthiWare.UpdateLib.Files
 {
@@ -39,16 +40,16 @@ namespace MatthiWare.UpdateLib.Files
 
         /// <summary>
         /// Gets or sets the version of the current  update.
-        /// The versionstring should be parsable by the <see cref="Version"/> to be valid. 
+        /// The versionstring should be parsable by the <see cref="System.Version"/> to be valid. 
         /// </summary>
         [XmlAttribute]
-        public string VersionString { get; set; } = "1.0.0.0";
+        public VersionXml Version { get; set; } = new Version("1.0.0.0");
 
         /// <summary>
         /// Gets the folders of the project
         /// </summary>
         [XmlArray("Folders"), XmlArrayItem("Directory")]
-        public List<DirectoryEntry> Folders { get; set; } = new List<DirectoryEntry>();
+        public List<DirectoryEntry> Folders { get; private set; } = new List<DirectoryEntry>();
 
         /// <summary>
         /// Gets the count of all the files in the <see cref="Folders"/>
@@ -61,7 +62,7 @@ namespace MatthiWare.UpdateLib.Files
         public int RegistryKeyCount { get { return Registry.Select(r => r.Count).Sum(); } }
 
         [XmlArray("Registry"), XmlArrayItem("Directory")]
-        public List<DirectoryEntry> Registry { get; set; } = new List<DirectoryEntry>();
+        public List<DirectoryEntry> Registry { get; private set; } = new List<DirectoryEntry>();
 
         public UpdateFile()
         {
@@ -80,7 +81,7 @@ namespace MatthiWare.UpdateLib.Files
                 throw new ArgumentException("Stream is not writable", nameof(output));
 
             XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
-           // ns.Add(string.Empty, string.Empty);
+            // ns.Add(string.Empty, string.Empty);
 
             XmlSerializer serializer = new XmlSerializer(typeof(UpdateFile), string.Empty);
             serializer.Serialize(output, this, ns);
@@ -96,11 +97,13 @@ namespace MatthiWare.UpdateLib.Files
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException(nameof(path));
 
-            if (File.Exists(path))
-                File.Delete(path);
+            FileInfo file = new FileInfo(path);
 
-            using (Stream s = File.Open(path, FileMode.OpenOrCreate, FileAccess.Write))
-                Save(s);
+            if (file.Exists)
+                file.Delete();
+
+            using (var stream = file.Open(FileMode.OpenOrCreate, FileAccess.Write))
+                Save(stream);
         }
 
         /// <summary>
@@ -141,11 +144,13 @@ namespace MatthiWare.UpdateLib.Files
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException(nameof(path));
 
-            if (!File.Exists(path))
+            FileInfo file = new FileInfo(path);
+
+            if (!file.Exists)
                 throw new FileNotFoundException("The UpdateFile doesn't exist.", path);
 
-            using (Stream s = File.Open(path, FileMode.Open, FileAccess.Read))
-                return Load(s);
+            using (Stream stream = file.OpenRead())
+                return Load(stream);
         }
     }
 }

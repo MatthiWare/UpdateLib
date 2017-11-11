@@ -20,7 +20,7 @@ using System;
 using System.IO;
 using System.Xml.Serialization;
 
-namespace MatthiWare.UpdateLib.Files
+namespace MatthiWare.UpdateLib.Common
 {
     [Serializable]
     public class HashCacheEntry

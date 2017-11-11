@@ -1,7 +1,4 @@
-﻿using MatthiWare.UpdateLib.Files;
-using Moq;
-using NUnit.Framework;
-/*  UpdateLib - .Net auto update library
+﻿/*  UpdateLib - .Net auto update library
  *  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -20,6 +17,10 @@ using NUnit.Framework;
 
 using System;
 using System.IO;
+using MatthiWare.UpdateLib.Common;
+using MatthiWare.UpdateLib.Files;
+using Moq;
+using NUnit.Framework;
 
 namespace UpdateLib.Tests.Files
 {
@@ -42,7 +43,7 @@ namespace UpdateLib.Tests.Files
             UpdateFile loadedFile = UpdateFile.Load(temp_file);
 
             Assert.AreEqual(file.ApplicationName, loadedFile.ApplicationName);
-            Assert.AreEqual(file.VersionString, loadedFile.VersionString);
+            Assert.AreEqual(file.Version, loadedFile.Version);
             Assert.AreEqual(file.FileCount, loadedFile.FileCount);
         }
 
@@ -85,7 +86,7 @@ namespace UpdateLib.Tests.Files
             UpdateFile file = new UpdateFile();
 
             file.ApplicationName = nameof(UpdateFileTest);
-            file.VersionString = "9.9.9.9";
+            file.Version = new Version("9.9.9.9");
 
             DirectoryEntry appSubFolder = new DirectoryEntry("AppSubFolder");
             DirectoryEntry otherSubFolder = new DirectoryEntry("OtherSubFolder");

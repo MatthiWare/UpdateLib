@@ -15,6 +15,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+using MatthiWare.UpdateLib.Common;
 using MatthiWare.UpdateLib.Files;
 using NUnit.Framework;
 using System;

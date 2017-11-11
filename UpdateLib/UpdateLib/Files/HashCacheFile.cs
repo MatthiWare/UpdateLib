@@ -16,6 +16,7 @@
  */
 
 using MatthiWare.UpdateLib.Utils;
+using MatthiWare.UpdateLib.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;

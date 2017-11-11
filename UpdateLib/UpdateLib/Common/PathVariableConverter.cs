@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace MatthiWare.UpdateLib.Files
+namespace MatthiWare.UpdateLib.Common
 {
     /// <summary>
     /// This will convert specified path variables to their actual path
