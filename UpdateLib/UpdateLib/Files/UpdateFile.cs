@@ -21,7 +21,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
-using System.Linq;
+using MatthiWare.UpdateLib.Utils;
 using MatthiWare.UpdateLib.Common;
 
 namespace MatthiWare.UpdateLib.Files
@@ -38,35 +38,15 @@ namespace MatthiWare.UpdateLib.Files
         [XmlAttribute]
         public string ApplicationName { get; set; } = "UpdateLib";
 
-        /// <summary>
-        /// Gets or sets the version of the current  update.
-        /// The versionstring should be parsable by the <see cref="System.Version"/> to be valid. 
-        /// </summary>
-        [XmlAttribute]
-        public UpdateVersion Version { get; set; } = new UpdateVersion(1);
-
-        /// <summary>
-        /// Gets the folders of the project
-        /// </summary>
-        [XmlArray("Folders"), XmlArrayItem("Directory")]
-        public List<DirectoryEntry> Folders { get; private set; } = new List<DirectoryEntry>();
-
-        /// <summary>
-        /// Gets the count of all the files in the <see cref="Folders"/>
-        /// and their subdirectories.
-        /// </summary>
-        [XmlIgnore]
-        public int FileCount { get { return Folders.Select(d => d.Count).Sum(); } }
-
-        [XmlIgnore]
-        public int RegistryKeyCount { get { return Registry.Select(r => r.Count).Sum(); } }
-
-        [XmlArray("Registry"), XmlArrayItem("Directory")]
-        public List<DirectoryEntry> Registry { get; private set; } = new List<DirectoryEntry>();
+        public List<UpdateInfo> Updates { get; private set; } = new List<UpdateInfo>();
 
         public UpdateFile()
         {
+
         }
+
+        public UpdateInfo GetLatestUpdate()
+            => Updates.Maxx(u => u.Version);
 
         /// <summary>
         /// Saves the current <see cref="UpdateFile"/> to the output <see cref="Stream"/>
@@ -129,7 +109,7 @@ namespace MatthiWare.UpdateLib.Files
 
             UpdateFile file = (UpdateFile)serializer.Deserialize(xml);
 
-            new UpdateFileProcessorTask(file).ConfigureAwait(false).Start().AwaitTask();
+            new UpdateInfoPostProcessorTask(file).ConfigureAwait(false).Start().AwaitTask();
 
             return file;
         }

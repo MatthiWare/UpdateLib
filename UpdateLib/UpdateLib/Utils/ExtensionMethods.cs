@@ -43,6 +43,25 @@ namespace MatthiWare.UpdateLib.Utils
         }
 
         [DebuggerStepThrough]
+        public static T Maxx<T, K>(this IEnumerable<T> collection, Func<T, K> resolve) where K : IComparable<K>
+        {
+            using (var enumerator = collection.GetEnumerator())
+            {
+                T max = default(T);
+
+                while (enumerator.MoveNext())
+                {
+                    T other = enumerator.Current;
+
+                    if (resolve(other).CompareTo(resolve(max)) > 0)
+                        max = other;
+                }
+
+                return max;
+            }
+        }
+
+        [DebuggerStepThrough]
         public static void ForEach<T>(this IEnumerable<T> collection, Action<T> action)
         {
             using (var enumerator = collection.GetEnumerator())

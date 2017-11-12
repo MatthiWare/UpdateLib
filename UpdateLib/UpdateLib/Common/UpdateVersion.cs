@@ -16,7 +16,10 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Xml;
+using System.Xml.Schema;
 using System.Xml.Serialization;
 
 namespace MatthiWare.UpdateLib.Common
@@ -27,6 +30,7 @@ namespace MatthiWare.UpdateLib.Common
     /// Partially based on Semantic Versioning <http://semver.org/>
     /// </summary>
     [Serializable]
+    
     public class UpdateVersion : IComparable, IComparable<UpdateVersion>, IEquatable<UpdateVersion>
     {
         private int m_major, m_minor, m_patch;
@@ -69,6 +73,7 @@ namespace MatthiWare.UpdateLib.Common
         }
 
         [XmlText]
+        [XmlElement(typeof(string))]
         [EditorBrowsable(EditorBrowsableState.Never), Browsable(false)]
         public string Value
         {
@@ -274,5 +279,6 @@ namespace MatthiWare.UpdateLib.Common
 
         public static bool operator <=(UpdateVersion v1, UpdateVersion v2)
             => !ReferenceEquals(v1, null) && v1.CompareTo(v2) <= 0;
+        
     }
 }
