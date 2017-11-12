@@ -20,6 +20,7 @@ using MatthiWare.UpdateLib.Common;
 using MatthiWare.UpdateLib.Logging.Writers;
 using System;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 
 namespace TestApp
 {
@@ -31,11 +32,15 @@ namespace TestApp
         [STAThread]
         static void Main()
         {
+        //    UpdateVersion v1 = new UpdateVersion(1, 2, 3, VersionLabel.Alpha);
+        //    XmlSerializer xml = new XmlSerializer(typeof(UpdateVersion));
+        //    xml.Serialize(Console.Out, v1);
+
             Console.WriteLine(Environment.CommandLine);
             foreach (var s in Environment.GetCommandLineArgs())
                 Console.WriteLine(s);
 
-           // Environment.Exit(0);
+           Environment.Exit(0);
 
             // we still want our updater to have visual styles in case of update cmd argument switch
             Application.EnableVisualStyles();

@@ -37,7 +37,8 @@ namespace MatthiWare.UpdateLib.Common
         private const string ALPHA_STRING = "-alpha";
         private const string BETA_STRING = "-beta";
         private const string RC_STRING = "-rc";
-        private static readonly char[] CharSplit = new char[] { '.', '-' };
+        private static readonly char[] CharSplitDot = new char[] { '.' };
+        private static readonly char[] CharSplitDash = new char[] { '-' };
 
         #endregion
 
@@ -90,7 +91,23 @@ namespace MatthiWare.UpdateLib.Common
 
         #region Constructor
 
-        public UpdateVersion(int major = 0, int minor = 0, int patch = 0, VersionLabel label = VersionLabel.None)
+        public UpdateVersion()
+            : this(0, 0, 0, VersionLabel.None)
+        { }
+
+        public UpdateVersion(int major)
+            : this(major, 0, 0, VersionLabel.None)
+        { }
+
+        public UpdateVersion(int major, int minor)
+            : this(major, minor, 0, VersionLabel.None)
+        { }
+
+        public UpdateVersion(int major, int minor, int patch)
+            : this(major, minor, patch, VersionLabel.None)
+        { }
+
+        public UpdateVersion(int major, int minor, int patch, VersionLabel label)
         {
             if (major < 0) throw new ArgumentOutOfRangeException(nameof(major), "Version cannot be negative");
             if (minor < 0) throw new ArgumentOutOfRangeException(nameof(minor), "Version cannot be negative");
@@ -211,19 +228,23 @@ namespace MatthiWare.UpdateLib.Common
 
         public static bool TryParse(string input, out UpdateVersion version)
         {
-            var tokens = input.Split(CharSplit);
+            var tokens = input.Split(CharSplitDot);
             version = new UpdateVersion();
 
-            if (tokens.Length < 3 || tokens.Length > 4)
+            if (tokens.Length != 3)
                 return false;
 
-            if (tokens.Length > 3)
-                if (!TryParseVersionLabelString(tokens[3], out version.m_label))
+            if (tokens.Length > 2)
+            {
+                var extraTokens = tokens[2].Split(CharSplitDash);
+
+                if (!int.TryParse(extraTokens[0], out version.m_patch))
                     return false;
 
-            if (tokens.Length > 2)
-                if (!int.TryParse(tokens[2], out version.m_patch))
-                    return false;
+                if (extraTokens.Length > 1)
+                    if (!TryParseVersionLabelString(extraTokens[1], out version.m_label))
+                        return false;
+            }
 
             if (tokens.Length > 1)
                 if (!int.TryParse(tokens[1], out version.m_minor))
