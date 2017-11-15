@@ -54,6 +54,11 @@
     <Compile Include="Common\ParameterDefinition.cs" />
     <Compile Include="Common\UpdateInfo.cs" />
     <Compile Include="Common\UpdateVersion.cs" />
+    <Compile Include="Compression\VCDiff\AddressCache.cs" />
+    <Compile Include="Compression\VCDiff\CodeTable.cs" />
+    <Compile Include="Compression\VCDiff\Instruction.cs" />
+    <Compile Include="Compression\VCDiff\VCDiffDecoder.cs" />
+    <Compile Include="Compression\VCDiff\VCDiffFormatException.cs" />
     <Compile Include="Controls\UpdaterControl.cs">
       <SubType>UserControl</SubType>
     </Compile>

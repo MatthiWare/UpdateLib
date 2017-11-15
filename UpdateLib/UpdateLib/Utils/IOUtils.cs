@@ -17,6 +17,7 @@
 
 using MatthiWare.UpdateLib.Common;
 using System;
+using System.IO;
 using System.Text;
 
 namespace MatthiWare.UpdateLib.Utils
@@ -78,5 +79,49 @@ namespace MatthiWare.UpdateLib.Utils
             }
         }
 
+        internal static byte[] CheckedReadBytes(this Stream stream, int size)
+        {
+            byte[] ret = new byte[size];
+            int index = 0;
+
+            while (index < size)
+            {
+                int read = stream.Read(ret, index, size - index);
+                if (read == 0)
+                    throw new EndOfStreamException();
+
+                index += read;
+            }
+
+            return ret;
+        }
+
+        internal static byte CheckedReadByte(this Stream stream)
+        {
+            int ret = stream.ReadByte();
+
+            if (ret == -1)
+                throw new IOException("Unable to read byte from stream");
+
+            return (byte)ret;
+        }
+
+        internal static int ReadBigEndian7BitEncodedInt(this Stream stream)
+        {
+            int ret = 0;
+
+            for (int i = 0; i < 5; i++)
+            {
+                int b = stream.ReadByte();
+                if (b == -1)
+                    throw new EndOfStreamException();
+
+                ret = (ret << 7) | (b & 0x7f);
+                if ((b & 0x80) == 0)
+                    return ret;
+            }
+
+            throw new IOException("Invalid 7-bit encoded integer in stream");
+        }
     }
 }

@@ -89,4 +89,12 @@
         RC=2,
         None=3
     }
+
+    internal enum InstructionType : byte
+    {
+        NoOp = 0,
+        Add = 1,
+        Run = 2,
+        Copy = 3
+    }
 }
