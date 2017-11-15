@@ -15,6 +15,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+using MatthiWare.UpdateLib.Common;
 using MatthiWare.UpdateLib.Files;
 using MatthiWare.UpdateLib.UI.Components;
 using System;
@@ -26,18 +27,18 @@ namespace MatthiWare.UpdateLib.UI
 {
     public partial class UpdaterForm : Form
     {
-        internal UpdateFile updateInfoFile;
+        internal UpdateInfo updateInfo;
         internal bool NeedsRestart = true;
         internal bool hasHadErrors = false;
         internal bool UserCancelled = false;
 
         private WizardPageCollection pages;
 
-        public UpdaterForm(UpdateFile updateFile)
+        public UpdaterForm(UpdateInfo updateInfo)
         {
             InitializeComponent();
 
-            updateInfoFile = updateFile;
+            this.updateInfo = updateInfo;
 
             pages = new WizardPageCollection();
             AddPage(new IntroPage(this));

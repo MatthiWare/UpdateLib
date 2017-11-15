@@ -21,13 +21,13 @@ using System;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
-    public class UpdateFileProcessorTask : AsyncTask
+    public class UpdateInfoPostProcessorTask : AsyncTask
     {
-        private UpdateFile file;
+        private UpdateInfo m_updateInfo;
 
-        public UpdateFileProcessorTask(UpdateFile file)
+        public UpdateInfoPostProcessorTask(UpdateInfo updateInfo)
         {
-            this.file = file;
+            m_updateInfo = updateInfo;
         }
 
 
@@ -50,10 +50,10 @@ namespace MatthiWare.UpdateLib.Tasks
 
         protected override void DoWork()
         {
-            foreach (DirectoryEntry dir in file.Folders)
+            foreach (DirectoryEntry dir in m_updateInfo.Folders)
                 PostProcessDirectory(dir);
 
-            foreach (DirectoryEntry dir in file.Registry)
+            foreach (DirectoryEntry dir in m_updateInfo.Registry)
                 PostProcessDirectory(dir);
 
             AwaitWorkers();

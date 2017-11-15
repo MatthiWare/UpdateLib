@@ -90,7 +90,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 
         private AsyncTask<UpdateFile> Build(Stream s)
         {
-            UpdateGeneratorTask task = new UpdateGeneratorTask(filesPage.Root, infoPage,registryPage.Folders);
+            UpdateGeneratorTask task = new UpdateGeneratorTask(filesPage.Root, infoPage, registryPage.Folders);
 
             btnBuild.Enabled = false;
 

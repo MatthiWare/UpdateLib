@@ -17,6 +17,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using MatthiWare.UpdateLib.Common;
 using MatthiWare.UpdateLib.Files;
 using Moq;
@@ -38,13 +39,15 @@ namespace UpdateLib.Tests.Files
         public void SaveAndLoadUpdateFileShouldBeTheSame()
         {
             UpdateFile file = MakeUpdateFile();
+            UpdateInfo info = file.GetLatestUpdate();
             file.Save(temp_file);
 
-            UpdateFile loadedFile = UpdateFile.Load(temp_file);
+            UpdateFile updateFile = UpdateFile.Load(temp_file);
+            UpdateInfo updateInfo = updateFile.GetLatestUpdate();
 
-            Assert.AreEqual(file.ApplicationName, loadedFile.ApplicationName);
-            Assert.AreEqual(file.Version, loadedFile.Version);
-            Assert.AreEqual(file.FileCount, loadedFile.FileCount);
+            Assert.AreEqual(file.ApplicationName, updateFile.ApplicationName);
+            Assert.AreEqual(info.Version, updateInfo.Version);
+            Assert.AreEqual(info.FileCount, updateInfo.FileCount);
         }
 
         [Test]
@@ -86,7 +89,8 @@ namespace UpdateLib.Tests.Files
             UpdateFile file = new UpdateFile();
 
             file.ApplicationName = nameof(UpdateFileTest);
-            file.Version = new UpdateVersion(9, 9, 9);
+
+            UpdateInfo info = new UpdateInfo { Version = new UpdateVersion(9, 9, 9) };
 
             DirectoryEntry appSubFolder = new DirectoryEntry("AppSubFolder");
             DirectoryEntry otherSubFolder = new DirectoryEntry("OtherSubFolder");
@@ -108,8 +112,8 @@ namespace UpdateLib.Tests.Files
             appSubFolder.Add(appFile);
             otherSubFolder.Add(otherFile);
 
-            file.Folders.Add(appSubFolder);
-            file.Folders.Add(otherSubFolder);
+            info.Folders.Add(appSubFolder);
+            info.Folders.Add(otherSubFolder);
 
             DirectoryEntry regDir = new DirectoryEntry("HKEY_LOCAL_MACHINE");
 
@@ -117,10 +121,10 @@ namespace UpdateLib.Tests.Files
 
             regDir.Add(regEntry);
 
-            file.Registry.Add(regDir);
+            info.Registry.Add(regDir);
 
-            Assert.AreEqual(2, file.FileCount);
-            Assert.AreEqual(1, file.RegistryKeyCount);
+            Assert.AreEqual(2, info.FileCount);
+            Assert.AreEqual(1, info.RegistryKeyCount);
 
             return file;
         }

@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="Common\Enums.cs" />
     <Compile Include="Common\ParameterDefinition.cs" />
+    <Compile Include="Common\UpdateInfo.cs" />
     <Compile Include="Common\UpdateVersion.cs" />
     <Compile Include="Controls\UpdaterControl.cs">
       <SubType>UserControl</SubType>

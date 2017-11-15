@@ -21,6 +21,8 @@ using System.Linq;
 using MatthiWare.UpdateLib.Utils;
 using Moq;
 using System.Diagnostics;
+using MatthiWare.UpdateLib.Common;
+using MatthiWare.UpdateLib.Files;
 
 namespace UpdateLib.Tests.Util
 {
@@ -47,6 +49,37 @@ namespace UpdateLib.Tests.Util
             Assert.AreEqual(7, test.Split('/').Count());
             Assert.AreEqual(4, test.Split('/').NotEmpty().Count());
         }
+
+        [Test]
+        public void TestMax()
+        {
+            UpdateInfo v1 = MakeUpdateInfo(new UpdateVersion(1));
+            UpdateInfo v2 = MakeUpdateInfo(new UpdateVersion(2));
+            UpdateInfo v3 = MakeUpdateInfo(new UpdateVersion(2, 1));
+            UpdateInfo v4 = MakeUpdateInfo(new UpdateVersion(2, 1, 1));
+            UpdateInfo v5 = MakeUpdateInfo(new UpdateVersion(2, 1, 1, VersionLabel.Beta));
+            UpdateInfo v6 = MakeUpdateInfo(new UpdateVersion(2, 1, 1, VersionLabel.RC));
+            UpdateInfo v7 = MakeUpdateInfo(new UpdateVersion(2, 1, 2));
+
+            List<UpdateInfo> versions = new List<UpdateInfo>(new UpdateInfo[]
+            {
+                v1,v2,v3,v4,v5,v6,v7
+            });
+
+            UpdateInfo max = versions.Maxx(u => u.Version);
+
+            Assert.AreEqual(v7, max);
+        }
+
+        private UpdateInfo MakeUpdateInfo(UpdateVersion version)
+        {
+            return new UpdateInfo
+            {
+                Version = version
+            };
+        }
+
+
 
         [Test]
         public void TestForEach()

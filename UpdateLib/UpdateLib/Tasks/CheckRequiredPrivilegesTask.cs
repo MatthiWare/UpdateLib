@@ -26,11 +26,11 @@ namespace MatthiWare.UpdateLib.Tasks
     public class CheckRequiredPrivilegesTask : AsyncTask<bool>
     {
 
-        public UpdateFile File { get; set; }
+        public UpdateInfo UpdateInfo { get; set; }
 
-        public CheckRequiredPrivilegesTask(UpdateFile file)
+        public CheckRequiredPrivilegesTask(UpdateInfo updateInfo)
         {
-            File = file;
+            UpdateInfo = updateInfo;
         }
 
         protected override void DoWork()
@@ -40,7 +40,7 @@ namespace MatthiWare.UpdateLib.Tasks
             if (PermissionUtil.IsProcessElevated)
                 return;
 
-            foreach (DirectoryEntry dir in File.Folders)
+            foreach (DirectoryEntry dir in UpdateInfo.Folders)
                 if (!CheckHasSufficientPermissionsForDirectory(dir))
                 {
                     Result = true;
@@ -48,7 +48,7 @@ namespace MatthiWare.UpdateLib.Tasks
                 }
 
 
-            foreach (DirectoryEntry dir in File.Registry)
+            foreach (DirectoryEntry dir in UpdateInfo.Registry)
                 if (!CheckHasSufficientPermissionForRegistry(dir))
                 {
                     Result = true;

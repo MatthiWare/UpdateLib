@@ -32,7 +32,7 @@ namespace MatthiWare.UpdateLib.UI.Components
     public partial class UpdatePage : UserControl, IWizardPage
     {
 
-        public UpdateFile UpdateFile { get; set; }
+        public UpdateInfo UpdateInfo { get; set; }
 
         public event EventHandler PageUpdate;
 
@@ -46,7 +46,7 @@ namespace MatthiWare.UpdateLib.UI.Components
 
             _updaterForm = parent;
 
-            UpdateFile = parent.updateInfoFile;
+            UpdateInfo = parent.updateInfo;
 
             ImageList ilItems = MakeImageList();
             lvItems.SmallImageList = ilItems;
@@ -73,18 +73,18 @@ namespace MatthiWare.UpdateLib.UI.Components
 
         private void FillListView()
         {
-            amountToDownload.Value = UpdateFile.FileCount;
+            amountToDownload.Value = UpdateInfo.FileCount;
 
             lvItems.BeginUpdate();
 
             AddDirectoryToListView(
-                UpdateFile.Folders
+                UpdateInfo.Folders
                 .SelectMany(dir => dir.GetItems())
                 .Select(e => e as FileEntry)
                 .Distinct()
                 .NotNull());
 
-            AddRegistryToListView(UpdateFile.Registry
+            AddRegistryToListView(UpdateInfo.Registry
                 .SelectMany(dir => dir.GetItems())
                 .Select(e => e as RegistryKeyEntry)
                 .Distinct()

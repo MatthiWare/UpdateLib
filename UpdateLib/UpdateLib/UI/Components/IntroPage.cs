@@ -28,8 +28,8 @@ namespace MatthiWare.UpdateLib.UI.Components
 
             _updateForm = parent;
 
-            txtDesc.Text = txtDesc.Text.Replace("%AppName%", parent.updateInfoFile.ApplicationName);
-            txtWelcome.Text = txtWelcome.Text.Replace("%AppName%", parent.updateInfoFile.ApplicationName);
+            txtDesc.Text = txtDesc.Text.Replace("%AppName%", parent.updateInfo.ApplicationName);
+            txtWelcome.Text = txtWelcome.Text.Replace("%AppName%", parent.updateInfo.ApplicationName);
         }
 
         public UserControl Conent

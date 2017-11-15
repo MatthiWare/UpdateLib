@@ -16,6 +16,7 @@
  */
 
 using System;
+using System.Linq;
 using System.Net;
 using MatthiWare.UpdateLib.Files;
 using System.IO;
@@ -63,10 +64,9 @@ namespace MatthiWare.UpdateLib.Tasks
             }
 
             // load the updatefile from disk
-            Result.UpdateFile = UpdateFile.Load(localFile);
-            Result.Version = Result.UpdateFile.Version;
+            Result.UpdateInfo = UpdateFile.Load(localFile).GetLatestUpdate();
 
-            CheckRequiredPrivilegesTask privilegesCheckTask = CheckPrivileges(Result.UpdateFile);
+            CheckRequiredPrivilegesTask privilegesCheckTask = CheckPrivileges(Result.UpdateInfo);
 
             // lets wait for the Cache update to complete and get the task
             HashCacheFile cache = updater.GetCache();
@@ -81,7 +81,7 @@ namespace MatthiWare.UpdateLib.Tasks
              * Start a task to get all the files that need to be updated
              * Returns if there is anything to update
              */
-            CheckForUpdatedItemsTask updatedFilesTask = CheckForUpdatedFiles(Result.UpdateFile, cache);
+            CheckForUpdatedItemsTask updatedFilesTask = CheckForUpdatedFiles(Result.UpdateInfo, cache);
 
             Result.AdminRightsNeeded = privilegesCheckTask.AwaitTask().Result;
             Result.UpdateAvailable = updatedFilesTask.AwaitTask().Result;
@@ -100,25 +100,25 @@ namespace MatthiWare.UpdateLib.Tasks
             return false;
         }
 
-        private CheckForUpdatedItemsTask CheckForUpdatedFiles(UpdateFile file, HashCacheFile cache)
+        private CheckForUpdatedItemsTask CheckForUpdatedFiles(UpdateInfo updateInfo, HashCacheFile cache)
         {
-            CheckForUpdatedItemsTask task = new CheckForUpdatedItemsTask(file, cache);
+            CheckForUpdatedItemsTask task = new CheckForUpdatedItemsTask(updateInfo, cache);
             task.ConfigureAwait(false).Start();
             return task;
         }
 
-        private CheckRequiredPrivilegesTask CheckPrivileges(UpdateFile file)
+        private CheckRequiredPrivilegesTask CheckPrivileges(UpdateInfo updateInfo)
         {
-            CheckRequiredPrivilegesTask task = new CheckRequiredPrivilegesTask(file);
+            CheckRequiredPrivilegesTask task = new CheckRequiredPrivilegesTask(updateInfo);
             task.ConfigureAwait(false).Start();
             return task;
         }
 
         public class CheckForUpdatesResult
         {
-            public UpdateVersion Version { get; set; } 
+            public UpdateVersion Version { get { return UpdateInfo.Version; } }
             public bool UpdateAvailable { get; set; } = false;
-            public UpdateFile UpdateFile { get; set; }
+            public UpdateInfo UpdateInfo { get; set; }
             public bool AdminRightsNeeded { get; set; } = false;
         }
     }

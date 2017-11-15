@@ -27,23 +27,23 @@ namespace MatthiWare.UpdateLib.Tasks
 {
     public class DownloadManager
     {
-        private AtomicInteger amountToDownload = new AtomicInteger();
-        private UpdateFile file;
+        private AtomicInteger m_amountToDownload = new AtomicInteger();
+        private UpdateInfo m_updateInfo;
 
-        private List<UpdatableTask> tasks = new List<UpdatableTask>();
+        private List<UpdatableTask> m_tasks = new List<UpdatableTask>();
         private bool hasRegUpdate, hasErrors = false;
 
         public event EventHandler Completed;
 
-        public DownloadManager(UpdateFile file)
+        public DownloadManager(UpdateInfo updateInfo)
         {
-            amountToDownload.Value = file.FileCount;
-            this.file = file;
+            m_amountToDownload.Value = updateInfo.FileCount;
+            this.m_updateInfo = updateInfo;
         }
 
         private void Reset()
         {
-            tasks.Clear();
+            m_tasks.Clear();
             hasRegUpdate = false;
             hasErrors = false;
         }
@@ -58,7 +58,7 @@ namespace MatthiWare.UpdateLib.Tasks
 
         private void StartUpdate()
         {
-            IEnumerable<DownloadTask> _tasks = tasks.Select(task => task as DownloadTask).NotNull();
+            IEnumerable<DownloadTask> _tasks = m_tasks.Select(task => task as DownloadTask).NotNull();
 
             _tasks.ForEach(task => task.Start());
 
@@ -68,12 +68,12 @@ namespace MatthiWare.UpdateLib.Tasks
 
         private void StartRegUpdate()
         {
-            tasks.Select(task => task as UpdateRegistryTask).NotNull().FirstOrDefault()?.Start();
+            m_tasks.Select(task => task as UpdateRegistryTask).NotNull().FirstOrDefault()?.Start();
         }
 
         private void AddUpdates()
         {
-            foreach (FileEntry file in file.Folders
+            foreach (FileEntry file in m_updateInfo.Folders
                 .SelectMany(dir => dir.GetItems())
                 .Select(e => e as FileEntry)
                 .Distinct()
@@ -82,10 +82,10 @@ namespace MatthiWare.UpdateLib.Tasks
                 DownloadTask task = new DownloadTask(file);
                 task.TaskCompleted += Task_TaskCompleted;
 
-                tasks.Add(task);
+                m_tasks.Add(task);
             }
 
-            IEnumerable<RegistryKeyEntry> keys = file.Registry
+            IEnumerable<RegistryKeyEntry> keys = m_updateInfo.Registry
                 .SelectMany(dir => dir.GetItems())
                 .Select(e => e as RegistryKeyEntry)
                 .Distinct()
@@ -95,12 +95,12 @@ namespace MatthiWare.UpdateLib.Tasks
                 return;
 
             hasRegUpdate = true;
-            amountToDownload.Increment();
+            m_amountToDownload.Increment();
 
             UpdateRegistryTask regTask = new UpdateRegistryTask(keys);
             regTask.TaskCompleted += Task_TaskCompleted;
 
-            tasks.Add(regTask);
+            m_tasks.Add(regTask);
         }
 
         private void Task_TaskCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
@@ -112,7 +112,7 @@ namespace MatthiWare.UpdateLib.Tasks
                 CancelOtherTasks();
             }
 
-            int left = amountToDownload.Decrement();
+            int left = m_amountToDownload.Decrement();
 
             if (hasErrors)
                 return;
@@ -126,7 +126,7 @@ namespace MatthiWare.UpdateLib.Tasks
 
         private void CancelOtherTasks()
         {
-            foreach (UpdatableTask task in tasks)
+            foreach (UpdatableTask task in m_tasks)
                 if (!task.IsCancelled)
                     task.Cancel();
         }

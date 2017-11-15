@@ -15,6 +15,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+using MatthiWare.UpdateLib.Common;
 using MatthiWare.UpdateLib.Files;
 using System;
 using System.Windows.Forms;
@@ -23,25 +24,28 @@ namespace MatthiWare.UpdateLib.UI.Components
 {
     public partial class FinishPage : UserControl, IWizardPage
     {
+
+        private UpdaterForm _updaterForm;
+
         public FinishPage(UpdaterForm parent)
         {
             InitializeComponent();
 
             _updaterForm = parent;
 
-            txtDescription.Text = txtDescription.Text.Replace("%AppName%", parent.updateInfoFile.ApplicationName);
-            txtDescription.Text = txtDescription.Text.Replace("%version%", parent.updateInfoFile.Version.Value);
+            txtDescription.Text = txtDescription.Text.Replace("%AppName%", parent.updateInfo.ApplicationName);
+            txtDescription.Text = txtDescription.Text.Replace("%version%", parent.updateInfo.Version.Value);
         }
 
         public void UpdateState()
         {
+            UpdateInfo file = _updaterForm.updateInfo;
+
             if (_updaterForm.hasHadErrors)
             {
                 cbRestart.Checked = false;
                 cbRestart.Enabled = false;
-
-                UpdateFile file = _updaterForm.updateInfoFile;
-
+                
                 txtDescription.Text = $"{file.ApplicationName} was unable to update to version {file.Version}!\n\n" +
                     "Check the log files for more information!\n\n" +
                     "Press Finish to close this wizard.";
@@ -52,9 +56,7 @@ namespace MatthiWare.UpdateLib.UI.Components
             {
                 cbRestart.Checked = false;
                 cbRestart.Enabled = false;
-
-                UpdateFile file = _updaterForm.updateInfoFile;
-
+                
                 txtDescription.Text = $"{file.ApplicationName} was unable to update to version {file.Version}!\n\n" +
                     "Update process cancelled by the user.\n\n" +
                     "Press Finish to close this wizard.";
@@ -128,7 +130,7 @@ namespace MatthiWare.UpdateLib.UI.Components
             }
         }
 
-        private UpdaterForm _updaterForm;
+        
         public UpdaterForm UpdaterForm
         {
             get

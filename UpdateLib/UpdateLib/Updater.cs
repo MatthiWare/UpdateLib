@@ -467,10 +467,10 @@ namespace MatthiWare.UpdateLib
                         return;
 
                 if (UpdateSilently)
-                    UpdateWithoutGUI(task.Result.UpdateFile);
+                    UpdateWithoutGUI(task.Result.UpdateInfo);
                 else
                 {
-                    UpdaterForm updateForm = new UpdaterForm(task.Result.UpdateFile);
+                    UpdaterForm updateForm = new UpdaterForm(task.Result.UpdateInfo);
                     updateForm.ShowDialog(owner);
                 }
 
@@ -552,10 +552,11 @@ namespace MatthiWare.UpdateLib
         /// <summary>
         /// Updates without user interaction
         /// </summary>
-        /// <param name="file">The update specifications file <see cref="UpdateFile"/> </param>
-        private void UpdateWithoutGUI(UpdateFile file)
+        /// <param name="updateInfo">The update specifications file <see cref="UpdateInfo"/> </param>
+        private void UpdateWithoutGUI(UpdateInfo updateInfo)
         {
-            DownloadManager downloader = new DownloadManager(file);
+            DownloadManager downloader = new DownloadManager(updateInfo);
+
             downloader.Completed += (o, e) =>
             {
                 GetCache().Save();

@@ -59,17 +59,17 @@ namespace UpdateLib.Tests.Tasks
         {
 
 
-            UpdateFile file = new UpdateFile();
+            UpdateInfo info = new UpdateInfo();
 
             DirectoryEntry dir = new DirectoryEntry("%appdir%");
             FileEntry entry_file = new FileEntry("testfile.txt");
             entry_file.Hash = HashUtil.GetHash(m_file);
             dir.Add(entry_file);
 
-            file.Folders.Add(dir);
+            info.Folders.Add(dir);
 
             ManualResetEvent wait = new ManualResetEvent(false);
-            DownloadManager manager = new DownloadManager(file);
+            DownloadManager manager = new DownloadManager(info);
             manager.Completed += (o, e) => wait.Set();
             manager.Update();
 

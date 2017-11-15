@@ -26,10 +26,10 @@ namespace MatthiWare.UpdateLib.Tasks
 {
     public class CheckForUpdatedItemsTask : AsyncTask<bool>
     {
-        private UpdateFile m_updateFile;
+        private UpdateInfo m_updateFile;
         private HashCacheFile m_cacheFile;
 
-        public CheckForUpdatedItemsTask(UpdateFile update, HashCacheFile cache)
+        public CheckForUpdatedItemsTask(UpdateInfo update, HashCacheFile cache)
         {
             if (update == null) throw new ArgumentNullException(nameof(update));
             if (cache == null) throw new ArgumentNullException(nameof(cache));
