@@ -33,7 +33,7 @@ namespace MatthiWare.UpdateLib.Compression.VCDiff
             }
         }
 
-        internal static CodeTable BuildDefaultCodeTable()
+        private static CodeTable BuildDefaultCodeTable()
         {
             // default are NoOps with size and mode 0.
             Instruction[,] instructions = new Instruction[256, 2];
