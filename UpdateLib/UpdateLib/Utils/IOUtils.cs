@@ -123,5 +123,25 @@ namespace MatthiWare.UpdateLib.Utils
 
             throw new IOException("Invalid 7-bit encoded integer in stream");
         }
+
+        internal static void Copy(Stream source, Stream dest, byte[] buffer)
+        {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            if (dest == null) throw new ArgumentNullException(nameof(dest));
+            if (buffer == null) throw new ArgumentNullException(nameof(buffer));
+
+            bool copying = true;
+
+            while (copying)
+            {
+                int bytesRead = source.Read(buffer, 0, buffer.Length);
+                copying = bytesRead > 0;
+
+                if (copying)
+                    dest.Write(buffer, 0, bytesRead);
+                else
+                    dest.Flush();
+            }
+        }
     }
 }
