@@ -173,9 +173,9 @@ namespace MatthiWare.UpdateLib.Compression.VCDiff
                 }
 
                 m_output.Write(targetData, 0, targetLength);
-
-                return true;
             }
+
+            return true;
         }
     }
 }

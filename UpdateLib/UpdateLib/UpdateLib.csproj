@@ -82,6 +82,11 @@
     <Compile Include="Compression\VCDiff\VCDiffFormatException.cs" />
     <Compile Include="Compression\Zip\ZipConstants.cs" />
     <Compile Include="Compression\Zip\ZipEntry.cs" />
+    <Compile Include="Compression\Zip\ZipException.cs" />
+    <Compile Include="Compression\Zip\ZipExtraData.cs" />
+    <Compile Include="Compression\Zip\ZipHelperStream.cs" />
+    <Compile Include="Compression\Zip\ZipInputStream.cs" />
+    <Compile Include="Compression\Zip\ZipOutputStream.cs" />
     <Compile Include="Controls\UpdaterControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
