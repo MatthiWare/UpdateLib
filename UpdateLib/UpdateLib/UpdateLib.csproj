@@ -54,13 +54,34 @@
     <Compile Include="Common\ParameterDefinition.cs" />
     <Compile Include="Common\UpdateInfo.cs" />
     <Compile Include="Common\UpdateVersion.cs" />
+    <Compile Include="Compression\Checksum\Adler32.cs" />
+    <Compile Include="Compression\Checksum\Crc32.cs" />
+    <Compile Include="Compression\Checksum\IChecksum.cs" />
+    <Compile Include="Compression\Deflater.cs" />
+    <Compile Include="Compression\DeflaterConstants.cs" />
+    <Compile Include="Compression\DeflaterEngine.cs" />
+    <Compile Include="Compression\DeflaterHuffman.cs" />
+    <Compile Include="Compression\DeflaterPending.cs" />
     <Compile Include="Compression\GZip\GZip.cs" />
+    <Compile Include="Compression\GZip\GZipConstants.cs" />
     <Compile Include="Compression\GZip\GZipException.cs" />
+    <Compile Include="Compression\GZip\GZipInputStream.cs" />
+    <Compile Include="Compression\GZip\GZipOutputStream.cs" />
+    <Compile Include="Compression\Inflater.cs" />
+    <Compile Include="Compression\InflaterDynHeader.cs" />
+    <Compile Include="Compression\InflaterHuffmanTree.cs" />
+    <Compile Include="Compression\PendingBuffer.cs" />
+    <Compile Include="Compression\Streams\DeflaterOutputStream.cs" />
+    <Compile Include="Compression\Streams\InflaterInputStream.cs" />
+    <Compile Include="Compression\Streams\OutputWindow.cs" />
+    <Compile Include="Compression\Streams\StreamManipulator.cs" />
     <Compile Include="Compression\VCDiff\AddressCache.cs" />
     <Compile Include="Compression\VCDiff\CodeTable.cs" />
     <Compile Include="Compression\VCDiff\Instruction.cs" />
     <Compile Include="Compression\VCDiff\VCDiffDecoder.cs" />
     <Compile Include="Compression\VCDiff\VCDiffFormatException.cs" />
+    <Compile Include="Compression\Zip\ZipConstants.cs" />
+    <Compile Include="Compression\Zip\ZipEntry.cs" />
     <Compile Include="Controls\UpdaterControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -201,9 +222,7 @@
       <DependentUpon>UpdaterForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Compression\Zip\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
