@@ -1,10 +1,42 @@
-﻿using MatthiWare.UpdateLib.Compression.Checksum;
+﻿/*  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as published
+ *  by the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/* Copyright © 2000-2016 SharpZipLib Contributors
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+ * to whom the Software is furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+ * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+ * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
+ */
+
+using MatthiWare.UpdateLib.Compression.Checksum;
 using MatthiWare.UpdateLib.Compression.Streams;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace MatthiWare.UpdateLib.Compression.GZip
 {
@@ -93,9 +125,8 @@ namespace MatthiWare.UpdateLib.Compression.GZip
         public void SetLevel(int level)
         {
             if (level < Deflater.BEST_SPEED)
-            {
                 throw new ArgumentOutOfRangeException(nameof(level));
-            }
+
             deflater_.SetLevel(level);
         }
 
@@ -103,10 +134,7 @@ namespace MatthiWare.UpdateLib.Compression.GZip
         /// Get the current compression level.
         /// </summary>
         /// <returns>The current compression level.</returns>
-        public int GetLevel()
-        {
-            return deflater_.GetLevel();
-        }
+        public int GetLevel() => deflater_.GetLevel();
         #endregion
 
         #region Stream overrides
@@ -119,14 +147,10 @@ namespace MatthiWare.UpdateLib.Compression.GZip
         public override void Write(byte[] buffer, int offset, int count)
         {
             if (state_ == OutputState.Header)
-            {
                 WriteHeader();
-            }
 
             if (state_ != OutputState.Footer)
-            {
                 throw new InvalidOperationException("Write not permitted in current state");
-            }
 
             crc.Update(buffer, offset, count);
             base.Write(buffer, offset, count);
@@ -147,10 +171,9 @@ namespace MatthiWare.UpdateLib.Compression.GZip
                 if (state_ != OutputState.Closed)
                 {
                     state_ = OutputState.Closed;
+
                     if (IsStreamOwner)
-                    {
                         baseOutputStream_.Dispose();
-                    }
                 }
             }
         }
@@ -164,9 +187,7 @@ namespace MatthiWare.UpdateLib.Compression.GZip
         {
             // If no data has been written a header should be added.
             if (state_ == OutputState.Header)
-            {
                 WriteHeader();
-            }
 
             if (state_ == OutputState.Footer)
             {
@@ -204,24 +225,28 @@ namespace MatthiWare.UpdateLib.Compression.GZip
                 var mod_time = (int)((DateTime.Now.Ticks - new DateTime(1970, 1, 1).Ticks) / 10000000L);  // Ticks give back 100ns intervals
                 byte[] gzipHeader = {
 					// The two magic bytes
-					(byte) (GZipConstants.GZIP_MAGIC >> 8), (byte) (GZipConstants.GZIP_MAGIC & 0xff),
+					(GZipConstants.GZIP_MAGIC >> 8),
+                    (GZipConstants.GZIP_MAGIC & 0xff),
 
 					// The compression type
-					(byte) Deflater.DEFLATED,
+					Deflater.DEFLATED,
 
 					// The flags (not set)
 					0,
 
 					// The modification time
-					(byte) mod_time, (byte) (mod_time >> 8),
-                    (byte) (mod_time >> 16), (byte) (mod_time >> 24),
+					(byte) mod_time,
+                    (byte) (mod_time >> 8),
+                    (byte) (mod_time >> 16),
+                    (byte) (mod_time >> 24),
 
 					// The extra flags
 					0,
 
 					// The OS type (unknown)
-					(byte) 255
+				     255
                 };
+
                 baseOutputStream_.Write(gzipHeader, 0, gzipHeader.Length);
             }
         }

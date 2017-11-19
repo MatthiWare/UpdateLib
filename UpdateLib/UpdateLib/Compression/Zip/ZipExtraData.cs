@@ -1,8 +1,40 @@
-﻿using System;
-using System.Collections.Generic;
+﻿/*  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as published
+ *  by the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/* Copyright © 2000-2016 SharpZipLib Contributors
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+ * to whom the Software is furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+ * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+ * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
+ */
+
+using System;
 using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace MatthiWare.UpdateLib.Compression.Zip
 {
@@ -68,9 +100,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         public void SetData(byte[] data, int offset, int count)
         {
             if (data == null)
-            {
                 throw new ArgumentNullException(nameof(data));
-            }
 
             _data = new byte[count];
             Array.Copy(data, offset, _data, 0, count);
@@ -80,10 +110,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         /// Get the binary data representing this instance.
         /// </summary>
         /// <returns>The raw binary data representing this instance.</returns>
-        public byte[] GetData()
-        {
-            return _data;
-        }
+        public byte[] GetData() => _data;
 
         #endregion
 
@@ -200,24 +227,28 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             {
                 helperStream.IsStreamOwner = false;
                 helperStream.WriteByte((byte)_flags);     // Flags
+
                 if ((_flags & Flags.ModificationTime) != 0)
                 {
                     TimeSpan span = _modificationTime - new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
                     var seconds = (int)span.TotalSeconds;
                     helperStream.WriteLEInt(seconds);
                 }
+
                 if ((_flags & Flags.AccessTime) != 0)
                 {
                     TimeSpan span = _lastAccessTime - new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
                     var seconds = (int)span.TotalSeconds;
                     helperStream.WriteLEInt(seconds);
                 }
+
                 if ((_flags & Flags.CreateTime) != 0)
                 {
                     TimeSpan span = _createTime - new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
                     var seconds = (int)span.TotalSeconds;
                     helperStream.WriteLEInt(seconds);
                 }
+
                 return ms.ToArray();
             }
         }
@@ -252,9 +283,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             set
             {
                 if (!IsValidValue(value))
-                {
                     throw new ArgumentOutOfRangeException(nameof(value));
-                }
 
                 _flags |= Flags.ModificationTime;
                 _modificationTime = value;
@@ -272,9 +301,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             set
             {
                 if (!IsValidValue(value))
-                {
                     throw new ArgumentOutOfRangeException(nameof(value));
-                }
 
                 _flags |= Flags.AccessTime;
                 _lastAccessTime = value;
@@ -292,9 +319,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             set
             {
                 if (!IsValidValue(value))
-                {
                     throw new ArgumentOutOfRangeException(nameof(value));
-                }
 
                 _flags |= Flags.CreateTime;
                 _createTime = value;
@@ -347,6 +372,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
                 {
                     int ntfsTag = helperStream.ReadLEShort();
                     int ntfsLength = helperStream.ReadLEShort();
+
                     if (ntfsTag == 1)
                     {
                         if (ntfsLength >= 24)
@@ -360,6 +386,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
                             long createTimeTicks = helperStream.ReadLELong();
                             _createTime = DateTime.FromFileTimeUtc(createTimeTicks);
                         }
+
                         break;
                     }
                     else
@@ -387,6 +414,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
                 helperStream.WriteLELong(_lastModificationTime.ToFileTimeUtc());
                 helperStream.WriteLELong(_lastAccessTime.ToFileTimeUtc());
                 helperStream.WriteLELong(_createTime.ToFileTimeUtc());
+
                 return ms.ToArray();
             }
         }
@@ -405,6 +433,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         public static bool IsValidValue(DateTime value)
         {
             bool result = true;
+
             try
             {
                 value.ToFileTimeUtc();
@@ -413,6 +442,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             {
                 result = false;
             }
+
             return result;
         }
 
@@ -425,9 +455,8 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             set
             {
                 if (!IsValidValue(value))
-                {
                     throw new ArgumentOutOfRangeException(nameof(value));
-                }
+
                 _lastModificationTime = value;
             }
         }
@@ -441,9 +470,8 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             set
             {
                 if (!IsValidValue(value))
-                {
                     throw new ArgumentOutOfRangeException(nameof(value));
-                }
+
                 _createTime = value;
             }
         }
@@ -457,9 +485,8 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             set
             {
                 if (!IsValidValue(value))
-                {
                     throw new ArgumentOutOfRangeException(nameof(value));
-                }
+
                 _lastAccessTime = value;
             }
         }
@@ -515,14 +542,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         /// <param name="data">The extra data.</param>
         public ZipExtraData(byte[] data)
         {
-            if (data == null)
-            {
-                _data = new byte[0];
-            }
-            else
-            {
-                _data = data;
-            }
+            _data = data ?? new byte[0];
         }
         #endregion
 
@@ -533,9 +553,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         public byte[] GetEntryData()
         {
             if (Length > ushort.MaxValue)
-            {
                 throw new ZipException("Data exceeds maximum length");
-            }
 
             return (byte[])_data.Clone();
         }
@@ -546,9 +564,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         public void Clear()
         {
             if ((_data == null) || (_data.Length != 0))
-            {
                 _data = new byte[0];
-            }
         }
 
         /// <summary>
@@ -567,10 +583,10 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         public Stream GetStreamForTag(int tag)
         {
             Stream result = null;
+
             if (Find(tag))
-            {
                 result = new MemoryStream(_data, _index, _readValueLength, false);
-            }
+
             return result;
         }
 
@@ -583,12 +599,13 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             where T : class, ITaggedData, new()
         {
             T result = new T();
-            if (Find(result.TagID))
-            {
-                result.SetData(_data, _readValueStart, _readValueLength);
-                return result;
-            }
-            else return null;
+
+            if (!Find(result.TagID))
+                return default(T);
+
+            result.SetData(_data, _readValueStart, _readValueLength);
+
+            return result;
         }
 
         /// <summary>
@@ -620,9 +637,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             {
                 if ((_readValueStart > _data.Length) ||
                     (_readValueStart < 4))
-                {
                     throw new ZipException("Find must be called before calling a Read method");
-                }
 
                 return _readValueStart + _readValueLength - _index;
             }
@@ -648,10 +663,9 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             {
                 localTag = ReadShortInternal();
                 localLength = ReadShortInternal();
+
                 if (localTag != headerID)
-                {
                     _index += localLength;
-                }
             }
 
             bool result = (localTag == headerID) && ((_index + localLength) <= _data.Length);
@@ -672,9 +686,8 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         public void AddEntry(ITaggedData taggedData)
         {
             if (taggedData == null)
-            {
                 throw new ArgumentNullException(nameof(taggedData));
-            }
+
             AddEntry(taggedData.TagID, taggedData.GetData());
         }
 
@@ -687,42 +700,35 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         public void AddEntry(int headerID, byte[] fieldData)
         {
             if ((headerID > ushort.MaxValue) || (headerID < 0))
-            {
                 throw new ArgumentOutOfRangeException(nameof(headerID));
-            }
 
             int addLength = (fieldData == null) ? 0 : fieldData.Length;
 
             if (addLength > ushort.MaxValue)
-            {
                 throw new ArgumentOutOfRangeException(nameof(fieldData), "exceeds maximum length");
-            }
 
             // Test for new length before adjusting data.
             int newLength = _data.Length + addLength + 4;
 
             if (Find(headerID))
-            {
                 newLength -= (ValueLength + 4);
-            }
 
             if (newLength > ushort.MaxValue)
-            {
                 throw new ZipException("Data exceeds maximum length");
-            }
 
             Delete(headerID);
 
             byte[] newData = new byte[newLength];
             _data.CopyTo(newData, 0);
+
             int index = _data.Length;
             _data = newData;
+
             SetShort(ref index, headerID);
             SetShort(ref index, addLength);
+
             if (fieldData != null)
-            {
                 fieldData.CopyTo(newData, index);
-            }
         }
 
         /// <summary>
@@ -765,9 +771,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         public void AddData(byte[] data)
         {
             if (data == null)
-            {
                 throw new ArgumentNullException(nameof(data));
-            }
 
             _newEntry.Write(data, 0, data.Length);
         }
@@ -835,6 +839,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
                 Array.Copy(_data, trueEnd, newData, trueStart, _data.Length - trueEnd);
                 _data = newData;
             }
+
             return result;
         }
 
@@ -859,7 +864,9 @@ namespace MatthiWare.UpdateLib.Compression.Zip
 
             int result = _data[_index] + (_data[_index + 1] << 8) +
                 (_data[_index + 2] << 16) + (_data[_index + 3] << 24);
+
             _index += 4;
+
             return result;
         }
 
@@ -870,8 +877,10 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         public int ReadShort()
         {
             ReadCheck(2);
+
             int result = _data[_index] + (_data[_index + 1] << 8);
             _index += 2;
+
             return result;
         }
 
@@ -882,11 +891,10 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         public int ReadByte()
         {
             int result = -1;
+
             if ((_index < _data.Length) && (_readValueStart + _readValueLength > _index))
-            {
-                result = _data[_index];
-                _index += 1;
-            }
+                result = _data[_index++];
+
             return result;
         }
 
@@ -904,19 +912,13 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         {
             if ((_readValueStart > _data.Length) ||
                 (_readValueStart < 4))
-            {
                 throw new ZipException("Find must be called before calling a Read method");
-            }
 
             if (_index > _readValueStart + _readValueLength - length)
-            {
                 throw new ZipException("End of extra data");
-            }
 
             if (_index + length < 4)
-            {
                 throw new ZipException("Cannot read before start of tag");
-            }
         }
 
         /// <summary>
@@ -926,20 +928,17 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         int ReadShortInternal()
         {
             if (_index > _data.Length - 2)
-            {
                 throw new ZipException("End of extra data");
-            }
 
-            int result = _data[_index] + (_data[_index + 1] << 8);
-            _index += 2;
+            int result = _data[_index++] + (_data[_index++] << 8);
+
             return result;
         }
 
         void SetShort(ref int index, int source)
         {
-            _data[index] = (byte)source;
-            _data[index + 1] = (byte)(source >> 8);
-            index += 2;
+            _data[index++] = (byte)source;
+            _data[index++] = (byte)(source >> 8);
         }
 
         #endregion

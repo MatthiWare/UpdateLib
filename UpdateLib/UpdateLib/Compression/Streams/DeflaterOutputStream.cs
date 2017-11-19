@@ -1,10 +1,41 @@
-﻿using MatthiWare.UpdateLib.Compression.Zip;
+﻿/*  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as published
+ *  by the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/* Copyright © 2000-2016 SharpZipLib Contributors
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+ * to whom the Software is furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+ * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+ * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
+ */
+
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
 
 namespace MatthiWare.UpdateLib.Compression.Streams
 {
@@ -67,9 +98,7 @@ namespace MatthiWare.UpdateLib.Compression.Streams
         public DeflaterOutputStream(Stream baseOutputStream, Deflater deflater, int bufferSize)
         {
             if (baseOutputStream == null)
-            {
                 throw new ArgumentNullException(nameof(baseOutputStream));
-            }
 
             if (baseOutputStream.CanWrite == false)
             {
@@ -77,19 +106,16 @@ namespace MatthiWare.UpdateLib.Compression.Streams
             }
 
             if (deflater == null)
-            {
                 throw new ArgumentNullException(nameof(deflater));
-            }
 
             if (bufferSize < 512)
-            {
                 throw new ArgumentOutOfRangeException(nameof(bufferSize));
-            }
 
             baseOutputStream_ = baseOutputStream;
             buffer_ = new byte[bufferSize];
             deflater_ = deflater;
         }
+
         #endregion
 
         #region Public API
@@ -106,34 +132,15 @@ namespace MatthiWare.UpdateLib.Compression.Streams
             {
                 int len = deflater_.Deflate(buffer_, 0, buffer_.Length);
                 if (len <= 0)
-                {
                     break;
-                }
-
-                if (cryptoTransform_ != null)
-                {
-                    EncryptBlock(buffer_, 0, len);
-                }
 
                 baseOutputStream_.Write(buffer_, 0, len);
             }
 
             if (!deflater_.IsFinished)
-            {
-                throw new SharpZipBaseException("Can't deflate all input?");
-            }
+                throw new IOException("Can't deflate all input?");
 
             baseOutputStream_.Flush();
-
-            if (cryptoTransform_ != null)
-            {
-                if (cryptoTransform_ is ZipAESTransform)
-                {
-                    AESAuthCode = ((ZipAESTransform)cryptoTransform_).GetAuthCode();
-                }
-                cryptoTransform_.Dispose();
-                cryptoTransform_ = null;
-            }
         }
 
         /// <summary>
@@ -156,87 +163,6 @@ namespace MatthiWare.UpdateLib.Compression.Streams
 
         #endregion
 
-        #region Encryption
-
-        string password;
-
-        ICryptoTransform cryptoTransform_;
-
-        /// <summary>
-        /// Returns the 10 byte AUTH CODE to be appended immediately following the AES data stream.
-        /// </summary>
-        protected byte[] AESAuthCode;
-
-        /// <summary>
-        /// Get/set the password used for encryption.
-        /// </summary>
-        /// <remarks>When set to null or if the password is empty no encryption is performed</remarks>
-        public string Password
-        {
-            get
-            {
-                return password;
-            }
-            set
-            {
-                if ((value != null) && (value.Length == 0))
-                {
-                    password = null;
-                }
-                else
-                {
-                    password = value;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Encrypt a block of data
-        /// </summary>
-        /// <param name="buffer">
-        /// Data to encrypt.  NOTE the original contents of the buffer are lost
-        /// </param>
-        /// <param name="offset">
-        /// Offset of first byte in buffer to encrypt
-        /// </param>
-        /// <param name="length">
-        /// Number of bytes in buffer to encrypt
-        /// </param>
-        protected void EncryptBlock(byte[] buffer, int offset, int length)
-        {
-            cryptoTransform_.TransformBlock(buffer, 0, length, buffer, 0);
-        }
-
-        /// <summary>
-        /// Initializes encryption keys based on given <paramref name="password"/>.
-        /// </summary>
-        /// <param name="password">The password.</param>
-        protected void InitializePassword(string password)
-        {
-            var pkManaged = new PkzipClassicManaged();
-            byte[] key = PkzipClassic.GenerateKeys(ZipConstants.ConvertToArray(password));
-            cryptoTransform_ = pkManaged.CreateEncryptor(key, null);
-        }
-
-        /// <summary>
-        /// Initializes encryption keys based on given password.
-        /// </summary>
-        protected void InitializeAESPassword(ZipEntry entry, string rawPassword,
-                                            out byte[] salt, out byte[] pwdVerifier)
-        {
-            salt = new byte[entry.AESSaltLen];
-            // Salt needs to be cryptographically random, and unique per file
-            if (_aesRnd == null)
-                _aesRnd = RandomNumberGenerator.Create();
-            _aesRnd.GetBytes(salt);
-            int blockSize = entry.AESKeySize / 8;   // bits to bytes
-
-            cryptoTransform_ = new ZipAESTransform(rawPassword, salt, blockSize, true);
-            pwdVerifier = ((ZipAESTransform)cryptoTransform_).PwdVerifier;
-        }
-
-        #endregion
-
         #region Deflation Support
         /// <summary>
         /// Deflates everything in the input buffers.  This will call
@@ -250,21 +176,13 @@ namespace MatthiWare.UpdateLib.Compression.Streams
                 int deflateCount = deflater_.Deflate(buffer_, 0, buffer_.Length);
 
                 if (deflateCount <= 0)
-                {
                     break;
-                }
-                if (cryptoTransform_ != null)
-                {
-                    EncryptBlock(buffer_, 0, deflateCount);
-                }
 
                 baseOutputStream_.Write(buffer_, 0, deflateCount);
             }
 
             if (!deflater_.IsNeedingInput)
-            {
-                throw new SharpZipBaseException("DeflaterOutputStream can't deflate all input?");
-            }
+                throw new IOException("DeflaterOutputStream can't deflate all input?");
         }
         #endregion
 
@@ -399,28 +317,12 @@ namespace MatthiWare.UpdateLib.Compression.Streams
                 try
                 {
                     Finish();
-                    if (cryptoTransform_ != null)
-                    {
-                        GetAuthCodeIfAES();
-                        cryptoTransform_.Dispose();
-                        cryptoTransform_ = null;
-                    }
                 }
                 finally
                 {
                     if (IsStreamOwner)
-                    {
                         baseOutputStream_.Dispose();
-                    }
                 }
-            }
-        }
-
-        private void GetAuthCodeIfAES()
-        {
-            if (cryptoTransform_ is ZipAESTransform)
-            {
-                AESAuthCode = ((ZipAESTransform)cryptoTransform_).GetAuthCode();
             }
         }
 
@@ -482,5 +384,4 @@ namespace MatthiWare.UpdateLib.Compression.Streams
         private static RandomNumberGenerator _aesRnd = RandomNumberGenerator.Create();
         #endregion
     }
-}
 }

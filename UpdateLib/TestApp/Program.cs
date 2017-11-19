@@ -20,7 +20,6 @@ using MatthiWare.UpdateLib.Common;
 using MatthiWare.UpdateLib.Logging.Writers;
 using System;
 using System.Windows.Forms;
-using System.Xml.Serialization;
 
 namespace TestApp
 {

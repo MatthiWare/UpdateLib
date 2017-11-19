@@ -18,7 +18,6 @@
 using System;
 using System.ComponentModel;
 using System.Windows.Forms;
-using MatthiWare.UpdateLib.Files;
 using MatthiWare.UpdateLib.Properties;
 using MatthiWare.UpdateLib.Tasks;
 using MatthiWare.UpdateLib.Threading;

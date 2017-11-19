@@ -1,10 +1,43 @@
-﻿using MatthiWare.UpdateLib.Compression.Checksum;
+﻿/*  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as published
+ *  by the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/* Copyright © 2000-2016 SharpZipLib Contributors
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+ * to whom the Software is furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+ * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+ * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
+ */
+
+using MatthiWare.UpdateLib.Compression.Checksum;
 using MatthiWare.UpdateLib.Compression.Streams;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace MatthiWare.UpdateLib.Compression.Zip
 {
@@ -101,10 +134,10 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         {
             // TODO: Its not yet clear how to handle unicode comments here.
             byte[] commentBytes = ZipConstants.ConvertToArray(comment);
+
             if (commentBytes.Length > 0xffff)
-            {
                 throw new ArgumentOutOfRangeException(nameof(comment));
-            }
+
             zipComment = commentBytes;
         }
 
@@ -208,24 +241,16 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         public void PutNextEntry(ZipEntry entry)
         {
             if (entry == null)
-            {
                 throw new ArgumentNullException(nameof(entry));
-            }
 
             if (entries == null)
-            {
                 throw new InvalidOperationException("ZipOutputStream was finished");
-            }
 
             if (curEntry != null)
-            {
                 CloseEntry();
-            }
 
             if (entries.Count == int.MaxValue)
-            {
                 throw new ZipException("Too many entries for Zip file");
-            }
 
             CompressionMethod method = entry.CompressionMethod;
             int compressionLevel = defaultCompressionLevel;
@@ -284,20 +309,8 @@ namespace MatthiWare.UpdateLib.Compression.Zip
                 }
             }
 
-            if (Password != null)
-            {
-                entry.IsCrypted = true;
-                if (entry.Crc < 0)
-                {
-                    // Need to append a data descriptor as the crc isnt available for use
-                    // with encryption, the date is used instead.  Setting the flag
-                    // indicates this to the decompressor.
-                    entry.Flags |= 8;
-                }
-            }
-
             entry.Offset = offset;
-            entry.CompressionMethod = (CompressionMethod)method;
+            entry.CompressionMethod = method;
 
             curMethod = method;
             sizePatchPos = -1;
@@ -312,7 +325,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
 
             WriteLeShort(entry.Version);
             WriteLeShort(entry.Flags);
-            WriteLeShort((byte)entry.CompressionMethodForHeader);
+            WriteLeShort((byte)entry.CompressionMethod);
             WriteLeInt((int)entry.DosTime);
 
             // TODO: Refactor header writing.  Its done in several places.
@@ -326,22 +339,19 @@ namespace MatthiWare.UpdateLib.Compression.Zip
                 }
                 else
                 {
-                    WriteLeInt(entry.IsCrypted ? (int)entry.CompressedSize + ZipConstants.CryptoHeaderSize : (int)entry.CompressedSize);
+                    WriteLeInt((int)entry.CompressedSize);
                     WriteLeInt((int)entry.Size);
                 }
             }
             else
             {
                 if (patchEntryHeader)
-                {
                     crcPatchPos = baseOutputStream_.Position;
-                }
+
                 WriteLeInt(0);  // Crc
 
                 if (patchEntryHeader)
-                {
                     sizePatchPos = baseOutputStream_.Position;
-                }
 
                 // For local header both sizes appear in Zip64 Extended Information
                 if (entry.LocalHeaderRequiresZip64 || patchEntryHeader)
@@ -359,15 +369,14 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             byte[] name = ZipConstants.ConvertToArray(entry.Flags, entry.Name);
 
             if (name.Length > 0xFFFF)
-            {
                 throw new ZipException("Entry name too long.");
-            }
 
             var ed = new ZipExtraData(entry.ExtraData);
 
             if (entry.LocalHeaderRequiresZip64)
             {
                 ed.StartNewEntry();
+
                 if (headerInfoAvailable)
                 {
                     ed.AddLeLong(entry.Size);
@@ -378,27 +387,18 @@ namespace MatthiWare.UpdateLib.Compression.Zip
                     ed.AddLeLong(-1);
                     ed.AddLeLong(-1);
                 }
+
                 ed.AddNewEntry(1);
 
                 if (!ed.Find(1))
-                {
                     throw new ZipException("Internal error cant find extra data");
-                }
 
                 if (patchEntryHeader)
-                {
                     sizePatchPos = ed.CurrentReadIndex;
-                }
             }
             else
-            {
                 ed.Delete(1);
-            }
 
-            if (entry.AESKeySize > 0)
-            {
-                AddExtraDataAES(entry, ed);
-            }
             byte[] extra = ed.GetEntryData();
 
             WriteLeShort(name.Length);
@@ -420,38 +420,18 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             }
 
             offset += ZipConstants.LocalHeaderBaseSize + name.Length + extra.Length;
-            // Fix offsetOfCentraldir for AES
-            if (entry.AESKeySize > 0)
-                offset += entry.AESOverheadSize;
 
             // Activate the entry.
             curEntry = entry;
             checksum.Reset();
+
             if (method == CompressionMethod.Deflated)
             {
                 deflater_.Reset();
                 deflater_.SetLevel(compressionLevel);
             }
-            size = 0;
 
-            if (entry.IsCrypted)
-            {
-                if (entry.AESKeySize > 0)
-                {
-                    WriteAESHeader(entry);
-                }
-                else
-                {
-                    if (entry.Crc < 0)
-                    {            // so testing Zip will says its ok
-                        WriteEncryptionHeader(entry.DosTime << 16);
-                    }
-                    else
-                    {
-                        WriteEncryptionHeader(entry.Crc);
-                    }
-                }
-            }
+            size = 0;
         }
 
         /// <summary>
@@ -486,12 +466,6 @@ namespace MatthiWare.UpdateLib.Compression.Zip
                 }
             }
 
-            // Write the AES Authentication Code (a hash of the compressed and encrypted data)
-            if (curEntry.AESKeySize > 0)
-            {
-                baseOutputStream_.Write(AESAuthCode, 0, 10);
-            }
-
             if (curEntry.Size < 0)
             {
                 curEntry.Size = size;
@@ -521,19 +495,6 @@ namespace MatthiWare.UpdateLib.Compression.Zip
 
             offset += csize;
 
-            if (curEntry.IsCrypted)
-            {
-                if (curEntry.AESKeySize > 0)
-                {
-                    curEntry.CompressedSize += curEntry.AESOverheadSize;
-
-                }
-                else
-                {
-                    curEntry.CompressedSize += ZipConstants.CryptoHeaderSize;
-                }
-            }
-
             // Patch the header if possible
             if (patchEntryHeader)
             {
@@ -547,9 +508,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
                 {
 
                     if (sizePatchPos == -1)
-                    {
                         throw new ZipException("Entry requires zip64 but this has been turned off");
-                    }
 
                     baseOutputStream_.Seek(sizePatchPos, SeekOrigin.Begin);
                     WriteLeLong(curEntry.Size);
@@ -560,6 +519,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
                     WriteLeInt((int)curEntry.CompressedSize);
                     WriteLeInt((int)curEntry.Size);
                 }
+
                 baseOutputStream_.Seek(curPos, SeekOrigin.Begin);
             }
 
@@ -587,60 +547,6 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             curEntry = null;
         }
 
-        void WriteEncryptionHeader(long crcValue)
-        {
-            offset += ZipConstants.CryptoHeaderSize;
-
-            InitializePassword(Password);
-
-            byte[] cryptBuffer = new byte[ZipConstants.CryptoHeaderSize];
-            var rnd = new Random();
-            rnd.NextBytes(cryptBuffer);
-            cryptBuffer[11] = (byte)(crcValue >> 24);
-
-            EncryptBlock(cryptBuffer, 0, cryptBuffer.Length);
-            baseOutputStream_.Write(cryptBuffer, 0, cryptBuffer.Length);
-        }
-
-        private static void AddExtraDataAES(ZipEntry entry, ZipExtraData extraData)
-        {
-
-            // Vendor Version: AE-1 IS 1. AE-2 is 2. With AE-2 no CRC is required and 0 is stored.
-            const int VENDOR_VERSION = 2;
-            // Vendor ID is the two ASCII characters "AE".
-            const int VENDOR_ID = 0x4541; //not 6965;
-            extraData.StartNewEntry();
-            // Pack AES extra data field see http://www.winzip.com/aes_info.htm
-            //extraData.AddLeShort(7);							// Data size (currently 7)
-            extraData.AddLeShort(VENDOR_VERSION);               // 2 = AE-2
-            extraData.AddLeShort(VENDOR_ID);                    // "AE"
-            extraData.AddData(entry.AESEncryptionStrength);     //  1 = 128, 2 = 192, 3 = 256
-            extraData.AddLeShort((int)entry.CompressionMethod); // The actual compression method used to compress the file
-            extraData.AddNewEntry(0x9901);
-        }
-
-        // Replaces WriteEncryptionHeader for AES
-        //
-        private void WriteAESHeader(ZipEntry entry)
-        {
-            byte[] salt;
-            byte[] pwdVerifier;
-            InitializeAESPassword(entry, Password, out salt, out pwdVerifier);
-            // File format for AES:
-            // Size (bytes)   Content
-            // ------------   -------
-            // Variable       Salt value
-            // 2              Password verification value
-            // Variable       Encrypted file data
-            // 10             Authentication code
-            //
-            // Value in the "compressed size" fields of the local file header and the central directory entry
-            // is the total size of all the items listed above. In other words, it is the total size of the
-            // salt value, password verification value, encrypted data, and authentication code.
-            baseOutputStream_.Write(salt, 0, salt.Length);
-            baseOutputStream_.Write(pwdVerifier, 0, pwdVerifier.Length);
-        }
-
         /// <summary>
         /// Writes the given buffer to the current entry.
         /// </summary>
@@ -652,29 +558,19 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         public override void Write(byte[] buffer, int offset, int count)
         {
             if (curEntry == null)
-            {
                 throw new InvalidOperationException("No open entry.");
-            }
 
             if (buffer == null)
-            {
                 throw new ArgumentNullException(nameof(buffer));
-            }
 
             if (offset < 0)
-            {
                 throw new ArgumentOutOfRangeException(nameof(offset), "Cannot be negative");
-            }
 
             if (count < 0)
-            {
                 throw new ArgumentOutOfRangeException(nameof(count), "Cannot be negative");
-            }
 
             if ((buffer.Length - offset) < count)
-            {
                 throw new ArgumentException("Invalid offset/count combination");
-            }
 
             checksum.Update(buffer, offset, count);
             size += count;
@@ -686,31 +582,8 @@ namespace MatthiWare.UpdateLib.Compression.Zip
                     break;
 
                 case CompressionMethod.Stored:
-                    if (Password != null)
-                    {
-                        CopyAndEncrypt(buffer, offset, count);
-                    }
-                    else
-                    {
-                        baseOutputStream_.Write(buffer, offset, count);
-                    }
+                    baseOutputStream_.Write(buffer, offset, count);
                     break;
-            }
-        }
-
-        void CopyAndEncrypt(byte[] buffer, int offset, int count)
-        {
-            const int CopyBufferSize = 4096;
-            byte[] localBuffer = new byte[CopyBufferSize];
-            while (count > 0)
-            {
-                int bufferCount = (count < CopyBufferSize) ? count : CopyBufferSize;
-
-                Array.Copy(buffer, offset, localBuffer, 0, bufferCount);
-                EncryptBlock(localBuffer, 0, bufferCount);
-                baseOutputStream_.Write(localBuffer, 0, bufferCount);
-                count -= bufferCount;
-                offset += bufferCount;
             }
         }
 
@@ -731,14 +604,10 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         public override void Finish()
         {
             if (entries == null)
-            {
                 return;
-            }
 
             if (curEntry != null)
-            {
                 CloseEntry();
-            }
 
             long numEntries = entries.Count;
             long sizeEntries = 0;
@@ -749,36 +618,22 @@ namespace MatthiWare.UpdateLib.Compression.Zip
                 WriteLeShort(ZipConstants.VersionMadeBy);
                 WriteLeShort(entry.Version);
                 WriteLeShort(entry.Flags);
-                WriteLeShort((short)entry.CompressionMethodForHeader);
+                WriteLeShort((short)entry.CompressionMethod);
                 WriteLeInt((int)entry.DosTime);
                 WriteLeInt((int)entry.Crc);
 
-                if (entry.IsZip64Forced() ||
-                    (entry.CompressedSize >= uint.MaxValue))
-                {
-                    WriteLeInt(-1);
-                }
-                else
-                {
-                    WriteLeInt((int)entry.CompressedSize);
-                }
+                WriteLeInt(entry.IsZip64Forced() || (entry.CompressedSize >= uint.MaxValue) ?
+                          -1 :
+                          (int)entry.CompressedSize);
 
-                if (entry.IsZip64Forced() ||
-                    (entry.Size >= uint.MaxValue))
-                {
-                    WriteLeInt(-1);
-                }
-                else
-                {
-                    WriteLeInt((int)entry.Size);
-                }
+                WriteLeInt(entry.IsZip64Forced() || (entry.Size >= uint.MaxValue) ?
+                    -1 :
+                    (int)entry.Size);
 
                 byte[] name = ZipConstants.ConvertToArray(entry.Flags, entry.Name);
 
                 if (name.Length > 0xffff)
-                {
                     throw new ZipException("Name too long.");
-                }
 
                 var ed = new ZipExtraData(entry.ExtraData);
 
@@ -787,32 +642,20 @@ namespace MatthiWare.UpdateLib.Compression.Zip
                     ed.StartNewEntry();
                     if (entry.IsZip64Forced() ||
                         (entry.Size >= 0xffffffff))
-                    {
                         ed.AddLeLong(entry.Size);
-                    }
 
                     if (entry.IsZip64Forced() ||
                         (entry.CompressedSize >= 0xffffffff))
-                    {
                         ed.AddLeLong(entry.CompressedSize);
-                    }
 
                     if (entry.Offset >= 0xffffffff)
-                    {
                         ed.AddLeLong(entry.Offset);
-                    }
 
                     ed.AddNewEntry(1);
                 }
                 else
-                {
                     ed.Delete(1);
-                }
 
-                if (entry.AESKeySize > 0)
-                {
-                    AddExtraDataAES(entry, ed);
-                }
                 byte[] extra = ed.GetEntryData();
 
                 byte[] entryComment =
@@ -821,9 +664,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
                     new byte[0];
 
                 if (entryComment.Length > 0xffff)
-                {
                     throw new ZipException("Comment too long.");
-                }
 
                 WriteLeShort(name.Length);
                 WriteLeShort(extra.Length);
@@ -833,52 +674,26 @@ namespace MatthiWare.UpdateLib.Compression.Zip
                                     // external file attributes
 
                 if (entry.ExternalFileAttributes != -1)
-                {
                     WriteLeInt(entry.ExternalFileAttributes);
-                }
                 else
-                {
-                    if (entry.IsDirectory)
-                    {                         // mark entry as directory (from nikolam.AT.perfectinfo.com)
-                        WriteLeInt(16);
-                    }
-                    else
-                    {
-                        WriteLeInt(0);
-                    }
-                }
+                    WriteLeInt(entry.IsDirectory ? 16 : 0); // mark entry as directory (from nikolam.AT.perfectinfo.com)
 
-                if (entry.Offset >= uint.MaxValue)
-                {
-                    WriteLeInt(-1);
-                }
-                else
-                {
-                    WriteLeInt((int)entry.Offset);
-                }
+                WriteLeInt(entry.Offset >= uint.MaxValue ? -1 : (int)entry.Offset);
 
                 if (name.Length > 0)
-                {
                     baseOutputStream_.Write(name, 0, name.Length);
-                }
 
                 if (extra.Length > 0)
-                {
                     baseOutputStream_.Write(extra, 0, extra.Length);
-                }
 
                 if (entryComment.Length > 0)
-                {
                     baseOutputStream_.Write(entryComment, 0, entryComment.Length);
-                }
 
                 sizeEntries += ZipConstants.CentralHeaderBaseSize + name.Length + extra.Length + entryComment.Length;
             }
 
             using (ZipHelperStream zhs = new ZipHelperStream(baseOutputStream_))
-            {
                 zhs.WriteEndOfCentralDirectory(numEntries, sizeEntries, offset, zipComment);
-            }
 
             entries = null;
         }

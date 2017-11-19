@@ -22,7 +22,6 @@ using MatthiWare.UpdateLib.Utils;
 using Moq;
 using System.Diagnostics;
 using MatthiWare.UpdateLib.Common;
-using MatthiWare.UpdateLib.Files;
 
 namespace UpdateLib.Tests.Util
 {

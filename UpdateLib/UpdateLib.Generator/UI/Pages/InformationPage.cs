@@ -16,7 +16,6 @@
  */
 
 using MatthiWare.UpdateLib.Common;
-using System;
 
 namespace MatthiWare.UpdateLib.Generator.UI.Pages
 {

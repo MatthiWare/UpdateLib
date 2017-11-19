@@ -1,7 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿/*  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as published
+ *  by the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/* Copyright © 2000-2016 SharpZipLib Contributors
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+ * to whom the Software is furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+ * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+ * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
+ */
+
+using System;
 
 namespace MatthiWare.UpdateLib.Compression.Streams
 {
@@ -36,13 +68,13 @@ namespace MatthiWare.UpdateLib.Compression.Streams
             if (bitsInBuffer_ < bitCount)
             {
                 if (windowStart_ == windowEnd_)
-                {
                     return -1; // ok
-                }
+
                 buffer_ |= (uint)((window_[windowStart_++] & 0xff |
                                  (window_[windowStart_++] & 0xff) << 8) << bitsInBuffer_);
                 bitsInBuffer_ += 16;
             }
+
             return (int)(buffer_ & ((1 << bitCount) - 1));
         }
 
@@ -69,10 +101,10 @@ namespace MatthiWare.UpdateLib.Compression.Streams
         public int GetBits(int bitCount)
         {
             int bits = PeekBits(bitCount);
+
             if (bits >= 0)
-            {
                 DropBits(bitCount);
-            }
+
             return bits;
         }
 
@@ -152,15 +184,11 @@ namespace MatthiWare.UpdateLib.Compression.Streams
         public int CopyBytes(byte[] output, int offset, int length)
         {
             if (length < 0)
-            {
                 throw new ArgumentOutOfRangeException(nameof(length));
-            }
 
             if ((bitsInBuffer_ & 7) != 0)
-            {
                 // bits_in_buffer may only be 0 or a multiple of 8
                 throw new InvalidOperationException("Bit buffer is not byte aligned!");
-            }
 
             int count = 0;
             while ((bitsInBuffer_ > 0) && (length > 0))
@@ -173,16 +201,14 @@ namespace MatthiWare.UpdateLib.Compression.Streams
             }
 
             if (length == 0)
-            {
                 return count;
-            }
 
             int avail = windowEnd_ - windowStart_;
+
             if (length > avail)
-            {
                 length = avail;
-            }
-            System.Array.Copy(window_, windowStart_, output, offset, length);
+            
+            Array.Copy(window_, windowStart_, output, offset, length);
             windowStart_ += length;
 
             if (((windowStart_ - windowEnd_) & 1) != 0)
@@ -191,6 +217,7 @@ namespace MatthiWare.UpdateLib.Compression.Streams
                 buffer_ = (uint)(window_[windowStart_++] & 0xff);
                 bitsInBuffer_ = 8;
             }
+
             return count + length;
         }
 
@@ -213,33 +240,23 @@ namespace MatthiWare.UpdateLib.Compression.Streams
         public void SetInput(byte[] buffer, int offset, int count)
         {
             if (buffer == null)
-            {
                 throw new ArgumentNullException(nameof(buffer));
-            }
 
             if (offset < 0)
-            {
                 throw new ArgumentOutOfRangeException(nameof(offset), "Cannot be negative");
-            }
 
             if (count < 0)
-            {
                 throw new ArgumentOutOfRangeException(nameof(count), "Cannot be negative");
-            }
 
             if (windowStart_ < windowEnd_)
-            {
                 throw new InvalidOperationException("Old input was not completely processed");
-            }
 
             int end = offset + count;
 
             // We want to throw an ArrayIndexOutOfBoundsException early.
             // Note the check also handles integer wrap around.
             if ((offset > end) || (end > buffer.Length))
-            {
                 throw new ArgumentOutOfRangeException(nameof(count));
-            }
 
             if ((count & 1) != 0)
             {

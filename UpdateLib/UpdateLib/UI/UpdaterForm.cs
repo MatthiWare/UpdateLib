@@ -16,7 +16,6 @@
  */
 
 using MatthiWare.UpdateLib.Common;
-using MatthiWare.UpdateLib.Files;
 using MatthiWare.UpdateLib.UI.Components;
 using System;
 using System.Diagnostics;

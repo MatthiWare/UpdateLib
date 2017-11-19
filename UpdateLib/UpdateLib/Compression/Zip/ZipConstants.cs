@@ -1,6 +1,39 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+/*  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as published
+ *  by the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/* Copyright © 2000-2016 SharpZipLib Contributors
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+ * to whom the Software is furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+ * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+ * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
+ */
+
 using System.Text;
 
 namespace MatthiWare.UpdateLib.Compression.Zip
@@ -51,76 +84,8 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         /// <summary>
         /// BZip2 compression. Not supported by #Zip.
         /// </summary>
-        BZip2 = 11,
+        BZip2 = 11
 
-        /// <summary>
-        /// WinZip special for AES encryption, Now supported by #Zip.
-        /// </summary>
-        WinZipAES = 99,
-
-    }
-
-    /// <summary>
-    /// Identifies the encryption algorithm used for an entry
-    /// </summary>
-    public enum EncryptionAlgorithm
-    {
-        /// <summary>
-        /// No encryption has been used.
-        /// </summary>
-        None = 0,
-        /// <summary>
-        /// Encrypted using PKZIP 2.0 or 'classic' encryption.
-        /// </summary>
-        PkzipClassic = 1,
-        /// <summary>
-        /// DES encryption has been used.
-        /// </summary>
-        Des = 0x6601,
-        /// <summary>
-        /// RC2 encryption has been used for encryption.
-        /// </summary>
-        RC2 = 0x6602,
-        /// <summary>
-        /// Triple DES encryption with 168 bit keys has been used for this entry.
-        /// </summary>
-        TripleDes168 = 0x6603,
-        /// <summary>
-        /// Triple DES with 112 bit keys has been used for this entry.
-        /// </summary>
-        TripleDes112 = 0x6609,
-        /// <summary>
-        /// AES 128 has been used for encryption.
-        /// </summary>
-        Aes128 = 0x660e,
-        /// <summary>
-        /// AES 192 has been used for encryption.
-        /// </summary>
-        Aes192 = 0x660f,
-        /// <summary>
-        /// AES 256 has been used for encryption.
-        /// </summary>
-        Aes256 = 0x6610,
-        /// <summary>
-        /// RC2 corrected has been used for encryption.
-        /// </summary>
-        RC2Corrected = 0x6702,
-        /// <summary>
-        /// Blowfish has been used for encryption.
-        /// </summary>
-        Blowfish = 0x6720,
-        /// <summary>
-        /// Twofish has been used for encryption.
-        /// </summary>
-        Twofish = 0x6721,
-        /// <summary>
-        /// RC4 has been used for encryption.
-        /// </summary>
-        RC4 = 0x6801,
-        /// <summary>
-        /// An unknown algorithm has been used for encryption.
-        /// </summary>
-        Unknown = 0xffff
     }
 
     /// <summary>
@@ -215,32 +180,6 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         public const int VersionMadeBy = 51; // was 45 before AES
 
         /// <summary>
-        /// The version made by field for entries in the central header when created by this library
-        /// </summary>
-        /// <remarks>
-        /// This is also the Zip version for the library when comparing against the version required to extract
-        /// for an entry.  See <see cref="ZipInputStream.CanDecompressEntry">ZipInputStream.CanDecompressEntry</see>.
-        /// </remarks>
-        [Obsolete("Use VersionMadeBy instead")]
-        public const int VERSION_MADE_BY = 51;
-
-        /// <summary>
-        /// The minimum version required to support strong encryption
-        /// </summary>
-        public const int VersionStrongEncryption = 50;
-
-        /// <summary>
-        /// The minimum version required to support strong encryption
-        /// </summary>
-        [Obsolete("Use VersionStrongEncryption instead")]
-        public const int VERSION_STRONG_ENCRYPTION = 50;
-
-        /// <summary>
-        /// Version indicating AES encryption
-        /// </summary>
-        public const int VERSION_AES = 51;
-
-        /// <summary>
         /// The version required for Zip64 extensions (4.5 or higher)
         /// </summary>
         public const int VersionZip64 = 45;
@@ -253,12 +192,6 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         public const int LocalHeaderBaseSize = 30;
 
         /// <summary>
-        /// Size of local entry header (excluding variable length fields at end)
-        /// </summary>
-        [Obsolete("Use LocalHeaderBaseSize instead")]
-        public const int LOCHDR = 30;
-
-        /// <summary>
         /// Size of Zip64 data descriptor
         /// </summary>
         public const int Zip64DataDescriptorSize = 24;
@@ -269,21 +202,9 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         public const int DataDescriptorSize = 16;
 
         /// <summary>
-        /// Size of data descriptor
-        /// </summary>
-        [Obsolete("Use DataDescriptorSize instead")]
-        public const int EXTHDR = 16;
-
-        /// <summary>
         /// Size of central header entry (excluding variable fields)
         /// </summary>
         public const int CentralHeaderBaseSize = 46;
-
-        /// <summary>
-        /// Size of central header entry
-        /// </summary>
-        [Obsolete("Use CentralHeaderBaseSize instead")]
-        public const int CENHDR = 46;
 
         /// <summary>
         /// Size of end of central record (excluding variable fields)
@@ -291,21 +212,9 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         public const int EndOfCentralRecordBaseSize = 22;
 
         /// <summary>
-        /// Size of end of central record (excluding variable fields)
-        /// </summary>
-        [Obsolete("Use EndOfCentralRecordBaseSize instead")]
-        public const int ENDHDR = 22;
-
-        /// <summary>
         /// Size of 'classic' cryptographic header stored before any entry data
         /// </summary>
         public const int CryptoHeaderSize = 12;
-
-        /// <summary>
-        /// Size of cryptographic header stored before entry data
-        /// </summary>
-        [Obsolete("Use CryptoHeaderSize instead")]
-        public const int CRYPTO_HEADER_SIZE = 12;
         #endregion
 
         #region Header Signatures
@@ -445,9 +354,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             {
                 if ((value < 0) || (value > 65535) ||
                     (value == 1) || (value == 2) || (value == 3) || (value == 42))
-                {
                     throw new ArgumentOutOfRangeException(nameof(value));
-                }
 
                 defaultCodePage = value;
             }
@@ -468,9 +375,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         public static string ConvertToString(byte[] data, int count)
         {
             if (data == null)
-            {
                 return string.Empty;
-            }
 
             return Encoding.GetEncoding(DefaultCodePage).GetString(data, 0, count);
         }
@@ -487,9 +392,8 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         public static string ConvertToString(byte[] data)
         {
             if (data == null)
-            {
                 return string.Empty;
-            }
+
             return ConvertToString(data, data.Length);
         }
 
@@ -507,18 +411,11 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         public static string ConvertToStringExt(int flags, byte[] data, int count)
         {
             if (data == null)
-            {
                 return string.Empty;
-            }
 
-            if ((flags & (int)GeneralBitFlags.UnicodeText) != 0)
-            {
-                return Encoding.UTF8.GetString(data, 0, count);
-            }
-            else
-            {
-                return ConvertToString(data, count);
-            }
+            return (flags & (int)GeneralBitFlags.UnicodeText) != 0 ?
+                Encoding.UTF8.GetString(data, 0, count) :
+                ConvertToString(data, count);
         }
 
         /// <summary>
@@ -534,18 +431,9 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         public static string ConvertToStringExt(int flags, byte[] data)
         {
             if (data == null)
-            {
                 return string.Empty;
-            }
 
-            if ((flags & (int)GeneralBitFlags.UnicodeText) != 0)
-            {
-                return Encoding.UTF8.GetString(data, 0, data.Length);
-            }
-            else
-            {
-                return ConvertToString(data, data.Length);
-            }
+            return ((flags & (int)GeneralBitFlags.UnicodeText) != 0) ? Encoding.UTF8.GetString(data, 0, data.Length) : ConvertToString(data, data.Length);
         }
 
         /// <summary>
@@ -558,9 +446,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         public static byte[] ConvertToArray(string str)
         {
             if (str == null)
-            {
                 return new byte[0];
-            }
 
             return Encoding.GetEncoding(DefaultCodePage).GetBytes(str);
         }
@@ -576,18 +462,9 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         public static byte[] ConvertToArray(int flags, string str)
         {
             if (str == null)
-            {
                 return new byte[0];
-            }
 
-            if ((flags & (int)GeneralBitFlags.UnicodeText) != 0)
-            {
-                return Encoding.UTF8.GetBytes(str);
-            }
-            else
-            {
-                return ConvertToArray(str);
-            }
+            return ((flags & (int)GeneralBitFlags.UnicodeText) != 0) ? Encoding.UTF8.GetBytes(str) : ConvertToArray(str);
         }
     }
 }

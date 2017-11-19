@@ -15,7 +15,6 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using MatthiWare.UpdateLib.Files;
 using MatthiWare.UpdateLib.Security;
 using System.Linq;
 using MatthiWare.UpdateLib.Utils;

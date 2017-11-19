@@ -1,8 +1,40 @@
-﻿using System;
-using System.Collections.Generic;
+﻿/*  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as published
+ *  by the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/* Copyright © 2000-2016 SharpZipLib Contributors
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+ * to whom the Software is furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+ * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+ * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
+ */
+
+using System;
 using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace MatthiWare.UpdateLib.Compression.Streams
 {
@@ -32,10 +64,10 @@ namespace MatthiWare.UpdateLib.Compression.Streams
         public InflaterInputBuffer(Stream stream, int bufferSize)
         {
             inputStream = stream;
+
             if (bufferSize < 1024)
-            {
                 bufferSize = 1024;
-            }
+
             rawData = new byte[bufferSize];
             clearText = rawData;
         }
@@ -120,21 +152,14 @@ namespace MatthiWare.UpdateLib.Compression.Streams
             {
                 int count = inputStream.Read(rawData, rawLength, toRead);
                 if (count <= 0)
-                {
                     break;
-                }
+
                 rawLength += count;
                 toRead -= count;
             }
 
-            if (cryptoTransform != null)
-            {
-                clearTextLength = cryptoTransform.TransformBlock(rawData, 0, rawLength, clearText, 0);
-            }
-            else
-            {
-                clearTextLength = rawLength;
-            }
+            clearTextLength = rawLength;
+
 
             available = clearTextLength;
         }
@@ -144,10 +169,7 @@ namespace MatthiWare.UpdateLib.Compression.Streams
         /// </summary>
         /// <param name="buffer">The buffer to fill</param>
         /// <returns>Returns the number of bytes read.</returns>
-        public int ReadRawBuffer(byte[] buffer)
-        {
-            return ReadRawBuffer(buffer, 0, buffer.Length);
-        }
+        public int ReadRawBuffer(byte[] buffer) => ReadRawBuffer(buffer, 0, buffer.Length);
 
         /// <summary>
         /// Read a buffer directly from the input stream
@@ -159,9 +181,7 @@ namespace MatthiWare.UpdateLib.Compression.Streams
         public int ReadRawBuffer(byte[] outBuffer, int offset, int length)
         {
             if (length < 0)
-            {
                 throw new ArgumentOutOfRangeException(nameof(length));
-            }
 
             int currentOffset = offset;
             int currentLength = length;
@@ -172,12 +192,12 @@ namespace MatthiWare.UpdateLib.Compression.Streams
                 {
                     Fill();
                     if (available <= 0)
-                    {
                         return 0;
-                    }
                 }
+
                 int toCopy = Math.Min(currentLength, available);
-                System.Array.Copy(rawData, rawLength - (int)available, outBuffer, currentOffset, toCopy);
+
+                Array.Copy(rawData, rawLength - available, outBuffer, currentOffset, toCopy);
                 currentOffset += toCopy;
                 currentLength -= toCopy;
                 available -= toCopy;
@@ -195,9 +215,7 @@ namespace MatthiWare.UpdateLib.Compression.Streams
         public int ReadClearTextBuffer(byte[] outBuffer, int offset, int length)
         {
             if (length < 0)
-            {
                 throw new ArgumentOutOfRangeException(nameof(length));
-            }
 
             int currentOffset = offset;
             int currentLength = length;
@@ -208,13 +226,11 @@ namespace MatthiWare.UpdateLib.Compression.Streams
                 {
                     Fill();
                     if (available <= 0)
-                    {
                         return 0;
-                    }
                 }
 
                 int toCopy = Math.Min(currentLength, available);
-                Array.Copy(clearText, clearTextLength - (int)available, outBuffer, currentOffset, toCopy);
+                Array.Copy(clearText, clearTextLength - available, outBuffer, currentOffset, toCopy);
                 currentOffset += toCopy;
                 currentLength -= toCopy;
                 available -= toCopy;
@@ -231,11 +247,11 @@ namespace MatthiWare.UpdateLib.Compression.Streams
             if (available <= 0)
             {
                 Fill();
+
                 if (available <= 0)
-                {
-                    throw new ZipException("EOF in header");
-                }
+                    throw new EndOfStreamException("EOF in header");
             }
+
             byte result = rawData[rawLength - available];
             available -= 1;
             return result;
@@ -245,61 +261,19 @@ namespace MatthiWare.UpdateLib.Compression.Streams
         /// Read an <see cref="short"/> in little endian byte order.
         /// </summary>
         /// <returns>The short value read case to an int.</returns>
-        public int ReadLeShort()
-        {
-            return ReadLeByte() | (ReadLeByte() << 8);
-        }
+        public int ReadLeShort() => ReadLeByte() | (ReadLeByte() << 8);
 
         /// <summary>
         /// Read an <see cref="int"/> in little endian byte order.
         /// </summary>
         /// <returns>The int value read.</returns>
-        public int ReadLeInt()
-        {
-            return ReadLeShort() | (ReadLeShort() << 16);
-        }
+        public int ReadLeInt() => ReadLeShort() | (ReadLeShort() << 16);
 
         /// <summary>
         /// Read a <see cref="long"/> in little endian byte order.
         /// </summary>
         /// <returns>The long value read.</returns>
-        public long ReadLeLong()
-        {
-            return (uint)ReadLeInt() | ((long)ReadLeInt() << 32);
-        }
-
-        /// <summary>
-        /// Get/set the <see cref="ICryptoTransform"/> to apply to any data.
-        /// </summary>
-        /// <remarks>Set this value to null to have no transform applied.</remarks>
-        public ICryptoTransform CryptoTransform
-        {
-            set
-            {
-                cryptoTransform = value;
-                if (cryptoTransform != null)
-                {
-                    if (rawData == clearText)
-                    {
-                        if (internalClearText == null)
-                        {
-                            internalClearText = new byte[rawData.Length];
-                        }
-                        clearText = internalClearText;
-                    }
-                    clearTextLength = rawLength;
-                    if (available > 0)
-                    {
-                        cryptoTransform.TransformBlock(rawData, rawLength - available, available, clearText, rawLength - available);
-                    }
-                }
-                else
-                {
-                    clearText = rawData;
-                    clearTextLength = rawLength;
-                }
-            }
-        }
+        public long ReadLeLong() => (uint)ReadLeInt() | ((long)ReadLeInt() << 32);
 
         #region Instance Fields
         int rawLength;
@@ -310,8 +284,6 @@ namespace MatthiWare.UpdateLib.Compression.Streams
         byte[] internalClearText;
 
         int available;
-
-        ICryptoTransform cryptoTransform;
         Stream inputStream;
         #endregion
     }
@@ -371,19 +343,13 @@ namespace MatthiWare.UpdateLib.Compression.Streams
         public InflaterInputStream(Stream baseInputStream, Inflater inflater, int bufferSize)
         {
             if (baseInputStream == null)
-            {
                 throw new ArgumentNullException(nameof(baseInputStream));
-            }
 
             if (inflater == null)
-            {
                 throw new ArgumentNullException(nameof(inflater));
-            }
 
             if (bufferSize <= 0)
-            {
                 throw new ArgumentOutOfRangeException(nameof(bufferSize));
-            }
 
             this.baseInputStream = baseInputStream;
             this.inf = inflater;
@@ -416,9 +382,7 @@ namespace MatthiWare.UpdateLib.Compression.Streams
         public long Skip(long count)
         {
             if (count <= 0)
-            {
                 throw new ArgumentOutOfRangeException(nameof(count));
-            }
 
             // v0.80 Skip by seeking if underlying stream supports it...
             if (baseInputStream.CanSeek)
@@ -430,9 +394,7 @@ namespace MatthiWare.UpdateLib.Compression.Streams
             {
                 int length = 2048;
                 if (count < length)
-                {
                     length = (int)count;
-                }
 
                 byte[] tmp = new byte[length];
                 int readCount = 1;
@@ -441,9 +403,7 @@ namespace MatthiWare.UpdateLib.Compression.Streams
                 while ((toSkip > 0) && (readCount > 0))
                 {
                     if (toSkip < length)
-                    {
                         length = (int)toSkip;
-                    }
 
                     readCount = baseInputStream.Read(tmp, 0, length);
                     toSkip -= readCount;
@@ -451,14 +411,6 @@ namespace MatthiWare.UpdateLib.Compression.Streams
 
                 return count - toSkip;
             }
-        }
-
-        /// <summary>
-        /// Clear any cryptographic state.
-        /// </summary>		
-        protected void StopDecrypting()
-        {
-            inputBuffer.CryptoTransform = null;
         }
 
         /// <summary>
@@ -485,11 +437,11 @@ namespace MatthiWare.UpdateLib.Compression.Streams
             if (inputBuffer.Available <= 0)
             {
                 inputBuffer.Fill();
+
                 if (inputBuffer.Available <= 0)
-                {
-                    throw new SharpZipBaseException("Unexpected EOF");
-                }
+                    throw new EndOfStreamException("Unexpected EOF");
             }
+
             inputBuffer.SetInflaterInput(inf);
         }
 
@@ -559,10 +511,7 @@ namespace MatthiWare.UpdateLib.Compression.Streams
         /// <summary>
         /// Flushes the baseInputStream
         /// </summary>
-        public override void Flush()
-        {
-            baseInputStream.Flush();
-        }
+        public override void Flush()=> baseInputStream.Flush();
 
         /// <summary>
         /// Sets the position within the current stream
@@ -621,10 +570,9 @@ namespace MatthiWare.UpdateLib.Compression.Streams
             if (!isClosed)
             {
                 isClosed = true;
+
                 if (IsStreamOwner)
-                {
                     baseInputStream.Dispose();
-                }
             }
         }
 
@@ -647,9 +595,7 @@ namespace MatthiWare.UpdateLib.Compression.Streams
         public override int Read(byte[] buffer, int offset, int count)
         {
             if (inf.IsNeedingDictionary)
-            {
-                throw new SharpZipBaseException("Need a dictionary");
-            }
+                throw new InvalidOperationException("Need a dictionary");
 
             int remainingBytes = count;
             while (true)
@@ -659,19 +605,14 @@ namespace MatthiWare.UpdateLib.Compression.Streams
                 remainingBytes -= bytesRead;
 
                 if (remainingBytes == 0 || inf.IsFinished)
-                {
                     break;
-                }
 
                 if (inf.IsNeedingInput)
-                {
                     Fill();
-                }
                 else if (bytesRead == 0)
-                {
-                    throw new ZipException("Dont know what to do");
-                }
+                    throw new IOException("Nothing reead");
             }
+
             return count - remainingBytes;
         }
         #endregion

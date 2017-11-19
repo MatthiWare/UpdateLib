@@ -17,7 +17,6 @@
 
 using MatthiWare.UpdateLib;
 using MatthiWare.UpdateLib.Common;
-using MatthiWare.UpdateLib.Files;
 using MatthiWare.UpdateLib.Security;
 using MatthiWare.UpdateLib.Tasks;
 using NUnit.Framework;

@@ -1,7 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿/*  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as published
+ *  by the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/* Copyright © 2000-2016 SharpZipLib Contributors
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+ * to whom the Software is furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+ * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+ * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
+ */
+
+using System;
 
 namespace MatthiWare.UpdateLib.Compression.Checksum
 {
@@ -49,8 +81,6 @@ namespace MatthiWare.UpdateLib.Compression.Checksum
     ///    checked separately. (Any sequence of zeroes has a Fletcher
     ///    checksum of zero.)"
     /// </summary>
-    /// <see cref="ICSharpCode.SharpZipLib.Zip.Compression.Streams.InflaterInputStream"/>
-    /// <see cref="ICSharpCode.SharpZipLib.Zip.Compression.Streams.DeflaterOutputStream"/>
     public sealed class Adler32 : IChecksum
     {
         #region Instance Fields
@@ -119,9 +149,7 @@ namespace MatthiWare.UpdateLib.Compression.Checksum
         public void Update(byte[] buffer)
         {
             if (buffer == null)
-            {
                 throw new ArgumentNullException(nameof(buffer));
-            }
 
             Update(buffer, 0, buffer.Length);
         }
@@ -135,29 +163,19 @@ namespace MatthiWare.UpdateLib.Compression.Checksum
         public void Update(byte[] buffer, int offset, int count)
         {
             if (buffer == null)
-            {
                 throw new ArgumentNullException(nameof(buffer));
-            }
 
             if (offset < 0)
-            {
                 throw new ArgumentOutOfRangeException(nameof(offset), "cannot be less than zero");
-            }
 
             if (offset >= buffer.Length)
-            {
                 throw new ArgumentOutOfRangeException(nameof(offset), "not a valid index into buffer");
-            }
 
             if (count < 0)
-            {
                 throw new ArgumentOutOfRangeException(nameof(count), "cannot be less than zero");
-            }
 
             if (offset + count > buffer.Length)
-            {
                 throw new ArgumentOutOfRangeException(nameof(count), "exceeds buffer size");
-            }
 
             //(By Per Bothner)
             uint s1 = checkValue & 0xFFFF;
@@ -169,16 +187,18 @@ namespace MatthiWare.UpdateLib.Compression.Checksum
                 // s1 maximally grows from 65521 to 65521 + 255 * 3800
                 // s2 maximally grows by 3800 * median(s1) = 2090079800 < 2^31
                 int n = 3800;
+
                 if (n > count)
-                {
                     n = count;
-                }
+
                 count -= n;
+
                 while (--n >= 0)
                 {
                     s1 = s1 + (uint)(buffer[offset++] & 0xff);
                     s2 = s2 + s1;
                 }
+
                 s1 %= BASE;
                 s2 %= BASE;
             }

@@ -17,7 +17,6 @@
 
 using System;
 using System.IO;
-using System.Linq;
 using MatthiWare.UpdateLib.Common;
 using MatthiWare.UpdateLib.Files;
 using Moq;

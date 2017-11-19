@@ -1,8 +1,40 @@
-﻿using System;
-using System.Collections.Generic;
+﻿/*  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as published
+ *  by the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/* Copyright © 2000-2016 SharpZipLib Contributors
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+ * to whom the Software is furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+ * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+ * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
+ */
+
+using System;
 using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace MatthiWare.UpdateLib.Compression.Zip
 {
@@ -178,64 +210,20 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             CompressionMethod method)
         {
             if (name == null)
-            {
                 throw new ArgumentNullException(nameof(name));
-            }
 
             if (name.Length > 0xffff)
-            {
                 throw new ArgumentException("Name is too long", nameof(name));
-            }
 
             if ((versionRequiredToExtract != 0) && (versionRequiredToExtract < 10))
-            {
                 throw new ArgumentOutOfRangeException(nameof(versionRequiredToExtract));
-            }
 
-            this.DateTime = DateTime.Now;
+
+            DateTime = DateTime.Now;
             this.name = CleanName(name);
-            this.versionMadeBy = (ushort)madeByInfo;
-            this.versionToExtract = (ushort)versionRequiredToExtract;
+            versionMadeBy = (ushort)madeByInfo;
+            versionToExtract = (ushort)versionRequiredToExtract;
             this.method = method;
-        }
-
-        /// <summary>
-        /// Creates a deep copy of the given zip entry.
-        /// </summary>
-        /// <param name="entry">
-        /// The entry to copy.
-        /// </param>
-        [Obsolete("Use Clone instead")]
-        public ZipEntry(ZipEntry entry)
-        {
-            if (entry == null)
-            {
-                throw new ArgumentNullException(nameof(entry));
-            }
-
-            known = entry.known;
-            name = entry.name;
-            size = entry.size;
-            compressedSize = entry.compressedSize;
-            crc = entry.crc;
-            dosTime = entry.dosTime;
-            method = entry.method;
-            comment = entry.comment;
-            versionToExtract = entry.versionToExtract;
-            versionMadeBy = entry.versionMadeBy;
-            externalFileAttributes = entry.externalFileAttributes;
-            flags = entry.flags;
-
-            zipFileIndex = entry.zipFileIndex;
-            offset = entry.offset;
-
-            forceZip64_ = entry.forceZip64_;
-
-            if (entry.extra != null)
-            {
-                extra = new byte[entry.extra.Length];
-                Array.Copy(entry.extra, 0, extra, 0, entry.extra.Length);
-            }
         }
 
         #endregion
@@ -248,30 +236,6 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             get
             {
                 return (known & Known.Crc) != 0;
-            }
-        }
-
-        /// <summary>
-        /// Get/Set flag indicating if entry is encrypted.
-        /// A simple helper routine to aid interpretation of <see cref="Flags">flags</see>
-        /// </summary>
-        /// <remarks>This is an assistant that interprets the <see cref="Flags">flags</see> property.</remarks>
-        public bool IsCrypted
-        {
-            get
-            {
-                return (flags & 1) != 0;
-            }
-            set
-            {
-                if (value)
-                {
-                    flags |= 1;
-                }
-                else
-                {
-                    flags &= ~1;
-                }
             }
         }
 
@@ -398,14 +362,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         {
             get
             {
-                if ((known & Known.ExternalAttributes) == 0)
-                {
-                    return -1;
-                }
-                else
-                {
-                    return externalFileAttributes;
-                }
+                return ((known & Known.ExternalAttributes) == 0) ? -1 : externalFileAttributes;
             }
 
             set
@@ -451,12 +408,12 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         bool HasDosAttributes(int attributes)
         {
             bool result = false;
+
             if ((known & Known.ExternalAttributes) != 0)
-            {
                 result |= (((HostSystem == (int)HostSystemID.Msdos) ||
                     (HostSystem == (int)HostSystemID.WindowsNT)) &&
                     (ExternalFileAttributes & attributes) == attributes);
-            }
+
             return result;
         }
 
@@ -547,36 +504,20 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             {
                 // Return recorded version if known.
                 if (versionToExtract != 0)
-                {
                     return versionToExtract & 0x00ff;               // Only lower order byte. High order is O/S file system.
-                }
                 else
                 {
                     int result = 10;
-                    if (AESKeySize > 0)
-                    {
-                        result = ZipConstants.VERSION_AES;          // Ver 5.1 = AES
-                    }
-                    else if (CentralHeaderRequiresZip64)
-                    {
+
+                    if (CentralHeaderRequiresZip64)
                         result = ZipConstants.VersionZip64;
-                    }
                     else if (CompressionMethod.Deflated == method)
-                    {
                         result = 20;
-                    }
                     else if (IsDirectory == true)
-                    {
                         result = 20;
-                    }
-                    else if (IsCrypted == true)
-                    {
-                        result = 20;
-                    }
                     else if (HasDosAttributes(0x08))
-                    {
                         result = 11;
-                    }
+
                     return result;
                 }
             }
@@ -592,12 +533,12 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             get
             {
                 return (Version <= ZipConstants.VersionMadeBy) &&
-                    ((Version == 10) ||
-                    (Version == 11) ||
-                    (Version == 20) ||
-                    (Version == 45) ||
-                    (Version == 51)) &&
-                    IsCompressionMethodSupported();
+                        ((Version == 10) ||
+                        (Version == 11) ||
+                        (Version == 20) ||
+                        (Version == 45) ||
+                        (Version == 51)) &&
+                        IsCompressionMethodSupported();
             }
         }
 
@@ -613,10 +554,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         /// Get a value indicating wether Zip64 extensions were forced.
         /// </summary>
         /// <returns>A <see cref="bool"/> value of true if Zip64 extensions have been forced on; false if not.</returns>
-        public bool IsZip64Forced()
-        {
-            return forceZip64_;
-        }
+        public bool IsZip64Forced() => forceZip64_;
 
         /// <summary>
         /// Gets a value indicating if the entry requires Zip64 extensions 
@@ -631,17 +569,10 @@ namespace MatthiWare.UpdateLib.Compression.Zip
 
                 if (!result)
                 {
-                    ulong trueCompressedSize = compressedSize;
-
-                    if ((versionToExtract == 0) && IsCrypted)
-                    {
-                        trueCompressedSize += ZipConstants.CryptoHeaderSize;
-                    }
-
                     // TODO: A better estimation of the true limit based on compression overhead should be used
                     // to determine when an entry should use Zip64.
                     result =
-                        ((this.size >= uint.MaxValue) || (trueCompressedSize >= uint.MaxValue)) &&
+                        ((size >= uint.MaxValue) || (compressedSize >= uint.MaxValue)) &&
                         ((versionToExtract == 0) || (versionToExtract >= ZipConstants.VersionZip64));
                 }
 
@@ -670,14 +601,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         {
             get
             {
-                if ((known & Known.Time) == 0)
-                {
-                    return 0;
-                }
-                else
-                {
-                    return dosTime;
-                }
+                return ((known & Known.Time) == 0) ? 0 : dosTime;
             }
 
             set
@@ -780,8 +704,8 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             }
             set
             {
-                this.size = (ulong)value;
-                this.known |= Known.Size;
+                size = (ulong)value;
+                known |= Known.Size;
             }
         }
 
@@ -799,8 +723,8 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             }
             set
             {
-                this.compressedSize = (ulong)value;
-                this.known |= Known.CompressedSize;
+                compressedSize = (ulong)value;
+                known |= Known.CompressedSize;
             }
         }
 
@@ -821,12 +745,11 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             }
             set
             {
-                if (((ulong)crc & 0xffffffff00000000L) != 0)
-                {
+                if ((crc & 0xffffffff00000000L) != 0)
                     throw new ArgumentOutOfRangeException(nameof(value));
-                }
-                this.crc = (uint)value;
-                this.known |= Known.Crc;
+
+                crc = (uint)value;
+                known |= Known.Crc;
             }
         }
 
@@ -848,23 +771,9 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             set
             {
                 if (!IsCompressionMethodSupported(value))
-                {
                     throw new NotSupportedException("Compression method not supported");
-                }
-                this.method = value;
-            }
-        }
 
-        /// <summary>
-        /// Gets the compression method for outputting to the local or central header.
-        /// Returns same value as CompressionMethod except when AES encrypting, which
-        /// places 99 in the method and places the real method in the extra data.
-        /// </summary>
-        internal CompressionMethod CompressionMethodForHeader
-        {
-            get
-            {
-                return (AESKeySize > 0) ? CompressionMethod.WinZipAES : method;
+                method = value;
             }
         }
 
@@ -890,103 +799,15 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             set
             {
                 if (value == null)
-                {
                     extra = null;
-                }
                 else
                 {
                     if (value.Length > 0xffff)
-                    {
-                        throw new System.ArgumentOutOfRangeException(nameof(value));
-                    }
+                        throw new ArgumentOutOfRangeException(nameof(value));
 
                     extra = new byte[value.Length];
                     Array.Copy(value, 0, extra, 0, value.Length);
                 }
-            }
-        }
-
-
-        /// <summary>
-        /// For AES encrypted files returns or sets the number of bits of encryption (128, 192 or 256).
-        /// When setting, only 0 (off), 128 or 256 is supported.
-        /// </summary>
-        public int AESKeySize
-        {
-            get
-            {
-                // the strength (1 or 3) is in the entry header
-                switch (_aesEncryptionStrength)
-                {
-                    case 0:
-                        return 0;   // Not AES
-                    case 1:
-                        return 128;
-                    case 2:
-                        return 192; // Not used by WinZip
-                    case 3:
-                        return 256;
-                    default:
-                        throw new ZipException("Invalid AESEncryptionStrength " + _aesEncryptionStrength);
-                }
-            }
-            set
-            {
-                switch (value)
-                {
-                    case 0:
-                        _aesEncryptionStrength = 0;
-                        break;
-                    case 128:
-                        _aesEncryptionStrength = 1;
-                        break;
-                    case 256:
-                        _aesEncryptionStrength = 3;
-                        break;
-                    default:
-                        throw new ZipException("AESKeySize must be 0, 128 or 256: " + value);
-                }
-            }
-        }
-
-        /// <summary>
-        /// AES Encryption strength for storage in extra data in entry header.
-        /// 1 is 128 bit, 2 is 192 bit, 3 is 256 bit.
-        /// </summary>
-        internal byte AESEncryptionStrength
-        {
-            get
-            {
-                return (byte)_aesEncryptionStrength;
-            }
-        }
-
-        /// <summary>
-        /// Returns the length of the salt, in bytes 
-        /// </summary>
-        internal int AESSaltLen
-        {
-            get
-            {
-                // Key size -> Salt length: 128 bits = 8 bytes, 192 bits = 12 bytes, 256 bits = 16 bytes.
-                return AESKeySize / 16;
-            }
-        }
-
-        /// <summary>
-        /// Number of extra bytes required to hold the AES Header fields (Salt, Pwd verify, AuthCode)
-        /// </summary>
-        internal int AESOverheadSize
-        {
-            get
-            {
-                // File format:
-                //   Bytes		Content
-                // Variable		Salt value
-                //     2		Password verification value
-                // Variable		Encrypted file data
-                //    10		Authentication code
-                return 12 + AESSaltLen;
             }
         }
 
@@ -998,7 +819,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         /// </param>
         internal void ProcessExtraData(bool localHeader)
         {
-            var extraData = new ZipExtraData(this.extra);
+            var extraData = new ZipExtraData(extra);
 
             if (extraData.Find(0x0001))
             {
@@ -1009,9 +830,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
                 forceZip64_ = true;
 
                 if (extraData.ValueLength < 4)
-                {
                     throw new ZipException("Extra data extended Zip64 information length is invalid");
-                }
 
                 // (localHeader ||) was deleted, because actually there is no specific difference with reading sizes between local header & central directory 
                 // https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT 
@@ -1038,50 +857,25 @@ namespace MatthiWare.UpdateLib.Compression.Zip
                 // 
                 // Othewise there is problem with minizip implementation
                 if (size == uint.MaxValue)
-                {
                     size = (ulong)extraData.ReadLong();
-                }
 
                 if (compressedSize == uint.MaxValue)
-                {
                     compressedSize = (ulong)extraData.ReadLong();
-                }
 
                 if (!localHeader && (offset == uint.MaxValue))
-                {
                     offset = extraData.ReadLong();
-                }
 
                 // Disk number on which file starts is ignored
             }
-            else
-            {
-                if (
-                    ((versionToExtract & 0xff) >= ZipConstants.VersionZip64) &&
-                    ((size == uint.MaxValue) || (compressedSize == uint.MaxValue))
-                )
-                {
-                    throw new ZipException("Zip64 Extended information required but is missing.");
-                }
-            }
+            else if (((versionToExtract & 0xff) >= ZipConstants.VersionZip64) &&
+                    (size == uint.MaxValue || compressedSize == uint.MaxValue))
+                throw new ZipException("Zip64 Extended information required but is missing.");
 
             DateTime = GetDateTime(extraData);
-            if (method == CompressionMethod.WinZipAES)
-            {
-                ProcessAESExtraData(extraData);
-            }
         }
 
         private DateTime GetDateTime(ZipExtraData extraData)
         {
-            // Check for NT timestamp
-            // NOTE: Disable by default to match behavior of InfoZIP
-#if RESPECT_NT_TIMESTAMP
-			NTTaggedData ntData = extraData.GetData<NTTaggedData>();
-			if (ntData != null)
-				return ntData.LastModificationTime;
-#endif
-
             // Check for Unix timestamp
             ExtendedUnixData unixData = extraData.GetData<ExtendedUnixData>();
             if (unixData != null &&
@@ -1100,34 +894,6 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             uint year = ((dosTime >> 25) & 0x7f) + 1980;
             int day = Math.Max(1, Math.Min(DateTime.DaysInMonth((int)year, (int)mon), (int)((dosTime >> 16) & 0x1f)));
             return new DateTime((int)year, (int)mon, day, (int)hrs, (int)min, (int)sec, DateTimeKind.Utc);
-        }
-
-        // For AES the method in the entry is 99, and the real compression method is in the extradata
-        //
-        private void ProcessAESExtraData(ZipExtraData extraData)
-        {
-
-            if (extraData.Find(0x9901))
-            {
-                // Set version and flag for Zipfile.CreateAndInitDecryptionStream
-                versionToExtract = ZipConstants.VERSION_AES;            // Ver 5.1 = AES see "Version" getter
-                                                                        // Set StrongEncryption flag for ZipFile.CreateAndInitDecryptionStream
-                Flags = Flags | (int)GeneralBitFlags.StrongEncryption;
-                //
-                // Unpack AES extra data field see http://www.winzip.com/aes_info.htm
-                int length = extraData.ValueLength;         // Data size currently 7
-                if (length < 7)
-                    throw new ZipException("AES Extra Data Length " + length + " invalid.");
-                int ver = extraData.ReadShort();            // Version number (1=AE-1 2=AE-2)
-                int vendorId = extraData.ReadShort();       // 2-character vendor ID 0x4541 = "AE"
-                int encrStrength = extraData.ReadByte();    // encryption strength 1 = 128 2 = 192 3 = 256
-                int actualCompress = extraData.ReadShort(); // The actual compression method used to compress the file
-                _aesVer = ver;
-                _aesEncryptionStrength = encrStrength;
-                method = (CompressionMethod)actualCompress;
-            }
-            else
-                throw new ZipException("AES Extra Data missing");
         }
 
         /// <summary>
@@ -1159,9 +925,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
                 // The full test is not possible here however as the code page to apply conversions with
                 // isnt available.
                 if ((value != null) && (value.Length > 0xffff))
-                {
                     throw new ArgumentOutOfRangeException(nameof(value), "cannot exceed 65535");
-                }
 
                 comment = value;
             }
@@ -1182,12 +946,9 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             get
             {
                 int nameLength = name.Length;
-                bool result =
-                    ((nameLength > 0) &&
-                    ((name[nameLength - 1] == '/') || (name[nameLength - 1] == '\\'))) ||
-                    HasDosAttributes(16)
-                    ;
-                return result;
+                return ((nameLength > 0) &&
+                        ((name[nameLength - 1] == '/') || (name[nameLength - 1] == '\\'))) ||
+                        HasDosAttributes(16);
             }
         }
 
@@ -1210,10 +971,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         /// Test entry to see if data can be extracted.
         /// </summary>
         /// <returns>Returns true if data can be extracted for this entry; false otherwise.</returns>
-        public bool IsCompressionMethodSupported()
-        {
-            return IsCompressionMethodSupported(CompressionMethod);
-        }
+        public bool IsCompressionMethodSupported() => IsCompressionMethodSupported(CompressionMethod);
 
         #region ICloneable Members
         /// <summary>
@@ -1222,7 +980,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         /// <returns>An <see cref="Object"/> that is a copy of the current instance.</returns>
         public object Clone()
         {
-            var result = (ZipEntry)this.MemberwiseClone();
+            var result = (ZipEntry)MemberwiseClone();
 
             // Ensure extra data is unique if it exists.
             if (extra != null)
@@ -1240,10 +998,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         /// Gets a string representation of this ZipEntry.
         /// </summary>
         /// <returns>A readable textual representation of this <see cref="ZipEntry"/></returns>
-        public override string ToString()
-        {
-            return name;
-        }
+        public override string ToString() => name;
 
         /// <summary>
         /// Test a <see cref="CompressionMethod">compression method</see> to see if this library
@@ -1273,23 +1028,18 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         public static string CleanName(string name)
         {
             if (name == null)
-            {
                 return string.Empty;
-            }
 
             if (Path.IsPathRooted(name))
-            {
                 // NOTE:
                 // for UNC names...  \\machine\share\zoom\beet.txt gives \zoom\beet.txt
                 name = name.Substring(Path.GetPathRoot(name).Length);
-            }
 
             name = name.Replace(@"\", "/");
 
             while ((name.Length > 0) && (name[0] == '/'))
-            {
                 name = name.Remove(0, 1);
-            }
+
             return name;
         }
 

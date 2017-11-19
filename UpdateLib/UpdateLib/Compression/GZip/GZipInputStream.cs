@@ -1,10 +1,42 @@
-﻿using MatthiWare.UpdateLib.Compression.Checksum;
+﻿/*  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as published
+ *  by the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/* Copyright © 2000-2016 SharpZipLib Contributors
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+ * to whom the Software is furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+ * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+ * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
+ */
+
+using MatthiWare.UpdateLib.Compression.Checksum;
 using MatthiWare.UpdateLib.Compression.Streams;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace MatthiWare.UpdateLib.Compression.GZip
 {
@@ -115,9 +147,7 @@ namespace MatthiWare.UpdateLib.Compression.GZip
                     try
                     {
                         if (!ReadHeader())
-                        {
                             return 0;
-                        }
                     }
                     catch (Exception ex) when (completedLastBlock && (ex is GZipException || ex is EndOfStreamException))
                     {
@@ -131,20 +161,14 @@ namespace MatthiWare.UpdateLib.Compression.GZip
                 // Try to read compressed data
                 int bytesRead = base.Read(buffer, offset, count);
                 if (bytesRead > 0)
-                {
                     crc.Update(buffer, offset, bytesRead);
-                }
 
                 // If this is the end of stream, read the footer
                 if (inf.IsFinished)
-                {
                     ReadFooter();
-                }
 
                 if (bytesRead > 0)
-                {
                     return bytesRead;
-                }
             }
         }
         #endregion
@@ -160,11 +184,9 @@ namespace MatthiWare.UpdateLib.Compression.GZip
             if (inputBuffer.Available <= 0)
             {
                 inputBuffer.Fill();
+
                 if (inputBuffer.Available <= 0)
-                {
-                    // No header, EOF.
-                    return false;
-                }
+                    return false; // No header, EOF.
             }
 
             // 1. Check the two magic bytes
@@ -172,28 +194,21 @@ namespace MatthiWare.UpdateLib.Compression.GZip
             int magic = inputBuffer.ReadLeByte();
 
             if (magic < 0)
-            {
                 throw new EndOfStreamException("EOS reading GZIP header");
-            }
 
             headCRC.Update(magic);
+
             if (magic != (GZipConstants.GZIP_MAGIC >> 8))
-            {
                 throw new GZipException("Error GZIP header, first magic byte doesn't match");
-            }
 
             //magic = baseInputStream.ReadByte();
             magic = inputBuffer.ReadLeByte();
 
             if (magic < 0)
-            {
                 throw new EndOfStreamException("EOS reading GZIP header");
-            }
 
             if (magic != (GZipConstants.GZIP_MAGIC & 0xFF))
-            {
                 throw new GZipException("Error GZIP header,  second magic byte doesn't match");
-            }
 
             headCRC.Update(magic);
 
@@ -201,22 +216,18 @@ namespace MatthiWare.UpdateLib.Compression.GZip
             int compressionType = inputBuffer.ReadLeByte();
 
             if (compressionType < 0)
-            {
                 throw new EndOfStreamException("EOS reading GZIP header");
-            }
 
             if (compressionType != 8)
-            {
                 throw new GZipException("Error GZIP header, data not in deflate format");
-            }
+
             headCRC.Update(compressionType);
 
             // 3. Check the flags
             int flags = inputBuffer.ReadLeByte();
             if (flags < 0)
-            {
                 throw new EndOfStreamException("EOS reading GZIP header");
-            }
+
             headCRC.Update(flags);
 
             /*    This flag byte is divided into individual bits as follows:
@@ -233,18 +244,16 @@ namespace MatthiWare.UpdateLib.Compression.GZip
             // 3.1 Check the reserved bits are zero
 
             if ((flags & 0xE0) != 0)
-            {
                 throw new GZipException("Reserved flag bits in GZIP header != 0");
-            }
 
             // 4.-6. Skip the modification time, extra flags, and OS type
             for (int i = 0; i < 6; i++)
             {
                 int readByte = inputBuffer.ReadLeByte();
+
                 if (readByte < 0)
-                {
                     throw new EndOfStreamException("EOS reading GZIP header");
-                }
+
                 headCRC.Update(readByte);
             }
 
@@ -256,10 +265,10 @@ namespace MatthiWare.UpdateLib.Compression.GZip
                 int len1, len2;
                 len1 = inputBuffer.ReadLeByte();
                 len2 = inputBuffer.ReadLeByte();
+
                 if ((len1 < 0) || (len2 < 0))
-                {
                     throw new EndOfStreamException("EOS reading GZIP header");
-                }
+
                 headCRC.Update(len1);
                 headCRC.Update(len2);
 
@@ -268,9 +277,8 @@ namespace MatthiWare.UpdateLib.Compression.GZip
                 {
                     int readByte = inputBuffer.ReadLeByte();
                     if (readByte < 0)
-                    {
                         throw new EndOfStreamException("EOS reading GZIP header");
-                    }
+
                     headCRC.Update(readByte);
                 }
             }
@@ -280,14 +288,11 @@ namespace MatthiWare.UpdateLib.Compression.GZip
             {
                 int readByte;
                 while ((readByte = inputBuffer.ReadLeByte()) > 0)
-                {
                     headCRC.Update(readByte);
-                }
 
                 if (readByte < 0)
-                {
                     throw new EndOfStreamException("EOS reading GZIP header");
-                }
+
                 headCRC.Update(readByte);
             }
 
@@ -296,14 +301,10 @@ namespace MatthiWare.UpdateLib.Compression.GZip
             {
                 int readByte;
                 while ((readByte = inputBuffer.ReadLeByte()) > 0)
-                {
                     headCRC.Update(readByte);
-                }
 
                 if (readByte < 0)
-                {
                     throw new EndOfStreamException("EOS reading GZIP header");
-                }
 
                 headCRC.Update(readByte);
             }
@@ -313,22 +314,19 @@ namespace MatthiWare.UpdateLib.Compression.GZip
             {
                 int tempByte;
                 int crcval = inputBuffer.ReadLeByte();
+
                 if (crcval < 0)
-                {
                     throw new EndOfStreamException("EOS reading GZIP header");
-                }
 
                 tempByte = inputBuffer.ReadLeByte();
+
                 if (tempByte < 0)
-                {
                     throw new EndOfStreamException("EOS reading GZIP header");
-                }
 
                 crcval = (crcval << 8) | tempByte;
+
                 if (crcval != ((int)headCRC.Value & 0xffff))
-                {
                     throw new GZipException("Header CRC value mismatch");
-                }
             }
 
             readGZIPHeader = true;
@@ -350,30 +348,25 @@ namespace MatthiWare.UpdateLib.Compression.GZip
             {
                 int count = inputBuffer.ReadClearTextBuffer(footer, 8 - needed, needed);
                 if (count <= 0)
-                {
                     throw new EndOfStreamException("EOS reading GZIP footer");
-                }
+
                 needed -= count; // Jewel Jan 16
             }
 
             // Calculate CRC
             int crcval = (footer[0] & 0xff) | ((footer[1] & 0xff) << 8) | ((footer[2] & 0xff) << 16) | (footer[3] << 24);
             if (crcval != (int)crc.Value)
-            {
                 throw new GZipException("GZIP crc sum mismatch, theirs \"" + crcval + "\" and ours \"" + (int)crc.Value);
-            }
 
             // NOTE The total here is the original total modulo 2 ^ 32.
             uint total =
-                (uint)((uint)footer[4] & 0xff) |
-                (uint)(((uint)footer[5] & 0xff) << 8) |
-                (uint)(((uint)footer[6] & 0xff) << 16) |
-                (uint)((uint)footer[7] << 24);
+                ((uint)footer[4] & 0xff) |
+                (((uint)footer[5] & 0xff) << 8) |
+                (((uint)footer[6] & 0xff) << 16) |
+                ((uint)footer[7] << 24);
 
             if (bytesRead != total)
-            {
                 throw new GZipException("Number of bytes mismatch in footer");
-            }
 
             // Mark header read as false so if another header exists, we'll continue reading through the file
             readGZIPHeader = false;
