@@ -125,12 +125,6 @@ namespace MatthiWare.UpdateLib.Compression
                 FillWindow();
                 bool canFlush = flush && (inputOff == inputEnd);
 
-#if DebugDeflation
-				if (DeflaterConstants.DEBUGGING) {
-					Console.WriteLine("window: [" + blockStart + "," + strstart + ","
-								+ lookahead + "], " + compressionFunction + "," + canFlush);
-				}
-#endif
                 switch (compressionFunction)
                 {
                     case DeflaterConstants.DEFLATE_STORED:
@@ -159,24 +153,16 @@ namespace MatthiWare.UpdateLib.Compression
         public void SetInput(byte[] buffer, int offset, int count)
         {
             if (buffer == null)
-            {
                 throw new ArgumentNullException(nameof(buffer));
-            }
 
             if (offset < 0)
-            {
                 throw new ArgumentOutOfRangeException(nameof(offset));
-            }
 
             if (count < 0)
-            {
                 throw new ArgumentOutOfRangeException(nameof(count));
-            }
 
             if (inputOff < inputEnd)
-            {
                 throw new InvalidOperationException("Old input was not completely processed");
-            }
 
             int end = offset + count;
 
@@ -184,9 +170,7 @@ namespace MatthiWare.UpdateLib.Compression
 			* check is very tricky: it also handles integer wrap around.
 			*/
             if ((offset > end) || (end > buffer.Length))
-            {
                 throw new ArgumentOutOfRangeException(nameof(count));
-            }
 
             inputBuf = buffer;
             inputOff = offset;
@@ -197,10 +181,7 @@ namespace MatthiWare.UpdateLib.Compression
         /// Determines if more <see cref="SetInput">input</see> is needed.
         /// </summary>		
         /// <returns>Return true if input is needed via <see cref="SetInput">SetInput</see></returns>
-        public bool NeedsInput()
-        {
-            return (inputEnd == inputOff);
-        }
+        public bool NeedsInput() => (inputEnd == inputOff);
 
         /// <summary>
         /// Set compression dictionary
@@ -210,17 +191,9 @@ namespace MatthiWare.UpdateLib.Compression
         /// <param name="length">The length of the dictionary data.</param>
         public void SetDictionary(byte[] buffer, int offset, int length)
         {
-#if DebugDeflation
-			if (DeflaterConstants.DEBUGGING && (strstart != 1) ) 
-			{
-				throw new InvalidOperationException("strstart not 1");
-			}
-#endif
             checksum.Update(buffer, offset, length);
             if (length < DeflaterConstants.MIN_MATCH)
-            {
                 return;
-            }
 
             if (length > DeflaterConstants.MAX_DIST)
             {
@@ -228,15 +201,17 @@ namespace MatthiWare.UpdateLib.Compression
                 length = DeflaterConstants.MAX_DIST;
             }
 
-            System.Array.Copy(buffer, offset, window, strstart, length);
+            Array.Copy(buffer, offset, window, strstart, length);
 
             UpdateHash();
             --length;
+
             while (--length > 0)
             {
                 InsertString();
                 strstart++;
             }
+
             strstart += 2;
             blockStart = strstart;
         }
@@ -255,23 +230,16 @@ namespace MatthiWare.UpdateLib.Compression
             matchLen = DeflaterConstants.MIN_MATCH - 1;
 
             for (int i = 0; i < DeflaterConstants.HASH_SIZE; i++)
-            {
                 head[i] = 0;
-            }
 
             for (int i = 0; i < DeflaterConstants.WSIZE; i++)
-            {
                 prev[i] = 0;
-            }
         }
 
         /// <summary>
         /// Reset Adler checksum
         /// </summary>		
-        public void ResetAdler()
-        {
-            checksum.Reset();
-        }
+        public void ResetAdler() => checksum.Reset();
 
         /// <summary>
         /// Get current value of Adler checksum
@@ -317,9 +285,7 @@ namespace MatthiWare.UpdateLib.Compression
         public void SetLevel(int level)
         {
             if ((level < 0) || (level > 9))
-            {
                 throw new ArgumentOutOfRangeException(nameof(level));
-            }
 
             goodLength = DeflaterConstants.GOOD_LENGTH[level];
             max_lazy = DeflaterConstants.MAX_LAZY[level];
@@ -328,13 +294,6 @@ namespace MatthiWare.UpdateLib.Compression
 
             if (DeflaterConstants.COMPR_FUNC[level] != compressionFunction)
             {
-
-#if DebugDeflation
-				if (DeflaterConstants.DEBUGGING) {
-				   Console.WriteLine("Change from " + compressionFunction + " to "
-										  + DeflaterConstants.COMPR_FUNC[level]);
-				}
-#endif
                 switch (compressionFunction)
                 {
                     case DeflaterConstants.DEFLATE_STORED:
@@ -344,6 +303,7 @@ namespace MatthiWare.UpdateLib.Compression
                                 strstart - blockStart, false);
                             blockStart = strstart;
                         }
+
                         UpdateHash();
                         break;
 
@@ -358,18 +318,19 @@ namespace MatthiWare.UpdateLib.Compression
 
                     case DeflaterConstants.DEFLATE_SLOW:
                         if (prevAvailable)
-                        {
                             huffman.TallyLit(window[strstart - 1] & 0xff);
-                        }
+
                         if (strstart > blockStart)
                         {
                             huffman.FlushBlock(window, blockStart, strstart - blockStart, false);
                             blockStart = strstart;
                         }
+
                         prevAvailable = false;
                         matchLen = DeflaterConstants.MIN_MATCH - 1;
                         break;
                 }
+
                 compressionFunction = DeflaterConstants.COMPR_FUNC[level];
             }
         }
@@ -383,9 +344,7 @@ namespace MatthiWare.UpdateLib.Compression
 			 * move the upper half to the lower one to make room in the upper half.
 			 */
             if (strstart >= DeflaterConstants.WSIZE + DeflaterConstants.MAX_DIST)
-            {
                 SlideWindow();
-            }
 
             /* If there is not enough lookahead, but still some input left,
 			 * read in the input
@@ -395,11 +354,9 @@ namespace MatthiWare.UpdateLib.Compression
                 int more = 2 * DeflaterConstants.WSIZE - lookahead - strstart;
 
                 if (more > inputEnd - inputOff)
-                {
                     more = inputEnd - inputOff;
-                }
 
-                System.Array.Copy(inputBuf, inputOff, window, strstart + lookahead, more);
+                Array.Copy(inputBuf, inputOff, window, strstart + lookahead, more);
                 checksum.Update(inputBuf, inputOff, more);
 
                 inputOff += more;
@@ -408,9 +365,7 @@ namespace MatthiWare.UpdateLib.Compression
             }
 
             if (lookahead >= DeflaterConstants.MIN_MATCH)
-            {
                 UpdateHash();
-            }
         }
 
         void UpdateHash()
@@ -432,23 +387,11 @@ namespace MatthiWare.UpdateLib.Compression
         {
             short match;
             int hash = ((ins_h << DeflaterConstants.HASH_SHIFT) ^ window[strstart + (DeflaterConstants.MIN_MATCH - 1)]) & DeflaterConstants.HASH_MASK;
-
-#if DebugDeflation
-			if (DeflaterConstants.DEBUGGING) 
-			{
-				if (hash != (((window[strstart] << (2*HASH_SHIFT)) ^ 
-								  (window[strstart + 1] << HASH_SHIFT) ^ 
-								  (window[strstart + 2])) & HASH_MASK)) {
-						throw new SharpZipBaseException("hash inconsistent: " + hash + "/"
-												+window[strstart] + ","
-												+window[strstart + 1] + ","
-												+window[strstart + 2] + "," + HASH_SHIFT);
-					}
-			}
-#endif
+            
             prev[strstart & DeflaterConstants.WMASK] = match = head[hash];
             head[hash] = unchecked((short)strstart);
             ins_h = hash;
+
             return match & 0xffff;
         }
 
@@ -517,9 +460,7 @@ namespace MatthiWare.UpdateLib.Compression
                  || window[match + matchLen - 1] != scan_end1
                  || window[match] != window[scan]
                  || window[++match] != window[++scan])
-                {
                     continue;
-                }
 
                 // scan is set to strstart+1 and the comparison passed, so
                 // scanMax - scan is the maximum number of bytes we can compare.
@@ -600,11 +541,6 @@ namespace MatthiWare.UpdateLib.Compression
 
                 if (scan - strstart > matchLen)
                 {
-#if DebugDeflation
-              if (DeflaterConstants.DEBUGGING && (ins_h == 0) )
-              Console.Error.WriteLine("Found match: " + curMatch + "-" + (scan - strstart));
-#endif
-
                     matchStart = curMatch;
                     matchLen = scan - strstart;
 
@@ -622,9 +558,7 @@ namespace MatthiWare.UpdateLib.Compression
         bool DeflateStored(bool flush, bool finish)
         {
             if (!flush && (lookahead == 0))
-            {
                 return false;
-            }
 
             strstart += lookahead;
             lookahead = 0;
@@ -642,26 +576,18 @@ namespace MatthiWare.UpdateLib.Compression
                     lastBlock = false;
                 }
 
-#if DebugDeflation
-				if (DeflaterConstants.DEBUGGING) 
-				{
-				   Console.WriteLine("storedBlock[" + storedLength + "," + lastBlock + "]");
-				}
-#endif
-
                 huffman.FlushStoredBlock(window, blockStart, storedLength, lastBlock);
                 blockStart += storedLength;
                 return !lastBlock;
             }
+
             return true;
         }
 
         bool DeflateFast(bool flush, bool finish)
         {
             if (lookahead < DeflaterConstants.MIN_LOOKAHEAD && !flush)
-            {
                 return false;
-            }
 
             while (lookahead >= DeflaterConstants.MIN_LOOKAHEAD || flush)
             {
@@ -690,16 +616,6 @@ namespace MatthiWare.UpdateLib.Compression
                     FindLongestMatch(hashHead))
                 {
                     // longestMatch sets matchStart and matchLen
-#if DebugDeflation
-					if (DeflaterConstants.DEBUGGING) 
-					{
-						for (int i = 0 ; i < matchLen; i++) {
-							if (window[strstart + i] != window[matchStart + i]) {
-								throw new SharpZipBaseException("Match failure");
-							}
-						}
-					}
-#endif
 
                     bool full = huffman.TallyDist(strstart - matchStart, matchLen);
 
@@ -711,26 +627,26 @@ namespace MatthiWare.UpdateLib.Compression
                             ++strstart;
                             InsertString();
                         }
+
                         ++strstart;
                     }
                     else
                     {
                         strstart += matchLen;
+
                         if (lookahead >= DeflaterConstants.MIN_MATCH - 1)
-                        {
                             UpdateHash();
-                        }
                     }
                     matchLen = DeflaterConstants.MIN_MATCH - 1;
+
                     if (!full)
-                    {
                         continue;
-                    }
                 }
                 else
                 {
                     // No match found
                     huffman.TallyLit(window[strstart] & 0xff);
+
                     ++strstart;
                     --lookahead;
                 }
@@ -738,8 +654,10 @@ namespace MatthiWare.UpdateLib.Compression
                 if (huffman.IsFull())
                 {
                     bool lastBlock = finish && (lookahead == 0);
+
                     huffman.FlushBlock(window, blockStart, strstart - blockStart, lastBlock);
                     blockStart = strstart;
+
                     return !lastBlock;
                 }
             }
@@ -749,27 +667,19 @@ namespace MatthiWare.UpdateLib.Compression
         bool DeflateSlow(bool flush, bool finish)
         {
             if (lookahead < DeflaterConstants.MIN_LOOKAHEAD && !flush)
-            {
                 return false;
-            }
 
             while (lookahead >= DeflaterConstants.MIN_LOOKAHEAD || flush)
             {
                 if (lookahead == 0)
                 {
                     if (prevAvailable)
-                    {
                         huffman.TallyLit(window[strstart - 1] & 0xff);
-                    }
+
                     prevAvailable = false;
 
                     // We are flushing everything
-#if DebugDeflation
-					if (DeflaterConstants.DEBUGGING && !flush) 
-					{
-						throw new SharpZipBaseException("Not flushing, but no lookahead");
-					}
-#endif
+
                     huffman.FlushBlock(window, blockStart, strstart - blockStart,
                         finish);
                     blockStart = strstart;
@@ -802,24 +712,14 @@ namespace MatthiWare.UpdateLib.Compression
 
                         // Discard match if too small and too far away
                         if (matchLen <= 5 && (strategy == DeflateStrategy.Filtered || (matchLen == DeflaterConstants.MIN_MATCH && strstart - matchStart > TooFar)))
-                        {
                             matchLen = DeflaterConstants.MIN_MATCH - 1;
-                        }
                     }
                 }
 
                 // previous match was better
                 if ((prevLen >= DeflaterConstants.MIN_MATCH) && (matchLen <= prevLen))
                 {
-#if DebugDeflation
-					if (DeflaterConstants.DEBUGGING) 
-					{
-					   for (int i = 0 ; i < matchLen; i++) {
-						  if (window[strstart-1+i] != window[prevMatch + i])
-							 throw new SharpZipBaseException();
-						}
-					}
-#endif
+
                     huffman.TallyDist(strstart - 1 - prevMatch, prevLen);
                     prevLen -= 2;
                     do
@@ -827,9 +727,8 @@ namespace MatthiWare.UpdateLib.Compression
                         strstart++;
                         lookahead--;
                         if (lookahead >= DeflaterConstants.MIN_MATCH)
-                        {
                             InsertString();
-                        }
+
                     } while (--prevLen > 0);
 
                     strstart++;
@@ -840,9 +739,8 @@ namespace MatthiWare.UpdateLib.Compression
                 else
                 {
                     if (prevAvailable)
-                    {
                         huffman.TallyLit(window[strstart - 1] & 0xff);
-                    }
+
                     prevAvailable = true;
                     strstart++;
                     lookahead--;
@@ -851,10 +749,10 @@ namespace MatthiWare.UpdateLib.Compression
                 if (huffman.IsFull())
                 {
                     int len = strstart - blockStart;
+
                     if (prevAvailable)
-                    {
                         len--;
-                    }
+
                     bool lastBlock = (finish && (lookahead == 0) && !prevAvailable);
                     huffman.FlushBlock(window, blockStart, len, lastBlock);
                     blockStart += len;

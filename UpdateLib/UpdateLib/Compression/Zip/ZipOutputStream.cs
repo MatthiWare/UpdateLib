@@ -316,9 +316,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             sizePatchPos = -1;
 
             if ((useZip64_ == UseZip64.On) || ((entry.Size < 0) && (useZip64_ == UseZip64.Dynamic)))
-            {
                 entry.ForceZip64();
-            }
 
             // Write the local file header
             WriteLeInt(ZipConstants.LocalHeaderSignature);
@@ -332,6 +330,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             if (headerInfoAvailable)
             {
                 WriteLeInt((int)entry.Crc);
+
                 if (entry.LocalHeaderRequiresZip64)
                 {
                     WriteLeInt(-1);
@@ -405,19 +404,13 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             WriteLeShort(extra.Length);
 
             if (name.Length > 0)
-            {
                 baseOutputStream_.Write(name, 0, name.Length);
-            }
 
             if (entry.LocalHeaderRequiresZip64 && patchEntryHeader)
-            {
                 sizePatchPos += baseOutputStream_.Position;
-            }
 
             if (extra.Length > 0)
-            {
                 baseOutputStream_.Write(extra, 0, extra.Length);
-            }
 
             offset += ZipConstants.LocalHeaderBaseSize + name.Length + extra.Length;
 
@@ -446,9 +439,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         public void CloseEntry()
         {
             if (curEntry == null)
-            {
                 throw new InvalidOperationException("No open entry");
-            }
 
             long csize = size;
 
@@ -461,37 +452,23 @@ namespace MatthiWare.UpdateLib.Compression.Zip
                     csize = deflater_.TotalOut;
                 }
                 else
-                {
                     deflater_.Reset();
-                }
             }
 
             if (curEntry.Size < 0)
-            {
                 curEntry.Size = size;
-            }
             else if (curEntry.Size != size)
-            {
                 throw new ZipException("size was " + size + ", but I expected " + curEntry.Size);
-            }
 
             if (curEntry.CompressedSize < 0)
-            {
                 curEntry.CompressedSize = csize;
-            }
             else if (curEntry.CompressedSize != csize)
-            {
                 throw new ZipException("compressed size was " + csize + ", but I expected " + curEntry.CompressedSize);
-            }
 
             if (curEntry.Crc < 0)
-            {
                 curEntry.Crc = checksum.Value;
-            }
             else if (curEntry.Crc != checksum.Value)
-            {
                 throw new ZipException("crc was " + checksum.Value + ", but I expected " + curEntry.Crc);
-            }
 
             offset += csize;
 
@@ -506,7 +483,6 @@ namespace MatthiWare.UpdateLib.Compression.Zip
 
                 if (curEntry.LocalHeaderRequiresZip64)
                 {
-
                     if (sizePatchPos == -1)
                         throw new ZipException("Entry requires zip64 but this has been turned off");
 

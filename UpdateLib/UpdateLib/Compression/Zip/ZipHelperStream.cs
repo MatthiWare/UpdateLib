@@ -224,9 +224,10 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             WriteLEShort((byte)method);
             WriteLEInt((int)entry.DosTime);
 
-            if (headerInfoAvailable == true)
+            if (headerInfoAvailable)
             {
                 WriteLEInt((int)entry.Crc);
+
                 if (entry.LocalHeaderRequiresZip64)
                 {
                     WriteLEInt(-1);
@@ -267,15 +268,14 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             byte[] name = ZipConstants.ConvertToArray(entry.Flags, entry.Name);
 
             if (name.Length > 0xFFFF)
-            {
                 throw new ZipException("Entry name too long.");
-            }
 
             var ed = new ZipExtraData(entry.ExtraData);
 
             if (entry.LocalHeaderRequiresZip64 && (headerInfoAvailable || patchEntryHeader))
             {
                 ed.StartNewEntry();
+
                 if (headerInfoAvailable)
                 {
                     ed.AddLeLong(entry.Size);
@@ -286,17 +286,14 @@ namespace MatthiWare.UpdateLib.Compression.Zip
                     ed.AddLeLong(-1);
                     ed.AddLeLong(-1);
                 }
+
                 ed.AddNewEntry(1);
 
                 if (!ed.Find(1))
-                {
                     throw new ZipException("Internal error cant find extra data");
-                }
 
                 if (patchData != null)
-                {
                     patchData.SizePatchOffset = ed.CurrentReadIndex;
-                }
             }
             else
             {
@@ -309,19 +306,13 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             WriteLEShort(extra.Length);
 
             if (name.Length > 0)
-            {
                 stream_.Write(name, 0, name.Length);
-            }
 
             if (entry.LocalHeaderRequiresZip64 && patchEntryHeader)
-            {
                 patchData.SizePatchOffset += stream_.Position;
-            }
 
             if (extra.Length > 0)
-            {
                 stream_.Write(extra, 0, extra.Length);
-            }
         }
 
         /// <summary>
@@ -336,9 +327,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         {
             long pos = endLocation - minimumBlockSize;
             if (pos < 0)
-            {
                 return -1;
-            }
 
             long giveUpMarker = Math.Max(pos - maximumVariableData, 0);
 
@@ -346,10 +335,10 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             do
             {
                 if (pos < giveUpMarker)
-                {
                     return -1;
-                }
+
                 Seek(pos--, SeekOrigin.Begin);
+
             } while (ReadLEInt() != signature);
 
             return Position;
@@ -403,9 +392,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             if ((noOfEntries >= 0xffff) ||
                 (startOfCentralDirectory >= 0xffffffff) ||
                 (sizeEntries >= 0xffffffff))
-            {
                 WriteZip64EndOfCentralDirectory(noOfEntries, sizeEntries, startOfCentralDirectory);
-            }
 
             WriteLEInt(ZipConstants.EndOfCentralDirectorySignature);
 
@@ -428,38 +415,26 @@ namespace MatthiWare.UpdateLib.Compression.Zip
 
             // Size of the central directory
             if (sizeEntries >= 0xffffffff)
-            {
                 WriteLEUint(0xffffffff);    // Zip64 marker
-            }
             else
-            {
                 WriteLEInt((int)sizeEntries);
-            }
 
 
             // offset of start of central directory
             if (startOfCentralDirectory >= 0xffffffff)
-            {
                 WriteLEUint(0xffffffff);    // Zip64 marker
-            }
             else
-            {
                 WriteLEInt((int)startOfCentralDirectory);
-            }
 
             int commentLength = (comment != null) ? comment.Length : 0;
 
             if (commentLength > 0xffff)
-            {
                 throw new ZipException(string.Format("Comment length({0}) is too long can only be 64K", commentLength));
-            }
 
             WriteLEShort(commentLength);
 
             if (commentLength > 0)
-            {
                 Write(comment, 0, comment.Length);
-            }
         }
 
         #region LE value reading/writing
@@ -478,15 +453,11 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             int byteValue1 = stream_.ReadByte();
 
             if (byteValue1 < 0)
-            {
                 throw new EndOfStreamException();
-            }
 
             int byteValue2 = stream_.ReadByte();
             if (byteValue2 < 0)
-            {
                 throw new EndOfStreamException();
-            }
 
             return byteValue1 | (byteValue2 << 8);
         }
@@ -501,19 +472,13 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         /// <exception cref="System.IO.EndOfStreamException">
         /// The file ends prematurely
         /// </exception>
-        public int ReadLEInt()
-        {
-            return ReadLEShort() | (ReadLEShort() << 16);
-        }
+        public int ReadLEInt() => ReadLEShort() | (ReadLEShort() << 16);
 
         /// <summary>
         /// Read a long in little endian byte order.
         /// </summary>
         /// <returns>The value read.</returns>
-        public long ReadLELong()
-        {
-            return (uint)ReadLEInt() | ((long)ReadLEInt() << 32);
-        }
+        public long ReadLELong() => (uint)ReadLEInt() | ((long)ReadLEInt() << 32);
 
         /// <summary>
         /// Write an unsigned short in little endian byte order.
@@ -585,9 +550,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         public int WriteDataDescriptor(ZipEntry entry)
         {
             if (entry == null)
-            {
                 throw new ArgumentNullException(nameof(entry));
-            }
 
             int result = 0;
 
@@ -631,9 +594,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             // In theory this may not be a descriptor according to PKZIP appnote.
             // In practise its always there.
             if (intValue != ZipConstants.DataDescriptorSignature)
-            {
                 throw new ZipException("Data descriptor signature not found");
-            }
 
             data.Crc = ReadLEInt();
 

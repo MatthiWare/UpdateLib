@@ -65,9 +65,8 @@ namespace MatthiWare.UpdateLib.Compression
                     case LNUM:
                         lnum = input.PeekBits(5);
                         if (lnum < 0)
-                        {
                             return false;
-                        }
+
                         lnum += 257;
                         input.DropBits(5);
                         //  	    System.err.println("LNUM: "+lnum);
@@ -104,9 +103,8 @@ namespace MatthiWare.UpdateLib.Compression
                         {
                             int len = input.PeekBits(3);
                             if (len < 0)
-                            {
                                 return false;
-                            }
+
                             input.DropBits(3);
                             //  		System.err.println("blLens["+BL_ORDER[ptr]+"]: "+len);
                             blLens[BL_ORDER[ptr]] = (byte)len;
@@ -128,31 +126,20 @@ namespace MatthiWare.UpdateLib.Compression
                                 litdistLens[ptr++] = lastLen = (byte)symbol;
 
                                 if (ptr == num)
-                                {
-                                    /* Finished */
                                     return true;
-                                }
                             }
 
                             /* need more input ? */
                             if (symbol < 0)
-                            {
                                 return false;
-                            }
 
                             /* otherwise repeat code */
                             if (symbol >= 17)
-                            {
-                                /* repeat zero */
-                                //  		  System.err.println("repeating zero");
                                 lastLen = 0;
-                            }
                             else
                             {
                                 if (ptr == 0)
-                                {
                                     throw new Exception("Repeating zero");
-                                }
                             }
                             repSymbol = symbol - 16;
                         }
@@ -172,7 +159,7 @@ namespace MatthiWare.UpdateLib.Compression
 
                             if (ptr + count > num)
                                 throw new Exception($"litdistLens repeated: {count}");
-                            
+
                             while (count-- > 0)
                                 litdistLens[ptr++] = lastLen;
 

@@ -264,22 +264,6 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         }
 
         /// <summary>
-        /// Value used during password checking for PKZIP 2.0 / 'classic' encryption.
-        /// </summary>
-        internal byte CryptoCheckValue
-        {
-            get
-            {
-                return cryptoCheckValue_;
-            }
-
-            set
-            {
-                cryptoCheckValue_ = value;
-            }
-        }
-
-        /// <summary>
         /// Get/Set general purpose bit flag for entry
         /// </summary>
         /// <remarks>

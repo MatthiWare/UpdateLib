@@ -193,26 +193,22 @@ namespace MatthiWare.UpdateLib.Compression
         /// the compression level, a value between NO_COMPRESSION
         /// and BEST_COMPRESSION.
         /// </param>
-        /// <param name="noZlibHeaderOrFooter">
+        /// <param name="noZlibHeaderOrFooter_">
         /// true, if we should suppress the Zlib/RFC1950 header at the
         /// beginning and the adler checksum at the end of the output.  This is
         /// useful for the GZIP/PKZIP formats.
         /// </param>
         /// <exception cref="System.ArgumentOutOfRangeException">if lvl is out of range.</exception>
-        public Deflater(int level, bool noZlibHeaderOrFooter)
+        public Deflater(int level, bool noZlibHeaderOrFooter_)
         {
             if (level == DEFAULT_COMPRESSION)
-            {
                 level = 6;
-            }
             else if (level < NO_COMPRESSION || level > BEST_COMPRESSION)
-            {
                 throw new ArgumentOutOfRangeException(nameof(level));
-            }
 
             pending = new DeflaterPending();
             engine = new DeflaterEngine(pending);
-            this.noZlibHeaderOrFooter = noZlibHeaderOrFooter;
+            noZlibHeaderOrFooter = noZlibHeaderOrFooter_;
             SetStrategy(DeflateStrategy.Default);
             SetLevel(level);
             Reset();
@@ -372,13 +368,9 @@ namespace MatthiWare.UpdateLib.Compression
         public void SetLevel(int level)
         {
             if (level == DEFAULT_COMPRESSION)
-            {
                 level = 6;
-            }
             else if (level < NO_COMPRESSION || level > BEST_COMPRESSION)
-            {
                 throw new ArgumentOutOfRangeException(nameof(level));
-            }
 
             if (this.level != level)
             {
@@ -391,10 +383,7 @@ namespace MatthiWare.UpdateLib.Compression
         /// Get current compression level
         /// </summary>
         /// <returns>Returns the current compression level</returns>
-        public int GetLevel()
-        {
-            return level;
-        }
+        public int GetLevel() => level;
 
         /// <summary>
         /// Sets the compression strategy. Strategy is one of
@@ -420,10 +409,7 @@ namespace MatthiWare.UpdateLib.Compression
         /// The number of compressed bytes added to the output, or 0 if either
         /// IsNeedingInput() or IsFinished returns true or length is zero.
         /// </returns>
-        public int Deflate(byte[] output)
-        {
-            return Deflate(output, 0, output.Length);
-        }
+        public int Deflate(byte[] output) => Deflate(output, 0, output.Length);
 
         /// <summary>
         /// Deflates the current input block to the given array.
@@ -452,29 +438,28 @@ namespace MatthiWare.UpdateLib.Compression
             int origLength = length;
 
             if (state == CLOSED_STATE)
-            {
                 throw new InvalidOperationException("Deflater closed");
-            }
 
             if (state < BUSY_STATE)
             {
                 // output header
                 int header = (DEFLATED +
                     ((DeflaterConstants.MAX_WBITS - 8) << 4)) << 8;
+
                 int level_flags = (level - 1) >> 1;
+
                 if (level_flags < 0 || level_flags > 3)
-                {
                     level_flags = 3;
-                }
+
                 header |= level_flags << 6;
+
                 if ((state & IS_SETDICT) != 0)
-                {
-                    // Dictionary was set
-                    header |= DeflaterConstants.PRESET_DICT;
-                }
+                    header |= DeflaterConstants.PRESET_DICT; // Dictionary was set
+
                 header += 31 - (header % 31);
 
                 pending.WriteShortMSB(header);
+
                 if ((state & IS_SETDICT) != 0)
                 {
                     int chksum = engine.Adler;
@@ -494,9 +479,7 @@ namespace MatthiWare.UpdateLib.Compression
                 length -= count;
 
                 if (length == 0 || state == FINISHED_STATE)
-                {
                     break;
-                }
 
                 if (!engine.Deflate((state & IS_FLUSHING) != 0, (state & IS_FINISHING) != 0))
                 {
@@ -505,6 +488,7 @@ namespace MatthiWare.UpdateLib.Compression
                         case BUSY_STATE:
                             // We need more input now
                             return origLength - length;
+
                         case FLUSHING_STATE:
                             if (level != NO_COMPRESSION)
                             {
@@ -522,6 +506,7 @@ namespace MatthiWare.UpdateLib.Compression
                                     neededbits -= 10;
                                 }
                             }
+
                             state = BUSY_STATE;
                             break;
                         case FINISHING_STATE:
@@ -534,6 +519,7 @@ namespace MatthiWare.UpdateLib.Compression
                                 pending.WriteShortMSB(adler >> 16);
                                 pending.WriteShortMSB(adler & 0xffff);
                             }
+
                             state = FINISHED_STATE;
                             break;
                     }
@@ -552,10 +538,7 @@ namespace MatthiWare.UpdateLib.Compression
         /// <exception cref="System.InvalidOperationException">
         /// if SetInput () or Deflate () were already called or another dictionary was already set.
         /// </exception>
-        public void SetDictionary(byte[] dictionary)
-        {
-            SetDictionary(dictionary, 0, dictionary.Length);
-        }
+        public void SetDictionary(byte[] dictionary) => SetDictionary(dictionary, 0, dictionary.Length);
 
         /// <summary>
         /// Sets the dictionary which should be used in the deflate process.
@@ -580,9 +563,7 @@ namespace MatthiWare.UpdateLib.Compression
         public void SetDictionary(byte[] dictionary, int index, int count)
         {
             if (state != INIT_STATE)
-            {
                 throw new InvalidOperationException();
-            }
 
             state = SETDICT_STATE;
             engine.SetDictionary(dictionary, index, count);

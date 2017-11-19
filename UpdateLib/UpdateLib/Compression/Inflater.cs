@@ -236,10 +236,10 @@ namespace MatthiWare.UpdateLib.Compression
         private bool DecodeHeader()
         {
             int header = input.PeekBits(16);
+
             if (header < 0)
-            {
                 return false;
-            }
+
             input.DropBits(16);
 
             // The header is written in "wrong" byte order
@@ -258,9 +258,7 @@ namespace MatthiWare.UpdateLib.Compression
 			*/
 
             if ((header & 0x0020) == 0)
-            { // Dictionary flag?
-                mode = DECODE_BLOCKS;
-            }
+                mode = DECODE_BLOCKS; // Dictionary flag?
             else
             {
                 mode = DECODE_DICT;
@@ -280,14 +278,15 @@ namespace MatthiWare.UpdateLib.Compression
             while (neededBits > 0)
             {
                 int dictByte = input.PeekBits(8);
+
                 if (dictByte < 0)
-                {
                     return false;
-                }
+
                 input.DropBits(8);
                 readAdler = (readAdler << 8) | dictByte;
                 neededBits -= 8;
             }
+
             return false;
         }
 
@@ -314,18 +313,15 @@ namespace MatthiWare.UpdateLib.Compression
                         while (((symbol = litlenTree.GetSymbol(input)) & ~0xff) == 0)
                         {
                             outputWindow.Write(symbol);
+
                             if (--free < 258)
-                            {
                                 return true;
-                            }
                         }
 
                         if (symbol < 257)
                         {
                             if (symbol < 0)
-                            {
                                 return false;
-                            }
                             else
                             {
                                 // symbol == 256: end of block
@@ -352,22 +348,21 @@ namespace MatthiWare.UpdateLib.Compression
                         {
                             mode = DECODE_HUFFMAN_LENBITS;
                             int i = input.PeekBits(neededBits);
+
                             if (i < 0)
-                            {
                                 return false;
-                            }
+
                             input.DropBits(neededBits);
                             repLength += i;
                         }
+
                         mode = DECODE_HUFFMAN_DIST;
                         goto case DECODE_HUFFMAN_DIST; // fall through
 
                     case DECODE_HUFFMAN_DIST:
                         symbol = distTree.GetSymbol(input);
                         if (symbol < 0)
-                        {
                             return false;
-                        }
 
                         try
                         {
@@ -387,9 +382,8 @@ namespace MatthiWare.UpdateLib.Compression
                             mode = DECODE_HUFFMAN_DISTBITS;
                             int i = input.PeekBits(neededBits);
                             if (i < 0)
-                            {
                                 return false;
-                            }
+
                             input.DropBits(neededBits);
                             repDist += i;
                         }
@@ -421,18 +415,15 @@ namespace MatthiWare.UpdateLib.Compression
             {
                 int chkByte = input.PeekBits(8);
                 if (chkByte < 0)
-                {
                     return false;
-                }
+
                 input.DropBits(8);
                 readAdler = (readAdler << 8) | chkByte;
                 neededBits -= 8;
             }
 
             if ((int)checksum.Value != readAdler)
-            {
                 throw new Exception("Adler chksum doesn't match: " + (int)checksum.Value + " vs. " + readAdler);
-            }
 
             mode = FINISHED;
             return false;
@@ -479,9 +470,8 @@ namespace MatthiWare.UpdateLib.Compression
 
                     int type = input.PeekBits(3);
                     if (type < 0)
-                    {
                         return false;
-                    }
+
                     input.DropBits(3);
 
                     isLastBlock |= (type & 1) != 0;
@@ -508,9 +498,8 @@ namespace MatthiWare.UpdateLib.Compression
                 case DECODE_STORED_LEN1:
                     {
                         if ((uncomprLen = input.PeekBits(16)) < 0)
-                        {
                             return false;
-                        }
+
                         input.DropBits(16);
                         mode = DECODE_STORED_LEN2;
                     }
@@ -520,14 +509,12 @@ namespace MatthiWare.UpdateLib.Compression
                     {
                         int nlen = input.PeekBits(16);
                         if (nlen < 0)
-                        {
                             return false;
-                        }
+
                         input.DropBits(16);
                         if (nlen != (uncomprLen ^ 0xffff))
-                        {
                             throw new FormatException("broken uncompressed block");
-                        }
+
                         mode = DECODE_STORED;
                     }
                     goto case DECODE_STORED; // fall through
@@ -546,9 +533,7 @@ namespace MatthiWare.UpdateLib.Compression
 
                 case DECODE_DYN_HEADER:
                     if (!dynHeader.Decode(input))
-                    {
                         return false;
-                    }
 
                     litlenTree = dynHeader.BuildLitLenTree();
                     distTree = dynHeader.BuildDistTree();
@@ -578,10 +563,7 @@ namespace MatthiWare.UpdateLib.Compression
         /// <param name="buffer">
         /// The dictionary.
         /// </param>
-        public void SetDictionary(byte[] buffer)
-        {
-            SetDictionary(buffer, 0, buffer.Length);
-        }
+        public void SetDictionary(byte[] buffer) => SetDictionary(buffer, 0, buffer.Length);
 
         /// <summary>
         /// Sets the preset dictionary.  This should only be called, if
@@ -662,7 +644,7 @@ namespace MatthiWare.UpdateLib.Compression
         public void SetInput(byte[] buffer, int index, int count)
         {
             input.SetInput(buffer, index, count);
-            totalIn += (long)count;
+            totalIn += count;
         }
 
         /// <summary>
@@ -687,9 +669,7 @@ namespace MatthiWare.UpdateLib.Compression
         public int Inflate(byte[] buffer)
         {
             if (buffer == null)
-            {
                 throw new ArgumentNullException(nameof(buffer));
-            }
 
             return Inflate(buffer, 0, buffer.Length);
         }
@@ -724,32 +704,23 @@ namespace MatthiWare.UpdateLib.Compression
         public int Inflate(byte[] buffer, int offset, int count)
         {
             if (buffer == null)
-            {
                 throw new ArgumentNullException(nameof(buffer));
-            }
 
             if (count < 0)
-            {
                 throw new ArgumentOutOfRangeException(nameof(count), "count cannot be negative");
-            }
 
             if (offset < 0)
-            {
                 throw new ArgumentOutOfRangeException(nameof(offset), "offset cannot be negative");
-            }
 
             if (offset + count > buffer.Length)
-            {
                 throw new ArgumentException("count exceeds buffer bounds");
-            }
 
             // Special case: count may be zero
             if (count == 0)
             {
                 if (!IsFinished)
-                { // -jr- 08-Nov-2003 INFLATE_BUG fix..
-                    Decode();
-                }
+                    Decode(); // -jr- 08-Nov-2003 INFLATE_BUG fix..
+
                 return 0;
             }
 
@@ -767,17 +738,17 @@ namespace MatthiWare.UpdateLib.Compression
 					*   implies more output can be produced.
 					*/
                     int more = outputWindow.CopyOutput(buffer, offset, count);
+
                     if (more > 0)
                     {
                         checksum.Update(buffer, offset, more);
                         offset += more;
                         bytesCopied += more;
-                        totalOut += (long)more;
+                        totalOut += more;
                         count -= more;
+
                         if (count == 0)
-                        {
                             return bytesCopied;
-                        }
                     }
                 }
             } while (Decode() || ((outputWindow.GetAvailable() > 0) && (mode != DECODE_CHKSUM)));

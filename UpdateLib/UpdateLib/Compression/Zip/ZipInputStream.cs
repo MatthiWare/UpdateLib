@@ -185,14 +185,10 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         public ZipEntry GetNextEntry()
         {
             if (checksum == null)
-            {
                 throw new InvalidOperationException("Closed.");
-            }
 
             if (entry != null)
-            {
                 CloseEntry();
-            }
 
             int header = inputBuffer.ReadLeInt();
 
@@ -210,14 +206,10 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             // -jr- 07-Dec-2003 Ignore spanning temporary signatures if found
             // Spanning signature is same as descriptor signature and is untested as yet.
             if ((header == ZipConstants.SpanningTempSignature) || (header == ZipConstants.SpanningSignature))
-            {
                 header = inputBuffer.ReadLeInt();
-            }
 
             if (header != ZipConstants.LocalHeaderSignature)
-            {
-                throw new ZipException("Wrong Local header signature: 0x" + String.Format("{0:X}", header));
-            }
+                throw new ZipException("Wrong Local header signature: 0x" + string.Format("{0:X}", header));
 
             var versionRequiredToExtract = (short)inputBuffer.ReadLeShort();
 
@@ -229,8 +221,6 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             size = inputBuffer.ReadLeInt();
             int nameLen = inputBuffer.ReadLeShort();
             int extraLen = inputBuffer.ReadLeShort();
-
-            bool isCrypted = (flags & 1) == 1;
 
             byte[] buffer = new byte[nameLen];
             inputBuffer.ReadRawBuffer(buffer);
@@ -247,9 +237,6 @@ namespace MatthiWare.UpdateLib.Compression.Zip
                 entry.Crc = crc2 & 0xFFFFFFFFL;
                 entry.Size = size & 0xFFFFFFFFL;
                 entry.CompressedSize = csize & 0xFFFFFFFFL;
-
-                entry.CryptoCheckValue = (byte)((crc2 >> 24) & 0xff);
-
             }
             else
             {
@@ -257,21 +244,13 @@ namespace MatthiWare.UpdateLib.Compression.Zip
                 // This allows for GNU, WinZip and possibly other archives, the PKZIP spec
                 // says these values are zero under these circumstances.
                 if (crc2 != 0)
-                {
                     entry.Crc = crc2 & 0xFFFFFFFFL;
-                }
 
                 if (size != 0)
-                {
                     entry.Size = size & 0xFFFFFFFFL;
-                }
 
                 if (csize != 0)
-                {
                     entry.CompressedSize = csize & 0xFFFFFFFFL;
-                }
-
-                entry.CryptoCheckValue = (byte)((dostime >> 8) & 0xff);
             }
 
             entry.DosTime = dostime;
@@ -289,19 +268,13 @@ namespace MatthiWare.UpdateLib.Compression.Zip
 
             entry.ProcessExtraData(true);
             if (entry.CompressedSize >= 0)
-            {
                 csize = entry.CompressedSize;
-            }
 
             if (entry.Size >= 0)
-            {
                 size = entry.Size;
-            }
 
-            if (method == (int)CompressionMethod.Stored && (!isCrypted && csize != size || (isCrypted && csize - ZipConstants.CryptoHeaderSize != size)))
-            {
+            if (method == (int)CompressionMethod.Stored && csize != size)
                 throw new ZipException("Stored, but compressed != uncompressed");
-            }
 
             // Determine how to handle reading of data if this is attempted.
             if (entry.IsCompressionMethodSupported())
@@ -386,10 +359,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
                     byte[] tmp = new byte[4096];
 
                     // Read will close this entry
-                    while (Read(tmp, 0, tmp.Length) > 0)
-                    {
-
-                    }
+                    while (Read(tmp, 0, tmp.Length) > 0) ;
 
                     return;
                 }
@@ -459,15 +429,12 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         public override int ReadByte()
         {
             byte[] b = new byte[1];
-            if (Read(b, 0, 1) <= 0)
-            {
-                return -1;
-            }
-            return b[0] & 0xff;
+
+            return (Read(b, 0, 1) <= 0) ? -1 : b[0] & 0xff;
         }
 
         /// <summary>
-        /// Handle attempts to read by throwing an <see cref="InvalidOperationException"/>.
+        /// Handle attempts to read by throwing an <see cref="IOException"/>.
         /// </summary>
         /// <param name="destination">The destination array to store data in.</param>
         /// <param name="offset">The offset at which data read should be stored.</param>
@@ -475,7 +442,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         /// <returns>Returns the number of bytes actually read.</returns>
         int ReadingNotAvailable(byte[] destination, int offset, int count)
         {
-            throw new InvalidOperationException("Unable to read from this stream");
+            throw new IOException("Unable to read from this stream");
         }
 
         /// <summary>
@@ -497,16 +464,12 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         int InitialRead(byte[] destination, int offset, int count)
         {
             if (!CanDecompressEntry)
-            {
-                throw new ZipException("Library cannot extract this entry. Version required is (" + entry.Version + ")");
-            }
+                throw new ZipException($"Library cannot extract this entry. Version required is ({entry.Version})");
 
             if ((csize > 0) || ((flags & (int)GeneralBitFlags.Descriptor) != 0))
             {
                 if ((method == (int)CompressionMethod.Deflated) && (inputBuffer.Available > 0))
-                {
                     inputBuffer.SetInflaterInput(inf);
-                }
 
                 internalReader = new ReadDataHandler(BodyRead);
                 return BodyRead(destination, offset, count);
@@ -529,24 +492,16 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         public override int Read(byte[] buffer, int offset, int count)
         {
             if (buffer == null)
-            {
                 throw new ArgumentNullException(nameof(buffer));
-            }
 
             if (offset < 0)
-            {
                 throw new ArgumentOutOfRangeException(nameof(offset), "Cannot be negative");
-            }
 
             if (count < 0)
-            {
                 throw new ArgumentOutOfRangeException(nameof(count), "Cannot be negative");
-            }
 
             if ((buffer.Length - offset) < count)
-            {
                 throw new ArgumentException("Invalid offset/count combination");
-            }
 
             return internalReader(buffer, offset, count);
         }
@@ -569,54 +524,48 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         int BodyRead(byte[] buffer, int offset, int count)
         {
             if (checksum == null)
-            {
                 throw new InvalidOperationException("Closed");
-            }
 
             if ((entry == null) || (count <= 0))
-            {
                 return 0;
-            }
 
             if (offset + count > buffer.Length)
-            {
                 throw new ArgumentException("Offset + count exceeds buffer size");
-            }
 
             bool finished = false;
 
             switch (method)
             {
                 case (int)CompressionMethod.Deflated:
+
                     count = base.Read(buffer, offset, count);
+
                     if (count <= 0)
                     {
                         if (!inf.IsFinished)
-                        {
                             throw new ZipException("Inflater not finished!");
-                        }
+
                         inputBuffer.Available = inf.RemainingInput;
 
                         // A csize of -1 is from an unpatched local header
                         if ((flags & 8) == 0 &&
                             (inf.TotalIn != csize && csize != 0xFFFFFFFF && csize != -1 || inf.TotalOut != size))
-                        {
                             throw new ZipException("Size mismatch: " + csize + ";" + size + " <-> " + inf.TotalIn + ";" + inf.TotalOut);
-                        }
+
                         inf.Reset();
                         finished = true;
                     }
                     break;
 
                 case (int)CompressionMethod.Stored:
+
                     if ((count > csize) && (csize >= 0))
-                    {
                         count = (int)csize;
-                    }
 
                     if (count > 0)
                     {
                         count = inputBuffer.ReadClearTextBuffer(buffer, offset, count);
+
                         if (count > 0)
                         {
                             csize -= count;
@@ -625,28 +574,19 @@ namespace MatthiWare.UpdateLib.Compression.Zip
                     }
 
                     if (csize == 0)
-                    {
                         finished = true;
-                    }
                     else
-                    {
                         if (count < 0)
-                        {
                             throw new ZipException("EOF in stored block");
-                        }
-                    }
+
                     break;
             }
 
             if (count > 0)
-            {
                 checksum.Update(buffer, offset, count);
-            }
 
             if (finished)
-            {
                 CompleteCloseEntry(true);
-            }
 
             return count;
         }

@@ -34,6 +34,8 @@
  */
 
 
+using System;
+
 namespace MatthiWare.UpdateLib.Compression
 {
     /// <summary>
@@ -96,12 +98,6 @@ namespace MatthiWare.UpdateLib.Compression
         /// </param>
         public void WriteByte(int value)
         {
-#if DebugDeflation
-			if (DeflaterConstants.DEBUGGING && (start != 0) )
-			{
-				throw new SharpZipBaseException("Debug check: start != 0");
-			}
-#endif
             buffer[end++] = unchecked((byte)value);
         }
 
@@ -113,12 +109,6 @@ namespace MatthiWare.UpdateLib.Compression
         /// </param>
         public void WriteShort(int value)
         {
-#if DebugDeflation
-			if (DeflaterConstants.DEBUGGING && (start != 0) )
-			{
-				throw new SharpZipBaseException("Debug check: start != 0");
-			}
-#endif
             buffer[end++] = unchecked((byte)value);
             buffer[end++] = unchecked((byte)(value >> 8));
         }
@@ -129,12 +119,6 @@ namespace MatthiWare.UpdateLib.Compression
         /// <param name="value">The value to write.</param>
         public void WriteInt(int value)
         {
-#if DebugDeflation
-			if (DeflaterConstants.DEBUGGING && (start != 0) )
-			{
-				throw new SharpZipBaseException("Debug check: start != 0");
-			}
-#endif
             buffer[end++] = unchecked((byte)value);
             buffer[end++] = unchecked((byte)(value >> 8));
             buffer[end++] = unchecked((byte)(value >> 16));
@@ -149,13 +133,7 @@ namespace MatthiWare.UpdateLib.Compression
         /// <param name="length">number of bytes to write</param>
         public void WriteBlock(byte[] block, int offset, int length)
         {
-#if DebugDeflation
-			if (DeflaterConstants.DEBUGGING && (start != 0) ) 
-			{
-				throw new SharpZipBaseException("Debug check: start != 0");
-			}
-#endif
-            System.Array.Copy(block, offset, buffer, end, length);
+            Array.Copy(block, offset, buffer, end, length);
             end += length;
         }
 
@@ -175,12 +153,6 @@ namespace MatthiWare.UpdateLib.Compression
         /// </summary>
         public void AlignToByte()
         {
-#if DebugDeflation
-			if (DeflaterConstants.DEBUGGING && (start != 0) ) 
-			{
-				throw new SharpZipBaseException("Debug check: start != 0");
-			}
-#endif
             if (bitCount > 0)
             {
                 buffer[end++] = unchecked((byte)bits);
@@ -200,16 +172,6 @@ namespace MatthiWare.UpdateLib.Compression
         /// <param name="count">number of bits to write</param>
         public void WriteBits(int b, int count)
         {
-#if DebugDeflation
-			if (DeflaterConstants.DEBUGGING && (start != 0) ) 
-			{
-				throw new SharpZipBaseException("Debug check: start != 0");
-			}
-
-			//			if (DeflaterConstants.DEBUGGING) {
-			//				//Console.WriteLine("writeBits("+b+","+count+")");
-			//			}
-#endif
             bits |= (uint)(b << bitCount);
             bitCount += count;
             if (bitCount >= 16)
@@ -227,12 +189,6 @@ namespace MatthiWare.UpdateLib.Compression
         /// <param name="s">value to write</param>
         public void WriteShortMSB(int s)
         {
-#if DebugDeflation
-			if (DeflaterConstants.DEBUGGING && (start != 0) ) 
-			{
-				throw new SharpZipBaseException("Debug check: start != 0");
-			}
-#endif
             buffer[end++] = unchecked((byte)(s >> 8));
             buffer[end++] = unchecked((byte)s);
         }
@@ -268,15 +224,16 @@ namespace MatthiWare.UpdateLib.Compression
             if (length > end - start)
             {
                 length = end - start;
-                System.Array.Copy(buffer, start, output, offset, length);
+                Array.Copy(buffer, start, output, offset, length);
                 start = 0;
                 end = 0;
             }
             else
             {
-                System.Array.Copy(buffer, start, output, offset, length);
+                Array.Copy(buffer, start, output, offset, length);
                 start += length;
             }
+
             return length;
         }
 
@@ -292,7 +249,7 @@ namespace MatthiWare.UpdateLib.Compression
             AlignToByte();
 
             byte[] result = new byte[end - start];
-            System.Array.Copy(buffer, start, result, 0, result.Length);
+            Array.Copy(buffer, start, result, 0, result.Length);
             start = 0;
             end = 0;
             return result;
