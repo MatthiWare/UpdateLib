@@ -87,6 +87,7 @@ namespace MatthiWare.UpdateLib.Utils
             while (index < size)
             {
                 int read = stream.Read(ret, index, size - index);
+
                 if (read == 0)
                     throw new EndOfStreamException();
 
@@ -94,6 +95,22 @@ namespace MatthiWare.UpdateLib.Utils
             }
 
             return ret;
+        }
+
+        internal static void CheckedReadBytes(this Stream stream, byte[] buffer, int offset, int length)
+        {
+            int index = offset;
+            int size = offset + length;
+
+            while (index < size)
+            {
+                int read = stream.Read(buffer, index, size);
+
+                if (read == 0)
+                    throw new EndOfStreamException();
+
+                index += read;
+            }
         }
 
         internal static byte CheckedReadByte(this Stream stream)

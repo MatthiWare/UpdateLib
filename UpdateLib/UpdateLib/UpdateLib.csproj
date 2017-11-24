@@ -80,10 +80,12 @@
     <Compile Include="Compression\VCDiff\Instruction.cs" />
     <Compile Include="Compression\VCDiff\VCDiffDecoder.cs" />
     <Compile Include="Compression\VCDiff\VCDiffFormatException.cs" />
+    <Compile Include="Compression\Zip\Zip.cs" />
     <Compile Include="Compression\Zip\ZipConstants.cs" />
     <Compile Include="Compression\Zip\ZipEntry.cs" />
     <Compile Include="Compression\Zip\ZipException.cs" />
     <Compile Include="Compression\Zip\ZipExtraData.cs" />
+    <Compile Include="Compression\Zip\ZipFile.cs" />
     <Compile Include="Compression\Zip\ZipHelperStream.cs" />
     <Compile Include="Compression\Zip\ZipInputStream.cs" />
     <Compile Include="Compression\Zip\ZipOutputStream.cs" />
