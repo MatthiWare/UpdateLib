@@ -41,7 +41,6 @@ namespace MatthiWare.UpdateLib.Compression.GZip
 {
     public static class GZip
     {
-
         public static void Decompress(Stream inStream, Stream outStream)
         {
             if (inStream == null || outStream == null)

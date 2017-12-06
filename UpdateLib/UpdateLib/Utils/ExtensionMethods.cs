@@ -43,12 +43,12 @@ namespace MatthiWare.UpdateLib.Utils
         }
 
         [DebuggerStepThrough]
-        public static T Maxx<T, K>(this IEnumerable<T> collection, Func<T, K> resolve) where K : IComparable<K>
+        public static T MaxOrDefault<T, K>(this IEnumerable<T> collection, Func<T, K> resolve) where K : IComparable<K>
         {
             using (var enumerator = collection.GetEnumerator())
             {
                 T max = default(T);
-
+                
                 while (enumerator.MoveNext())
                 {
                     T other = enumerator.Current;

@@ -31,7 +31,7 @@ namespace UpdateLib.Tests.Tasks
             var path = new DirectoryInfo(".").FullName;
 
             Updater.Instance
-                .ConfigureUpdateUrl($@"file:///{path}")
+                .ConfigureAddUpdateUri($@"file:///{path}")
                 .ConfigureInstallationMode(InstallationMode.Local)
                 .ConfigureAllowUnsafeConnections(true)
                 .Initialize();

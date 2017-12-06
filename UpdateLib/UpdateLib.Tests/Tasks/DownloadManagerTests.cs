@@ -48,7 +48,7 @@ namespace UpdateLib.Tests.Tasks
             }
 
             Updater.Instance.ConfigurePathConverter(c => c["appdir"] = $@"{Path.GetTempPath()}dl_test");
-            Updater.Instance.ConfigureUpdateUrl(m_path + "\\update.xml");
+            Updater.Instance.ConfigureAddUpdateUri(m_path + "\\update.xml");
 
             Updater.Instance.Initialize();
         }

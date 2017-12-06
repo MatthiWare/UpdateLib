@@ -37,7 +37,9 @@ namespace MatthiWare.UpdateLib.Files
         [XmlAttribute]
         public string ApplicationName { get; set; } = "UpdateLib";
 
-        public List<UpdateInfo> Updates { get; private set; } = new List<UpdateInfo>();
+        public List<Uri> DownloadURIs { get; } = new List<Uri>();
+
+        public List<UpdateInfo> Updates { get;  } = new List<UpdateInfo>();
 
         public UpdateFile()
         {
@@ -45,7 +47,7 @@ namespace MatthiWare.UpdateLib.Files
         }
 
         public UpdateInfo GetLatestUpdate()
-            => Updates.Maxx(u => u.Version);
+            => Updates.MaxOrDefault(u => u.Version);
 
         /// <summary>
         /// Saves the current <see cref="UpdateFile"/> to the output <see cref="Stream"/>

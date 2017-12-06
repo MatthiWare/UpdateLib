@@ -47,7 +47,7 @@ namespace TestApp
 
             Updater.Instance
                 //.ConfigureUpdateUrl("https://raw.githubusercontent.com/MatthiWare/UpdateLib.TestApp.UpdateExample/master/Dev/updatefile.xml")
-                .ConfigureUpdateUrl("http://matthiware.dev/UpdateLib/Dev/updatefile.xml")
+                .ConfigureAddUpdateUri("http://matthiware.dev/UpdateLib/Dev/updatefile.xml")
                 .ConfigureLogger((logger) => logger.LogLevel = LoggingLevel.Debug)
                 .ConfigureLogger((logger) => logger.Writers.Add(new ConsoleLogWriter()))
                 .ConfigureLogger((logger) => logger.Writers.Add(new FileLogWriter()))

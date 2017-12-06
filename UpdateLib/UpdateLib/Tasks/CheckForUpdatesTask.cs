@@ -22,28 +22,24 @@ using System.IO;
 using MatthiWare.UpdateLib.Utils;
 using static MatthiWare.UpdateLib.Tasks.CheckForUpdatesTask;
 using MatthiWare.UpdateLib.Common;
+using System.Collections.Generic;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
     public class CheckForUpdatesTask : AsyncTask<CheckForUpdatesResult>
     {
-        public string Url { get; set; }
+        private IList<Uri> m_uris;
 
-        private WebClient wcDownloader;
+        private WebClient m_wc;
 
-        public CheckForUpdatesTask(string url)
+        public CheckForUpdatesTask(IList<Uri> uris)
         {
-            if (string.IsNullOrEmpty(url)) throw new ArgumentNullException(nameof(url));
-
-            Url = url;
-
-            wcDownloader = new WebClient();
+            m_uris = uris;
+            m_wc = new WebClient();
         }
 
         protected override void DoWork()
         {
-            if (string.IsNullOrEmpty(Url)) throw new WebException("Invalid Url", WebExceptionStatus.NameResolutionFailure);
-
             Result = new CheckForUpdatesResult();
 
             Updater updater = Updater.Instance;
@@ -59,7 +55,7 @@ namespace MatthiWare.UpdateLib.Tasks
             if (IsUpdateFileInvalid(localFile))
             {
                 updater.Logger.Warn(nameof(CheckForUpdatesTask), nameof(DoWork), "Cached update file validity expired, downloading new one..");
-                wcDownloader.DownloadFile(Url, localFile);
+                m_wc.DownloadFile(Url, localFile);
             }
 
             // load the updatefile from disk

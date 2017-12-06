@@ -65,7 +65,7 @@ namespace UpdateLib.Tests.Util
                 v1,v2,v3,v4,v5,v6,v7
             });
 
-            UpdateInfo max = versions.Maxx(u => u.Version);
+            UpdateInfo max = versions.MaxOrDefault(u => u.Version);
 
             Assert.AreEqual(v7, max);
         }

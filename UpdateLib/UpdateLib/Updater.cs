@@ -61,8 +61,6 @@ namespace MatthiWare.UpdateLib
         #region Fields
 
         private const string m_strUpdateLib = "UpdateLib";
-
-        private string m_updateUrl = string.Empty;
         private const string m_argUpdateSilent = "silent";
         private const string m_argUpdate = "update";
         private const string m_argWait = "wait";
@@ -105,21 +103,16 @@ namespace MatthiWare.UpdateLib
 
         internal static string UpdaterName { get { return m_lazyUpdaterName.Value; } }
 
+        /// <summary>
+        /// Gets the command line parser. Use this to add additional command line arguments that need to be parsed. 
+        /// </summary>
         public CmdLineParser CommandLine { get; } = new CmdLineParser();
 
         /// <summary>
-        /// Gets or sets the url to update from
+        /// Gets the collection of Uri's to update from
         /// </summary>
         /// <remarks>If you want to specify an unsafe connection you should enable <see cref="AllowUnsafeConnection"/></remarks>
-        public string UpdateURL
-        {
-            get { return m_updateUrl; }
-            set
-            {
-                m_updateUrl = value;
-                RemoteBasePath = IOUtils.GetRemoteBasePath(value);
-            }
-        }
+        public IList<Uri> UpdateURIs { get; } = new List<Uri>();
 
         /// <summary>
         /// Gets the logger for the application.
@@ -308,11 +301,11 @@ namespace MatthiWare.UpdateLib
         /// Configures the update url
         /// </summary>
         /// <remarks>To use HTTP you should enable <see cref="AllowUnsafeConnection"/> </remarks>
-        /// <param name="url">Url to update from</param>
+        /// <param name="uri">Uri to update from</param>
         /// <returns><see cref="Updater"/> </returns>
-        public Updater ConfigureUpdateUrl(string url)
+        public Updater ConfigureAddUpdateUri(Uri uri)
         {
-            UpdateURL = url;
+            UpdateURIs.Add(uri);
 
             return this;
         }
@@ -339,7 +332,6 @@ namespace MatthiWare.UpdateLib
 
             // parse the command line
             CommandLine.Parse();
-
 
             WaitForProcessExit = CommandLine[m_argWait]?.IsFound ?? false;
             StartUpdating = CommandLine[m_argUpdate]?.IsFound ?? false;
@@ -373,13 +365,10 @@ namespace MatthiWare.UpdateLib
         /// <param name="pid">Process ID</param>
         private void WaitForProcessToExit(int pid)
         {
-            Process[] processes = Process.GetProcesses();
-            Process toWatch = processes.FirstOrDefault(p => p.Id == pid);
+            var process = Process.GetProcesses().FirstOrDefault(p => p.Id == pid);
 
-            if (toWatch == null) return;
-
-            toWatch.CloseMainWindow();
-            toWatch.WaitForExit();
+            process?.CloseMainWindow();
+            process?.WaitForExit();
         }
 
         /// <summary>
@@ -387,9 +376,7 @@ namespace MatthiWare.UpdateLib
         /// </summary>
         /// <returns>Whether or not there is an update available and the latest version</returns>
         public CheckForUpdatesTask.CheckForUpdatesResult CheckForUpdates()
-        {
-            return CheckForUpdatesAsync().AwaitTask().Result;
-        }
+            => CheckForUpdatesAsync().AwaitTask().Result;
 
         /// <summary>
         /// Starting the update process
@@ -397,18 +384,14 @@ namespace MatthiWare.UpdateLib
         /// <param name="owner">The owner window</param>
         /// <returns>Whether or not there is an update available and the latest version</returns>
         public CheckForUpdatesTask.CheckForUpdatesResult CheckForUpdates(IWin32Window owner)
-        {
-            return CheckForUpdatesAsync(owner).AwaitTask().Result;
-        }
+            => CheckForUpdatesAsync(owner).AwaitTask().Result;
 
         /// <summary>
         /// Start the update process asynchronously
         /// </summary>
         /// <returns>The update checker task.</returns>
         public CheckForUpdatesTask CheckForUpdatesAsync()
-        {
-            return CheckForUpdatesAsync(null);
-        }
+            => CheckForUpdatesAsync(null);
 
         /// <summary>
         /// Start the update process asynchronously
@@ -418,15 +401,22 @@ namespace MatthiWare.UpdateLib
         public CheckForUpdatesTask CheckForUpdatesAsync(IWin32Window owner)
         {
             if (!IsInitialized)
-                throw new InvalidOperationException("The updater needs to be initialized first.");
+                throw new InvalidOperationException("The updater needs to be initialized first");
 
-            if (string.IsNullOrEmpty(UpdateURL))
-                throw new ArgumentException("You need to specifify an update url", nameof(UpdateURL));
+            if (UpdateURIs.Count == 0)
+                throw new ArgumentException("No uri's specified", nameof(UpdateURIs));
 
-            if (!AllowUnsafeConnection && new Uri(UpdateURL).Scheme != Uri.UriSchemeHttps)
-                throw new SecurityException("Using unsafe connections to update from is not allowed");
+            IEnumerable<Uri> uris = UpdateURIs.AsEnumerable();
 
-            CheckForUpdatesTask task = new CheckForUpdatesTask(UpdateURL);
+            if (!AllowUnsafeConnection)
+            {
+                uris = uris.Where(u => u.Scheme == Uri.UriSchemeHttps);
+
+                if (uris.Count() == 0)
+                    throw new SecurityException("Using unsafe connections to update from is not allowed");
+            }
+
+            CheckForUpdatesTask task = new CheckForUpdatesTask(uris.ToList());
             task.TaskCompleted += (o, e) =>
             {
                 bool error = e.Error != null;
@@ -461,10 +451,10 @@ namespace MatthiWare.UpdateLib
                 if (result != DialogResult.Yes)
                     return;
 
-                if ((!StartUpdating && NeedsRestartBeforeUpdate)
+                if (((!StartUpdating && NeedsRestartBeforeUpdate)
                     || (adminReq && !PermissionUtil.IsProcessElevated))
-                    if (!RestartApp(true, UpdateSilently, true, adminReq))
-                        return;
+                    && !RestartApp(true, UpdateSilently, true, adminReq))
+                    return;
 
                 if (UpdateSilently)
                     UpdateWithoutGUI(task.Result.UpdateInfo);
@@ -473,9 +463,6 @@ namespace MatthiWare.UpdateLib
                     UpdaterForm updateForm = new UpdaterForm(task.Result.UpdateInfo);
                     updateForm.ShowDialog(owner);
                 }
-
-
-
             };
 
             return (CheckForUpdatesTask)task.Start();
