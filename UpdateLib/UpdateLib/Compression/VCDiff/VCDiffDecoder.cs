@@ -24,11 +24,15 @@ namespace MatthiWare.UpdateLib.Compression.VCDiff
     public sealed class VCDiffDecoder
     {
 
+        public delegate void ProgressChangedHandler(bool completed, double progress);
+
         private Stream m_original, m_delta, m_output;
 
         private CodeTable m_codeTable = CodeTable.Default;
 
         private AddressCache m_cache = new AddressCache(4, 3);
+
+        public event ProgressChangedHandler ProgressChanged;
 
         private VCDiffDecoder(Stream original, Stream delta, Stream output)
         {
@@ -59,11 +63,20 @@ namespace MatthiWare.UpdateLib.Compression.VCDiff
         private void Decode()
         {
             ReadHeader();
+
+            while (DecodeWindow())
+                OnProgressChanged(false, (m_delta.Position * 1.0) / m_delta.Length);
+
+            OnProgressChanged(true, 1);
         }
+
+        private void OnProgressChanged(bool completed, double progress)
+            => ProgressChanged?.Invoke(completed, progress);
 
         private void ReadHeader()
         {
             byte[] header = m_delta.CheckedReadBytes(4);
+
             if (header[0] != 0xd6 ||
                 header[1] != 0xc3 ||
                 header[2] != 0xc4)
