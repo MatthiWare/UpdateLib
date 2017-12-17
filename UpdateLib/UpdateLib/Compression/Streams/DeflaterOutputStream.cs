@@ -33,6 +33,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+using MatthiWare.UpdateLib.Compression.Deflaters;
 using System;
 using System.IO;
 using System.Security.Cryptography;

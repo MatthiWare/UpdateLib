@@ -34,7 +34,7 @@
  */
 
 
-namespace MatthiWare.UpdateLib.Compression
+namespace MatthiWare.UpdateLib.Compression.Deflaters
 {
     /// <summary>
     /// This class stores the pending output of the Deflater.

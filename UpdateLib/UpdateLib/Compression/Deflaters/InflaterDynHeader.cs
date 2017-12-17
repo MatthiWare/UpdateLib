@@ -36,7 +36,7 @@
 using MatthiWare.UpdateLib.Compression.Streams;
 using System;
 
-namespace MatthiWare.UpdateLib.Compression
+namespace MatthiWare.UpdateLib.Compression.Deflaters
 {
     public class InflaterDynHeader
     {

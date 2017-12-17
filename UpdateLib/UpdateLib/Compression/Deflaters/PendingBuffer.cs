@@ -36,7 +36,7 @@
 
 using System;
 
-namespace MatthiWare.UpdateLib.Compression
+namespace MatthiWare.UpdateLib.Compression.Deflaters
 {
     /// <summary>
     /// This class is general purpose class for writing data to a buffer.

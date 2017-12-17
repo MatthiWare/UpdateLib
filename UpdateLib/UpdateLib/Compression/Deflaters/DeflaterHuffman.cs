@@ -35,7 +35,7 @@
 
 using System;
 
-namespace MatthiWare.UpdateLib.Compression
+namespace MatthiWare.UpdateLib.Compression.Deflaters
 {
     /// <summary>
     /// This is the DeflaterHuffman class.

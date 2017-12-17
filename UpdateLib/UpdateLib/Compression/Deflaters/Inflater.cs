@@ -37,7 +37,7 @@ using MatthiWare.UpdateLib.Compression.Checksum;
 using MatthiWare.UpdateLib.Compression.Streams;
 using System;
 
-namespace MatthiWare.UpdateLib.Compression
+namespace MatthiWare.UpdateLib.Compression.Deflaters
 {
     /// <summary>
     /// Inflater is used to decompress data that has been compressed according

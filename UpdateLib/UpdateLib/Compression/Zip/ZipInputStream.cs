@@ -34,6 +34,7 @@
  */
 
 using MatthiWare.UpdateLib.Compression.Checksum;
+using MatthiWare.UpdateLib.Compression.Deflaters;
 using MatthiWare.UpdateLib.Compression.Streams;
 using System;
 using System.IO;
