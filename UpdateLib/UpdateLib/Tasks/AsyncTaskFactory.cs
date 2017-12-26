@@ -1,5 +1,12 @@
-﻿/*  UpdateLib - .Net auto update library
- *  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
+﻿/*  Copyright
+ *  
+ *  UpdateLib - .Net auto update library <https://github.com/MatthiWare/UpdateLib>
+ *  
+ *  File: AsyncTaskFactory.cs v0.5
+ *  
+ *  Author: Matthias Beerens
+ *  
+ *  Copyright (C) 2016 - MatthiWare
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as published
@@ -12,54 +19,55 @@
  *  GNU Affero General Public License for more details.
  *
  *  You should have received a copy of the GNU Affero General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with this program.  If not, see <https://github.com/MatthiWare/UpdateLib/blob/master/LICENSE>.
  */
 
 using System;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
+    /// <summary>
+    /// Factory methods for creating and starting a new task
+    /// </summary>
     public class AsyncTaskFactory
     {
-
+        /// <summary>
+        /// Starts a new task
+        /// </summary>
+        /// <param name="action">The action delegate</param>
+        /// <param name="args">The parameters to pass to the action</param>
+        /// <returns>The <see cref="AsyncTask"/> object</returns>
         public static AsyncTask StartNew(Delegate action, params object[] args)
-        {
-            AnonymousTask task = new AnonymousTask(action, args);
-            return task.Start();
-        }
+            => new AnonymousTask(action, args).Start();
 
+        /// <summary>
+        ///  Starts a new task
+        /// </summary>
+        /// <typeparam name="T">The result type</typeparam>
+        /// <param name="action">The action delegate</param>
+        /// <param name="args">The parameters to pass to the action</param>
+        /// <returns>The <see cref="AsyncTask"/> object with <see cref="T"/> result property</returns>
         public static AsyncTask<T> StartNew<T>(Delegate action, params object[] args)
-        {
-            AnonymousTask<T> task = new AnonymousTask<T>(action, args);
-            return task.Start();
-        }
+            => new AnonymousTask<T>(action, args).Start();
 
+        /// <summary>
+        /// Creates a new task
+        /// </summary>
+        /// <param name="action">The action delegate</param>
+        /// <param name="args">The parameters to pass to the action</param>
+        /// <returns>The <see cref="AsyncTask"/> object</returns>
         public static AsyncTask From(Delegate action, params object[] args)
-        {
-            return new AnonymousTask(action, args);
-        }
+            => new AnonymousTask(action, args);
 
+        /// <summary>
+        /// Creates a new task
+        /// </summary>
+        /// <typeparam name="T">The result type</typeparam>
+        /// <param name="action">The action delegate</param>
+        /// <param name="args">The parameters to pass to the action</param>
+        /// <returns>The <see cref="AsyncTask"/> object with <see cref="T"/> result property</returns>
         public static AsyncTask<T> From<T>(Delegate action, params object[] args)
-        {
-            return new AnonymousTask<T>(action, args);
-        }
-
-        private class AnonymousTask<T> : AsyncTask<T>
-        {
-            private Delegate action;
-            private object[] args;
-
-            public AnonymousTask(Delegate action, params object[] args)
-            {
-                this.action = action;
-                this.args = args;
-            }
-
-            protected override void DoWork()
-            {
-                Result = (T)action.DynamicInvoke(args);
-            }
-        }
+            => new AnonymousTask<T>(action, args);
 
         private class AnonymousTask : AsyncTask
         {
@@ -73,8 +81,23 @@ namespace MatthiWare.UpdateLib.Tasks
             }
 
             protected override void DoWork()
+                => action.DynamicInvoke(args);
+        }
+
+        private class AnonymousTask<TResult> : AsyncTask<TResult, AsyncTask<TResult>>
+        {
+            private Delegate action;
+            private object[] args;
+
+            public AnonymousTask(Delegate action, params object[] args)
             {
-                action.DynamicInvoke(args);
+                this.action = action;
+                this.args = args;
+            }
+
+            protected override void DoWork()
+            {
+                Result = (TResult)action.DynamicInvoke(args);
             }
         }
 

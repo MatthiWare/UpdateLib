@@ -1,5 +1,12 @@
-﻿/*  UpdateLib - .Net auto update library
- *  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
+﻿/*  Copyright
+ *  
+ *  UpdateLib - .Net auto update library <https://github.com/MatthiWare/UpdateLib>
+ *  
+ *  File: UpdateCacheTask.cs v0.5
+ *  
+ *  Author: Matthias Beerens
+ *  
+ *  Copyright (C) 2016 - MatthiWare
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as published
@@ -12,7 +19,7 @@
  *  GNU Affero General Public License for more details.
  *
  *  You should have received a copy of the GNU Affero General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with this program.  If not, see <https://github.com/MatthiWare/UpdateLib/blob/master/LICENSE>.
  */
 
 using MatthiWare.UpdateLib.Common;
@@ -25,7 +32,7 @@ using System.Linq;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
-    public class UpdateCacheTask : AsyncTask<HashCacheFile>
+    public class UpdateCacheTask : AsyncTask<HashCacheFile, UpdateCacheTask>
     {
         private Dictionary<HashCacheEntry, bool> existingEntries = null;
         private IEnumerable<FileInfo> files = null;
@@ -37,7 +44,7 @@ namespace MatthiWare.UpdateLib.Tasks
             try
             {
                 // first of lets load the file, (file might be corrupt..)
-                Result = HashCacheFile.Load();
+                Result = FileManager.LoadFile<HashCacheFile>();
 
                 Result.Items.ForEach(e => existingEntries.Add(e, false));
             }
@@ -47,7 +54,7 @@ namespace MatthiWare.UpdateLib.Tasks
                 Result = null;
             }
 
-            DirectoryInfo dir = new DirectoryInfo(Updater.Instance.Converter.Convert("%appdir%"));
+            var dir = new DirectoryInfo(Updater.Instance.Converter.Convert("%appdir%"));
             files = dir.GetFiles("*", SearchOption.AllDirectories).Where(f => !f.FullName.Contains(".old.tmp"));
 
             Updater.Instance.Logger.Debug(nameof(UpdateCacheTask), nameof(DoWork), $"found {files.Count()} files to recheck.");

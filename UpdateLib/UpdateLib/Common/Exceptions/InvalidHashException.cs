@@ -15,38 +15,26 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using MatthiWare.UpdateLib.Common.Abstraction;
-using Microsoft.Win32;
 using System;
-using System.Diagnostics;
-using System.Xml.Serialization;
+using System.Runtime.Serialization;
 
-namespace MatthiWare.UpdateLib.Common
+namespace MatthiWare.UpdateLib.Common.Exceptions
 {
     [Serializable]
-    [DebuggerDisplay("RegistryKeyEntry: {DestinationLocation}")]
-    public class RegistryKeyEntry : EntryBase
+    public class InvalidHashException : Exception
     {
-        /// <summary>
-        /// The type of registry key  
-        /// </summary>
-        [XmlAttribute]
-        public RegistryValueKind Type { get; set; }
+        public InvalidHashException() { }
 
-        /// <summary>
-        /// The value of the key
-        /// </summary>
-        public object Value { get; set; } = "Test";
-
-        public RegistryKeyEntry()
-            : this(string.Empty, RegistryValueKind.String, null)
+        public InvalidHashException(string message) :
+            base(message)
         { }
 
-        public RegistryKeyEntry(string name, RegistryValueKind type, object value)
-        {
-            Name = name;
-            Type = type;
-            Value = value;
-        }
+        public InvalidHashException(string message, Exception inner) :
+            base(message, inner)
+        { }
+
+        protected InvalidHashException(SerializationInfo info, StreamingContext context) :
+            base(info, context)
+        { }
     }
 }

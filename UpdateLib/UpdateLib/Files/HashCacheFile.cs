@@ -22,11 +22,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Xml.Serialization;
 using System.Linq;
+using MatthiWare.UpdateLib.Common.Abstraction;
 
 namespace MatthiWare.UpdateLib.Files
 {
     [Serializable]
-    public class HashCacheFile
+    public class HashCacheFile : FileBase<HashCacheFile>
     {
         public const string FILE_NAME = "Cache.xml";
 
@@ -65,64 +66,21 @@ namespace MatthiWare.UpdateLib.Files
         }
 
         #region Save/Load
-        private static string GetStoragePath()=> $@"{IOUtils.AppDataPath}\{FILE_NAME}";
+        private static string GetStoragePath() => $@"{IOUtils.AppDataPath}\{FILE_NAME}";
         
-
         /// <summary>
         /// Loads the <see cref="HashCacheFile"/> from the default storage location 
         /// </summary>
         /// <returns>The loaded <see cref="HashCacheFile"/> or null if it doesn't exist </returns>
-        public static HashCacheFile Load()
-        {
-            return Load(GetStoragePath());
-        }
-
-        /// <summary>
-        /// Loads the <see cref="HashCacheFile"/> from the given storage location 
-        /// </summary>
-        /// <param name="path">The storage location</param>
-        /// <returns>The loaded <see cref="HashCacheFile"/> or null if it doesn't exist </returns>
-        public static HashCacheFile Load(string path)
-        {
-            if (!File.Exists(path))
-                return null;
-
-            using (Stream stream = File.Open(path, FileMode.Open, FileAccess.Read))
-            {
-                XmlSerializer serializer = new XmlSerializer(typeof(HashCacheFile));
-                return (HashCacheFile)serializer.Deserialize(stream);
-            }
-        }
+        public override HashCacheFile Load()
+            => Load(GetStoragePath());
 
         /// <summary>
         /// Saves the <see cref="HashCacheFile"/> in the default storage location 
         /// </summary>
-        public void Save()
-        {
-            Save(GetStoragePath());
-        }
+        public override void Save()
+            => Save(GetStoragePath());
 
-        /// <summary>
-        /// Saves the <see cref="HashCacheFile"/> in the given storage location 
-        /// </summary>
-        /// <param name="path">The storage location</param>
-        public void Save(string path)
-        {
-            FileInfo fi = new FileInfo(path);
-
-            if (!fi.Directory.Exists)
-                fi.Directory.Create();
-
-            if (fi.Exists)
-                fi.Delete();
-
-
-            using (Stream stream = fi.Open(FileMode.OpenOrCreate, FileAccess.Write))
-            {
-                XmlSerializer serializer = new XmlSerializer(typeof(HashCacheFile));
-                serializer.Serialize(stream, this);
-            }
-        }
         #endregion
 
     }

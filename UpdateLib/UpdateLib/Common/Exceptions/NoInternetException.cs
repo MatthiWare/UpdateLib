@@ -1,5 +1,10 @@
 ﻿/*  UpdateLib - .Net auto update library
- *  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
+ *  
+ *  File: NoInternetException.cs
+ *  
+ *  Author: Matthias Beerens <github.com/Matthiee>
+ *  
+ *  Copyright (C) 2016 - MatthiWare
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as published
@@ -15,28 +20,19 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using MatthiWare.UpdateLib.Common.Abstraction;
 using System;
-using System.Xml.Serialization;
 
-namespace MatthiWare.UpdateLib.Common
+namespace MatthiWare.UpdateLib.Common.Exceptions
 {
+
     [Serializable]
-    public class FileEntry : EntryBase
+    public class NoInternetException : Exception
     {
-        /// <summary>
-        /// The calculated hash for the file
-        /// </summary>
-        [XmlAttribute]
-        public string Hash { get; set; }
-
-        public FileEntry() { }
-
-        public FileEntry(string name)
-        {
-            Name = name;
-        }
-
-
+        public NoInternetException() { }
+        public NoInternetException(string message) : base(message) { }
+        public NoInternetException(string message, Exception inner) : base(message, inner) { }
+        protected NoInternetException(
+          System.Runtime.Serialization.SerializationInfo info,
+          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
     }
 }

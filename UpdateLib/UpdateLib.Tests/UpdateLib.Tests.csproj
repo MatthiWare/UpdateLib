@@ -54,6 +54,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\.shared\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Common\UpdateVersionTests.cs" />
     <Compile Include="Files\DirectoryEntryTest.cs" />
     <Compile Include="Files\FileEntryTest.cs" />

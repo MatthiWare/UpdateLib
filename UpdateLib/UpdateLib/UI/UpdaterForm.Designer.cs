@@ -129,7 +129,7 @@
             this.linkSite.TabStop = true;
             this.linkSite.Text = "Powered by UpdateLib";
             this.linkSite.VisitedLinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(43)))), ((int)(((byte)(129)))), ((int)(((byte)(181)))));
-            this.linkSite.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkSite_LinkClicked);
+            this.linkSite.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LinkSite_LinkClicked);
             // 
             // UpdaterForm
             // 

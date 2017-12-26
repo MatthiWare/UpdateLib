@@ -1,5 +1,16 @@
-﻿/*  UpdateLib - .Net auto update library
- *  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
+﻿/*  Copyright
+ *  
+ *  UpdateLib - .Net auto update library <https://github.com/MatthiWare/UpdateLib>
+ *  
+/*  Copyright
+ *  
+ *  UpdateLib - .Net auto update library <https://github.com/MatthiWare/UpdateLib>
+ *  
+ *  File: DownloadTask.cs v0.5
+ *  
+ *  Author: Matthias Beerens
+ *  
+ *  Copyright (C) 2016 - MatthiWare
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as published
@@ -12,10 +23,11 @@
  *  GNU Affero General Public License for more details.
  *
  *  You should have received a copy of the GNU Affero General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with this program.  If not, see <https://github.com/MatthiWare/UpdateLib/blob/master/LICENSE>.
  */
 
 using MatthiWare.UpdateLib.Common;
+using MatthiWare.UpdateLib.Common.Exceptions;
 using MatthiWare.UpdateLib.Security;
 using MatthiWare.UpdateLib.Utils;
 using System;
@@ -49,8 +61,7 @@ namespace MatthiWare.UpdateLib.Tasks
 
             string localFile = Updater.Instance.Converter.Convert(Entry.DestinationLocation);
             string remoteFile = string.Concat(Updater.Instance.RemoteBasePath, Entry.SourceLocation);
-
-
+            
             Updater.Instance.Logger.Debug(nameof(DownloadTask), nameof(DoWork), $"LocalFile => {localFile}");
             Updater.Instance.Logger.Debug(nameof(DownloadTask), nameof(DoWork), $"RemoteFile => {remoteFile}");
 
@@ -66,14 +77,14 @@ namespace MatthiWare.UpdateLib.Tasks
             if (!fi.Directory.Exists)
                 fi.Directory.Create();
 
-            Uri uri = new Uri(remoteFile);
+            var uri = new Uri(remoteFile);
             webClient.DownloadFileAsync(uri, localFile);
 
             wait.WaitOne();
             wait.Close();
             wait = null;
 
-            string hash = HashUtil.GetHash(localFile);
+            var hash = HashUtil.GetHash(localFile);
 
             if (hash.Length != Entry.Hash.Length || hash != Entry.Hash)
                 throw new InvalidHashException($"Calculated hash doesn't match provided hash for file: {localFile}");

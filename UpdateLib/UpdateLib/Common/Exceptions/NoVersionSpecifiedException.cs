@@ -2,11 +2,11 @@
  *  
  *  UpdateLib - .Net auto update library <https://github.com/MatthiWare/UpdateLib>
  *  
- *  File: UpdatableTask.cs v0.5
+ *  File: NoVersionSpecifiedException.cs v0.5
  *  
  *  Author: Matthias Beerens
  *  
- *  Copyright (C) 2016 - MatthiWare
+ *  Copyright (C) 2017 - MatthiWare
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as published
@@ -22,28 +22,19 @@
  *  along with this program.  If not, see <https://github.com/MatthiWare/UpdateLib/blob/master/LICENSE>.
  */
 
-namespace MatthiWare.UpdateLib.Tasks
+using System;
+
+namespace MatthiWare.UpdateLib.Common.Exceptions
 {
-    public abstract class UpdatableTask : AsyncTask
+
+    [Serializable]
+    public class NoVersionSpecifiedException : Exception
     {
-        private new void Start()
-        {
-            base.Start();
-        }
-
-        public void Update()
-        {
-            Start();
-        }
-
-        public override void Cancel()
-        {
-            base.Cancel();
-
-            Rollback();
-        }
-
-        public abstract void Rollback();
-
+        public NoVersionSpecifiedException() { }
+        public NoVersionSpecifiedException(string message) : base(message) { }
+        public NoVersionSpecifiedException(string message, Exception inner) : base(message, inner) { }
+        protected NoVersionSpecifiedException(
+          System.Runtime.Serialization.SerializationInfo info,
+          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
     }
 }

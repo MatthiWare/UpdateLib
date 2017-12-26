@@ -50,7 +50,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\.shared\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="Common\Abstraction\FileBase.cs" />
+    <Compile Include="Common\Delegates.cs" />
     <Compile Include="Common\Enums.cs" />
+    <Compile Include="Common\Exceptions\NoInternetException.cs" />
+    <Compile Include="Common\Exceptions\NoVersionSpecifiedException.cs" />
+    <Compile Include="Common\FileManager.cs" />
+    <Compile Include="Common\Interfaces.cs" />
     <Compile Include="Common\ParameterDefinition.cs" />
     <Compile Include="Common\UpdateInfo.cs" />
     <Compile Include="Common\UpdateVersion.cs" />
@@ -71,6 +80,8 @@
     <Compile Include="Compression\Deflaters\InflaterDynHeader.cs" />
     <Compile Include="Compression\Deflaters\InflaterHuffmanTree.cs" />
     <Compile Include="Compression\Deflaters\PendingBuffer.cs" />
+    <Compile Include="Compression\PatchBuilder.cs" />
+    <Compile Include="Compression\Patcher.cs" />
     <Compile Include="Compression\Streams\DeflaterOutputStream.cs" />
     <Compile Include="Compression\Streams\InflaterInputStream.cs" />
     <Compile Include="Compression\Streams\OutputWindow.cs" />
@@ -96,19 +107,20 @@
       <DependentUpon>UpdaterControl.cs</DependentUpon>
     </Compile>
     <Compile Include="Common\DirectoryEntry.cs" />
-    <Compile Include="Common\EntryBase.cs" />
+    <Compile Include="Common\Abstraction\EntryBase.cs" />
     <Compile Include="Common\HashCacheEntry.cs" />
     <Compile Include="Files\HashCacheFile.cs" />
     <Compile Include="Common\FileEntry.cs" />
     <Compile Include="Common\PathVariableConverter.cs" />
     <Compile Include="Common\RegistryKeyEntry.cs" />
+    <Compile Include="Files\ServerFile.cs" />
     <Compile Include="Files\UpdateFile.cs" />
     <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Logging\ILogWriter.cs" />
     <Compile Include="Logging\Logger.cs" />
     <Compile Include="Logging\Writers\ConsoleLogWriter.cs" />
     <Compile Include="Logging\Writers\FileLogWriter.cs" />
-    <Compile Include="Security\InvalidHashException.cs" />
+    <Compile Include="Common\Exceptions\InvalidHashException.cs" />
     <Compile Include="Security\PermissionUtil.cs" />
     <Compile Include="Tasks\AsyncTaskFactory.cs" />
     <Compile Include="Tasks\CheckForUpdatesCompletedEventArgs.cs" />
@@ -116,7 +128,6 @@
     <Compile Include="Tasks\CheckRequiredPrivilegesTask.cs" />
     <Compile Include="Tasks\DownloadManager.cs" />
     <Compile Include="Tasks\UpdatableTask.cs" />
-    <Compile Include="Tasks\UpdateFileProcessorTask.cs" />
     <Compile Include="Security\HashUtil.cs" />
     <Compile Include="Tasks\AsyncTask.cs" />
     <Compile Include="Tasks\CheckForUpdatedItemsTask.cs" />

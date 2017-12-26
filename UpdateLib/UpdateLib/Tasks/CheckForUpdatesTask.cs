@@ -1,5 +1,12 @@
-﻿/*  UpdateLib - .Net auto update library
- *  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
+﻿/*  Copyright
+ *  
+ *  UpdateLib - .Net auto update library <https://github.com/MatthiWare/UpdateLib>
+ *  
+ *  File: CheckForUpdatesTask.cs v0.5
+ *  
+ *  Author: Matthias Beerens
+ *  
+ *  Copyright (C) 2016 - MatthiWare
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as published
@@ -12,29 +19,28 @@
  *  GNU Affero General Public License for more details.
  *
  *  You should have received a copy of the GNU Affero General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with this program.  If not, see <https://github.com/MatthiWare/UpdateLib/blob/master/LICENSE>.
  */
 
 using System;
 using System.Net;
 using MatthiWare.UpdateLib.Files;
-using System.IO;
 using MatthiWare.UpdateLib.Utils;
-using static MatthiWare.UpdateLib.Tasks.CheckForUpdatesTask;
 using MatthiWare.UpdateLib.Common;
-using System.Collections.Generic;
+using MatthiWare.UpdateLib.Common.Exceptions;
+using static MatthiWare.UpdateLib.Tasks.CheckForUpdatesTask;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
-    public class CheckForUpdatesTask : AsyncTask<CheckForUpdatesResult>
+    public class CheckForUpdatesTask : AsyncTask<CheckForUpdatesResult, CheckForUpdatesTask>
     {
-        private IList<Uri> m_uris;
+        public Uri Uri { get; set; }
 
         private WebClient m_wc;
 
-        public CheckForUpdatesTask(IList<Uri> uris)
+        public CheckForUpdatesTask(Uri uri)
         {
-            m_uris = uris;
+            Uri = uri;
             m_wc = new WebClient();
         }
 
@@ -44,27 +50,23 @@ namespace MatthiWare.UpdateLib.Tasks
 
             Updater updater = Updater.Instance;
 
-            if (!NetworkUtils.HasConnection()) throw new WebException("No internet available", WebExceptionStatus.ConnectFailure);
+            if (!NetworkUtils.HasConnection()) throw new NoInternetException("No internet available");
 
             // Getting the file name from the url
             string localFile = $@"{IOUtils.AppDataPath}\Update.xml";
 
-            if (IsCancelled)
-                return;
+            if (IsCancelled) return;
 
-            if (IsUpdateFileInvalid(localFile))
-            {
-                updater.Logger.Warn(nameof(CheckForUpdatesTask), nameof(DoWork), "Cached update file validity expired, downloading new one..");
-                m_wc.DownloadFile(Url, localFile);
-            }
+            updater.Logger.Debug(nameof(CheckForUpdatesTask), nameof(DoWork), $"Attempting to download update file from {Uri}");
+            m_wc.DownloadFile(Uri, localFile);
 
             // load the updatefile from disk
-            Result.UpdateInfo = UpdateFile.Load(localFile).GetLatestUpdate();
+            Result.UpdateInfo = FileManager.LoadFile<UpdateFile>(localFile).GetLatestUpdate() ?? throw new NoVersionSpecifiedException();
 
-            CheckRequiredPrivilegesTask privilegesCheckTask = CheckPrivileges(Result.UpdateInfo);
+            var privilegesCheckTask = CheckPrivileges(Result.UpdateInfo);
 
             // lets wait for the Cache update to complete and get the task
-            HashCacheFile cache = updater.GetCache();
+            var cache = updater.GetCache();
 
             // Wait for the clean up to complete
             updater.CleanUpTask.AwaitTask();
@@ -76,38 +78,17 @@ namespace MatthiWare.UpdateLib.Tasks
              * Start a task to get all the files that need to be updated
              * Returns if there is anything to update
              */
-            CheckForUpdatedItemsTask updatedFilesTask = CheckForUpdatedFiles(Result.UpdateInfo, cache);
+            var updatedFilesTask = CheckForUpdatedFiles(Result.UpdateInfo, cache);
 
             Result.AdminRightsNeeded = privilegesCheckTask.AwaitTask().Result;
             Result.UpdateAvailable = updatedFilesTask.AwaitTask().Result;
         }
 
-        private bool IsUpdateFileInvalid(string localFile)
-        {
-            if (!File.Exists(localFile))
-                return true;
-
-            DateTime time = File.GetLastWriteTime(localFile);
-
-            if (time.Add(Updater.Instance.CacheInvalidationTime) < DateTime.Now)
-                return true;
-
-            return false;
-        }
-
         private CheckForUpdatedItemsTask CheckForUpdatedFiles(UpdateInfo updateInfo, HashCacheFile cache)
-        {
-            CheckForUpdatedItemsTask task = new CheckForUpdatedItemsTask(updateInfo, cache);
-            task.ConfigureAwait(false).Start();
-            return task;
-        }
+            => new CheckForUpdatedItemsTask(updateInfo, cache).ConfigureAwait(false).Start();
 
         private CheckRequiredPrivilegesTask CheckPrivileges(UpdateInfo updateInfo)
-        {
-            CheckRequiredPrivilegesTask task = new CheckRequiredPrivilegesTask(updateInfo);
-            task.ConfigureAwait(false).Start();
-            return task;
-        }
+            => new CheckRequiredPrivilegesTask(updateInfo).ConfigureAwait(false).Start();
 
         public class CheckForUpdatesResult
         {

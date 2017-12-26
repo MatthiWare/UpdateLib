@@ -1,5 +1,12 @@
-﻿/*  UpdateLib - .Net auto update library
- *  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
+﻿/*  Copyright
+ *  
+ *  UpdateLib - .Net auto update library <https://github.com/MatthiWare/UpdateLib>
+ *  
+ *  File: CleanUpTask.cs v0.5
+ *  
+ *  Author: Matthias Beerens
+ *  
+ *  Copyright (C) 2016 - MatthiWare
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as published
@@ -12,15 +19,15 @@
  *  GNU Affero General Public License for more details.
  *
  *  You should have received a copy of the GNU Affero General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with this program.  If not, see <https://github.com/MatthiWare/UpdateLib/blob/master/LICENSE>.
  */
- 
+
 using System;
 using System.IO;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
-    public class CleanUpTask : AsyncTask
+    public class CleanUpTask : AsyncTask<object, CleanUpTask>
     {
         public string PathToClean { get; set; }
         public string SearchPattern { get; set; }

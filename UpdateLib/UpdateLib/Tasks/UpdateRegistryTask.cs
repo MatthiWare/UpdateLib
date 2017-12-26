@@ -1,5 +1,12 @@
-﻿/*  UpdateLib - .Net auto update library
- *  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
+﻿/*  Copyright
+ *  
+ *  UpdateLib - .Net auto update library <https://github.com/MatthiWare/UpdateLib>
+ *  
+ *  File: UpdateRegistryTask.cs v0.5
+ *  
+ *  Author: Matthias Beerens
+ *  
+ *  Copyright (C) 2016 - MatthiWare
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as published
@@ -12,7 +19,7 @@
  *  GNU Affero General Public License for more details.
  *
  *  You should have received a copy of the GNU Affero General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with this program.  If not, see <https://github.com/MatthiWare/UpdateLib/blob/master/LICENSE>.
  */
 
 using MatthiWare.UpdateLib.Common;
@@ -28,9 +35,9 @@ namespace MatthiWare.UpdateLib.Tasks
     {
 
         public IEnumerable<RegistryKeyEntry> Keys { get; set; }
-        
+
         private List<RollbackData> cachedUpdates = new List<RollbackData>();
-        
+
         public UpdateRegistryTask(IEnumerable<RegistryKeyEntry> keys)
         {
             Keys = keys;
@@ -61,7 +68,9 @@ namespace MatthiWare.UpdateLib.Tasks
 
             RegistryHelper.Update(key, rollback);
 
-            Updater.Instance.Logger.Info(nameof(UpdateRegistryTask), nameof(UpdateKey),
+            Updater.Instance.Logger.Info(
+                nameof(UpdateRegistryTask), 
+                nameof(UpdateKey),
                 $"Succesfully updated {key.DestinationLocation}");
         }
 
@@ -88,16 +97,20 @@ namespace MatthiWare.UpdateLib.Tasks
                 {
                     key.DeleteValue(data.key);
 
-                    Updater.Instance.Logger.Warn(nameof(UpdateRegistryTask), nameof(Rollback),
-                $"Deleted ->  {data.path}\\{data.key}");
+                    Updater.Instance.Logger.Warn(
+                        nameof(UpdateRegistryTask), 
+                        nameof(Rollback),
+                        $"Deleted ->  {data.path}\\{data.key}");
 
                     return;
                 }
 
                 key.SetValue(data.key, data.cachedValue, data.type);
 
-                Updater.Instance.Logger.Warn(nameof(UpdateRegistryTask), nameof(Rollback),
-                $"Rolled back ->  {data.path}\\{data.key}");
+                Updater.Instance.Logger.Warn(
+                    nameof(UpdateRegistryTask), 
+                    nameof(Rollback),
+                    $"Rolled back ->  {data.path}\\{data.key}");
             }
             catch (Exception e)
             {

@@ -1,5 +1,12 @@
-﻿/*  UpdateLib - .Net auto update library
- *  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
+﻿/*  Copyright
+ *  
+ *  UpdateLib - .Net auto update library <https://github.com/MatthiWare/UpdateLib>
+ *  
+ *  File: CheckForUpdatedItemsTask.cs v0.5
+ *  
+ *  Author: Matthias Beerens
+ *  
+ *  Copyright (C) 2016 - MatthiWare
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as published
@@ -12,7 +19,7 @@
  *  GNU Affero General Public License for more details.
  *
  *  You should have received a copy of the GNU Affero General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with this program.  If not, see <https://github.com/MatthiWare/UpdateLib/blob/master/LICENSE>.
  */
 
 using MatthiWare.UpdateLib.Common;
@@ -24,18 +31,15 @@ using System.Linq;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
-    public class CheckForUpdatedItemsTask : AsyncTask<bool>
+    public class CheckForUpdatedItemsTask : AsyncTask<bool, CheckForUpdatedItemsTask>
     {
         private UpdateInfo m_updateFile;
         private HashCacheFile m_cacheFile;
 
         public CheckForUpdatedItemsTask(UpdateInfo update, HashCacheFile cache)
         {
-            if (update == null) throw new ArgumentNullException(nameof(update));
-            if (cache == null) throw new ArgumentNullException(nameof(cache));
-
-            m_updateFile = update;
-            m_cacheFile = cache;
+            m_updateFile = update ?? throw new ArgumentNullException(nameof(update));
+            m_cacheFile = cache ?? throw new ArgumentNullException(nameof(cache));
         }
 
         protected override void DoWork()
@@ -61,8 +65,7 @@ namespace MatthiWare.UpdateLib.Tasks
                 if (cacheEntry == null)
                     return false;
 
-                bool val = (fe as FileEntry).Hash.Equals(cacheEntry.Hash);
-                return val;
+                return (fe as FileEntry)?.Hash.Equals(cacheEntry.Hash) ?? true;
             });
 
             IEnumerable<DirectoryEntry> dirsToCheck = dir.Directories.Where(d => d.Count > 0);

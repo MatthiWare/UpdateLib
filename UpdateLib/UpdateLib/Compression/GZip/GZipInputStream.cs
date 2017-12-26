@@ -165,7 +165,7 @@ namespace MatthiWare.UpdateLib.Compression.GZip
                     crc.Update(buffer, offset, bytesRead);
 
                 // If this is the end of stream, read the footer
-                if (inf.IsFinished)
+                if (inflater.IsFinished)
                     ReadFooter();
 
                 if (bytesRead > 0)
@@ -339,9 +339,9 @@ namespace MatthiWare.UpdateLib.Compression.GZip
             byte[] footer = new byte[8];
 
             // End of stream; reclaim all bytes from inf, read the final byte count, and reset the inflator
-            long bytesRead = inf.TotalOut & 0xffffffff;
-            inputBuffer.Available += inf.RemainingInput;
-            inf.Reset();
+            long bytesRead = inflater.TotalOut & 0xffffffff;
+            inputBuffer.Available += inflater.RemainingInput;
+            inflater.Reset();
 
             // Read footer from inputBuffer
             int needed = 8;

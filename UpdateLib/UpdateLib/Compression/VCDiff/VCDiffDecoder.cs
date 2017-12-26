@@ -23,9 +23,6 @@ namespace MatthiWare.UpdateLib.Compression.VCDiff
 {
     public sealed class VCDiffDecoder
     {
-
-        public delegate void ProgressChangedHandler(bool completed, double progress);
-
         private Stream m_original, m_delta, m_output;
 
         private CodeTable m_codeTable = CodeTable.Default;
@@ -34,14 +31,7 @@ namespace MatthiWare.UpdateLib.Compression.VCDiff
 
         public event ProgressChangedHandler ProgressChanged;
 
-        private VCDiffDecoder(Stream original, Stream delta, Stream output)
-        {
-            m_original = original;
-            m_delta = delta;
-            m_output = output;
-        }
-
-        public static void Decode(Stream original, Stream delta, Stream output)
+        public VCDiffDecoder(Stream original, Stream delta, Stream output)
         {
             if (original == null) throw new ArgumentNullException(nameof(original));
             if (delta == null) throw new ArgumentNullException(nameof(delta));
@@ -56,11 +46,12 @@ namespace MatthiWare.UpdateLib.Compression.VCDiff
             if (!output.CanWrite || !output.CanSeek || !output.CanRead)
                 throw new ArgumentException("Must be able to read, seek and write in stream", nameof(output));
 
-            VCDiffDecoder decoder = new VCDiffDecoder(original, delta, output);
-            decoder.Decode();
+            m_original = original;
+            m_delta = delta;
+            m_output = output;
         }
 
-        private void Decode()
+        public void Decode()
         {
             ReadHeader();
 

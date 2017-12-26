@@ -19,7 +19,7 @@ using System;
 using System.Text;
 using System.Xml.Serialization;
 
-namespace MatthiWare.UpdateLib.Common
+namespace MatthiWare.UpdateLib.Common.Abstraction
 {
     [Serializable]
     public abstract class EntryBase

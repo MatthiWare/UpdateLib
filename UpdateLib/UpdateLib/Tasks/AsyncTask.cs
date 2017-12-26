@@ -1,5 +1,12 @@
-﻿/*  UpdateLib - .Net auto update library
- *  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
+﻿/*  Copyright
+ *  
+ *  UpdateLib - .Net auto update library <https://github.com/MatthiWare/UpdateLib>
+ *  
+ *  File: AsyncTask.cs v0.5
+ *  
+ *  Author: Matthias Beerens
+ *  
+ *  Copyright (C) 2016 - MatthiWare
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as published
@@ -12,7 +19,7 @@
  *  GNU Affero General Public License for more details.
  *
  *  You should have received a copy of the GNU Affero General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with this program.  If not, see <https://github.com/MatthiWare/UpdateLib/blob/master/LICENSE>.
  */
 
 using MatthiWare.UpdateLib.Common;
@@ -171,26 +178,6 @@ namespace MatthiWare.UpdateLib.Tasks
             return this;
         }
 
-        #endregion
-
-        /// <summary>
-        /// Resets the task back to its initial state
-        /// </summary>
-        private void Reset()
-        {
-            IsCancelled = false;
-            IsRunning = false;
-            LastException = null;
-            IsCompleted = false;
-
-            m_waitHandle.Reset();
-            m_childTasks.Clear();
-
-#if DEBUG
-            m_sw.Reset();
-#endif
-        }
-
         /// <summary>
         /// Starts the task
         /// </summary>
@@ -247,6 +234,45 @@ namespace MatthiWare.UpdateLib.Tasks
         }
 
         /// <summary>
+        /// Blocks the calling thread until the complete task is done.
+        /// DO NOT call this in the worker method use <see cref="AwaitWorkers"/> method instead. 
+        /// </summary>
+        public AsyncTask AwaitTask()
+        {
+            if (IsChildTask && !IsCompleted && !IsRunning)
+                Reset();
+
+            if (m_waitHandle != null)
+            {
+                m_waitHandle.WaitOne();
+                m_waitHandle.Close();
+                m_waitHandle = null;
+            }
+
+            return this;
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Resets the task back to its initial state
+        /// </summary>
+        private void Reset()
+        {
+            IsCancelled = false;
+            IsRunning = false;
+            LastException = null;
+            IsCompleted = false;
+
+            m_waitHandle.Reset();
+            m_childTasks.Clear();
+
+#if DEBUG
+            m_sw.Reset();
+#endif
+        }
+
+        /// <summary>
         /// The worker method.
         /// </summary>
         protected abstract void DoWork();
@@ -271,7 +297,7 @@ namespace MatthiWare.UpdateLib.Tasks
             if (HasErrors || IsCancelled)
                 return;
 
-            AsyncTask task = AsyncTaskFactory.From(action, args);
+            var task = AsyncTaskFactory.From(action, args);
             task.IsChildTask = true;
             task.TaskCompleted += (o, e) =>
             {
@@ -289,32 +315,12 @@ namespace MatthiWare.UpdateLib.Tasks
         }
 
         /// <summary>
-        /// Blocks the calling thread until the complete task is done.
-        /// DO NOT call this in the worker method use <see cref="AwaitWorkers"/> method instead. 
-        /// </summary>
-        public AsyncTask AwaitTask()
-        {
-            if (IsChildTask && !IsCompleted && !IsRunning)
-                Reset();
-
-            if (m_waitHandle != null)
-            {
-                m_waitHandle.WaitOne();
-                m_waitHandle.Close();
-                m_waitHandle = null;
-            }
-
-            return this;
-        }
-
-        private int x = 0;
-
-        /// <summary>
         /// Blocks the calling thread until all the workers are done.
         /// </summary>
         protected void AwaitWorkers()
         {
             AsyncTask task = null;
+
             while (m_childTasks.TryDequeue(out task))
                 task.AwaitTask();
         }
@@ -385,14 +391,22 @@ namespace MatthiWare.UpdateLib.Tasks
     /// <summary>
     /// Base class for all Tasks that need to be run Async
     /// </summary>
-    /// <typeparam name="T">The type of the Result object</typeparam>
-    public abstract class AsyncTask<T> : AsyncTask
+    /// <typeparam name="ResultType">The type of the Result object</typeparam>
+    public abstract class AsyncTask<ResultType> : AsyncTask
     {
         /// <summary>
         /// Gets or sets the result <see cref="T"/> 
         /// </summary>
-        public virtual T Result { get; protected set; }
+        public virtual ResultType Result { get; protected set; } = default(ResultType);
+    }
 
+    /// <summary>
+    /// Base class for all Tasks that need to be run Async
+    /// </summary>
+    /// <typeparam name="TaskType">The task type to be returned from the FluentAPI</typeparam>
+    /// <typeparam name="ResultType">The type of the Result object</typeparam>
+    public abstract class AsyncTask<ResultType, TaskType> : AsyncTask<ResultType> where TaskType : AsyncTask
+    {
         #region FluentAPI
 
         /// <summary>
@@ -401,18 +415,18 @@ namespace MatthiWare.UpdateLib.Tasks
         /// <remarks>default is true.</remarks>
         /// <param name="useSyncContext">Indicate if we should use  the synchronization context</param>
         /// <returns>The task object for fluent API.</returns>
-        public new AsyncTask<T> ConfigureAwait(bool useSyncContext)
+        public new TaskType ConfigureAwait(bool useSyncContext)
         {
-            return (AsyncTask<T>)base.ConfigureAwait(useSyncContext);
+            return (TaskType)base.ConfigureAwait(useSyncContext);
         }
 
         /// <summary>
         /// Starts the task
         /// </summary>
         /// <returns>Returns the current Task.</returns>
-        public new AsyncTask<T> Start()
+        public new TaskType Start()
         {
-            return (AsyncTask<T>)base.Start();
+            return (TaskType)base.Start();
 
         }
 
@@ -421,14 +435,14 @@ namespace MatthiWare.UpdateLib.Tasks
         /// DO NOT call this in the worker method use <see cref="AsyncTask.AwaitWorkers"/> method instead. 
         /// </summary>
         /// <returns><see cref="Result"/></returns>
-        public new AsyncTask<T> AwaitTask()
+        public new TaskType AwaitTask()
         {
-            return (AsyncTask<T>)base.AwaitTask();
+            return (TaskType)base.AwaitTask();
 
         }
 
         #endregion
-
-
     }
+
+    
 }

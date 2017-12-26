@@ -228,10 +228,11 @@ namespace MatthiWare.UpdateLib.Compression.Zip
 
             string name = ZipConstants.ConvertToStringExt(flags, buffer);
 
-            entry = new ZipEntry(name, versionRequiredToExtract);
-            entry.Flags = flags;
-
-            entry.CompressionMethod = (CompressionMethod)method;
+            entry = new ZipEntry(name, versionRequiredToExtract)
+            {
+                Flags = flags,
+                CompressionMethod = (CompressionMethod)method
+            };
 
             if ((flags & 8) == 0)
             {
@@ -330,7 +331,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             checksum.Reset();
 
             if (method == (int)CompressionMethod.Deflated)
-                inf.Reset();
+                inflater.Reset();
 
             entry = null;
         }
@@ -365,8 +366,8 @@ namespace MatthiWare.UpdateLib.Compression.Zip
                     return;
                 }
 
-                csize -= inf.TotalIn;
-                inputBuffer.Available += inf.RemainingInput;
+                csize -= inflater.TotalIn;
+                inputBuffer.Available += inflater.RemainingInput;
             }
 
             if ((inputBuffer.Available > csize) && (csize >= 0))
@@ -470,7 +471,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             if ((csize > 0) || ((flags & (int)GeneralBitFlags.Descriptor) != 0))
             {
                 if ((method == (int)CompressionMethod.Deflated) && (inputBuffer.Available > 0))
-                    inputBuffer.SetInflaterInput(inf);
+                    inputBuffer.SetInflaterInput(inflater);
 
                 internalReader = new ReadDataHandler(BodyRead);
                 return BodyRead(destination, offset, count);
@@ -543,17 +544,17 @@ namespace MatthiWare.UpdateLib.Compression.Zip
 
                     if (count <= 0)
                     {
-                        if (!inf.IsFinished)
+                        if (!inflater.IsFinished)
                             throw new ZipException("Inflater not finished!");
 
-                        inputBuffer.Available = inf.RemainingInput;
+                        inputBuffer.Available = inflater.RemainingInput;
 
                         // A csize of -1 is from an unpatched local header
                         if ((flags & 8) == 0 &&
-                            (inf.TotalIn != csize && csize != 0xFFFFFFFF && csize != -1 || inf.TotalOut != size))
-                            throw new ZipException("Size mismatch: " + csize + ";" + size + " <-> " + inf.TotalIn + ";" + inf.TotalOut);
+                            (inflater.TotalIn != csize && csize != 0xFFFFFFFF && csize != -1 || inflater.TotalOut != size))
+                            throw new ZipException("Size mismatch: " + csize + ";" + size + " <-> " + inflater.TotalIn + ";" + inflater.TotalOut);
 
-                        inf.Reset();
+                        inflater.Reset();
                         finished = true;
                     }
                     break;
@@ -578,7 +579,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
                         finished = true;
                     else
                         if (count < 0)
-                            throw new ZipException("EOF in stored block");
+                        throw new ZipException("EOF in stored block");
 
                     break;
             }

@@ -2,11 +2,11 @@
  *  
  *  UpdateLib - .Net auto update library <https://github.com/MatthiWare/UpdateLib>
  *  
- *  File: UpdatableTask.cs v0.5
+ *  File: ServerFile.cs v0.5
  *  
  *  Author: Matthias Beerens
  *  
- *  Copyright (C) 2016 - MatthiWare
+ *  Copyright (C) 2017 - MatthiWare
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as published
@@ -22,28 +22,18 @@
  *  along with this program.  If not, see <https://github.com/MatthiWare/UpdateLib/blob/master/LICENSE>.
  */
 
-namespace MatthiWare.UpdateLib.Tasks
+using MatthiWare.UpdateLib.Common.Abstraction;
+using System;
+
+namespace MatthiWare.UpdateLib.Files
 {
-    public abstract class UpdatableTask : AsyncTask
+    [Serializable]
+    public class ServerFile : FileBase<ServerFile>
     {
-        private new void Start()
-        {
-            base.Start();
-        }
+        public override ServerFile Load()
+            => Load("");
 
-        public void Update()
-        {
-            Start();
-        }
-
-        public override void Cancel()
-        {
-            base.Cancel();
-
-            Rollback();
-        }
-
-        public abstract void Rollback();
-
+        public override void Save()
+            => Save("");
     }
 }

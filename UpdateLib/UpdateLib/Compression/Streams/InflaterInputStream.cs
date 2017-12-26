@@ -343,17 +343,11 @@ namespace MatthiWare.UpdateLib.Compression.Streams
         /// </param>
         public InflaterInputStream(Stream baseInputStream, Inflater inflater, int bufferSize)
         {
-            if (baseInputStream == null)
-                throw new ArgumentNullException(nameof(baseInputStream));
-
-            if (inflater == null)
-                throw new ArgumentNullException(nameof(inflater));
-
             if (bufferSize <= 0)
                 throw new ArgumentOutOfRangeException(nameof(bufferSize));
 
-            this.baseInputStream = baseInputStream;
-            this.inf = inflater;
+            this.baseInputStream = baseInputStream ?? throw new ArgumentNullException(nameof(baseInputStream));
+            this.inflater = inflater ?? throw new ArgumentNullException(nameof(inflater));
 
             inputBuffer = new InflaterInputBuffer(baseInputStream, bufferSize);
         }
@@ -422,7 +416,7 @@ namespace MatthiWare.UpdateLib.Compression.Streams
         {
             get
             {
-                return inf.IsFinished ? 0 : 1;
+                return inflater.IsFinished ? 0 : 1;
             }
         }
 
@@ -443,7 +437,7 @@ namespace MatthiWare.UpdateLib.Compression.Streams
                     throw new EndOfStreamException("Unexpected EOF");
             }
 
-            inputBuffer.SetInflaterInput(inf);
+            inputBuffer.SetInflaterInput(inflater);
         }
 
         #region Stream Overrides
@@ -512,7 +506,7 @@ namespace MatthiWare.UpdateLib.Compression.Streams
         /// <summary>
         /// Flushes the baseInputStream
         /// </summary>
-        public override void Flush()=> baseInputStream.Flush();
+        public override void Flush() => baseInputStream.Flush();
 
         /// <summary>
         /// Sets the position within the current stream
@@ -595,20 +589,20 @@ namespace MatthiWare.UpdateLib.Compression.Streams
         /// </exception>
         public override int Read(byte[] buffer, int offset, int count)
         {
-            if (inf.IsNeedingDictionary)
+            if (inflater.IsNeedingDictionary)
                 throw new InvalidOperationException("Need a dictionary");
 
             int remainingBytes = count;
             while (true)
             {
-                int bytesRead = inf.Inflate(buffer, offset, remainingBytes);
+                int bytesRead = inflater.Inflate(buffer, offset, remainingBytes);
                 offset += bytesRead;
                 remainingBytes -= bytesRead;
 
-                if (remainingBytes == 0 || inf.IsFinished)
+                if (remainingBytes == 0 || inflater.IsFinished)
                     break;
 
-                if (inf.IsNeedingInput)
+                if (inflater.IsNeedingInput)
                     Fill();
                 else if (bytesRead == 0)
                     throw new IOException("Nothing reead");
@@ -622,7 +616,7 @@ namespace MatthiWare.UpdateLib.Compression.Streams
         /// <summary>
         /// Decompressor for this stream
         /// </summary>
-        protected Inflater inf;
+        protected Inflater inflater;
 
         /// <summary>
         /// <see cref="InflaterInputBuffer">Input buffer</see> for this stream.

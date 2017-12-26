@@ -15,9 +15,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using MatthiWare.UpdateLib.Common;
 using System;
 using System.Windows.Forms;
+
+using MatthiWare.UpdateLib.Common;
 
 namespace MatthiWare.UpdateLib.UI.Components
 {
@@ -32,7 +33,7 @@ namespace MatthiWare.UpdateLib.UI.Components
 
             _updaterForm = parent;
 
-            txtDescription.Text = txtDescription.Text.Replace("%AppName%", parent.updateInfo.ApplicationName);
+            txtDescription.Text = txtDescription.Text.Replace("%AppName%", parent.ApplicationName);
             txtDescription.Text = txtDescription.Text.Replace("%version%", parent.updateInfo.Version.Value);
         }
 
@@ -44,7 +45,7 @@ namespace MatthiWare.UpdateLib.UI.Components
             {
                 cbRestart.Checked = false;
                 cbRestart.Enabled = false;
-                
+
                 txtDescription.Text = $"{file.ApplicationName} was unable to update to version {file.Version}!\n\n" +
                     "Check the log files for more information!\n\n" +
                     "Press Finish to close this wizard.";
@@ -55,7 +56,7 @@ namespace MatthiWare.UpdateLib.UI.Components
             {
                 cbRestart.Checked = false;
                 cbRestart.Enabled = false;
-                
+
                 txtDescription.Text = $"{file.ApplicationName} was unable to update to version {file.Version}!\n\n" +
                     "Update process cancelled by the user.\n\n" +
                     "Press Finish to close this wizard.";
@@ -129,7 +130,7 @@ namespace MatthiWare.UpdateLib.UI.Components
             }
         }
 
-        
+
         public UpdaterForm UpdaterForm
         {
             get

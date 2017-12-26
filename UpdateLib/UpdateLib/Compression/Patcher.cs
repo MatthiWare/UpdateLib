@@ -1,5 +1,4 @@
-﻿/*  UpdateLib - .Net auto update library
- *  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
+﻿/*  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as published
@@ -16,25 +15,23 @@
  */
 
 using System;
-using System.Runtime.Serialization;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using MatthiWare.UpdateLib.Common;
 
-namespace MatthiWare.UpdateLib.Security
+namespace MatthiWare.UpdateLib.Compression
 {
-    [Serializable]
-    public class InvalidHashException : Exception
+    public class Patcher
     {
-        public InvalidHashException() { }
+        public event ProgressChangedHandler ProgressChanged;
 
-        public InvalidHashException(string message) :
-            base(message)
-        { }
+        public void Patch()
+        {
+             
+        }
 
-        public InvalidHashException(string message, Exception inner) :
-            base(message, inner)
-        { }
-
-        protected InvalidHashException(SerializationInfo info, StreamingContext context) :
-            base(info, context)
-        { }
+        protected void OnProgressChanged(bool completed, double progress)
+            => ProgressChanged?.Invoke(completed, progress);
     }
 }

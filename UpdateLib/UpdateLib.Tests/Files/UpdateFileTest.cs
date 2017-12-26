@@ -18,6 +18,7 @@
 using System;
 using System.IO;
 using MatthiWare.UpdateLib.Common;
+using MatthiWare.UpdateLib.Common.Abstraction;
 using MatthiWare.UpdateLib.Files;
 using Moq;
 using NUnit.Framework;
@@ -41,7 +42,7 @@ namespace UpdateLib.Tests.Files
             UpdateInfo info = file.GetLatestUpdate();
             file.Save(temp_file);
 
-            UpdateFile updateFile = UpdateFile.Load(temp_file);
+            UpdateFile updateFile = FileManager.LoadFile<UpdateFile>(temp_file);
             UpdateInfo updateInfo = updateFile.GetLatestUpdate();
 
             Assert.AreEqual(file.ApplicationName, updateFile.ApplicationName);
@@ -70,17 +71,17 @@ namespace UpdateLib.Tests.Files
         {
             Stream nullStream = null;
 
-            Assert.Catch<ArgumentNullException>(() => { UpdateFile.Load(nullStream); });
-            Assert.Catch<ArgumentNullException>(() => { UpdateFile.Load(string.Empty); });
+            Assert.Catch<ArgumentNullException>(() => { FileManager.LoadFile<UpdateFile>(nullStream); });
+            Assert.Catch<ArgumentNullException>(() => { FileManager.LoadFile<UpdateFile>(string.Empty); });
 
             CleanUp();
 
-            Assert.Catch<FileNotFoundException>(() => { UpdateFile.Load(temp_file); });
+            Assert.Catch<FileNotFoundException>(() => { FileManager.LoadFile<UpdateFile>(temp_file); });
 
             Mock<Stream> unreadableStream = new Mock<Stream>();
             unreadableStream.SetupGet(s => s.CanRead).Returns(false);
 
-            Assert.Catch<ArgumentException>(() => { UpdateFile.Load(unreadableStream.Object); });
+            Assert.Catch<ArgumentException>(() => { FileManager.LoadFile<UpdateFile>(unreadableStream.Object); });
         }
 
         private UpdateFile MakeUpdateFile()

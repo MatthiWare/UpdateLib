@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpdateLib", "UpdateLib\UpdateLib.csproj", "{4394BE57-95E2-45B1-A968-1404B0590B35}"
 EndProject
@@ -12,6 +12,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpdateLib.Tests", "UpdateLib.Tests\UpdateLib.Tests.csproj", "{C47B8CC3-ABAB-4F56-8CA2-1323F902D1C3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpdateLib.Generator", "UpdateLib.Generator\UpdateLib.Generator.csproj", "{5194FF71-49F6-4ADB-9B0E-4BEB418DC6F3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CDD5CD43-2D33-4654-8680-2352806AE394}"
+	ProjectSection(SolutionItems) = preProject
+		.shared\SharedAssemblyInfo.cs = .shared\SharedAssemblyInfo.cs
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,5 +46,8 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C47B8CC3-ABAB-4F56-8CA2-1323F902D1C3} = {4FDF7C41-4B30-4153-A06A-6DE8989B4EFF}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {95EA950A-A44A-4CF2-BEF3-CE45E2B42596}
 	EndGlobalSection
 EndGlobal

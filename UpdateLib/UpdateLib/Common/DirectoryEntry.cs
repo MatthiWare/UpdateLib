@@ -21,6 +21,7 @@ using System.Text;
 using System.Xml.Serialization;
 using System.Linq;
 using System.Diagnostics;
+using MatthiWare.UpdateLib.Common.Abstraction;
 
 namespace MatthiWare.UpdateLib.Common
 {
