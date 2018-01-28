@@ -1,6 +1,8 @@
-﻿using MatthiWare.UpdateLib.Common;
+﻿using System;
+
+using MatthiWare.UpdateLib.Common;
+
 using NUnit.Framework;
-using System;
 
 namespace UpdateLib.Tests.Common
 {
@@ -19,6 +21,19 @@ namespace UpdateLib.Tests.Common
             Assert.AreEqual(2, v.Minor);
             Assert.AreEqual(3, v.Patch);
             Assert.AreEqual(VersionLabel.Beta, v.Label);
+        }
+
+        [Test]
+        public void TestTryParseGood2()
+        {
+            string input = "1.2";
+
+            var v = new UpdateVersion(input);
+
+            Assert.AreEqual(1, v.Major);
+            Assert.AreEqual(2, v.Minor);
+            Assert.AreEqual(0, v.Patch);
+            Assert.AreEqual(VersionLabel.None, v.Label);
         }
 
         [Test]
@@ -73,6 +88,23 @@ namespace UpdateLib.Tests.Common
 
             Assert.IsTrue(v7 > v6, "v7 > v6");
             Assert.IsTrue(v6 > v5, "v6 > v5");
+        }
+
+        [Test]
+        public void TestConversion()
+        {
+            string input = "1.1.1-rc";
+
+            UpdateVersion v = input;
+
+            Assert.AreEqual(1, v.Major);
+            Assert.AreEqual(1, v.Minor);
+            Assert.AreEqual(1, v.Patch);
+            Assert.AreEqual(VersionLabel.RC, v.Label);
+
+            string output = v;
+
+            Assert.AreEqual(input, output);
         }
     }
 }

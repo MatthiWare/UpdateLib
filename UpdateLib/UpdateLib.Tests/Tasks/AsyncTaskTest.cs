@@ -15,11 +15,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using MatthiWare.UpdateLib.Tasks;
-using NUnit.Framework;
 using System;
-using System.Threading;
 using System.Runtime.Serialization;
+using System.Threading;
+
+using MatthiWare.UpdateLib.Tasks;
+
+using NUnit.Framework;
 
 namespace UpdateLib.Tests.Tasks
 {
@@ -72,9 +74,9 @@ namespace UpdateLib.Tests.Tasks
         [Test, Parallelizable]
         public void TestResultReturnsCorrectObject()
         {
-            TestResultTask<bool>(false);
-            TestResultTask<int>(19951);
-            TestResultTask<object>(new object());
+            TestResultTask(false);
+            TestResultTask(19951);
+            TestResultTask(new object());
         }
 
         private void TestResultTask<T>(T input)
@@ -164,7 +166,7 @@ namespace UpdateLib.Tests.Tasks
             }
         }
 
-        private class ResultTask<T> : AsyncTask<T>
+        private class ResultTask<T> : AsyncTask<T, ResultTask<T>>
         {
             private T returnObj;
 

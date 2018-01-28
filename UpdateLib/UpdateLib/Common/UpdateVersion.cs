@@ -28,7 +28,7 @@ namespace MatthiWare.UpdateLib.Common
     /// Partially based on Semantic Versioning <http://semver.org/>
     /// </summary>
     [Serializable]
-    
+
     public class UpdateVersion : IComparable, IComparable<UpdateVersion>, IEquatable<UpdateVersion>
     {
         private int m_major, m_minor, m_patch;
@@ -180,12 +180,24 @@ namespace MatthiWare.UpdateLib.Common
                 && m_label == other.m_label;
         }
 
+        public override bool Equals(object obj)
+            => Equals(obj as UpdateVersion);
+
+        public override int GetHashCode()
+        {
+            int hash = 269;
+
+            hash = (hash * 47) + Major.GetHashCode();
+            hash = (hash * 47) + Minor.GetHashCode();
+            hash = (hash * 47) + Patch.GetHashCode();
+            hash = (hash * 47) + Label.GetHashCode();
+
+            return hash;
+        }
+
         #endregion
 
-        public override string ToString()
-        {
-            return $"{m_major}.{m_minor}.{m_patch}{LabelToString()}";
-        }
+        public override string ToString() => $"{m_major}.{m_minor}.{m_patch}{LabelToString()}";
 
         private string LabelToString()
         {
@@ -229,12 +241,18 @@ namespace MatthiWare.UpdateLib.Common
             }
         }
 
+        /// <summary>
+        /// Tries to parse the <paramref name="input"/> to a <see cref="UpdateVersion"/>
+        /// </summary>
+        /// <param name="input">Input string should be of format "major.minor.patch(-label)". The (-label) is optional</param>
+        /// <param name="version">The output parameter</param>
+        /// <returns>True if succesfully parsed, false if failed</returns>
         public static bool TryParse(string input, out UpdateVersion version)
         {
             var tokens = input.Split(CharSplitDot);
             version = new UpdateVersion();
 
-            if (tokens.Length != 3)
+            if (tokens.Length > 3) // invalid version format, needs to be the following major.minor.patch(-label)
                 return false;
 
             if (tokens.Length > 2)
@@ -244,20 +262,19 @@ namespace MatthiWare.UpdateLib.Common
                 if (!int.TryParse(extraTokens[0], out version.m_patch))
                     return false;
 
-                if (extraTokens.Length > 1)
-                    if (!TryParseVersionLabelString(extraTokens[1], out version.m_label))
-                        return false;
+                if (extraTokens.Length > 1 && !TryParseVersionLabelString(extraTokens[1], out version.m_label)) // unable to parse the version label
+                    return false;
+
+                if (extraTokens.Length > 2) return false; // invalid, can only contain 1 version label string
             }
 
-            if (tokens.Length > 1)
-                if (!int.TryParse(tokens[1], out version.m_minor))
-                    return false;
+            if (tokens.Length > 1 && !int.TryParse(tokens[1], out version.m_minor))
+                return false;
 
-            if (tokens.Length > 0)
-                if (!int.TryParse(tokens[0], out version.m_major))
-                    return false;
+            if (tokens.Length > 0 && !int.TryParse(tokens[0], out version.m_major))
+                return false;
 
-            return true;
+            return true; // everything parsed succesfully
         }
 
         public static bool operator ==(UpdateVersion v1, UpdateVersion v2)
@@ -277,6 +294,11 @@ namespace MatthiWare.UpdateLib.Common
 
         public static bool operator <=(UpdateVersion v1, UpdateVersion v2)
             => !ReferenceEquals(v1, null) && v1.CompareTo(v2) <= 0;
-        
+
+        public static implicit operator UpdateVersion(string value)
+            => new UpdateVersion(value);
+
+        public static implicit operator string(UpdateVersion version)
+            => version.Value;
     }
 }

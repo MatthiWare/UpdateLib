@@ -57,12 +57,14 @@
     <Compile Include="..\.shared\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Common\CatalogEntryTests.cs" />
     <Compile Include="Common\UpdateVersionTests.cs" />
     <Compile Include="Files\DirectoryEntryTest.cs" />
     <Compile Include="Files\FileEntryTest.cs" />
     <Compile Include="Files\HashCacheEntryTest.cs" />
     <Compile Include="Files\HashCacheFileTest.cs" />
     <Compile Include="Files\PathVariableConverterTest.cs" />
+    <Compile Include="Files\UpdateCatalogFileTests.cs" />
     <Compile Include="Files\UpdateFileTest.cs" />
     <Compile Include="Logging\LoggingTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

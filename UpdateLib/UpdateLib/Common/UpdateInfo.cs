@@ -25,17 +25,14 @@ namespace MatthiWare.UpdateLib.Common
         /// and their subdirectories.
         /// </summary>
         [XmlIgnore]
-        public int FileCount { get { return Folders.Select(d => d.Count).Sum(); } }
+        public int FileCount => Folders.Sum(dir => dir.Count);
 
         [XmlIgnore]
-        public int RegistryKeyCount { get { return Registry.Select(r => r.Count).Sum(); } }
+        public int RegistryKeyCount => Registry.Sum(reg => reg.Count);
 
         [XmlArray("Registry"), XmlArrayItem("Directory")]
         public List<DirectoryEntry> Registry { get; private set; } = new List<DirectoryEntry>();
 
-        public UpdateInfo()
-        {
-
-        }
+        public UpdateInfo() { }
     }
 }

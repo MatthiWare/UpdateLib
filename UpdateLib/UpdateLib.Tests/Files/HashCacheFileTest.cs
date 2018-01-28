@@ -15,13 +15,15 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using MatthiWare.UpdateLib.Common;
-using MatthiWare.UpdateLib.Files;
-using NUnit.Framework;
 using System;
 using System.IO;
 using System.Linq;
 using System.Text;
+
+using MatthiWare.UpdateLib.Common;
+using MatthiWare.UpdateLib.Files;
+
+using NUnit.Framework;
 
 namespace UpdateLib.Tests.Files
 {
@@ -36,25 +38,24 @@ namespace UpdateLib.Tests.Files
         {
             var path = Path.GetTempPath();
 
-            m_path = $@"{path}\\Cache_{Guid.NewGuid().ToString()}\{HashCacheFile.FILE_NAME}";
+            m_path = $@"{path}\\Cache_{Guid.NewGuid().ToString()}\\{HashCacheFile.FILE_NAME}";
 
             m_tempFile = Path.GetTempPath() + Guid.NewGuid().ToString() + "hash_cache_file_test.tmp";
-            using (StreamWriter sw = new StreamWriter(File.Open(m_tempFile, FileMode.OpenOrCreate, FileAccess.Write), Encoding.Default))
-            {
+
+            using (var sw = new StreamWriter(File.Open(m_tempFile, FileMode.OpenOrCreate, FileAccess.Write), Encoding.Default))
                 sw.WriteLine("This is a test");
-            }
         }
 
         [Test]
         public void TestLoadAndSaving()
         {
-            HashCacheFile file = new HashCacheFile();
+            var file = new HashCacheFile();
 
             file.Items.Add(new HashCacheEntry(m_tempFile));
 
             file.Save(m_path);
 
-            HashCacheFile loadedFile = HashCacheFile.Load(m_path);
+            var loadedFile = FileManager.LoadFile<HashCacheFile>(m_path);
 
             CheckEntries(file.Items.FirstOrDefault(), loadedFile.Items.FirstOrDefault());
         }
@@ -89,12 +90,8 @@ namespace UpdateLib.Tests.Files
 
         private void EditFile()
         {
-            using (StreamWriter sw = new StreamWriter(File.Open(m_tempFile, FileMode.OpenOrCreate, FileAccess.Write), Encoding.Default))
-            {
+            using (var sw = new StreamWriter(File.Open(m_tempFile, FileMode.OpenOrCreate, FileAccess.Write), Encoding.Default))
                 sw.WriteLine("edited");
-
-                sw.Flush();
-            }
         }
 
         [TearDown]
