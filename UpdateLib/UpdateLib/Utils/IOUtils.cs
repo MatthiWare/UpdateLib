@@ -15,10 +15,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using MatthiWare.UpdateLib.Common;
 using System;
 using System.IO;
 using System.Text;
+
+using MatthiWare.UpdateLib.Common;
 
 namespace MatthiWare.UpdateLib.Utils
 {
@@ -27,17 +28,16 @@ namespace MatthiWare.UpdateLib.Utils
         private static Lazy<string> m_getAppDataPath = new Lazy<string>(GetAppDataPath);
         private static Lazy<string> m_getCachePath = new Lazy<string>(() => $"{AppDataPath}\\Cache");
         private static Lazy<string> m_getLogPath = new Lazy<string>(() => $"{AppDataPath}\\Log");
+        private static Lazy<string> m_getTempPath = new Lazy<string>(() => $"{AppDataPath}\\Temp");
 
-        internal static void ReinitializeAppData()
-        {
-            m_getAppDataPath.Reset();
-        }
+        internal static void ReinitializeAppData() => m_getAppDataPath.Reset();
 
-        public static string AppDataPath { get { return m_getAppDataPath.Value; } }
-        public static string CachePath { get { return m_getCachePath.Value; } }
-        public static string LogPath { get { return m_getLogPath.Value; } }
+        public static string AppDataPath => m_getAppDataPath;
+        public static string CachePath => m_getCachePath;
+        public static string LogPath => m_getLogPath;
+        public static string TempPath => m_getTempPath;
 
-        public static string GetRemoteBasePath(string url)
+        internal static string GetRemoteBasePath(string url)
         {
             if (string.IsNullOrEmpty(url)) throw new ArgumentNullException(nameof(url));
 
@@ -50,12 +50,9 @@ namespace MatthiWare.UpdateLib.Utils
             {
                 builder.Append(s);
                 builder.Append(slash);
-
             }
 
             return builder.ToString();
-
-            //return .AppendAll(splitter.ToString());
         }
 
         private static string GetAppDataPath()

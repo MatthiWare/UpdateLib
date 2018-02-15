@@ -15,29 +15,32 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using MatthiWare.UpdateLib.Common;
-using MatthiWare.UpdateLib.UI.Components;
 using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
+using MatthiWare.UpdateLib.Common;
+using MatthiWare.UpdateLib.Files;
+using MatthiWare.UpdateLib.UI.Components;
 
 namespace MatthiWare.UpdateLib.UI
 {
     public partial class UpdaterForm : Form
     {
-        internal UpdateInfo updateInfo;
-        internal bool NeedsRestart = true;
-        internal bool hasHadErrors = false;
-        internal bool UserCancelled = false;
+        public UpdateInfo UpdateInfo { get; internal set; }
+        public string ApplicationName { get; internal set; }
+        public bool NeedsRestart { get; internal set; } = true;
+        public bool HasHadErrors { get; internal set; } = false;
+        public bool UserCancelled { get; internal set; } = false;
 
         private WizardPageCollection pages;
 
-        public UpdaterForm(UpdateInfo updateInfo)
+        public UpdaterForm(UpdateInfo updateInfo, string appName)
         {
             InitializeComponent();
 
-            this.updateInfo = updateInfo;
+            UpdateInfo = updateInfo ?? throw new ArgumentException(nameof(UpdateInfo));
+            ApplicationName = string.IsNullOrEmpty(appName) ? throw new ArgumentException(nameof(appName)) : appName;
 
             pages = new WizardPageCollection();
             AddPage(new IntroPage(this));
@@ -93,18 +96,16 @@ namespace MatthiWare.UpdateLib.UI
 
                 if (page.HasErrors && page.NeedsRollBack)
                 {
-                    hasHadErrors = true;
+                    HasHadErrors = true;
                     btnNext.Enabled = true;
                     btnPrevious.Enabled = false;
                     btnCancel.Enabled = false;
                     btnNext.Text = "Rollback";
                 }
 
-                if (!pages.CurrentPage.HasErrors && pages.CurrentPage.NeedsRollBack && hasHadErrors)
-                {
+                if (!pages.CurrentPage.HasErrors && pages.CurrentPage.NeedsRollBack && HasHadErrors)
                     foreach (IWizardPage wp in pages)
                         wp.UpdateState();
-                }
 
                 if (pages.AllDone())
                     btnCancel.Enabled = false;
@@ -183,7 +184,7 @@ namespace MatthiWare.UpdateLib.UI
 
         private void ExitUpdater()
         {
-            Updater.Instance.GetCache().Save();
+            Updater.Instance.GetCache2().Save();
 
             if (NeedsRestart)
             {

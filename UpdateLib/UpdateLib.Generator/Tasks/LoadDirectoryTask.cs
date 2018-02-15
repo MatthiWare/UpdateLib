@@ -15,12 +15,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using MatthiWare.UpdateLib.Tasks;
-using MatthiWare.UpdateLib.UI;
 using System;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+
+using MatthiWare.UpdateLib.Tasks;
+using MatthiWare.UpdateLib.UI;
 
 namespace MatthiWare.UpdateLib.Generator.Tasks
 {
@@ -32,14 +33,11 @@ namespace MatthiWare.UpdateLib.Generator.Tasks
 
         public LoadDirectoryTask(ListView lv, ImageList iconCache, DirectoryInfo dirPath)
         {
-            if (lv == null) throw new ArgumentNullException(nameof(lv));
-            if (iconCache == null) throw new ArgumentNullException(nameof(iconCache));
-            if (dirPath == null) throw new ArgumentNullException(nameof(dirPath));
-            if (!dirPath.Exists) throw new DirectoryNotFoundException($"The directory '{dirPath.FullName}' was not found.");
+            ItemsListView = lv ?? throw new ArgumentNullException(nameof(lv));
+            IconList = iconCache ?? throw new ArgumentNullException(nameof(iconCache));
+            DirectoryPath = dirPath ?? throw new ArgumentNullException(nameof(dirPath));
 
-            ItemsListView = lv;
-            IconList = iconCache;
-            DirectoryPath = dirPath;
+            if (!DirectoryPath.Exists) throw new DirectoryNotFoundException($"The directory '{dirPath.FullName}' was not found.");
         }
 
         protected override void DoWork()
@@ -75,7 +73,7 @@ namespace MatthiWare.UpdateLib.Generator.Tasks
             SetColumnAutoSize(2);
 
             EndUpdate();
-            
+
         }
 
         private void SetColumnAutoSize(int clmn)

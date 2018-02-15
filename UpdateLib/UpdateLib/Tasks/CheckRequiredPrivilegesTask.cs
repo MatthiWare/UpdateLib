@@ -22,21 +22,23 @@
  *  along with this program.  If not, see <https://github.com/MatthiWare/UpdateLib/blob/master/LICENSE>.
  */
 
-using MatthiWare.UpdateLib.Security;
 using System.Linq;
-using MatthiWare.UpdateLib.Utils;
+
 using MatthiWare.UpdateLib.Common;
+using MatthiWare.UpdateLib.Files;
+using MatthiWare.UpdateLib.Security;
+using MatthiWare.UpdateLib.Utils;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
     public class CheckRequiredPrivilegesTask : AsyncTask<bool, CheckRequiredPrivilegesTask>
     {
 
-        public UpdateInfo UpdateInfo { get; set; }
+        public UpdateMetadataFile UpdateFile { get; set; }
 
-        public CheckRequiredPrivilegesTask(UpdateInfo updateInfo)
+        public CheckRequiredPrivilegesTask(UpdateMetadataFile updateFile)
         {
-            UpdateInfo = updateInfo;
+            UpdateFile = updateFile;
         }
 
         protected override void DoWork()
@@ -46,7 +48,7 @@ namespace MatthiWare.UpdateLib.Tasks
             if (PermissionUtil.IsProcessElevated)
                 return;
 
-            foreach (DirectoryEntry dir in UpdateInfo.Folders)
+            foreach (DirectoryEntry dir in UpdateFile.Folders)
                 if (!CheckHasSufficientPermissionsForDirectory(dir))
                 {
                     Result = true;
@@ -54,7 +56,7 @@ namespace MatthiWare.UpdateLib.Tasks
                 }
 
 
-            foreach (DirectoryEntry dir in UpdateInfo.Registry)
+            foreach (DirectoryEntry dir in UpdateFile.Registry)
                 if (!CheckHasSufficientPermissionForRegistry(dir))
                 {
                     Result = true;

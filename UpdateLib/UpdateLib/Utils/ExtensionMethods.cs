@@ -17,8 +17,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
+using System.Text;
 
 namespace MatthiWare.UpdateLib.Utils
 {
@@ -42,16 +44,29 @@ namespace MatthiWare.UpdateLib.Utils
 
         }
 
+        public static IEnumerable<string> Replace(this IEnumerable<string> collection, string oldStr, string newStr)
+        {
+            using (var enumerator = collection.GetEnumerator())
+                while (enumerator.MoveNext())
+                    yield return enumerator.Current.Replace(oldStr, newStr);
+        }
+
         [DebuggerStepThrough]
         public static T MaxOrDefault<T, K>(this IEnumerable<T> collection, Func<T, K> resolve) where K : IComparable<K>
         {
             using (var enumerator = collection.GetEnumerator())
             {
                 T max = default(T);
-                
+
                 while (enumerator.MoveNext())
                 {
                     T other = enumerator.Current;
+
+                    if (max == null)
+                    {
+                        max = other;
+                        continue;
+                    }
 
                     if (resolve(other).CompareTo(resolve(max)) > 0)
                         max = other;
@@ -60,6 +75,10 @@ namespace MatthiWare.UpdateLib.Utils
                 return max;
             }
         }
+
+        public static string GetDescription(this Type type)
+            => type.GetCustomAttributes(typeof(DescriptionAttribute), false).Cast<DescriptionAttribute>().FirstOrDefault().Description ?? "invalid description";
+
 
         [DebuggerStepThrough]
         public static void ForEach<T>(this IEnumerable<T> collection, Action<T> action)

@@ -33,9 +33,10 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-using MatthiWare.UpdateLib.Compression.Deflaters;
 using System;
 using System.IO;
+
+using MatthiWare.UpdateLib.Compression.Deflaters;
 
 namespace MatthiWare.UpdateLib.Compression.Streams
 {
@@ -282,7 +283,6 @@ namespace MatthiWare.UpdateLib.Compression.Streams
 
         int clearTextLength;
         byte[] clearText;
-        byte[] internalClearText;
 
         int available;
         Stream inputStream;

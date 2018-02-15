@@ -18,8 +18,6 @@
 using System;
 using System.Windows.Forms;
 
-using MatthiWare.UpdateLib.Common;
-
 namespace MatthiWare.UpdateLib.UI.Components
 {
     public partial class FinishPage : UserControl, IWizardPage
@@ -34,19 +32,20 @@ namespace MatthiWare.UpdateLib.UI.Components
             _updaterForm = parent;
 
             txtDescription.Text = txtDescription.Text.Replace("%AppName%", parent.ApplicationName);
-            txtDescription.Text = txtDescription.Text.Replace("%version%", parent.updateInfo.Version.Value);
+            txtDescription.Text = txtDescription.Text.Replace("%version%", parent.UpdateInfo.Version);
         }
 
         public void UpdateState()
         {
-            UpdateInfo file = _updaterForm.updateInfo;
+            var version = _updaterForm.UpdateInfo.Version;
+            string appName = _updaterForm.ApplicationName;
 
-            if (_updaterForm.hasHadErrors)
+            if (_updaterForm.HasHadErrors)
             {
                 cbRestart.Checked = false;
                 cbRestart.Enabled = false;
 
-                txtDescription.Text = $"{file.ApplicationName} was unable to update to version {file.Version}!\n\n" +
+                txtDescription.Text = $"{appName} was unable to update to version {version}!\n\n" +
                     "Check the log files for more information!\n\n" +
                     "Press Finish to close this wizard.";
 
@@ -57,7 +56,7 @@ namespace MatthiWare.UpdateLib.UI.Components
                 cbRestart.Checked = false;
                 cbRestart.Enabled = false;
 
-                txtDescription.Text = $"{file.ApplicationName} was unable to update to version {file.Version}!\n\n" +
+                txtDescription.Text = $"{appName} was unable to update to version {version}!\n\n" +
                     "Update process cancelled by the user.\n\n" +
                     "Press Finish to close this wizard.";
 

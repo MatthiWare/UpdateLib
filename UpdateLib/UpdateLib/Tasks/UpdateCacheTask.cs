@@ -35,7 +35,7 @@ namespace MatthiWare.UpdateLib.Tasks
     public class UpdateCacheTask : AsyncTask<HashCacheFile, UpdateCacheTask>
     {
         private Dictionary<HashCacheEntry, bool> existingEntries = null;
-        private IEnumerable<FileInfo> files = null;
+        private IEnumerable<System.IO.FileInfo> files = null;
 
         protected override void DoWork()
         {
@@ -75,14 +75,14 @@ namespace MatthiWare.UpdateLib.Tasks
 
         private void CheckFiles()
         {
-            foreach (FileInfo f in files)
+            foreach (System.IO.FileInfo f in files)
             {
-                HashCacheEntry entry = Result.Items.Find(match => match.FilePath == f.FullName);
+                HashCacheEntry entry = base.Result.Items.Find(match => match.FilePath == f.FullName);
                 if (entry == null)
                 {
                     try
                     {
-                        Result.Items.Add(new HashCacheEntry(f.FullName));
+                        base.Result.Items.Add(new HashCacheEntry(f.FullName));
                     }
                     catch (Exception ex) // file might no longer exist or is in use
                     {
@@ -105,7 +105,7 @@ namespace MatthiWare.UpdateLib.Tasks
 
             var result = new HashCacheFile();
 
-            foreach (FileInfo f in files)
+            foreach (System.IO.FileInfo f in files)
             {
                 try
                 {

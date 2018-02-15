@@ -16,22 +16,24 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows.Forms;
+
+using MatthiWare.UpdateLib.Common;
+using MatthiWare.UpdateLib.Files;
 using MatthiWare.UpdateLib.Properties;
 using MatthiWare.UpdateLib.Tasks;
 using MatthiWare.UpdateLib.Threading;
-using System.Collections.Generic;
-using System.Linq;
 using MatthiWare.UpdateLib.Utils;
-using MatthiWare.UpdateLib.Common;
 
 namespace MatthiWare.UpdateLib.UI.Components
 {
     public partial class UpdatePage : UserControl, IWizardPage
     {
 
-        public UpdateInfo UpdateInfo { get; set; }
+        public UpdateMetadataFile UpdateFile { get; set; }
 
         public event EventHandler PageUpdate;
 
@@ -45,7 +47,7 @@ namespace MatthiWare.UpdateLib.UI.Components
 
             _updaterForm = parent;
 
-            UpdateInfo = parent.updateInfo;
+            UpdateFile = parent.UpdateInfo;
 
             ImageList ilItems = MakeImageList();
             lvItems.SmallImageList = ilItems;
@@ -72,18 +74,18 @@ namespace MatthiWare.UpdateLib.UI.Components
 
         private void FillListView()
         {
-            amountToDownload.Value = UpdateInfo.FileCount;
+            amountToDownload.Value = UpdateFile.FileCount;
 
             lvItems.BeginUpdate();
 
             AddDirectoryToListView(
-                UpdateInfo.Folders
+                UpdateFile.Folders
                 .SelectMany(dir => dir.GetItems())
                 .Select(e => e as FileEntry)
                 .Distinct()
                 .NotNull());
 
-            AddRegistryToListView(UpdateInfo.Registry
+            AddRegistryToListView(UpdateFile.Registry
                 .SelectMany(dir => dir.GetItems())
                 .Select(e => e as RegistryKeyEntry)
                 .Distinct()

@@ -22,120 +22,97 @@
  *  along with this program.  If not, see <https://github.com/MatthiWare/UpdateLib/blob/master/LICENSE>.
  */
 
-using MatthiWare.UpdateLib.Common;
-using MatthiWare.UpdateLib.Threading;
-using MatthiWare.UpdateLib.Utils;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.ComponentModel;
+using System.IO;
+using System.Net;
+
+using MatthiWare.UpdateLib.Common;
+using MatthiWare.UpdateLib.Common.Exceptions;
+using MatthiWare.UpdateLib.Security;
+using MatthiWare.UpdateLib.Utils;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
     public class DownloadManager
     {
-        private AtomicInteger m_amountToDownload = new AtomicInteger();
         private UpdateInfo m_updateInfo;
 
-        private List<UpdatableTask> m_tasks = new List<UpdatableTask>();
-        private bool hasRegUpdate, hasErrors = false;
+        private IList<string> m_urls;
 
-        public event EventHandler Completed;
+        public event EventHandler<ProgressChangedEventArgs> ProgressChanged;
+        public event EventHandler<AsyncCompletedEventArgs> Completed;
 
-        public DownloadManager(UpdateInfo updateInfo)
+        private int index = 0;
+
+        private Updater updater;
+
+        public DownloadManager(UpdateInfo updateInfo, IList<string> urls)
         {
-            m_amountToDownload.Value = updateInfo.FileCount;
-            m_updateInfo = updateInfo;
+            m_urls = urls ?? throw new ArgumentNullException(nameof(urls));
+            m_updateInfo = updateInfo ?? throw new ArgumentNullException(nameof(updateInfo));
+
+            if (m_urls.Count == 0) throw new ArgumentException("No download sources specified ", nameof(urls));
+
+            updater = Updater.Instance;
         }
 
-        private void Reset()
+        public void Download()
         {
-            m_tasks.Clear();
-            hasRegUpdate = false;
-            hasErrors = false;
-        }
+            var urlToUse = GetNextUrl();
 
-        public void Update()
-        {
-            Reset();
+            if (string.IsNullOrEmpty(urlToUse))
+                throw new WebException("Unable to download patch from specified download sources");
 
-            AddUpdates();
-            StartUpdate();
-        }
+            var local = new FileInfo($"{IOUtils.TempPath}\\{m_updateInfo.FileName}");
 
-        private void StartUpdate()
-        {
-            IEnumerable<DownloadTask> _tasks = m_tasks.Select(task => task as DownloadTask).NotNull();
+            if (!local.Directory.Exists) local.Directory.Create();
+            if (local.Exists) local.Delete();
 
-            _tasks.ForEach(task => task.Start());
+            var task = new DownloadTask(urlToUse, local.FullName);
 
-            if (hasRegUpdate && _tasks.Count() == 0)
-                StartRegUpdate();
-        }
+            task.TaskProgressChanged += (o, e) => OnProgressChanged(e.ProgressPercentage, 110);
 
-        private void StartRegUpdate()
-        {
-            m_tasks.Select(task => task as UpdateRegistryTask).NotNull().FirstOrDefault()?.Start();
-        }
-
-        private void AddUpdates()
-        {
-            foreach (FileEntry file in m_updateInfo.Folders
-                .SelectMany(dir => dir.GetItems())
-                .Select(e => e as FileEntry)
-                .Distinct()
-                .NotNull())
+            task.TaskCompleted += (o, e) =>
             {
-                DownloadTask task = new DownloadTask(file);
-                task.TaskCompleted += Task_TaskCompleted;
+                if (e.Error != null)
+                {
+                    updater.Logger.Error(nameof(DownloadManager), nameof(Download), e.Error);
+                    updater.Logger.Info(nameof(DownloadManager), nameof(Download), "Attempting to download patch from next url..");
 
-                m_tasks.Add(task);
-            }
+                    task.Url = GetNextUrl();
 
-            IEnumerable<RegistryKeyEntry> keys = m_updateInfo.Registry
-                .SelectMany(dir => dir.GetItems())
-                .Select(e => e as RegistryKeyEntry)
-                .Distinct()
-                .NotNull();
+                    if (string.IsNullOrEmpty(task.Url))
+                        OnCompleted(new WebException("Unable to download patch from specified download sources", e.Error));
+                    else
+                        task.Start();
 
-            if (keys.Count() == 0)
-                return;
+                    return;
+                }
 
-            hasRegUpdate = true;
-            m_amountToDownload.Increment();
+                var hash = HashUtil.GetHash(local.FullName);
 
-            UpdateRegistryTask regTask = new UpdateRegistryTask(keys);
-            regTask.TaskCompleted += Task_TaskCompleted;
+                if (m_updateInfo.Hash != hash)
+                {
+                    OnCompleted(new InvalidHashException($"Hash doesn't match was expecting '{m_updateInfo.Hash}' but got '{hash}'"));
+                    return;
+                }
 
-            m_tasks.Add(regTask);
+                OnProgressChanged(100, 100);
+                OnCompleted(null);
+            };
+
+            task.Start();
         }
 
-        private void Task_TaskCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
-        {
-            if (e.Error != null)
-            {
-                hasErrors = true;
+        protected void OnProgressChanged(int done, int total)
+            => ProgressChanged?.Invoke(this, new ProgressChangedEventArgs((int)((done / (double)total) * 100), null));
 
-                CancelOtherTasks();
-            }
+        protected void OnCompleted(Exception e)
+            => Completed?.Invoke(this, new AsyncCompletedEventArgs(e, false, null));
 
-            int left = m_amountToDownload.Decrement();
-
-            if (hasErrors)
-                return;
-
-            if (hasRegUpdate && left == 1)
-                StartRegUpdate();
-            else if (left == 0)
-                Completed?.Invoke(this, EventArgs.Empty);
-
-        }
-
-        private void CancelOtherTasks()
-        {
-            foreach (UpdatableTask task in m_tasks)
-                if (!task.IsCancelled)
-                    task.Cancel();
-        }
-
+        private string GetNextUrl()
+            => (index < m_urls.Count) ? m_urls[index++].Replace("%file%", m_updateInfo.FileName) : string.Empty;
     }
 }

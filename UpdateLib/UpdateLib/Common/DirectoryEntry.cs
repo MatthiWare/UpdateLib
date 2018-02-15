@@ -17,10 +17,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
-using System.Linq;
-using System.Diagnostics;
+
 using MatthiWare.UpdateLib.Common.Abstraction;
 
 namespace MatthiWare.UpdateLib.Common
@@ -43,13 +44,7 @@ namespace MatthiWare.UpdateLib.Common
         /// <summary>
         /// Gets how many files there are in this directory and its subdirectories. 
         /// </summary>
-        public int Count
-        {
-            get
-            {
-                return Items.Count + Directories.Sum(d => d.Count);
-            }
-        }
+        public int Count => Items.Count + Directories.Sum(dir => dir.Count);
 
         /// <summary>
         /// Gets the list of <see cref="DirectoryEntry">subdirectories</see>.
@@ -153,9 +148,6 @@ namespace MatthiWare.UpdateLib.Common
         /// Gets all the items including the items of childs
         /// </summary>
         /// <returns>A list of items</returns>
-        public IEnumerable<EntryBase> GetItems()
-        {
-            return Items.Concat(Directories.SelectMany(d => d.GetItems()));
-        }
+        public IEnumerable<EntryBase> GetItems() => Items.Concat(Directories.SelectMany(d => d.GetItems()));
     }
 }

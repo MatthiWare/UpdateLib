@@ -2,7 +2,7 @@
  *  
  *  UpdateLib - .Net auto update library <https://github.com/MatthiWare/UpdateLib>
  *  
- *  File: ServerFile.cs v0.5
+ *  File: UpdateCatalogFile.cs v0.5
  *  
  *  Author: Matthias Beerens
  *  
@@ -24,18 +24,32 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
 using System.Linq;
+using System.Xml.Serialization;
 
 using MatthiWare.UpdateLib.Common;
 using MatthiWare.UpdateLib.Common.Abstraction;
-using MatthiWare.UpdateLib.Utils;
+using MatthiWare.UpdateLib.Compression.GZip;
 
 namespace MatthiWare.UpdateLib.Files
 {
-    [Serializable]
+    [Serializable, Description("Update Catalog File")]
     public class UpdateCatalogFile : FileBase<UpdateCatalogFile>
     {
-        public List<CatalogEntry> Catalog { get; private set; } = new List<CatalogEntry>();
+        public const string FILE_NAME = "catalogus.gz";
+
+        /// <summary>
+        /// Gets or sets the name of the application
+        /// </summary>
+        [XmlAttribute]
+        public string ApplicationName { get; set; } = "UpdateLib";
+
+        /// <summary>
+        /// Gets the <see cref="UpdateInfo"/> Catalog
+        /// </summary>
+        public List<UpdateInfo> Catalog { get; private set; } = new List<UpdateInfo>();
 
         /// <summary>
         /// Download Url's 
@@ -43,22 +57,25 @@ namespace MatthiWare.UpdateLib.Files
         public List<string> DownloadUrls { get; private set; } = new List<string>();
 
         /// <summary>
-        /// Tries to get the best update for the current version. 
+        /// Gets the best update for the current version. 
         /// </summary>
-        /// <param name="currentVersion"></param>
-        /// <param name="entry"></param>
-        /// <returns>True if an update available, false if none available.</returns>
-        public bool TryGetLatestUpdateForVersion(UpdateVersion currentVersion, out CatalogEntry entry)
+        /// <param name="currentVersion">The currect application version</param>
+        /// <returns><see cref="UpdateInfo"/></returns>
+        public UpdateInfo GetLatestUpdateForVersion(UpdateVersion currentVersion)
         {
             if (currentVersion == null) throw new ArgumentNullException(nameof(currentVersion));
 
-            entry = Catalog.OrderBy(c => c).Where(c => currentVersion < c.Version && ((c.IsPatch && c.BasedOnVersion == currentVersion) || !c.IsPatch)).FirstOrDefault();
-
-            return entry != null;
+            return Catalog.OrderBy(c => c).Where(c => currentVersion < c.Version && ((c.IsPatch && c.BasedOnVersion == currentVersion) || !c.IsPatch)).FirstOrDefault();
         }
 
-        public override UpdateCatalogFile Load() => Load($"{IOUtils.AppDataPath}\\catalogus.xml");
+        public override UpdateCatalogFile Load() => throw new NotImplementedException();
+
+        public override UpdateCatalogFile Load(Stream stream)
+           => base.Load(new GZipInputStream(stream, false));
 
         public override void Save() => throw new NotImplementedException();
+
+        public override void Save(Stream stream)
+            => base.Save(new GZipOutputStream(stream, false));
     }
 }

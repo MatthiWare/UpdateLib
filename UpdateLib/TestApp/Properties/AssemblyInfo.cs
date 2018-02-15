@@ -1,7 +1,10 @@
 ﻿using System.Reflection;
 
+using MatthiWare.UpdateLib.Common;
+
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("TestApp")]
 [assembly: AssemblyDescription("Test App for UpdateLib")]
+[assembly: ApplicationVersion("0.5.0-alpha")]

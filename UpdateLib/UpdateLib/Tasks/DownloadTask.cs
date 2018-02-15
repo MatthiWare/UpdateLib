@@ -26,10 +26,6 @@
  *  along with this program.  If not, see <https://github.com/MatthiWare/UpdateLib/blob/master/LICENSE>.
  */
 
-using MatthiWare.UpdateLib.Common;
-using MatthiWare.UpdateLib.Common.Exceptions;
-using MatthiWare.UpdateLib.Security;
-using MatthiWare.UpdateLib.Utils;
 using System;
 using System.IO;
 using System.Net;
@@ -37,19 +33,28 @@ using System.Threading;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
-    public class DownloadTask : UpdatableTask
+    public class DownloadTask : AsyncTask<object, DownloadTask>
     {
         private WebClient webClient;
         private ManualResetEvent wait;
+        private Updater m_updater;
 
-        public FileEntry Entry { get; private set; }
+        public string Url { get; set; }
+        public string Local { get; set; }
 
-        public DownloadTask(FileEntry entry)
+        public DownloadTask(string url, string local)
         {
-            Entry = entry;
+            if (string.IsNullOrEmpty(local)) throw new ArgumentNullException(nameof(local));
+            if (string.IsNullOrEmpty(url)) throw new ArgumentNullException(nameof(url));
+
+            Url = url;
+            Local = local;
+
             webClient = new WebClient();
-            webClient.DownloadProgressChanged += (o, e) => { OnTaskProgressChanged(e.ProgressPercentage, 110); };
+            webClient.DownloadProgressChanged += (o, e) => { OnTaskProgressChanged(e.ProgressPercentage); };
             webClient.DownloadFileCompleted += (o, e) => { wait.Set(); };
+
+            m_updater = Updater.Instance;
         }
 
         protected override void DoWork()
@@ -59,66 +64,20 @@ namespace MatthiWare.UpdateLib.Tasks
 
             wait = new ManualResetEvent(false);
 
-            string localFile = Updater.Instance.Converter.Convert(Entry.DestinationLocation);
-            string remoteFile = string.Concat(Updater.Instance.RemoteBasePath, Entry.SourceLocation);
-            
-            Updater.Instance.Logger.Debug(nameof(DownloadTask), nameof(DoWork), $"LocalFile => {localFile}");
-            Updater.Instance.Logger.Debug(nameof(DownloadTask), nameof(DoWork), $"RemoteFile => {remoteFile}");
+            m_updater.Logger.Debug(nameof(DownloadTask), nameof(DoWork), $"LocalFile => {Local}");
+            m_updater.Logger.Debug(nameof(DownloadTask), nameof(DoWork), $"RemoteFile => {Url}");
 
-            FileInfo fi = new FileInfo(localFile);
-            string cacheFile = $"{IOUtils.CachePath}\\{fi.Name}";
-
-            if (File.Exists(cacheFile))
-                File.Delete(cacheFile);
-
-            if (fi.Exists)
-                fi.MoveTo(cacheFile);
+            var fi = new FileInfo(Local);
 
             if (!fi.Directory.Exists)
                 fi.Directory.Create();
 
-            var uri = new Uri(remoteFile);
-            webClient.DownloadFileAsync(uri, localFile);
+            var uri = new Uri(Url);
+            webClient.DownloadFileAsync(uri, Local);
 
             wait.WaitOne();
             wait.Close();
             wait = null;
-
-            var hash = HashUtil.GetHash(localFile);
-
-            if (hash.Length != Entry.Hash.Length || hash != Entry.Hash)
-                throw new InvalidHashException($"Calculated hash doesn't match provided hash for file: {localFile}");
-
-            Updater.Instance.GetCache().AddOrUpdateEntry(localFile, hash);
-
-            OnTaskProgressChanged(100);
-        }
-
-        public override void Rollback()
-        {
-            OnTaskProgressChanged(0);
-
-            webClient.CancelAsync();
-
-            FileInfo localFile = new FileInfo(Updater.Instance.Converter.Convert(Entry.DestinationLocation));
-            FileInfo cacheFile = new FileInfo($"{IOUtils.CachePath}\\{localFile.Name}");
-
-            if (!cacheFile.Exists)
-            {
-                OnTaskProgressChanged(100);
-                return;
-            }
-
-            if (localFile.Exists)
-                localFile.Delete();
-
-            cacheFile.MoveTo(localFile.FullName);
-
-            OnTaskProgressChanged(50);
-
-            Updater.Instance.GetCache().AddOrUpdateEntry(localFile.FullName);
-
-            Updater.Instance.Logger.Warn(nameof(DownloadTask), nameof(Cancel), $"Rolled back -> {Entry.Name}");
 
             OnTaskProgressChanged(100);
         }

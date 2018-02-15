@@ -33,12 +33,12 @@
 * DEALINGS IN THE SOFTWARE.
 */
 
-using MatthiWare.UpdateLib.Utils;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
+
+using MatthiWare.UpdateLib.Utils;
 
 namespace MatthiWare.UpdateLib.Compression.Zip
 {
@@ -259,7 +259,7 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         }
 
         #endregion
-        
+
         #endregion
 
         #region Disposing
@@ -393,8 +393,8 @@ namespace MatthiWare.UpdateLib.Compression.Zip
             long offsetOfCentralDir = ReadLEUint();
             uint commentSize = ReadLEUshort();
 
-            comment_ = (commentSize > 0) ? 
-                ZipConstants.ConvertToString(baseStream_.CheckedReadBytes((int)commentSize)) : 
+            comment_ = (commentSize > 0) ?
+                ZipConstants.ConvertToString(baseStream_.CheckedReadBytes((int)commentSize)) :
                 string.Empty;
 
             bool isZip64 = false;
@@ -517,29 +517,14 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         bool isDisposed_;
         string name_;
         string comment_;
-        string rawPassword_;
         Stream baseStream_;
         bool isStreamOwner;
         long offsetOfFirstEntry;
         ZipEntry[] entries_;
-        byte[] key;
-        bool isNewArchive_;
-
-        // Default is dynamic which is not backwards compatible and can cause problems
-        // with XP's built in compression which cant read Zip64 archives.
-        // However it does avoid the situation were a large file is added and cannot be completed correctly.
-        // Hint: Set always ZipEntry size before they are added to an archive and this setting isnt needed.
-        UseZip64 useZip64_ = UseZip64.Dynamic;
-
-        #region Zip Update Instance Fields
-        Dictionary<string, int> updateIndex_;
-        bool contentsEdited_;
-        byte[] copyBuffer_;
-        #endregion
         #endregion
 
         #region Support Classes
-        
+
         /// <summary>
         /// An <see cref="IEnumerator">enumerator</see> for <see cref="ZipEntry">Zip entries</see>
         /// </summary>

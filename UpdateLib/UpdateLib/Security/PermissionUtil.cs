@@ -15,9 +15,6 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using MatthiWare.UpdateLib.Common;
-using MatthiWare.UpdateLib.Utils;
-using Microsoft.Win32;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -25,11 +22,15 @@ using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using System.Security.Principal;
 
+using MatthiWare.UpdateLib.Common;
+using MatthiWare.UpdateLib.Utils;
+
+using Microsoft.Win32;
+
 namespace MatthiWare.UpdateLib.Security
 {
     public static class PermissionUtil
     {
-
         private const string uacRegistryKey = "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System";
         private const string uacRegistryValue = "EnableLUA";
 
@@ -44,23 +45,9 @@ namespace MatthiWare.UpdateLib.Security
         [DllImport("advapi32.dll", SetLastError = true)]
         private static extern bool GetTokenInformation(IntPtr TokenHandle, TOKEN_INFORMATION_CLASS TokenInformationClass, IntPtr TokenInformation, uint TokenInformationLength, out uint ReturnLength);
 
- 
+        public static bool IsUacEnabled => m_lazyIsUacEnabled;
 
-        public static bool IsUacEnabled
-        {
-            get
-            {
-                return m_lazyIsUacEnabled.Value;
-            }
-        }
-
-        public static bool IsProcessElevated
-        {
-            get
-            {
-                return m_lazyIsElevated.Value;
-            }
-        }
+        public static bool IsProcessElevated => m_lazyIsElevated;
 
         private static Lazy<bool> m_lazyIsUacEnabled = new Lazy<bool>(() =>
         {
@@ -87,24 +74,21 @@ namespace MatthiWare.UpdateLib.Security
                 IntPtr elevationTypePtr = Marshal.AllocHGlobal(elevationResultSize);
 
                 bool success = GetTokenInformation(tokenHandle, TOKEN_INFORMATION_CLASS.TokenElevationType, elevationTypePtr, (uint)elevationResultSize, out returnedSize);
-                if (success)
-                {
-                    elevationResult = (TOKEN_ELEVATION_TYPE)Marshal.ReadInt32(elevationTypePtr);
-                    bool isProcessAdmin = elevationResult == TOKEN_ELEVATION_TYPE.TokenElevationTypeFull;
-                    return isProcessAdmin;
-                }
-                else
+                if (!success)
                 {
                     Updater.Instance.Logger.Warn(nameof(PermissionUtil), nameof(IsProcessElevated), "Unable to determine the current elevation.");
                     return false;
                 }
+
+                elevationResult = (TOKEN_ELEVATION_TYPE)Marshal.ReadInt32(elevationTypePtr);
+                bool isProcessAdmin = elevationResult == TOKEN_ELEVATION_TYPE.TokenElevationTypeFull;
+                return isProcessAdmin;
             }
             else
             {
                 WindowsIdentity identity = WindowsIdentity.GetCurrent();
                 WindowsPrincipal principal = new WindowsPrincipal(identity);
-                bool result = principal.IsInRole(WindowsBuiltInRole.Administrator);
-                return result;
+                return principal.IsInRole(WindowsBuiltInRole.Administrator);
             }
         });
 
@@ -131,7 +115,7 @@ namespace MatthiWare.UpdateLib.Security
 
             return false;
         }
-        
+
         public static bool CheckRegPermission(RegistryKeyEntry key)
         {
             try

@@ -15,14 +15,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using MatthiWare.UpdateLib.Utils;
-using MatthiWare.UpdateLib.Common;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Xml.Serialization;
 using System.Linq;
+using System.Xml.Serialization;
+
+using MatthiWare.UpdateLib.Common;
 using MatthiWare.UpdateLib.Common.Abstraction;
+using MatthiWare.UpdateLib.Utils;
 
 namespace MatthiWare.UpdateLib.Files
 {
@@ -66,8 +66,8 @@ namespace MatthiWare.UpdateLib.Files
         }
 
         #region Save/Load
-        private static string GetStoragePath() => $@"{IOUtils.AppDataPath}\{FILE_NAME}";
-        
+        private static string GetStoragePath() => $@"{IOUtils.CachePath}\{FILE_NAME}";
+
         /// <summary>
         /// Loads the <see cref="HashCacheFile"/> from the default storage location 
         /// </summary>

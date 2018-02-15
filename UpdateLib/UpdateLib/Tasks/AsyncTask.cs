@@ -22,13 +22,14 @@
  *  along with this program.  If not, see <https://github.com/MatthiWare/UpdateLib/blob/master/LICENSE>.
  */
 
-using MatthiWare.UpdateLib.Common;
-using MatthiWare.UpdateLib.Threading;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading;
+
+using MatthiWare.UpdateLib.Common;
+using MatthiWare.UpdateLib.Threading;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
@@ -331,18 +332,13 @@ namespace MatthiWare.UpdateLib.Tasks
         /// <param name="done">The amount of work that is done.</param>
         /// <param name="total">The total amount of work.</param>
         protected virtual void OnTaskProgressChanged(int done, int total)
-        {
-            double percent = ((double)done / total) * 100;
-            OnTaskProgressChanged((int)percent);
-        }
+            => OnTaskProgressChanged((int)((done / (double)total) * 100));
 
         /// <summary>   /// Raises the <see cref="TaskProgressChanged"/> event.  
         /// </summary>
         /// <param name="percent">The percentage of work that is done.</param>
         protected virtual void OnTaskProgressChanged(int percent)
-        {
-            OnTaskProgressChanged(new ProgressChangedEventArgs(percent, null));
-        }
+            => OnTaskProgressChanged(new ProgressChangedEventArgs(percent, null));
 
         private int m_lastProgressUpdate = -1;
 
@@ -371,9 +367,7 @@ namespace MatthiWare.UpdateLib.Tasks
         /// <param name="e">If an <see cref="Exception"/> occured pass the <see cref="Exception"/> object.</param>
         /// <param name="cancelled">Indicates whether the <see cref="AsyncTask"/> got cancelled.</param>
         protected virtual void OnTaskCompleted(Exception e, bool cancelled = false)
-        {
-            OnTaskCompleted(new AsyncCompletedEventArgs(e, cancelled, null));
-        }
+            => OnTaskCompleted(new AsyncCompletedEventArgs(e, cancelled, null));
 
         /// <summary>
         /// Raises the <see cref="TaskCompleted"/> event. 
@@ -444,5 +438,5 @@ namespace MatthiWare.UpdateLib.Tasks
         #endregion
     }
 
-    
+
 }

@@ -16,155 +16,191 @@
  */
 
 using System;
-using System.ComponentModel;
+using System.Collections.Generic;
+using System.Data;
 using System.Drawing;
-using System.IO;
+using System.Linq;
 using System.Windows.Forms;
-using MatthiWare.UpdateLib.Generator.Tasks;
+
+using MatthiWare.UpdateLib.Generator.UI;
+using MatthiWare.UpdateLib.Generator.UI.Pages;
+using MatthiWare.UpdateLib.Tasks;
 using MatthiWare.UpdateLib.UI;
 
 namespace MatthiWare.UpdateLib.Generator
 {
     public partial class MainForm : Form
     {
-
-        private DirectoryInfo applicationFolder = new DirectoryInfo("./ApplicationFolder");
-        private DirectoryInfo outputFolder = new DirectoryInfo("./Output");
-
-        private ImageList iconList;
+        private Dictionary<string, PageControlBase> pageCache;
+        private AsyncTask loadTask;
+        private bool shouldShowNewPage = false;
 
         public MainForm()
         {
             InitializeComponent();
 
-            if (!applicationFolder.Exists)
-                applicationFolder.Create();
+            pageCache = new Dictionary<string, PageControlBase>();
 
-            if (!outputFolder.Exists)
-                outputFolder.Create();
-
-            iconList = new ImageList();
-            iconList.ImageSize = new Size(24, 24);
-            lvItems.SmallImageList = iconList;
-
-            LoadFolder(applicationFolder);
+            LoadPagesTask().Start();
         }
 
-        private LoadDirectoryTask LoadFolder(DirectoryInfo path)
+        public bool TryGetPage(string key, out PageControlBase page) => pageCache.TryGetValue(key, out page);
+
+        private AsyncTask LoadPagesTask()
         {
-            if (path == null) throw new ArgumentNullException(nameof(path));
-            if (!path.Exists) throw new DirectoryNotFoundException($"The directory '{path.FullName}' was not found.");
-
-            LoadDirectoryTask task = new LoadDirectoryTask(lvItems, iconList, path);
-            task.Start();
-
-            return task;
-        }
-
-        private void Generate()
-        {
-
-            UpdateGeneratorTask generator = new UpdateGeneratorTask(null, null, null);
-
-            generator.TaskCompleted += Generator_TaskCompleted;
-            generator.TaskProgressChanged += Generator_TaskProgressChanged;
-
-            SetProgressBarValue(0);
-            SetProgressBarVisible(true);
-            SetWaitCursor(true);
-
-            SetStatusMessage("Generating...");
-
-            generator.Start();
-        }
-
-        private void SetWaitCursor(bool val)
-        {
-            this.InvokeOnUI(() => UseWaitCursor = val);
-        }
-
-        private void SetProgressBarVisible(bool val)
-        {
-            this.InvokeOnUI(() => progressBar.Visible = val);
-        }
-
-        private void SetProgressBarValue(int val)
-        {
-            this.InvokeOnUI(() => progressBar.Value = val);
-        }
-
-        private void SetStatusMessage(string msg)
-        {
-            this.InvokeOnUI(() => lblStatus.Text = msg);
-        }
-
-        private void Generator_TaskProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            SetStatusMessage($"Generating {e.ProgressPercentage}%");
-            SetProgressBarValue(e.ProgressPercentage);
-        }
-
-        private void Generator_TaskCompleted(object sender, AsyncCompletedEventArgs e)
-        {
-            string filePath = string.Concat(outputFolder.FullName, "\\", "updatefile.xml");
-
-            UpdateGeneratorTask gen = (UpdateGeneratorTask)sender;
-
-            gen.Result.Save(filePath);
-
-            SetProgressBarValue(110);
-
-            SetStatusMessage("Build completed");
-        }
-
-        private void MainForm_Load(object sender, EventArgs e)
-        {
-            tvProject.ExpandAll();
-            tvProject.SelectedNode = tvProject.Nodes["root"].Nodes["nodeInfo"];
-        }
-
-        private void tvProject_AfterSelect(object sender, TreeViewEventArgs e)
-        {
-            switch (e.Node.Name)
+            if (loadTask == null)
             {
-                case "nodeInfo":
-                default:
+                LoaderControl.Show(ContentPanel);
 
-                    break;
-                case "nodeFiles":
+                Action loadAction = new Action(() =>
+                {
+                    var pageType = typeof(PageControlBase);
+                    var types = AppDomain.CurrentDomain.GetAssemblies()
+                        .SelectMany(asm => asm.GetTypes())
+                        .Where(type => pageType.IsAssignableFrom(type) && !type.IsAbstract && type.IsClass && pageType != type);
 
-                    break;
-                case "nodeRegistry":
+                    foreach (Type type in types)
+                    {
+                        var name = type.Name;
 
-                    break;
+                        PageControlBase page = Activator.CreateInstance(type) as PageControlBase;
+                        page.TestForm = this;
+
+                        pageCache.Add(name, page);
+                    }
+                });
+
+                loadTask = AsyncTaskFactory.From(loadAction, null);
+
+                loadTask.TaskCompleted += (o, e) =>
+                {
+                    LoaderControl.Hide(ContentPanel);
+
+                    btnTabInformation.PerformClick();
+                };
             }
+
+            return loadTask;
         }
 
-        private void buildToolStripButton_Click(object sender, EventArgs e)
+        private void TestForm_Click(object sender, EventArgs e)
         {
-            Action generateAction = new Action(Generate);
+            WindowState = (WindowState == FormWindowState.Maximized) ? FormWindowState.Normal : FormWindowState.Maximized;
+        }
 
-            generateAction.BeginInvoke(new AsyncCallback(r =>
+        private void pbMinimize_Click(object sender, EventArgs e)
+        {
+            WindowState = FormWindowState.Minimized;
+        }
+
+        private void pbMaximize_Click(object sender, EventArgs e)
+        {
+            MaximumSize = Screen.FromControl(this).WorkingArea.Size;
+            WindowState = (WindowState == FormWindowState.Normal ? FormWindowState.Maximized : FormWindowState.Normal);
+        }
+
+        private void pbClose_Click(object sender, EventArgs e) => Close();
+
+        private void flatButton1_Click(object sender, EventArgs e) => LoadPage(nameof(InformationPage));
+
+        private void flatButton2_Click(object sender, EventArgs e) => LoadPage(nameof(FilesPage));
+
+        private bool LoadPage(string pageName)
+        {
+            loadTask.AwaitTask();
+
+            bool success = TryGetPage(pageName, out PageControlBase page);
+
+            if (success)
             {
-                SetWaitCursor(false);
-                //SetProgressBarVisible(false);
-                generateAction.EndInvoke(r);
-            }), null);
+                shouldShowNewPage = true;
+
+                if (page.IsPageInitialized)
+                {
+                    AddControlToContentPanel(page);
+                }
+                else
+                {
+                    AddControlToContentPanel(null);
+
+                    LoaderControl.Show(ContentPanel);
+
+                    page.InitializePage((o, e) =>
+                    {
+                        LoaderControl.Hide(ContentPanel);
+
+                        if (e.Cancelled)
+                        {
+                            ShowMessageBox(
+                                "Page Load",
+                                "Task cancelled",
+                                "The loading of the page got cancelled.",
+                                SystemIcons.Warning,
+                                MessageBoxButtons.OK);
+
+                            return;
+                        }
+
+                        if (e.Error != null)
+                        {
+                            ShowMessageBox(
+                                "Page Load",
+                                "Error occured when loading the page",
+                                "Check the log files for more information!",
+                                SystemIcons.Error,
+                                MessageBoxButtons.OK);
+
+                            return;
+                        }
+
+                        AddControlToContentPanel(page);
+                    });
+                }
+            }
+
+            return success;
         }
 
-        private void lvItems_DoubleClick(object sender, EventArgs e)
+        private void ShowMessageBox(string title, string header, string desc, Icon icon, MessageBoxButtons buttons = MessageBoxButtons.YesNo)
         {
-            if (lvItems.SelectedItems.Count == 0)
+            MessageDialog.Show(
+                this,
+                title,
+                header,
+                desc,
+                icon,
+                buttons);
+        }
+
+        private void AddControlToContentPanel(Control toAdd)
+        {
+            if (!shouldShowNewPage)
                 return;
 
-            ListViewItem item = lvItems.SelectedItems[0];
+            ContentPanel.SuspendLayout();
 
-            DirectoryInfo dir = item.Tag as DirectoryInfo;
+            ContentPanel.Controls.Clear();
 
-            if (dir == null)
-                return;
+            if (toAdd != null)
+            {
+                toAdd.Dock = DockStyle.Fill;
+                ContentPanel.Controls.Add(toAdd);
 
-            LoadFolder(dir);
+                shouldShowNewPage = false;
+            }
+
+            ContentPanel.ResumeLayout();
+
+        }
+
+        private void btnTabBuild_Click(object sender, EventArgs e)
+        {
+            LoadPage(nameof(BuilderPage));
+        }
+
+        private void btnTabRegistry_Click(object sender, EventArgs e)
+        {
+            LoadPage(nameof(RegistryPage));
         }
     }
 }

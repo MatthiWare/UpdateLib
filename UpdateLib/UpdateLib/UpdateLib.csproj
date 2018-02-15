@@ -54,14 +54,18 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Common\Abstraction\FileBase.cs" />
+    <Compile Include="Common\Attributes.cs" />
     <Compile Include="Common\Delegates.cs" />
     <Compile Include="Common\Enums.cs" />
     <Compile Include="Common\Exceptions\NoInternetException.cs" />
-    <Compile Include="Common\Exceptions\NoVersionSpecifiedException.cs" />
+    <Compile Include="Common\Exceptions\InvalidUpdateServerException.cs" />
+    <Compile Include="Common\Exceptions\UnableToDownloadUpdateException.cs" />
     <Compile Include="Common\FileManager.cs" />
     <Compile Include="Common\Interfaces.cs" />
     <Compile Include="Common\ParameterDefinition.cs" />
     <Compile Include="Common\UpdateInfo.cs" />
+    <Compile Include="Files\CacheFile.cs" />
+    <Compile Include="Files\UpdateMetadataFile.cs" />
     <Compile Include="Common\UpdateVersion.cs" />
     <Compile Include="Compression\Checksum\Adler32.cs" />
     <Compile Include="Compression\Checksum\Crc32.cs" />
@@ -113,8 +117,7 @@
     <Compile Include="Common\FileEntry.cs" />
     <Compile Include="Common\PathVariableConverter.cs" />
     <Compile Include="Common\RegistryKeyEntry.cs" />
-    <Compile Include="Files\ServerFile.cs" />
-    <Compile Include="Files\UpdateFile.cs" />
+    <Compile Include="Files\UpdateCatalogFile.cs" />
     <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Logging\ILogWriter.cs" />
     <Compile Include="Logging\Logger.cs" />
@@ -127,6 +130,7 @@
     <Compile Include="Tasks\CheckForUpdatesTask.cs" />
     <Compile Include="Tasks\CheckRequiredPrivilegesTask.cs" />
     <Compile Include="Tasks\DownloadManager.cs" />
+    <Compile Include="Tasks\LoadCacheTask.cs" />
     <Compile Include="Tasks\UpdatableTask.cs" />
     <Compile Include="Security\HashUtil.cs" />
     <Compile Include="Tasks\AsyncTask.cs" />

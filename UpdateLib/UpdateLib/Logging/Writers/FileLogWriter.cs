@@ -28,7 +28,7 @@ namespace MatthiWare.UpdateLib.Logging.Writers
     {
         public LoggingLevel LoggingLevel { get { return LoggingLevel.Debug; } }
 
-        private Lazy<FileInfo> m_logFile = new Lazy<FileInfo>(GetLogFile);
+        private Lazy<System.IO.FileInfo> m_logFile = new Lazy<System.IO.FileInfo>(GetLogFile);
 
         private ConcurrentQueue<string> m_logQueue = new ConcurrentQueue<string>();
         private AsyncTask m_logTask;
@@ -40,7 +40,7 @@ namespace MatthiWare.UpdateLib.Logging.Writers
 
         private static FileInfo GetLogFile()
         {
-            FileInfo m_logFile = new FileInfo($@"{IOUtils.LogPath}\log_{DateTime.Now.ToString("yyyyMMdd")}.log");
+            System.IO.FileInfo m_logFile = new System.IO.FileInfo($@"{IOUtils.LogPath}\log_{DateTime.Now.ToString("yyyyMMdd")}.log");
 
             if (!m_logFile.Directory.Exists)
                 m_logFile.Directory.Create();

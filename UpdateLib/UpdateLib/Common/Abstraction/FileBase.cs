@@ -46,7 +46,7 @@ namespace MatthiWare.UpdateLib.Common.Abstraction
         {
             if (string.IsNullOrEmpty(path)) throw new ArgumentNullException(nameof(path));
 
-            FileInfo fi = new FileInfo(path);
+            var fi = new FileInfo(path);
 
             if (!fi.Directory.Exists)
                 fi.Directory.Create();
@@ -61,6 +61,7 @@ namespace MatthiWare.UpdateLib.Common.Abstraction
         /// <param name="stream">The stream to save the file to.</param>
         public virtual void Save(Stream stream)
         {
+            if (stream == null) throw new ArgumentNullException(nameof(stream));
             if (!stream.CanWrite) throw new ArgumentException("Unwritable stream", nameof(stream));
 
             XmlSerializer serializer = new XmlSerializer(typeof(T));
@@ -82,7 +83,7 @@ namespace MatthiWare.UpdateLib.Common.Abstraction
         {
             if (string.IsNullOrEmpty(path)) throw new ArgumentNullException(nameof(path));
 
-            FileInfo fi = new FileInfo(path);
+            var fi = new FileInfo(path);
 
             if (!fi.Exists) throw new FileNotFoundException("File does not exist", path);
 
@@ -97,6 +98,7 @@ namespace MatthiWare.UpdateLib.Common.Abstraction
         /// <returns>A loaded instance of the <see cref="T"/> file.</returns>
         public virtual T Load(Stream stream)
         {
+            if (stream == null) throw new ArgumentNullException(nameof(stream));
             if (!stream.CanRead) throw new ArgumentException("Unreadable stream", nameof(stream));
 
             XmlSerializer serializer = new XmlSerializer(typeof(T));

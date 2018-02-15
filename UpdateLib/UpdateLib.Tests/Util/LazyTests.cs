@@ -15,6 +15,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+using MatthiWare.UpdateLib.Utils;
+
 using NUnit.Framework;
 
 namespace UpdateLib.Tests.Util
@@ -26,18 +28,18 @@ namespace UpdateLib.Tests.Util
         [Test]
         public void TestLazyInitializesCorreclty()
         {
-            MatthiWare.UpdateLib.Utils.Lazy<string> myObject = new MatthiWare.UpdateLib.Utils.Lazy<string>(() => "test");
+            var myObject = new Lazy<string>(() => "test");
 
-            Assert.AreEqual("test", myObject.Value);
+            Assert.AreEqual("test", myObject);
         }
 
         [Test]
         public void TestLaszySet()
         {
-            MatthiWare.UpdateLib.Utils.Lazy<string> myObj = new MatthiWare.UpdateLib.Utils.Lazy<string>(() => "test");
+            var myObj = new Lazy<string>(() => "test");
             myObj.Value = "new";
 
-            Assert.AreEqual("new", myObj.Value);
+            Assert.AreEqual("new", myObj);
         }
 
         [Test]
@@ -45,17 +47,17 @@ namespace UpdateLib.Tests.Util
         {
             SwitchObject switcher = new SwitchObject();
 
-            MatthiWare.UpdateLib.Utils.Lazy<string> myLazy = new MatthiWare.UpdateLib.Utils.Lazy<string>(switcher.Get);
+            var myLazy = new Lazy<string>(switcher.Get);
 
-            Assert.AreEqual(switcher.Get(), myLazy.Value);
+            Assert.AreEqual(switcher.Get(), myLazy);
 
             switcher.Toggle();
 
-            Assert.AreNotEqual(switcher.Get(), myLazy.Value);
+            Assert.AreNotEqual(switcher.Get(), myLazy);
 
             myLazy.Reset();
 
-            Assert.AreEqual(switcher.Get(), myLazy.Value);
+            Assert.AreEqual(switcher.Get(), myLazy);
         }
 
         private class SwitchObject
@@ -68,9 +70,7 @@ namespace UpdateLib.Tests.Util
             }
 
             public string Get()
-            {
-                return m_state ? "true" : "false";
-            }
+                => m_state ? "true" : "false";
         }
     }
 }

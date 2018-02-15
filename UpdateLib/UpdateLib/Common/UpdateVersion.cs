@@ -17,18 +17,19 @@
 
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Xml;
 using System.Xml.Serialization;
 
 namespace MatthiWare.UpdateLib.Common
 {
     /// <summary>
-    /// Versioning class with small extensions over the original <see cref="System.Version"/>.
+    /// Versioning class with small extensions over the original <see cref="System.Version"/> as the original is sealed.
     /// Support for version label's and serializable.
     /// Partially based on Semantic Versioning <http://semver.org/>
     /// </summary>
     [Serializable]
-
+    [DebuggerDisplay("[UpdateVersion {Value}]")]
     public class UpdateVersion : IComparable, IComparable<UpdateVersion>, IEquatable<UpdateVersion>
     {
         private int m_major, m_minor, m_patch;
@@ -47,28 +48,16 @@ namespace MatthiWare.UpdateLib.Common
         #region Properties
 
         [XmlIgnore]
-        public int Major
-        {
-            get { return m_major; }
-        }
+        public int Major => m_major;
 
         [XmlIgnore]
-        public int Minor
-        {
-            get { return m_minor; }
-        }
+        public int Minor => m_minor;
 
         [XmlIgnore]
-        public int Patch
-        {
-            get { return m_patch; }
-        }
+        public int Patch => m_patch;
 
         [XmlIgnore]
-        public VersionLabel Label
-        {
-            get { return m_label; }
-        }
+        public VersionLabel Label => m_label;
 
         [XmlText]
         [XmlElement(typeof(string))]

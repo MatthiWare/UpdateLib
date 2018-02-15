@@ -33,11 +33,12 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+using System;
+using System.IO;
+
 using MatthiWare.UpdateLib.Compression.Checksum;
 using MatthiWare.UpdateLib.Compression.Deflaters;
 using MatthiWare.UpdateLib.Compression.Streams;
-using System;
-using System.IO;
 
 namespace MatthiWare.UpdateLib.Compression.GZip
 {
@@ -97,9 +98,10 @@ namespace MatthiWare.UpdateLib.Compression.GZip
         /// <param name="baseInputStream">
         /// The stream to read compressed data from (baseInputStream GZIP format)
         /// </param>
-        public GZipInputStream(Stream baseInputStream)
+        public GZipInputStream(Stream baseInputStream, bool isOwner = true)
             : this(baseInputStream, 4096)
         {
+            IsStreamOwner = isOwner;
         }
 
         /// <summary>

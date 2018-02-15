@@ -16,8 +16,8 @@
  */
 
 using System;
-using System.Security.Cryptography;
 using System.IO;
+using System.Security.Cryptography;
 
 namespace MatthiWare.UpdateLib.Security
 {
@@ -29,10 +29,7 @@ namespace MatthiWare.UpdateLib.Security
         /// </summary>
         /// <param name="file">The input file to hash</param>
         /// <returns>The hashed string</returns>
-        public static string GetHash(string file)
-        {
-            return GetHash<SHA256>(file);
-        }
+        public static string GetHash(string file) => GetHash<SHA256>(file);
 
         /// <summary>
         /// Gets the hash from file using the given hashing algorithm.
@@ -48,12 +45,12 @@ namespace MatthiWare.UpdateLib.Security
             if (!File.Exists(file))
                 throw new FileNotFoundException("File not found", file);
 
-            using (Stream stream = File.OpenRead(file))
+            using (var stream = File.OpenRead(file))
             {
-                using (HashAlgorithm algo = HashAlgorithm.Create(typeof(T).FullName))
+                using (var algo = HashAlgorithm.Create(typeof(T).FullName))
                 {
-                    byte[] hash = algo.ComputeHash(stream);
-                    return BitConverter.ToString(hash).Replace("-", string.Empty);
+                    var computedHash = algo.ComputeHash(stream);
+                    return BitConverter.ToString(computedHash).Replace("-", string.Empty);
                 }
             }
         }

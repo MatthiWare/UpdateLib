@@ -24,7 +24,7 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 {
     public class PageControlBase : UserControl
     {
-        internal TestForm TestForm { get; set; }
+        internal MainForm TestForm { get; set; }
 
         public PageControlBase()
         {

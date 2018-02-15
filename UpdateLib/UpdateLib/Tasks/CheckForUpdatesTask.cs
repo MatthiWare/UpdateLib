@@ -23,79 +23,112 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Net;
+
+using MatthiWare.UpdateLib.Common;
+using MatthiWare.UpdateLib.Common.Abstraction;
+using MatthiWare.UpdateLib.Common.Exceptions;
 using MatthiWare.UpdateLib.Files;
 using MatthiWare.UpdateLib.Utils;
-using MatthiWare.UpdateLib.Common;
-using MatthiWare.UpdateLib.Common.Exceptions;
+
 using static MatthiWare.UpdateLib.Tasks.CheckForUpdatesTask;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
     public class CheckForUpdatesTask : AsyncTask<CheckForUpdatesResult, CheckForUpdatesTask>
     {
-        public Uri Uri { get; set; }
+        public IList<string> Urls { get; set; }
 
         private WebClient m_wc;
+        private UpdateVersion m_version;
+        private Updater m_updater;
 
-        public CheckForUpdatesTask(Uri uri)
+        private const string REPLACE_FILE_NAME = "%file%";
+
+        public CheckForUpdatesTask(IList<string> urls, UpdateVersion currentVersion)
         {
-            Uri = uri;
+            Urls = urls ?? throw new ArgumentNullException(nameof(urls));
+            m_version = currentVersion ?? throw new ArgumentNullException(nameof(currentVersion));
+            if (urls.Count == 0) throw new ArgumentException("Empty url list provided", nameof(urls));
+
             m_wc = new WebClient();
+            m_updater = Updater.Instance;
         }
 
         protected override void DoWork()
         {
             Result = new CheckForUpdatesResult();
 
-            Updater updater = Updater.Instance;
-
             if (!NetworkUtils.HasConnection()) throw new NoInternetException("No internet available");
-
-            // Getting the file name from the url
-            string localFile = $@"{IOUtils.AppDataPath}\Update.xml";
 
             if (IsCancelled) return;
 
-            updater.Logger.Debug(nameof(CheckForUpdatesTask), nameof(DoWork), $"Attempting to download update file from {Uri}");
-            m_wc.DownloadFile(Uri, localFile);
-
             // load the updatefile from disk
-            Result.UpdateInfo = FileManager.LoadFile<UpdateFile>(localFile).GetLatestUpdate() ?? throw new NoVersionSpecifiedException();
+            var file = DownloadFile<UpdateCatalogFile>(Urls.Replace(REPLACE_FILE_NAME, UpdateCatalogFile.FILE_NAME), $"{IOUtils.AppDataPath}\\{UpdateCatalogFile.FILE_NAME}");
 
-            var privilegesCheckTask = CheckPrivileges(Result.UpdateInfo);
+            if (IsCancelled) return;
 
-            // lets wait for the Cache update to complete and get the task
-            var cache = updater.GetCache();
+            if (file.Catalog == null || file.Catalog.Count == 0) throw new InvalidUpdateServerException();
 
-            // Wait for the clean up to complete
-            updater.CleanUpTask.AwaitTask();
+            Result.UpdateInfo = file.GetLatestUpdateForVersion(m_version);
+            Result.ApplicationName = file.ApplicationName;
+            Result.DownloadURLs = file.DownloadUrls;
 
-            if (IsCancelled)
-                return;
+            if (!Result.UpdateAvailable || IsCancelled) return;
 
-            /* 
-             * Start a task to get all the files that need to be updated
-             * Returns if there is anything to update
-             */
-            var updatedFilesTask = CheckForUpdatedFiles(Result.UpdateInfo, cache);
+            if (Result.DownloadURLs == null || Result.DownloadURLs.Count == 0) throw new InvalidUpdateServerException();
 
+            var meta = DownloadFile<UpdateMetadataFile>(Result.DownloadURLs.Replace(REPLACE_FILE_NAME, Result.UpdateInfo.FileName), $"{IOUtils.TempPath}\\{UpdateMetadataFile.FILE_NAME}");
+
+            if (IsCancelled) return;
+
+            var privilegesCheckTask = new CheckRequiredPrivilegesTask(meta).ConfigureAwait(false).Start();
             Result.AdminRightsNeeded = privilegesCheckTask.AwaitTask().Result;
-            Result.UpdateAvailable = updatedFilesTask.AwaitTask().Result;
         }
 
-        private CheckForUpdatedItemsTask CheckForUpdatedFiles(UpdateInfo updateInfo, HashCacheFile cache)
-            => new CheckForUpdatedItemsTask(updateInfo, cache).ConfigureAwait(false).Start();
+        private T DownloadFile<T>(IEnumerable<string> urlsToUse, string localFile) where T : FileBase<T>, new()
+        {
+            var enumerator = urlsToUse.GetEnumerator();
 
-        private CheckRequiredPrivilegesTask CheckPrivileges(UpdateInfo updateInfo)
-            => new CheckRequiredPrivilegesTask(updateInfo).ConfigureAwait(false).Start();
+            m_updater.Logger.Info(nameof(CheckForUpdatesTask), nameof(DownloadFile), $"Getting {typeof(T).GetDescription()}");
+
+            do
+            {
+                if (!enumerator.MoveNext() || string.IsNullOrEmpty(enumerator.Current))
+                    throw new UnableToDownloadUpdateException();
+            } while (!DownloadLocalFile(enumerator.Current, localFile));
+
+            return FileManager.LoadFile<T>(localFile);
+        }
+
+        private bool DownloadLocalFile(string url, string localFile)
+        {
+            m_updater.Logger.Debug(nameof(CheckForUpdatesTask), nameof(DownloadLocalFile), $"Attempting to download file from {url}");
+
+            try
+            {
+                m_wc.DownloadFile(url, localFile);
+
+                m_updater.Logger.Info(nameof(CheckForUpdatesTask), nameof(DownloadLocalFile), $"Succesfully downloaded file from {url}");
+            }
+            catch (Exception e)
+            {
+                m_updater.Logger.Error(nameof(CheckForUpdatesTask), nameof(DoWork), e);
+                return false;
+            }
+
+            return true;
+        }
 
         public class CheckForUpdatesResult
         {
             public UpdateVersion Version { get { return UpdateInfo.Version; } }
-            public bool UpdateAvailable { get; set; } = false;
+            public bool UpdateAvailable => UpdateInfo != null;
             public UpdateInfo UpdateInfo { get; set; }
-            public bool AdminRightsNeeded { get; set; } = false;
+            public string ApplicationName { get; set; }
+            public IList<string> DownloadURLs { get; set; }
+            public bool AdminRightsNeeded { get; set; }
         }
     }
 }

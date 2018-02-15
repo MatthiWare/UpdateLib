@@ -1051,9 +1051,6 @@ namespace MatthiWare.UpdateLib.Compression.Zip
         long offset;                           // used by ZipFile and ZipOutputStream
 
         bool forceZip64_;
-        byte cryptoCheckValue_;
-        int _aesVer;                            // Version number (2 = AE-2 ?). Assigned but not used.
-        int _aesEncryptionStrength;             // Encryption strength 1 = 128 2 = 192 3 = 256
         #endregion
     }
 }

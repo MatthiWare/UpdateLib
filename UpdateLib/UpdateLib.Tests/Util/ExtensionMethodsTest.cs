@@ -15,13 +15,17 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using NUnit.Framework;
 using System.Collections.Generic;
-using System.Linq;
-using MatthiWare.UpdateLib.Utils;
-using Moq;
 using System.Diagnostics;
+using System.Linq;
+
 using MatthiWare.UpdateLib.Common;
+using MatthiWare.UpdateLib.Files;
+using MatthiWare.UpdateLib.Utils;
+
+using Moq;
+
+using NUnit.Framework;
 
 namespace UpdateLib.Tests.Util
 {
@@ -52,27 +56,27 @@ namespace UpdateLib.Tests.Util
         [Test]
         public void TestMax()
         {
-            UpdateInfo v1 = MakeUpdateInfo(new UpdateVersion(1));
-            UpdateInfo v2 = MakeUpdateInfo(new UpdateVersion(2));
-            UpdateInfo v3 = MakeUpdateInfo(new UpdateVersion(2, 1));
-            UpdateInfo v4 = MakeUpdateInfo(new UpdateVersion(2, 1, 1));
-            UpdateInfo v5 = MakeUpdateInfo(new UpdateVersion(2, 1, 1, VersionLabel.Beta));
-            UpdateInfo v6 = MakeUpdateInfo(new UpdateVersion(2, 1, 1, VersionLabel.RC));
-            UpdateInfo v7 = MakeUpdateInfo(new UpdateVersion(2, 1, 2));
+            UpdateMetadataFile v1 = MakeUpdateFile("1");
+            UpdateMetadataFile v2 = MakeUpdateFile("2");
+            UpdateMetadataFile v3 = MakeUpdateFile("2.1");
+            UpdateMetadataFile v4 = MakeUpdateFile("2.1.1");
+            UpdateMetadataFile v5 = MakeUpdateFile("2.1.1-beta");
+            UpdateMetadataFile v6 = MakeUpdateFile("2.1.1-rc");
+            UpdateMetadataFile v7 = MakeUpdateFile("2.1.2");
 
-            List<UpdateInfo> versions = new List<UpdateInfo>(new UpdateInfo[]
+            List<UpdateMetadataFile> versions = new List<UpdateMetadataFile>(new UpdateMetadataFile[]
             {
                 v1,v2,v3,v4,v5,v6,v7
             });
 
-            UpdateInfo max = versions.MaxOrDefault(u => u.Version);
+            var max = versions.MaxOrDefault(u => u.Version);
 
             Assert.AreEqual(v7, max);
         }
 
-        private UpdateInfo MakeUpdateInfo(UpdateVersion version)
+        private UpdateMetadataFile MakeUpdateFile(UpdateVersion version)
         {
-            return new UpdateInfo
+            return new UpdateMetadataFile()
             {
                 Version = version
             };

@@ -15,10 +15,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using MatthiWare.UpdateLib.Security;
 using System;
 using System.IO;
 using System.Xml.Serialization;
+
+using MatthiWare.UpdateLib.Security;
 
 namespace MatthiWare.UpdateLib.Common
 {
@@ -55,15 +56,14 @@ namespace MatthiWare.UpdateLib.Common
         {
             try
             {
-                long tick = File.GetLastWriteTime(FilePath).Ticks;
+                var tick = File.GetLastWriteTime(FilePath).Ticks;
 
-                if (Ticks == -1 || tick != Ticks)
-                {
-                    Hash = string.IsNullOrEmpty(hash) ? HashUtil.GetHash(FilePath) : hash;
-                    Ticks = tick;
+                if (Ticks != -1 && tick == Ticks) return;
 
-                    Updater.Instance.Logger.Debug(nameof(HashCacheEntry), nameof(Recalculate), $"Recalculated Time: {DateTime.FromBinary(Ticks).ToString()} Name: {FilePath} Hash: {Hash}");
-                }
+                Hash = string.IsNullOrEmpty(hash) ? HashUtil.GetHash(FilePath) : hash;
+                Ticks = tick;
+
+                Updater.Instance.Logger.Debug(nameof(HashCacheEntry), nameof(Recalculate), $"Recalculated Time: {DateTime.FromBinary(Ticks).ToString()} Name: {FilePath} Hash: {Hash}");
             }
             catch (Exception ex) // file might no longer exist or is in use
             {

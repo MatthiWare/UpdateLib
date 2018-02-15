@@ -17,14 +17,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Windows.Forms;
-using System.IO;
-using MatthiWare.UpdateLib.UI;
-using MatthiWare.UpdateLib.Tasks;
-using MatthiWare.UpdateLib.Generator.Tasks;
-using MatthiWare.UpdateLib.Files;
 using System.Diagnostics;
+using System.Drawing;
+using System.IO;
+using System.Windows.Forms;
+
+using MatthiWare.UpdateLib.Generator.Tasks;
+using MatthiWare.UpdateLib.UI;
 
 namespace MatthiWare.UpdateLib.Generator.UI.Pages
 {
@@ -88,9 +87,9 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
 
         Stopwatch sw = new Stopwatch();
 
-        private AsyncTask<UpdateFile> Build(Stream s)
+        private UpdateGeneratorTask Build(Stream s)
         {
-            UpdateGeneratorTask task = new UpdateGeneratorTask(filesPage.Root, infoPage, registryPage.Folders);
+            var task = new UpdateGeneratorTask(filesPage.Root, infoPage, registryPage.Folders);
 
             btnBuild.Enabled = false;
 
@@ -106,8 +105,6 @@ namespace MatthiWare.UpdateLib.Generator.UI.Pages
                 sw.Stop();
 
                 Updater.Instance.Logger.Debug(nameof(BuilderPage), nameof(Build), $"File generation completed in {sw.ElapsedMilliseconds} ms.");
-
-
 
                 btnBuild.Enabled = true;
 

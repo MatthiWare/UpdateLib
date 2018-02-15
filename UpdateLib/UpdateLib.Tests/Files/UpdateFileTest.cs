@@ -17,10 +17,13 @@
 
 using System;
 using System.IO;
+
 using MatthiWare.UpdateLib.Common;
 using MatthiWare.UpdateLib.Common.Abstraction;
 using MatthiWare.UpdateLib.Files;
+
 using Moq;
+
 using NUnit.Framework;
 
 namespace UpdateLib.Tests.Files
@@ -38,16 +41,14 @@ namespace UpdateLib.Tests.Files
         [Test]
         public void SaveAndLoadUpdateFileShouldBeTheSame()
         {
-            UpdateFile file = MakeUpdateFile();
-            UpdateInfo info = file.GetLatestUpdate();
+            var file = MakeUpdateFile();
             file.Save(temp_file);
 
-            UpdateFile updateFile = FileManager.LoadFile<UpdateFile>(temp_file);
-            UpdateInfo updateInfo = updateFile.GetLatestUpdate();
+            var updateFile = FileManager.LoadFile<UpdateMetadataFile>(temp_file);
 
-            Assert.AreEqual(file.ApplicationName, updateFile.ApplicationName);
-            Assert.AreEqual(info.Version, updateInfo.Version);
-            Assert.AreEqual(info.FileCount, updateInfo.FileCount);
+            //Assert.AreEqual(file.ApplicationName, updateFile.ApplicationName);
+            Assert.AreEqual(file.Version, updateFile.Version);
+            Assert.AreEqual(file.FileCount, updateFile.FileCount);
         }
 
         [Test]
@@ -55,7 +56,7 @@ namespace UpdateLib.Tests.Files
         {
             Stream nullStream = null;
 
-            UpdateFile file = new UpdateFile();
+            var file = new UpdateMetadataFile();
 
             Assert.Catch<ArgumentNullException>(() => { file.Save(nullStream); });
             Assert.Catch<ArgumentNullException>(() => { file.Save(string.Empty); });
@@ -71,26 +72,24 @@ namespace UpdateLib.Tests.Files
         {
             Stream nullStream = null;
 
-            Assert.Catch<ArgumentNullException>(() => { FileManager.LoadFile<UpdateFile>(nullStream); });
-            Assert.Catch<ArgumentNullException>(() => { FileManager.LoadFile<UpdateFile>(string.Empty); });
+            Assert.Catch<ArgumentNullException>(() => { FileManager.LoadFile<UpdateMetadataFile>(nullStream); });
+            Assert.Catch<ArgumentNullException>(() => { FileManager.LoadFile<UpdateMetadataFile>(string.Empty); });
 
             CleanUp();
 
-            Assert.Catch<FileNotFoundException>(() => { FileManager.LoadFile<UpdateFile>(temp_file); });
+            Assert.Catch<FileNotFoundException>(() => { FileManager.LoadFile<UpdateMetadataFile>(temp_file); });
 
             Mock<Stream> unreadableStream = new Mock<Stream>();
             unreadableStream.SetupGet(s => s.CanRead).Returns(false);
 
-            Assert.Catch<ArgumentException>(() => { FileManager.LoadFile<UpdateFile>(unreadableStream.Object); });
+            Assert.Catch<ArgumentException>(() => { FileManager.LoadFile<UpdateMetadataFile>(unreadableStream.Object); });
         }
 
-        private UpdateFile MakeUpdateFile()
+        private UpdateMetadataFile MakeUpdateFile()
         {
-            UpdateFile file = new UpdateFile();
+            var file = new UpdateMetadataFile();
 
-            file.ApplicationName = nameof(UpdateFileTest);
-
-            UpdateInfo info = new UpdateInfo { Version = new UpdateVersion(9, 9, 9) };
+            var info = new UpdateMetadataFile { Version = "9.9.9" };
 
             DirectoryEntry appSubFolder = new DirectoryEntry("AppSubFolder");
             DirectoryEntry otherSubFolder = new DirectoryEntry("OtherSubFolder");

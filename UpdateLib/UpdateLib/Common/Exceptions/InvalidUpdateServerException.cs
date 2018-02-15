@@ -2,7 +2,7 @@
  *  
  *  UpdateLib - .Net auto update library <https://github.com/MatthiWare/UpdateLib>
  *  
- *  File: ServerFile.cs v0.5
+ *  File: NoVersionSpecifiedException.cs v0.5
  *  
  *  Author: Matthias Beerens
  *  
@@ -22,18 +22,19 @@
  *  along with this program.  If not, see <https://github.com/MatthiWare/UpdateLib/blob/master/LICENSE>.
  */
 
-using MatthiWare.UpdateLib.Common.Abstraction;
 using System;
 
-namespace MatthiWare.UpdateLib.Files
+namespace MatthiWare.UpdateLib.Common.Exceptions
 {
-    [Serializable]
-    public class ServerFile : FileBase<ServerFile>
-    {
-        public override ServerFile Load()
-            => Load("");
 
-        public override void Save()
-            => Save("");
+    [Serializable]
+    public class InvalidUpdateServerException : Exception
+    {
+        public InvalidUpdateServerException() { }
+        public InvalidUpdateServerException(string message) : base(message) { }
+        public InvalidUpdateServerException(string message, Exception inner) : base(message, inner) { }
+        protected InvalidUpdateServerException(
+          System.Runtime.Serialization.SerializationInfo info,
+          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
     }
 }

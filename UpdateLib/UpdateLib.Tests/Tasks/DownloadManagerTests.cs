@@ -15,14 +15,17 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using MatthiWare.UpdateLib;
-using MatthiWare.UpdateLib.Common;
-using MatthiWare.UpdateLib.Security;
-using MatthiWare.UpdateLib.Tasks;
-using NUnit.Framework;
 using System;
 using System.IO;
 using System.Threading;
+
+using MatthiWare.UpdateLib;
+using MatthiWare.UpdateLib.Common;
+using MatthiWare.UpdateLib.Files;
+using MatthiWare.UpdateLib.Security;
+using MatthiWare.UpdateLib.Tasks;
+
+using NUnit.Framework;
 
 namespace UpdateLib.Tests.Tasks
 {
@@ -53,15 +56,14 @@ namespace UpdateLib.Tests.Tasks
             Updater.Instance.Initialize();
         }
 
-        [Test]
+        [Test, Parallelizable]
         public void TestDownloadManager()
         {
-
-
-            UpdateInfo info = new UpdateInfo();
+            MatthiWare.UpdateLib.Files.UpdateInfo info = new MatthiWare.UpdateLib.Files.UpdateInfo();
 
             DirectoryEntry dir = new DirectoryEntry("%appdir%");
             FileEntry entry_file = new FileEntry("testfile.txt");
+
             entry_file.Hash = HashUtil.GetHash(m_file);
             dir.Add(entry_file);
 
@@ -70,9 +72,9 @@ namespace UpdateLib.Tests.Tasks
             ManualResetEvent wait = new ManualResetEvent(false);
             DownloadManager manager = new DownloadManager(info);
             manager.Completed += (o, e) => wait.Set();
-            manager.Update();
+            manager.Download();
 
-            Assert.IsTrue(wait.WaitOne(TimeSpan.FromSeconds(20)), "The async download timed-out after 10 seconds");
+            Assert.IsTrue(wait.WaitOne(TimeSpan.FromSeconds(60*5)), "The async download timed-out after 10 seconds");
 
             string localFile = Updater.Instance.Converter.Convert("%appdir%/testfile.txt");
             Assert.IsTrue(File.Exists(localFile), "File didn't exist");

@@ -15,21 +15,22 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using MatthiWare.UpdateLib.Files;
-using MatthiWare.UpdateLib.Security;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
-using System.IO;
-using MatthiWare.UpdateLib.Tasks;
-using MatthiWare.UpdateLib.Generator.Data.FilesPage;
-using System.Collections.Generic;
-using MatthiWare.UpdateLib.Generator.UI.Pages;
+
 using MatthiWare.UpdateLib.Common;
+using MatthiWare.UpdateLib.Files;
+using MatthiWare.UpdateLib.Generator.Data.FilesPage;
+using MatthiWare.UpdateLib.Generator.UI.Pages;
+using MatthiWare.UpdateLib.Security;
+using MatthiWare.UpdateLib.Tasks;
 
 namespace MatthiWare.UpdateLib.Generator.Tasks
 {
-    public class UpdateGeneratorTask : AsyncTask<UpdateFile>
+    public class UpdateGeneratorTask : AsyncTask<UpdateLib.Files.UpdateInfo, UpdateGeneratorTask>
     {
         private delegate void AddDirRecursiveDelegate(GenFolder dir, DirectoryEntry entry);
 
@@ -44,17 +45,14 @@ namespace MatthiWare.UpdateLib.Generator.Tasks
 
         public UpdateGeneratorTask(GenFolder dir, InformationPage info, IList<GenFolder> registry)
         {
-            if (dir == null)
-                throw new ArgumentNullException("dir", "The directory cannot be null");
-
-            Result = new UpdateFile();
-
-            baseDir = dir;
+            baseDir = dir ?? throw new ArgumentNullException("dir", "The directory cannot be null");
             registryFolders = registry;
 
             total = dir.Count + registry.Sum(g => g.Count);
 
             infoPage = info;
+
+            base.Result = new UpdateLib.Files.UpdateInfo();
         }
 
         protected override void DoWork()
@@ -73,7 +71,7 @@ namespace MatthiWare.UpdateLib.Generator.Tasks
 
             Enqueue(new Action(AddRegistryItems), null);
 
-            Result.ApplicationName = infoPage.ApplicationName;
+            // Result.ApplicationName = infoPage.ApplicationName;
             Result.Version = infoPage.Version;
         }
 
@@ -128,7 +126,7 @@ namespace MatthiWare.UpdateLib.Generator.Tasks
             List<IGenItem> files = dir.Items;
             foreach (GenFile genFile in files)
             {
-                FileInfo fi = genFile.FileInfo;
+                System.IO.FileInfo fi = genFile.FileInfo;
                 FileEntry newEntry = new FileEntry(fi.Name);
                 newEntry.Hash = HashUtil.GetHash(fi.FullName);
 

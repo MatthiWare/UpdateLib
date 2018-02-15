@@ -77,6 +77,8 @@ namespace MatthiWare.UpdateLib.Utils
             m_initFunction = initFunction;
         }
 
+        public static implicit operator T(Lazy<T> self)
+            => self.Value;
 
     }
 }
