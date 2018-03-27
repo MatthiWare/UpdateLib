@@ -41,70 +41,60 @@ namespace MatthiWare.UpdateLib.Utils
 
                 return builder.ToString();
             }
-
         }
 
         public static IEnumerable<string> Replace(this IEnumerable<string> collection, string oldStr, string newStr)
         {
-            using (var enumerator = collection.GetEnumerator())
-                while (enumerator.MoveNext())
-                    yield return enumerator.Current.Replace(oldStr, newStr);
+            foreach (var str in collection)
+                yield return str.Replace(oldStr, newStr);
         }
 
         [DebuggerStepThrough]
         public static T MaxOrDefault<T, K>(this IEnumerable<T> collection, Func<T, K> resolve) where K : IComparable<K>
         {
-            using (var enumerator = collection.GetEnumerator())
+            T max = default(T);
+
+            foreach (T other in collection)
             {
-                T max = default(T);
-
-                while (enumerator.MoveNext())
+                if (max == null)
                 {
-                    T other = enumerator.Current;
-
-                    if (max == null)
-                    {
-                        max = other;
-                        continue;
-                    }
-
-                    if (resolve(other).CompareTo(resolve(max)) > 0)
-                        max = other;
+                    max = other;
+                    continue;
                 }
 
-                return max;
+                if (resolve(other).CompareTo(resolve(max)) > 0)
+                    max = other;
             }
+
+            return max;
         }
 
         public static string GetDescription(this Type type)
-            => type.GetCustomAttributes(typeof(DescriptionAttribute), false).Cast<DescriptionAttribute>().FirstOrDefault().Description ?? "invalid description";
+            => type.GetCustomAttributes(typeof(DescriptionAttribute), false).Cast<DescriptionAttribute>().FirstOrDefault().Description ?? "No description available";
 
 
         [DebuggerStepThrough]
         public static void ForEach<T>(this IEnumerable<T> collection, Action<T> action)
         {
-            using (var enumerator = collection.GetEnumerator())
-                while (enumerator.MoveNext())
-                    action(enumerator.Current);
+            foreach (T item in collection)
+                action(item);
         }
 
         [DebuggerStepThrough]
         public static IEnumerable<T> NotNull<T>(this IEnumerable<T> collection)
         {
-            using (var enumerator = collection.GetEnumerator())
-                while (enumerator.MoveNext())
-                    if (enumerator.Current != null)
-                        yield return enumerator.Current;
+            foreach (T item in collection)
+                if (item != null)
+                    yield return item;
 
         }
 
         [DebuggerStepThrough]
         public static IEnumerable<string> NotEmpty(this IEnumerable<string> collection)
         {
-            using (var enumerator = collection.GetEnumerator())
-                while (enumerator.MoveNext())
-                    if (!string.IsNullOrEmpty(enumerator.Current))
-                        yield return enumerator.Current;
+            foreach (var item in collection)
+                if (!string.IsNullOrEmpty(item))
+                    yield return item;
         }
 
         /// <summary>
@@ -128,20 +118,18 @@ namespace MatthiWare.UpdateLib.Utils
             int i = 0;
             var buffer = new Queue<T>(count + 1);
 
-            using (var enumerator = source.GetEnumerator())
+            foreach (T item in source)
             {
-                while (enumerator.MoveNext())
+                if (i == count)
                 {
-                    if (i == count)
-                    {
-                        yield return buffer.Dequeue();
-                        i--;
-                    }
-
-                    buffer.Enqueue(enumerator.Current);
-                    i++;
+                    yield return buffer.Dequeue();
+                    i--;
                 }
+
+                buffer.Enqueue(item);
+                i++;
             }
+
         }
     }
 }

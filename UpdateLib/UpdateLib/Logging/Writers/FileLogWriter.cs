@@ -15,12 +15,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+using System;
+using System.IO;
+
 using MatthiWare.UpdateLib.Common;
 using MatthiWare.UpdateLib.Tasks;
 using MatthiWare.UpdateLib.Threading;
 using MatthiWare.UpdateLib.Utils;
-using System;
-using System.IO;
 
 namespace MatthiWare.UpdateLib.Logging.Writers
 {
@@ -28,7 +29,7 @@ namespace MatthiWare.UpdateLib.Logging.Writers
     {
         public LoggingLevel LoggingLevel { get { return LoggingLevel.Debug; } }
 
-        private Lazy<System.IO.FileInfo> m_logFile = new Lazy<System.IO.FileInfo>(GetLogFile);
+        private Lazy<FileInfo> m_logFile = new Lazy<FileInfo>(GetLogFile);
 
         private ConcurrentQueue<string> m_logQueue = new ConcurrentQueue<string>();
         private AsyncTask m_logTask;
@@ -40,7 +41,7 @@ namespace MatthiWare.UpdateLib.Logging.Writers
 
         private static FileInfo GetLogFile()
         {
-            System.IO.FileInfo m_logFile = new System.IO.FileInfo($@"{IOUtils.LogPath}\log_{DateTime.Now.ToString("yyyyMMdd")}.log");
+            FileInfo m_logFile = new FileInfo($@"{IOUtils.LogPath}\log_{DateTime.Now.ToString("yyyyMMdd")}.log");
 
             if (!m_logFile.Directory.Exists)
                 m_logFile.Directory.Create();
@@ -58,9 +59,8 @@ namespace MatthiWare.UpdateLib.Logging.Writers
 
         private void Log()
         {
-            string text;
             using (StreamWriter writer = new StreamWriter(m_logFile.Value.Open(FileMode.OpenOrCreate, FileAccess.Write)))
-                while (m_logQueue.TryDequeue(out text))
+                while (m_logQueue.TryDequeue(out string text))
                 {
                     writer.BaseStream.Seek(0, SeekOrigin.End);
                     writer.WriteLine(text);

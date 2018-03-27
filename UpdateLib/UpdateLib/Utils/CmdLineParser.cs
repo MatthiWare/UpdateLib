@@ -14,10 +14,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using MatthiWare.UpdateLib.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
+using MatthiWare.UpdateLib.Common;
 
 namespace MatthiWare.UpdateLib.Utils
 {
@@ -32,7 +33,7 @@ namespace MatthiWare.UpdateLib.Utils
             if (string.IsNullOrEmpty(paramName)) throw new ArgumentNullException(nameof(paramName));
             if (paramName.Contains(' ')) throw new ArgumentException("Parameter cannot contain spaces", nameof(paramName));
             if (m_params.ContainsKey(paramName)) throw new ArgumentException("Key already exists", nameof(paramName));
-            
+
             var param = new ParameterDefinition(paramName, mandatoryType, valueType);
             m_params.Add(paramName, param);
         }
@@ -81,16 +82,14 @@ namespace MatthiWare.UpdateLib.Utils
 
             if (param.ValueType == ParamValueType.Int || param.ValueType == ParamValueType.OptionalInt)
             {
-                int value;
-                succes = int.TryParse(data, out value);
+                succes = int.TryParse(data, out int value);
 
                 if (succes)
                     param.Value = value;
             }
             else if (param.ValueType == ParamValueType.Bool || param.ValueType == ParamValueType.OptionalBool)
             {
-                bool value;
-                succes = bool.TryParse(data, out value);
+                succes = bool.TryParse(data, out bool value);
 
                 if (succes)
                     param.Value = value;
@@ -104,10 +103,9 @@ namespace MatthiWare.UpdateLib.Utils
             }
             else if (param.ValueType == ParamValueType.MultipleInts)
             {
-                List<int> values = new List<int>();
-                int outValue;
+                var values = new List<int>();
 
-                while (index < args.Length && int.TryParse(args[index], out outValue))
+                while (index < args.Length && int.TryParse(args[index], out int outValue))
                 {
                     values.Add(outValue);
                     index++;
