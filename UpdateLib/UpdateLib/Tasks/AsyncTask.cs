@@ -29,7 +29,6 @@ using System.Diagnostics;
 using System.Threading;
 
 using MatthiWare.UpdateLib.Common;
-using MatthiWare.UpdateLib.Threading;
 
 namespace MatthiWare.UpdateLib.Tasks
 {
@@ -41,7 +40,7 @@ namespace MatthiWare.UpdateLib.Tasks
 
         #region private fields
 
-        private Exception m_lastException = null;
+        protected Exception m_lastException = null;
 
         private bool m_useSyncContext = true;
         private SynchronizationContext m_syncContext;
@@ -52,7 +51,7 @@ namespace MatthiWare.UpdateLib.Tasks
         public Stopwatch m_sw = new Stopwatch();
 #endif
 
-        private readonly ConcurrentQueue<AsyncTask> m_childTasks = new ConcurrentQueue<AsyncTask>();
+        private readonly Queue<AsyncTask> m_childTasks = new Queue<AsyncTask>();
         private ManualResetEvent m_waitHandle = new ManualResetEvent(true);
         private readonly object sync = new object();
 
@@ -84,11 +83,6 @@ namespace MatthiWare.UpdateLib.Tasks
                 lock (sync)
                     return m_lastException;
             }
-            protected set
-            {
-                lock (sync)
-                    m_lastException = value;
-            }
         }
 
         /// <summary>
@@ -110,11 +104,6 @@ namespace MatthiWare.UpdateLib.Tasks
                 lock (sync)
                     return m_completed;
             }
-            set
-            {
-                lock (sync)
-                    m_completed = value;
-            }
         }
 
         /// <summary>
@@ -127,25 +116,19 @@ namespace MatthiWare.UpdateLib.Tasks
                 lock (sync)
                     return m_cancelled;
             }
-            private set
-            {
-                lock (sync)
-                    m_cancelled = value;
-            }
         }
 
 
+
+        /// <summary>
+        /// Gets if the current <see cref="AsyncTask"/> is Running.
+        /// </summary>
         public bool IsRunning
         {
             get
             {
                 lock (sync)
                     return m_running;
-            }
-            private set
-            {
-                lock (sync)
-                    m_running = value;
             }
         }
 
@@ -185,53 +168,57 @@ namespace MatthiWare.UpdateLib.Tasks
         /// <returns>Returns the current Task.</returns>
         public AsyncTask Start()
         {
-            if (IsRunning)
+            lock (sync)
+            {
+                if (m_running)
+                    return this;
+
+                Reset();
+
+                m_syncContext = SynchronizationContext.Current;
+
+                Action worker = new Action(() =>
+                {
+                    try
+                    {
+                        m_running = true;
+                        DoWork();
+                    }
+                    catch (Exception ex)
+                    {
+                        m_lastException = ex;
+
+                        Updater.Instance.Logger.Error(GetType().Name, null, ex);
+                    }
+                    finally
+                    {
+                        AwaitWorkers();
+
+                        m_running = false;
+                        m_completed = true;
+                    }
+                });
+
+#if DEBUG
+                m_sw.Start();
+#endif
+
+                worker.BeginInvoke(new AsyncCallback((IAsyncResult r) =>
+                {
+#if DEBUG
+                    m_sw.Stop();
+                    Updater.Instance.Logger.Debug(GetType().Name, nameof(Start), $"Completed in {m_sw.ElapsedMilliseconds}ms");
+#endif
+                    worker.EndInvoke(r);
+
+                    OnTaskCompleted(m_lastException, IsCancelled);
+
+                    m_waitHandle.Set();
+
+                }), null); ;
+
                 return this;
-
-            Reset();
-
-            m_syncContext = SynchronizationContext.Current;
-
-            Action worker = new Action(() =>
-            {
-                try
-                {
-                    IsRunning = true;
-                    DoWork();
-                }
-                catch (Exception ex)
-                {
-                    LastException = ex;
-
-                    Updater.Instance.Logger.Error(GetType().Name, null, ex);
-                }
-                finally
-                {
-                    AwaitWorkers();
-                    IsRunning = false;
-                    IsCompleted = true;
-                }
-            });
-
-#if DEBUG
-            m_sw.Start();
-#endif
-
-            worker.BeginInvoke(new AsyncCallback((IAsyncResult r) =>
-            {
-#if DEBUG
-                m_sw.Stop();
-                Updater.Instance.Logger.Debug(GetType().Name, nameof(Start), $"Completed in {m_sw.ElapsedMilliseconds}ms");
-#endif
-                worker.EndInvoke(r);
-
-                OnTaskCompleted(m_lastException, IsCancelled);
-
-                m_waitHandle.Set();
-
-            }), null); ;
-
-            return this;
+            }
         }
 
         /// <summary>
@@ -240,17 +227,20 @@ namespace MatthiWare.UpdateLib.Tasks
         /// </summary>
         public AsyncTask AwaitTask()
         {
-            if (IsChildTask && !IsCompleted && !IsRunning)
-                Reset();
-
-            if (m_waitHandle != null)
+            lock (sync)
             {
-                m_waitHandle.WaitOne();
-                m_waitHandle.Close();
-                m_waitHandle = null;
-            }
+                if (IsChildTask && !m_completed && !m_running)
+                    Reset();
 
-            return this;
+                if (m_waitHandle != null)
+                {
+                    m_waitHandle.WaitOne();
+                    m_waitHandle.Close();
+                    m_waitHandle = null;
+                }
+
+                return this;
+            }
         }
 
         #endregion
@@ -260,10 +250,10 @@ namespace MatthiWare.UpdateLib.Tasks
         /// </summary>
         private void Reset()
         {
-            IsCancelled = false;
-            IsRunning = false;
-            LastException = null;
-            IsCompleted = false;
+            m_cancelled = false;
+            m_running = false;
+            m_lastException = null;
+            m_completed = false;
 
             m_waitHandle.Reset();
             m_childTasks.Clear();
@@ -284,7 +274,8 @@ namespace MatthiWare.UpdateLib.Tasks
         /// </summary>
         public virtual void Cancel()
         {
-            IsCancelled = true;
+            lock (sync)
+                m_cancelled = true;
         }
 
         /// <summary>
@@ -294,25 +285,29 @@ namespace MatthiWare.UpdateLib.Tasks
         /// <param name="args">Optional arguments for the action</param>
         protected void Enqueue(Delegate action, params object[] args)
         {
-            // Don't allow to start another task when the parent task has been cancelled or contains errors.
-            if (HasErrors || IsCancelled)
-                return;
-
-            var task = AsyncTaskFactory.From(action, args);
-            task.IsChildTask = true;
-            task.TaskCompleted += (o, e) =>
+            lock (sync)
             {
-                if (e.Error != null)
+                // Don't allow to start another child task when the parent task has been cancelled or contains errors.
+                if (m_lastException != null || m_cancelled)
+                    return;
+
+                var task = AsyncTaskFactory.From(action, args);
+
+                task.IsChildTask = true;
+                task.TaskCompleted += (o, e) =>
                 {
-                    LastException = e.Error?.InnerException ?? e.Error;
+                    if (e.Error != null)
+                    {
+                        m_lastException = e.Error?.InnerException ?? e.Error;
 
-                    Updater.Instance.Logger.Error(GetType().Name, null, LastException);
-                }
-            };
+                        Updater.Instance.Logger.Error(GetType().Name, null, LastException);
+                    }
+                };
 
-            m_childTasks.Enqueue(task);
+                m_childTasks.Enqueue(task);
 
-            WorkerScheduler.Instance.Schedule(task);
+                WorkerScheduler.Instance.Schedule(task);
+            }
         }
 
         /// <summary>
@@ -320,10 +315,9 @@ namespace MatthiWare.UpdateLib.Tasks
         /// </summary>
         protected void AwaitWorkers()
         {
-            AsyncTask task = null;
-
-            while (m_childTasks.TryDequeue(out task))
-                task.AwaitTask();
+            lock (sync)
+                while (m_childTasks.Count != 0)
+                    m_childTasks.Dequeue().AwaitTask();
         }
 
         /// <summary>
