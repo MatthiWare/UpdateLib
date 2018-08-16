@@ -63,14 +63,14 @@ namespace MatthiWare.UpdateLib.Common
                 Hash = string.IsNullOrEmpty(hash) ? HashUtil.GetHash(FilePath) : hash;
                 Ticks = tick;
 
-                Updater.Instance.Logger.Debug(nameof(HashCacheEntry), nameof(Recalculate), $"Recalculated Time: {DateTime.FromBinary(Ticks).ToString()} Name: {FilePath} Hash: {Hash}");
+                //Updater.Instance.Logger.Debug(nameof(HashCacheEntry), nameof(Recalculate), $"Recalculated Time: {DateTime.FromBinary(Ticks).ToString()} Name: {FilePath} Hash: {Hash}");
             }
             catch (Exception ex) // file might no longer exist or is in use
             {
                 Hash = string.Empty;
                 Ticks = -1;
 
-                Updater.Instance.Logger.Error(nameof(HashCacheEntry), nameof(Recalculate), ex);
+                //Updater.Instance.Logger.Error(nameof(HashCacheEntry), nameof(Recalculate), ex);
             }
         }
 

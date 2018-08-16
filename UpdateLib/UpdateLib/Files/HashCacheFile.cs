@@ -61,7 +61,7 @@ namespace MatthiWare.UpdateLib.Files
                     Items.Add(entry);
                 }
 
-                Updater.Instance.Logger.Debug(nameof(HashCacheFile), nameof(AddOrUpdateEntry), $"Cache updated for file -> '{entry.FilePath}'");
+                //Updater.Instance.Logger.Debug(nameof(HashCacheFile), nameof(AddOrUpdateEntry), $"Cache updated for file -> '{entry.FilePath}'");
             }
         }
 

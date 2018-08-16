@@ -14,9 +14,9 @@ namespace MatthiWare.UpdateLib.Files
         public UpdateVersion CurrentVersion { get; set; }
 
         public override CacheFile Load()
-            => Load(m_filePath);
+            => Load(m_filePath.Value);
 
         public override void Save()
-            => Save(m_filePath);
+            => Save(m_filePath.Value);
     }
 }

@@ -15,9 +15,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using MatthiWare.UpdateLib.Logging.Writers;
 using System;
-using System.Windows.Forms;
 
 namespace MatthiWare.UpdateLib.Generator
 {
@@ -29,11 +27,11 @@ namespace MatthiWare.UpdateLib.Generator
         [STAThread]
         static void Main()
         {
-            Updater.Instance.ConfigureLogger((logger) => logger.Writers.Add(new ConsoleLogWriter()));
+            //Updater.Instance.ConfigureLogger((logger) => logger.Writers.Add(new ConsoleLogWriter()));
 
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainForm());
+            //Application.EnableVisualStyles();
+            //Application.SetCompatibleTextRenderingDefault(false);
+            //Application.Run(new MainForm());
         }
     }
 }

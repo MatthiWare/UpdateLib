@@ -25,17 +25,16 @@ namespace MatthiWare.UpdateLib.Utils
 {
     public static class IOUtils
     {
-        private static Lazy<string> m_getAppDataPath = new Lazy<string>(GetAppDataPath);
-        private static Lazy<string> m_getCachePath = new Lazy<string>(() => $"{AppDataPath}\\Cache");
-        private static Lazy<string> m_getLogPath = new Lazy<string>(() => $"{AppDataPath}\\Log");
-        private static Lazy<string> m_getTempPath = new Lazy<string>(() => $"{AppDataPath}\\Temp");
+        private static Lazy<string> m_getAppDataPath = new Lazy<string>(() => "");
+        private static Lazy<string> m_getCachePath = new Lazy<string>(() => $"");
+        private static Lazy<string> m_getLogPath = new Lazy<string>(() => $"");
+        private static Lazy<string> m_getTempPath = new Lazy<string>(() => $"");
 
-        internal static void ReinitializeAppData() => m_getAppDataPath.Reset();
 
-        public static string AppDataPath => m_getAppDataPath;
-        public static string CachePath => m_getCachePath;
-        public static string LogPath => m_getLogPath;
-        public static string TempPath => m_getTempPath;
+        public static string AppDataPath => m_getAppDataPath.Value;
+        public static string CachePath => m_getCachePath.Value;
+        public static string LogPath => m_getLogPath.Value;
+        public static string TempPath => m_getTempPath.Value;
 
         internal static string GetRemoteBasePath(string url)
         {
@@ -53,15 +52,6 @@ namespace MatthiWare.UpdateLib.Utils
             }
 
             return builder.ToString();
-        }
-
-        private static string GetAppDataPath()
-        {
-            string path = GetPathPrefix();
-            string updaterName = Updater.UpdaterName;
-            string productName = Updater.ProductName;
-
-            return $@"{path}\{productName}\{updaterName}";
         }
 
         private static string GetPathPrefix()
