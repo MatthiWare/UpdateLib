@@ -28,6 +28,7 @@ namespace MatthiWare.UpdateLib.Common
     /// Support for version label's and serializable.
     /// Partially based on Semantic Versioning <http://semver.org/>
     /// </summary>
+    [Serializable]
     [DebuggerDisplay("[UpdateVersion {Value}]")]
     public class UpdateVersion : IComparable, IComparable<UpdateVersion>, IEquatable<UpdateVersion>
     {
@@ -46,13 +47,37 @@ namespace MatthiWare.UpdateLib.Common
 
         #region Properties
 
+        [XmlIgnore]
         public int Major => m_major;
 
+        [XmlIgnore]
         public int Minor => m_minor;
 
+        [XmlIgnore]
         public int Patch => m_patch;
 
+        [XmlIgnore]
         public VersionLabel Label => m_label;
+
+        [XmlText]
+        [XmlElement(typeof(string))]
+        [EditorBrowsable(EditorBrowsableState.Never), Browsable(false)]
+        public string Value
+        {
+            get { return ToString(); }
+            set
+            {
+                UpdateVersion version;
+
+                if (!TryParse(value, out version))
+                    throw new ArgumentException(nameof(value), "Unable to parse input string");
+
+                m_major = version.m_major;
+                m_minor = version.m_minor;
+                m_patch = version.m_patch;
+                m_label = version.m_label;
+            }
+        }
 
         #endregion
 
@@ -88,7 +113,9 @@ namespace MatthiWare.UpdateLib.Common
 
         public UpdateVersion(string input)
         {
-            if (!TryParse(input, out UpdateVersion version))
+            UpdateVersion version;
+
+            if (!TryParse(input, out version))
                 throw new ArgumentException(nameof(input), "Unable to parse input string");
 
             m_major = version.m_major;
@@ -171,6 +198,7 @@ namespace MatthiWare.UpdateLib.Common
                     return BETA_STRING;
                 case VersionLabel.RC:
                     return RC_STRING;
+                case VersionLabel.None:
                 default:
                     return string.Empty;
             }
@@ -260,6 +288,6 @@ namespace MatthiWare.UpdateLib.Common
             => new UpdateVersion(value);
 
         public static implicit operator string(UpdateVersion version)
-            => version.ToString();
+            => version.Value;
     }
 }

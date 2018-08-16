@@ -17,8 +17,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Xml.Serialization;
 
 using MatthiWare.UpdateLib.Common.Abstraction;
 
@@ -35,6 +37,8 @@ namespace MatthiWare.UpdateLib.Common
         /// <summary>
         /// Gets or sets the name of the <see cref="DirectoryEntry">directory</see>. 
         /// </summary>
+        [XmlAttribute]
+        [DebuggerDisplay("{DestinationLocation}")]
         public string Name { get; set; }
 
         /// <summary>
@@ -45,18 +49,23 @@ namespace MatthiWare.UpdateLib.Common
         /// <summary>
         /// Gets the list of <see cref="DirectoryEntry">subdirectories</see>.
         /// </summary>
+        [XmlArray("Directories"), XmlArrayItem("Directory")]
         public List<DirectoryEntry> Directories { get; set; } = new List<DirectoryEntry>();
 
         /// <summary>
         /// Gets the list of <see cref="EntryBase">files</see> in this directory.
         /// </summary>
+        [XmlElement(typeof(FileEntry))]
+        [XmlElement(typeof(RegistryKeyEntry))]
         public List<EntryBase> Items { get; set; } = new List<EntryBase>();
 
         /// <summary>
         /// Gets or Sets the Parent of this Directory
         /// </summary>
+        [XmlIgnore]
         public DirectoryEntry Parent { get; set; }
 
+        [XmlIgnore]
         public string SourceLocation
         {
             get
@@ -74,6 +83,7 @@ namespace MatthiWare.UpdateLib.Common
             }
         }
 
+        [XmlIgnore]
         public string DestinationLocation
         {
             get

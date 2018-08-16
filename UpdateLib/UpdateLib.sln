@@ -3,20 +3,20 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UpdateLib", "UpdateLib\UpdateLib.csproj", "{4394BE57-95E2-45B1-A968-1404B0590B35}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpdateLib", "UpdateLib\UpdateLib.csproj", "{4394BE57-95E2-45B1-A968-1404B0590B35}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestApp", "TestApp\TestApp.csproj", "{7C3C0345-6D01-40A6-9F01-60D8D6451FB1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApp", "TestApp\TestApp.csproj", "{7C3C0345-6D01-40A6-9F01-60D8D6451FB1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{4FDF7C41-4B30-4153-A06A-6DE8989B4EFF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UpdateLib.Tests", "UpdateLib.Tests\UpdateLib.Tests.csproj", "{C47B8CC3-ABAB-4F56-8CA2-1323F902D1C3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpdateLib.Tests", "UpdateLib.Tests\UpdateLib.Tests.csproj", "{C47B8CC3-ABAB-4F56-8CA2-1323F902D1C3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpdateLib.Generator", "UpdateLib.Generator\UpdateLib.Generator.csproj", "{5194FF71-49F6-4ADB-9B0E-4BEB418DC6F3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CDD5CD43-2D33-4654-8680-2352806AE394}"
 	ProjectSection(SolutionItems) = preProject
 		.shared\SharedAssemblyInfo.cs = .shared\SharedAssemblyInfo.cs
 	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpdateLib.Generator", "UpdateLib.Generator\UpdateLib.Generator.csproj", "{5194FF71-49F6-4ADB-9B0E-4BEB418DC6F3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

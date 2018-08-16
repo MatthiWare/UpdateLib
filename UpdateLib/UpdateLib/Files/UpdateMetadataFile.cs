@@ -7,6 +7,7 @@ using System.Xml.Serialization;
 
 using MatthiWare.UpdateLib.Common;
 using MatthiWare.UpdateLib.Common.Abstraction;
+using MatthiWare.UpdateLib.Compression.GZip;
 
 namespace MatthiWare.UpdateLib.Files
 {
@@ -40,11 +41,11 @@ namespace MatthiWare.UpdateLib.Files
         public override UpdateMetadataFile Load() => throw new NotImplementedException();
 
         public override UpdateMetadataFile Load(Stream stream)
-           => base.Load(stream);
+           => base.Load(new GZipInputStream(stream, false));
 
         public override void Save() => throw new NotImplementedException();
 
         public override void Save(Stream stream)
-            => base.Save(stream);
+            => base.Save(new GZipOutputStream(stream, false));
     }
 }

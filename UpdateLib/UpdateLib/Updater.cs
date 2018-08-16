@@ -24,13 +24,21 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Security;
+using System.Windows.Forms;
 
 using MatthiWare.UpdateLib.Common;
+using MatthiWare.UpdateLib.Common.Exceptions;
 using MatthiWare.UpdateLib.Files;
+using MatthiWare.UpdateLib.Logging;
+using MatthiWare.UpdateLib.Security;
+using MatthiWare.UpdateLib.Tasks;
+using MatthiWare.UpdateLib.UI;
 using MatthiWare.UpdateLib.Utils;
 
 namespace MatthiWare.UpdateLib
@@ -66,7 +74,26 @@ namespace MatthiWare.UpdateLib
         private const string m_argWait = "wait";
         private const string m_rollback = "rollback";
         private Lazy<PathVariableConverter> m_lazyPathVarConv = new Lazy<PathVariableConverter>(() => new PathVariableConverter());
+        private Lazy<Logger> m_lazyLogger = new Lazy<Logger>(() => new Logger());
         private InstallationMode m_installationMode = InstallationMode.Shared;
+
+        private LoadCacheTask m_loadCacheTask;
+
+        private static Lazy<string> m_lazyProductName = new Lazy<string>(() =>
+        {
+            AssemblyProductAttribute attr = Assembly.GetEntryAssembly()?.GetCustomAttributes(typeof(AssemblyProductAttribute), true).FirstOrDefault() as AssemblyProductAttribute;
+
+            //AssemblyProductAttribute attr = Attribute.GetCustomAttribute(Assembly.GetEntryAssembly(), ) as AssemblyProductAttribute;
+            return attr?.Product ?? m_strUpdateLib;
+        });
+
+        private static Lazy<string> m_lazyUpdaterName = new Lazy<string>(() =>
+        {
+            AssemblyProductAttribute attr = Assembly.GetAssembly(typeof(Updater))?.GetCustomAttributes(typeof(AssemblyProductAttribute), true).FirstOrDefault() as AssemblyProductAttribute;
+
+            //AssemblyProductAttribute attr = Attribute.GetCustomAttribute(), typeof(AssemblyProductAttribute)) as AssemblyProductAttribute;
+            return attr?.Product ?? m_strUpdateLib;
+        });
 
         #endregion
 
@@ -75,11 +102,15 @@ namespace MatthiWare.UpdateLib
         /// <summary>
         /// Check for updates completed event.
         /// </summary>
-        //public event EventHandler<CheckForUpdatesCompletedEventArgs> CheckForUpdatesCompleted;
+        public event EventHandler<CheckForUpdatesCompletedEventArgs> CheckForUpdatesCompleted;
 
         #endregion
 
         #region Properties
+
+        internal static string ProductName => m_lazyProductName;
+
+        internal static string UpdaterName => m_lazyUpdaterName;
 
         /// <summary>
         /// Gets the command line parser. Use this to add additional command line arguments that need to be parsed. 
@@ -93,6 +124,11 @@ namespace MatthiWare.UpdateLib
         public IList<string> UpdateURLs { get; } = new List<string>();
 
         /// <summary>
+        /// Gets the logger for the application.
+        /// </summary>
+        public ILogger Logger => m_lazyLogger.Value;
+
+        /// <summary>
         /// Gets or sets the Updater Installation mode
         /// </summary>
         public InstallationMode InstallationMode
@@ -103,6 +139,7 @@ namespace MatthiWare.UpdateLib
                 if (m_installationMode != value)
                 {
                     m_installationMode = value;
+                    IOUtils.ReinitializeAppData();
                 }
             }
         }
@@ -134,6 +171,7 @@ namespace MatthiWare.UpdateLib
         public PathVariableConverter Converter
         {
             get { return m_lazyPathVarConv.Value; }
+            private set { m_lazyPathVarConv.Value = value; }
         }
 
         /// <summary>
@@ -142,15 +180,15 @@ namespace MatthiWare.UpdateLib
         /// </summary>
         public bool AllowUnsafeConnection { get; set; } = false;
 
-        ///// <summary>
-        ///// Gets the clean up task
-        ///// </summary>
-        //public CleanUpTask CleanUpTask { get; private set; }
+        /// <summary>
+        /// Gets the clean up task
+        /// </summary>
+        public CleanUpTask CleanUpTask { get; private set; }
 
-        ///// <summary>
-        ///// Gets the update cache task
-        ///// </summary>
-        //public UpdateCacheTask UpdateCacheTask { get; private set; }
+        /// <summary>
+        /// Gets the update cache task
+        /// </summary>
+        public UpdateCacheTask UpdateCacheTask { get; private set; }
 
 
 
@@ -191,6 +229,18 @@ namespace MatthiWare.UpdateLib
         public Updater ConfigureAllowUnsafeConnections(bool allow)
         {
             AllowUnsafeConnection = allow;
+
+            return this;
+        }
+
+        /// <summary>
+        /// Configures the logger
+        /// </summary>
+        /// <param name="action">Action to perform on the logger</param>
+        /// <returns><see cref="Updater"/> </returns>
+        public Updater ConfigureLogger(Action<ILogger> action)
+        {
+            action(Logger);
 
             return this;
         }
@@ -291,7 +341,7 @@ namespace MatthiWare.UpdateLib
 
             IsInitialized = true;
 
-            //if (StartUpdating) CheckForUpdates();
+            if (StartUpdating) CheckForUpdates();
         }
 
         /// <summary>
@@ -299,7 +349,9 @@ namespace MatthiWare.UpdateLib
         /// </summary>
         private void StartInitializationTasks()
         {
-
+            CleanUpTask = new CleanUpTask("%appdir%").ConfigureAwait(false).Start();
+            UpdateCacheTask = new UpdateCacheTask().ConfigureAwait(false).Start();
+            m_loadCacheTask = new LoadCacheTask().ConfigureAwait(false).Start();
         }
 
         /// <summary>
@@ -315,10 +367,173 @@ namespace MatthiWare.UpdateLib
         }
 
         /// <summary>
+        /// Starting the update process
+        /// </summary>
+        /// <returns>Whether or not there is an update available and the latest version</returns>
+        public CheckForUpdatesTask.CheckForUpdatesResult CheckForUpdates()
+            => CheckForUpdatesAsync().AwaitTask().Result;
+
+        /// <summary>
+        /// Starting the update process
+        /// </summary>
+        /// <param name="owner">The owner window</param>
+        /// <returns>Whether or not there is an update available and the latest version</returns>
+        public CheckForUpdatesTask.CheckForUpdatesResult CheckForUpdates(IWin32Window owner)
+            => CheckForUpdatesAsync(owner).AwaitTask().Result;
+
+        /// <summary>
+        /// Start the update process asynchronously
+        /// </summary>
+        /// <returns>The update checker task.</returns>
+        public CheckForUpdatesTask CheckForUpdatesAsync()
+            => CheckForUpdatesAsync(null);
+
+        /// <summary>
+        /// Start the update process asynchronously
+        /// </summary>
+        /// <param name="owner">The owner window</param>
+        /// <returns>The update checker task.</returns>
+        public CheckForUpdatesTask CheckForUpdatesAsync(IWin32Window owner)
+        {
+            if (!IsInitialized) throw new InvalidOperationException("The updater needs to be initialized first");
+            if (UpdateURLs.Count == 0) throw new ArgumentException("No uri's specified", nameof(UpdateURLs));
+
+            var urls = UpdateURLs.Where(u => !AllowUnsafeConnection || (AllowUnsafeConnection && u.StartsWith(Uri.UriSchemeHttps)));
+
+            if (AllowUnsafeConnection && urls.Count() == 0)
+                throw new SecurityException("Using unsafe connections to update from is not allowed");
+
+            var version = GetCache().CurrentVersion;
+
+            CheckForUpdatesTask task = new CheckForUpdatesTask(urls.ToList(), version);
+            task.TaskCompleted += (o, e) =>
+            {
+                bool error = e.Error != null;
+                bool cancelled = e.Cancelled;
+                bool update = task.Result.UpdateAvailable;
+                bool adminReq = task.Result.AdminRightsNeeded;
+
+                CheckForUpdatesCompleted?.Invoke(task, new CheckForUpdatesCompletedEventArgs(task.Result, e));
+
+                if (!update || cancelled || error)
+                {
+                    if (error)
+                        HandleException(owner, e.Error);
+                    else if (cancelled)
+                        HandleUserCancelled(owner);
+                    else if (!update)
+                        HandleNoUpdate(owner, task.Result.Version);
+
+                    return;
+                }
+
+                DialogResult result = DialogResult.Yes;
+
+                if (!UpdateSilently && !StartUpdating)
+                    result = MessageDialog.Show(
+                        owner,
+                        "Update available",
+                        $"Version {task.Result.Version} available",
+                        "Update now?\nPress yes to update or no to cancel.",
+                        SystemIcons.Question);
+
+                if (result != DialogResult.Yes)
+                    return;
+
+                if (((!StartUpdating && NeedsRestartBeforeUpdate) || (adminReq && !PermissionUtil.IsProcessElevated))
+                    && !RestartApp(owner, true, UpdateSilently, true, adminReq))
+                    return;
+
+                if (UpdateSilently)
+                    UpdateWithoutGUI(task.Result.UpdateInfo, task.Result.DownloadURLs);
+                else
+                {
+                    UpdaterForm updateForm = new UpdaterForm(task.Result.UpdateInfo, task.Result.ApplicationName);
+                    updateForm.ShowDialog(owner);
+                }
+            };
+
+            return task.Start();
+        }
+
+        private void HandleException(IWin32Window owner, Exception e)
+        {
+            if (UpdateSilently)
+                return;
+
+            if (e is NoInternetException)
+                MessageDialog.Show(
+                   owner,
+                   $"{ProductName} Updater",
+                   "Error while updating",
+                   "Unable to connect to the update server\nPlease check your internet connection and try again!",
+                    SystemIcons.Error,
+                   MessageBoxButtons.OK);
+            else if (e is InvalidUpdateServerException)
+                MessageDialog.Show(
+                   owner,
+                   $"{ProductName} Updater",
+                   "Error while updating",
+                   "No valid update server available\nPlease contact the software vendor!",
+                    SystemIcons.Error,
+                   MessageBoxButtons.OK);
+            else if (e is Win32Exception)
+                MessageDialog.Show(
+                   owner,
+                   $"{ProductName} Updater",
+                   "Update cancelled",
+                   "Update got cancelled by the user!",
+                    SystemIcons.Warning,
+                   MessageBoxButtons.OK);
+            else
+                MessageDialog.Show(
+                   owner,
+                   $"{ProductName} Updater",
+                   "Error while updating",
+                   "Check the log files for more information!",
+                   SystemIcons.Error,
+                   MessageBoxButtons.OK);
+        }
+
+        private void HandleNoUpdate(IWin32Window owner, UpdateVersion latest)
+        {
+            Logger.Info(nameof(Updater), nameof(CheckForUpdatesAsync), "No update available");
+
+            if (!UpdateSilently)
+                MessageDialog.Show(
+                   owner,
+                   $"{ProductName} Updater",
+                   "No Update available",
+                   $"You already have the latest version {latest}",
+                   SystemIcons.Information,
+                   MessageBoxButtons.OK);
+        }
+
+        private void HandleUserCancelled(IWin32Window owner)
+        {
+            Logger.Info(nameof(Updater), nameof(CheckForUpdatesAsync), "Update cancalled");
+
+            if (!UpdateSilently)
+                MessageDialog.Show(
+                   owner,
+                   $"{ProductName} Updater",
+                   "Cancelled",
+                   "Update got cancelled",
+                   SystemIcons.Warning,
+                   MessageBoxButtons.OK);
+        }
+
+        /// <summary>
+        /// Gets the cached index of the current application
+        /// </summary>
+        /// <returns>The <see cref="HashCacheFile"/> of the current application</returns>
+        public HashCacheFile GetCache2() => UpdateCacheTask.AwaitTask().Result;
+
+        /// <summary>
         /// Gets the cache of the updater
         /// </summary>
         /// <returns>The loaded <see cref="CacheFile"/> of the current application</returns>
-        //public CacheFile GetCache() => m_loadCacheTask.AwaitTask().Result;
+        public CacheFile GetCache() => m_loadCacheTask.AwaitTask().Result;
 
         /// <summary>
         /// Updates without user interaction
@@ -326,36 +541,30 @@ namespace MatthiWare.UpdateLib
         /// <param name="updateInfo">The update specifications file <see cref="UpdateInfo"/> </param>
         private void UpdateWithoutGUI(UpdateInfo updateInfo, IList<string> urls)
         {
-            //var downloadManager = new DownloadManager(updateInfo, urls);
+            var downloadManager = new DownloadManager(updateInfo, urls);
 
-            //downloadManager.Completed += (o, e) =>
-            //{
-            //    //GetCache2().Save();
-            //    RestartApp();
-            //};
+            downloadManager.Completed += (o, e) =>
+            {
+                GetCache2().Save();
+                RestartApp();
+            };
 
-            //downloadManager.Download();
+            downloadManager.Download();
         }
 
-        internal bool RestartApp(bool update = false, bool silent = false, bool waitForPidExit = true, bool asAdmin = false)
+        internal bool RestartApp(IWin32Window owner = null, bool update = false, bool silent = false, bool waitForPid = true, bool asAdmin = false)
         {
-            //Logger.Debug(nameof(Updater), nameof(RestartApp), $"Restarting app: [update={update}; silent={silent}; waitForPidExit={waitForPidExit}; asAdmin={asAdmin}]");
+            Logger.Debug(nameof(Updater), nameof(RestartApp), $"Restarting app: [update={update}; silent={silent}; waitForPid={waitForPid}; asAdmin={asAdmin}]");
 
-            var args = new List<string>(Environment.GetCommandLineArgs());
-
-            var cmdUpdate = $"{CommandLine.ParameterPrefix}{m_argUpdate}";
-            var cmdSilent = $"{CommandLine.ParameterPrefix}{m_argUpdateSilent}";
-            var cmdWait = $"{CommandLine.ParameterPrefix}{m_argWait}";
+            List<string> args = new List<string>(Environment.GetCommandLineArgs());
 
             for (int i = 0; i < args.Count; i++)
             {
-                var carg = args[i];
-
-                if ((!update && carg == cmdUpdate) || (!silent && carg == cmdSilent))
+                if ((!update && args[i] == CommandLine.ParameterPrefix + m_argUpdate) || (!silent && args[i] == CommandLine.ParameterPrefix + m_argUpdateSilent))
                 {
                     args[i] = string.Empty;
                 }
-                else if (carg == cmdWait)
+                else if (args[i] == CommandLine.ParameterPrefix + m_argWait)
                 {
                     args[i] = string.Empty;
                     if (i + 1 < args.Count)
@@ -363,17 +572,17 @@ namespace MatthiWare.UpdateLib
                 }
             }
 
-            if (waitForPidExit && !args.Contains(cmdWait))
+            if (waitForPid && !args.Contains(CommandLine.ParameterPrefix + m_argWait))
             {
-                args.Add(cmdWait);
+                args.Add(CommandLine.ParameterPrefix + m_argWait);
                 args.Add(Process.GetCurrentProcess().Id.ToString());
             }
 
-            if (update && !args.Contains(cmdUpdate))
-                args.Add(cmdUpdate);
+            if (update && !args.Contains(CommandLine.ParameterPrefix + m_argUpdate))
+                args.Add(CommandLine.ParameterPrefix + m_argUpdate);
 
-            if (silent && !args.Contains(cmdSilent))
-                args.Add(cmdSilent);
+            if (silent && !args.Contains(CommandLine.ParameterPrefix + m_argUpdateSilent))
+                args.Add(CommandLine.ParameterPrefix + m_argUpdateSilent);
 
             string arguments = args.NotEmpty().Distinct().AppendAll(" ");
 
@@ -386,14 +595,15 @@ namespace MatthiWare.UpdateLib
 
             try
             {
-                Process.Start(startInfo);
+                Process proc = Process.Start(startInfo);
 
-                // gracefully exit the current process
                 Environment.Exit(0);
             }
             catch (Exception e)
             {
-                // Logger.Error(nameof(Updater), nameof(RestartApp), e);
+                Logger.Error(nameof(Updater), nameof(RestartApp), e);
+
+                HandleException(owner, e);
 
                 return false;
             }

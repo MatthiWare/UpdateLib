@@ -61,12 +61,12 @@ namespace MatthiWare.UpdateLib.Files
                     Items.Add(entry);
                 }
 
-                //Updater.Instance.Logger.Debug(nameof(HashCacheFile), nameof(AddOrUpdateEntry), $"Cache updated for file -> '{entry.FilePath}'");
+                Updater.Instance.Logger.Debug(nameof(HashCacheFile), nameof(AddOrUpdateEntry), $"Cache updated for file -> '{entry.FilePath}'");
             }
         }
 
         #region Save/Load
-        private static string GetStoragePath() => "";
+        private static string GetStoragePath() => $@"{IOUtils.CachePath}\{FILE_NAME}";
 
         /// <summary>
         /// Loads the <see cref="HashCacheFile"/> from the default storage location 
