@@ -18,6 +18,7 @@
     <ProjectGuid>{7C3C0345-6D01-40A6-9F01-60D8D6451FB1}</ProjectGuid>
     <StartupObject>TestApp.Program</StartupObject>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\UpdateLib\UpdateLib.csproj" />

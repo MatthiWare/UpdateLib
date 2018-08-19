@@ -13,6 +13,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <ProjectGuid>{C47B8CC3-ABAB-4F56-8CA2-1323F902D1C3}</ProjectGuid>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\UpdateLib\UpdateLib.csproj" />

@@ -54,7 +54,7 @@ namespace UpdateLib.Tests
         {
             Updater u = Updater.Instance;
 
-            u.Initialize();
+            u.InitializeAsync();
 
             Assert.IsTrue(u.IsInitialized);
 

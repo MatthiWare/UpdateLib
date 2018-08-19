@@ -27,274 +27,169 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-
+using System.Threading;
+using System.Threading.Tasks;
+using MatthiWare.UpdateLib.Abstractions;
+using MatthiWare.UpdateLib.Abstractions.Internal;
 using MatthiWare.UpdateLib.Common;
+using MatthiWare.UpdateLib.Core;
 using MatthiWare.UpdateLib.Utils;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace MatthiWare.UpdateLib
 {
-    public sealed class Updater
+    public sealed class Updater : IUpdater
     {
-        #region Singleton
-        private static volatile Updater instance = null;
-        private static readonly object synclock = new object();
-
-        /// <summary>
-        /// Gets a thread safe instance of <see cref="Updater"/> 
-        /// </summary>
-        public static Updater Instance
-        {
-            get
-            {
-                if (instance == null)
-                    lock (synclock)
-                        if (instance == null)
-                            instance = new Updater();
-
-                return instance;
-            }
-        }
-        #endregion
-
         #region Fields
 
-        private const string m_strUpdateLib = "UpdateLib";
-        private const string m_argUpdateSilent = "silent";
-        private const string m_argUpdate = "update";
-        private const string m_argWait = "wait";
-        private const string m_rollback = "rollback";
-        private InstallationMode m_installationMode = InstallationMode.Shared;
+        private readonly ILogger logger;
+        private readonly UpdateLibOptions options;
+        private readonly ICommandLineParser cmd;
+        private readonly IUpdateManager updateManager;
 
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Gets the command line parser. Use this to add additional command line arguments that need to be parsed. 
-        /// </summary>
-        public CmdLineParser CommandLine { get; } = new CmdLineParser();
-
-        /// <summary>
-        /// Gets the collection of Url's to update from
-        /// </summary>
-        /// <remarks>If you want to specify an unsafe connection you should enable <see cref="AllowUnsafeConnection"/></remarks>
-        public IList<string> UpdateURLs { get; } = new List<string>();
-
-
-        /// <summary>
-        /// Gets or sets the Updater Installation mode
-        /// </summary>
-        public InstallationMode InstallationMode
-        {
-            get { return m_installationMode; }
-            set
-            {
-                if (m_installationMode != value)
-                {
-                    m_installationMode = value;
-                    //IOUtils.ReinitializeAppData();
-                }
-            }
-        }
-
+        private bool m_initialized = false;
 
         /// <summary>
         /// Gets or sets if we want to check for updates before the actual program is loaded.
         /// </summary>
-        public bool StartUpdating { get; private set; } = false;
-
-        /// <summary>
-        /// Gets or sets if we want to update silently (no UI interaction).
-        /// </summary>
-        public bool UpdateSilently { get; private set; } = false;
+        private bool m_startUpdating = false;
 
         /// <summary>
         /// Indicates if we want to wait for the given process to wait
-        /// See <seealso cref="WaitForProcessCmdArg"/> and <seealso cref="ConfigureWaitForProcessCmdArg(string)"/>
-        /// If this property has been set to true it will wait for the <see cref="Process.Id"/> to exit before continuing when <see cref="Initialize"/> has been called.  
+        /// If this property has been set to true it will wait for the <see cref="Process.Id"/> to exit before continuing when <see cref="InitializeAsync"/> has been called.  
         /// </summary>
-        public bool WaitForProcessExit { get; private set; }
+        private bool m_waitForProcessExit = false;
 
-        public bool Rollback { get; private set; }
-
-
-        /// <summary>
-        /// Gets or sets if the updater allows unsafe connection 
-        /// <value>`True` to allow HTTP connections, `False` to only allow HTTPS connections</value>
-        /// </summary>
-        public bool AllowUnsafeConnection { get; set; } = false;
-
-        /// <summary>
-        /// Is the updater already initialized?
-        /// </summary>
-        public bool IsInitialized { get; private set; }
-
-        /// <summary>
-        /// Gets or sets if the updater needs to launch as a new instance.
-        /// <c>True</c> if you want cold-swapping, <c>False</c> if you want hot-swapping
-        /// </summary>
-        /// <remarks>Hot-swapping might cause issues if the files are still in use.</remarks>
-        public bool NeedsRestartBeforeUpdate { get; set; } = true;
-
-        #endregion
-
-        #region Fluent API
-
-        /// <summary>
-        /// Configures if unsafe connections are allowed
-        /// </summary>
-        /// <remarks>Do not enable this unless you know what you are doing</remarks>
-        /// <param name="allow">Allowed?</param>
-        /// <returns><see cref="Updater"/></returns>
-        public Updater ConfigureAllowUnsafeConnections(bool allow)
-        {
-            AllowUnsafeConnection = allow;
-
-            return this;
-        }
-
-        /// <summary>
-        /// Configures the command line parser
-        /// </summary>
-        /// <param name="action">Action to perform on the command line parser</param>
-        /// <returns><see cref="Updater"/> </returns>
-        public Updater ConfigureCommandLineParser(Action<CmdLineParser> action)
-        {
-            action(CommandLine);
-
-            return this;
-        }
-
-        /// <summary>
-        /// Configures if the updater needs a restart before updating
-        /// </summary>
-        /// <remarks>Disabling this feature will allow for hot-swapping of the files. </remarks>
-        /// <param name="needsRestartBeforeUpdate">Restart updater in new instance</param>
-        /// <returns><see cref="Updater"/> </returns>
-        public Updater ConfigureNeedsRestartBeforeUpdate(bool needsRestartBeforeUpdate)
-        {
-            NeedsRestartBeforeUpdate = needsRestartBeforeUpdate;
-
-            return this;
-        }
-
-        /// <summary>
-        /// Configures the time till the cache becomes invalid
-        /// </summary>
-        /// <param name="timeTillInvalidation">Specify the validity time</param>
-        /// <returns><see cref="Updater"/> </returns>
-        [Obsolete("No longer used")]
-        public Updater ConfigureCacheInvalidation(TimeSpan timeTillInvalidation)
-        {
-            //CacheInvalidationTime = timeTillInvalidation;
-
-            return this;
-        }
-
-        /// <summary>
-        /// Configures the installation mode for the client
-        /// </summary>
-        /// <param name="mode">The <see cref="InstallationMode"/></param>
-        /// <returns><see cref="Updater"/></returns>
-        public Updater ConfigureInstallationMode(InstallationMode mode)
-        {
-            InstallationMode = mode;
-
-            return this;
-        }
-
-        /// <summary>
-        /// Configures the update url
-        /// </summary>
-        /// <remarks>To use HTTP you should enable <see cref="AllowUnsafeConnection"/> </remarks>
-        /// <param name="uri">Uri to update from</param>
-        /// <returns><see cref="Updater"/> </returns>
-        public Updater ConfigureAddUpdateUri(string uri)
-        {
-            UpdateURLs.Add(uri);
-
-            return this;
-        }
+        private bool m_rollback = false;
 
         #endregion
 
         /// <summary>
         /// Initializes a new instance of <see cref="Updater"/> with the default settings. 
         /// </summary>
-        private Updater()
+        public Updater(ILogger<Updater> logger, IOptions<UpdateLibOptions> options, ICommandLineParser commandLineParser, IUpdateManager updateManager)
         {
-            CommandLine.AddParameter(m_argUpdateSilent);
-            CommandLine.AddParameter(m_argUpdate);
-            CommandLine.AddParameter(m_argWait, ParamMandatoryType.Optional, ParamValueType.Int);
-            CommandLine.AddParameter(m_rollback);
+            this.logger = logger;
+            this.options = options.Value;
+            cmd = commandLineParser;
+            this.updateManager = updateManager;
+
+            //CommandLine.AddParameter(m_argUpdateSilent);
+            //CommandLine.AddParameter(m_argUpdate);
+            //CommandLine.AddParameter(m_argWait, ParamMandatoryType.Optional, ParamValueType.Int);
+            //CommandLine.AddParameter(m_rollback);
         }
+
+        public static UpdateBuilder GetBuilder()
+            => UpdateBuilder.CreateDefaultUpdateBuilder();
 
         /// <summary>
         /// Initializes the updater
         /// </summary>
-        public void Initialize()
+        public async Task InitializeAsync(CancellationToken cancellation = default)
         {
             //StartInitializationTasks();
 
             // parse the command line
-            CommandLine.Parse();
+            cmd.Parse();
 
             // Set cmd line flags
-            WaitForProcessExit = CommandLine[m_argWait]?.IsFound ?? false;
-            StartUpdating = CommandLine[m_argUpdate]?.IsFound ?? false;
-            UpdateSilently = CommandLine[m_argUpdateSilent]?.IsFound ?? false;
-            Rollback = CommandLine[m_rollback]?.IsFound ?? false;
+            m_waitForProcessExit = cmd.Get(options.WaitArgumentName)?.IsFound ?? false;
+            m_startUpdating = cmd.Get(options.UpdateArgumentName)?.IsFound ?? false;
+            m_rollback = cmd.Get(options.RollbackArgumentName)?.IsFound ?? false;
 
-            if (WaitForProcessExit) WaitForProcessToExit((int)CommandLine[m_argWait].Value);
+            if (m_waitForProcessExit) await WaitForProcessToExitAsync(cmd.Get<int>(options.WaitArgumentName).Value, cancellation);
 
-            IsInitialized = true;
+            m_initialized = true;
 
-            //if (StartUpdating) CheckForUpdates();
+            if (m_startUpdating) await CheckForUpdatesAsync(cancellation);
+        }
+
+        public async Task<CheckForUpdatesResult> CheckForUpdatesAsync(CancellationToken cancellation = default)
+        {
+            var childCts = CancellationTokenSource.CreateLinkedTokenSource(cancellation);
+
+            if (!m_initialized) throw new InvalidOperationException("The updater needs to be initialized first");
+            if (string.IsNullOrEmpty(options.UpdateUrl)) throw new ArgumentException("No update url specified", nameof(UpdateLibOptions));
+
+            var checkForUpdatesTask = updateManager.CheckForUpdatesAsync(childCts.Token);
+            var result = await checkForUpdatesTask;
+
+            if (checkForUpdatesTask.IsCanceled || checkForUpdatesTask.IsFaulted || !result.UpdateAvailable)
+            {
+                // TODO: what to do here? Let the caller handle it?
+                return result;
+            }
+
+            // update available yay!!
+            // TODO: let the caller decide if we want to update with some middleware?
+            Func<bool> allowedToUpdate = new Func<bool>(() => true);
+
+            if (!allowedToUpdate())
+            {
+                // TODO: Is this a good way?
+                childCts.Cancel();
+            }
+
+            bool elevated = false;
+
+            // we are allowed to update
+            if (((!m_startUpdating || (result.AdminRightsNeeded && !elevated))) && !RestartApp(true, true, result.AdminRightsNeeded))
+                return result;
+
+            await updateManager.UpdateAsync(childCts.Token);
+
+            return result;
         }
 
         /// <summary>
         /// Waits for a process to exit on the current thread
         /// </summary>
         /// <param name="pid">Process ID</param>
-        private void WaitForProcessToExit(int pid)
+        private Task WaitForProcessToExitAsync(int pid, CancellationToken cancellation)
         {
-            var process = Process.GetProcesses().FirstOrDefault(p => p.Id == pid);
+            logger.LogInformation($"Waiting for pid {pid} to exit");
 
-            process?.CloseMainWindow();
-            process?.WaitForExit();
+            var tcs = new TaskCompletionSource<int>();
+
+            cancellation.Register(() =>
+            {
+                tcs.SetCanceled();
+            });
+
+            using (var process = Process.GetProcesses().FirstOrDefault(p => p.Id == pid))
+            {
+                if (process.HasExited) tcs.SetResult(process.ExitCode);
+
+                process.EnableRaisingEvents = true;
+
+                process.Exited += (sender, args) =>
+                {
+                    tcs.SetResult(process.ExitCode);
+                };
+
+                process?.CloseMainWindow();
+                process?.WaitForExit(1);
+            }
+
+            return tcs.Task;
         }
 
-        /// <summary>
-        /// Updates without user interaction
-        /// </summary>
-        /// <param name="updateInfo">The update specifications file <see cref="UpdateInfo"/> </param>
-        private void UpdateWithoutGUI(UpdateInfo updateInfo, IList<string> urls)
+
+        internal bool RestartApp(bool update = false, bool waitForPid = true, bool asAdmin = false)
         {
-            //var downloadManager = new DownloadManager(updateInfo, urls);
-
-            //downloadManager.Completed += (o, e) =>
-            //{
-            //    GetCache2().Save();
-            //    RestartApp();
-            //};
-
-            //downloadManager.Download();
-        }
-
-        internal bool RestartApp(bool update = false, bool silent = false, bool waitForPid = true, bool asAdmin = false)
-        {
-            //Logger.Debug(nameof(Updater), nameof(RestartApp), $"Restarting app: [update={update}; silent={silent}; waitForPid={waitForPid}; asAdmin={asAdmin}]");
+            logger.LogDebug($"Restarting app: [update={update}; waitForPid={waitForPid}; asAdmin={asAdmin}]");
 
             List<string> args = new List<string>(Environment.GetCommandLineArgs());
 
             for (int i = 0; i < args.Count; i++)
             {
-                if ((!update && args[i] == CommandLine.ParameterPrefix + m_argUpdate) || (!silent && args[i] == CommandLine.ParameterPrefix + m_argUpdateSilent))
+                if (!update && args[i] == options.ParameterPrefix + options.UpdateArgumentName)
                 {
                     args[i] = string.Empty;
                 }
-                else if (args[i] == CommandLine.ParameterPrefix + m_argWait)
+                else if (args[i] == options.ParameterPrefix + options.WaitArgumentName)
                 {
                     args[i] = string.Empty;
                     if (i + 1 < args.Count)
@@ -302,17 +197,14 @@ namespace MatthiWare.UpdateLib
                 }
             }
 
-            if (waitForPid && !args.Contains(CommandLine.ParameterPrefix + m_argWait))
+            if (waitForPid && !args.Contains(options.ParameterPrefix + options.WaitArgumentName))
             {
-                args.Add(CommandLine.ParameterPrefix + m_argWait);
+                args.Add(options.ParameterPrefix + options.WaitArgumentName);
                 args.Add(Process.GetCurrentProcess().Id.ToString());
             }
 
-            if (update && !args.Contains(CommandLine.ParameterPrefix + m_argUpdate))
-                args.Add(CommandLine.ParameterPrefix + m_argUpdate);
-
-            if (silent && !args.Contains(CommandLine.ParameterPrefix + m_argUpdateSilent))
-                args.Add(CommandLine.ParameterPrefix + m_argUpdateSilent);
+            if (update && !args.Contains(options.ParameterPrefix + options.UpdateArgumentName))
+                args.Add(options.ParameterPrefix + options.UpdateArgumentName);
 
             string arguments = args.NotEmpty().Distinct().AppendAll(" ");
 
@@ -331,7 +223,7 @@ namespace MatthiWare.UpdateLib
             }
             catch (Exception e)
             {
-                //Logger.Error(nameof(Updater), nameof(RestartApp), e);
+                logger.LogError(e, $"Unable to restart the application");
 
                 //HandleException(owner, e);
 

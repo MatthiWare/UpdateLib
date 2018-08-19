@@ -56,14 +56,15 @@ namespace MatthiWare.UpdateLib.Utils
 
         private static string GetPathPrefix()
         {
-            switch (Updater.Instance.InstallationMode)
-            {
-                case InstallationMode.Local:
-                    return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-                case InstallationMode.Shared:
-                default:
-                    return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            }
+            //switch (Updater.Instance.InstallationMode)
+            //{
+            //    case InstallationMode.Local:
+            //        return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            //    case InstallationMode.Shared:
+            //    default:
+            //        return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            //}
+            return "";
         }
 
         internal static byte[] CheckedReadBytes(this Stream stream, int size)

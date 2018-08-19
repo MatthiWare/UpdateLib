@@ -30,7 +30,6 @@ namespace MatthiWare.UpdateLib.Common
     /// <summary>
     /// An entry for the <see cref="Files.UpdateCatalogFile"/>
     /// </summary>
-    [Serializable]
     public class UpdateInfo : IComparable, IComparable<UpdateInfo>
     {
         /// <summary>
@@ -67,7 +66,6 @@ namespace MatthiWare.UpdateLib.Common
         /// <summary>
         /// Indicates if this update is a patch.
         /// </summary>
-        [XmlIgnore]
         public bool IsPatch => BasedOnVersion != null;
 
         public UpdateInfo() { }

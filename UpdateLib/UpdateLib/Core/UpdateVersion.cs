@@ -18,6 +18,7 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -28,8 +29,7 @@ namespace MatthiWare.UpdateLib.Common
     /// Support for version label's and serializable.
     /// Partially based on Semantic Versioning <http://semver.org/>
     /// </summary>
-    [Serializable]
-    [DebuggerDisplay("[UpdateVersion {Value}]")]
+    [DebuggerDisplay("{Value}")]
     public class UpdateVersion : IComparable, IComparable<UpdateVersion>, IEquatable<UpdateVersion>
     {
         private int m_major, m_minor, m_patch;
@@ -42,26 +42,20 @@ namespace MatthiWare.UpdateLib.Common
         private const string RC_STRING = "-rc";
         private static readonly char[] CharSplitDot = new char[] { '.' };
         private static readonly char[] CharSplitDash = new char[] { '-' };
+        private static readonly Regex m_regex = new Regex(@"([v]?[0-9]+){1}(\.[0-9]+){0,2}([-](alpha|beta|rc))?");
 
         #endregion
 
         #region Properties
 
-        [XmlIgnore]
         public int Major => m_major;
 
-        [XmlIgnore]
         public int Minor => m_minor;
 
-        [XmlIgnore]
         public int Patch => m_patch;
 
-        [XmlIgnore]
         public VersionLabel Label => m_label;
 
-        [XmlText]
-        [XmlElement(typeof(string))]
-        [EditorBrowsable(EditorBrowsableState.Never), Browsable(false)]
         public string Value
         {
             get { return ToString(); }
@@ -230,14 +224,20 @@ namespace MatthiWare.UpdateLib.Common
             }
         }
 
+        public static bool CanParse(string input)
+            => m_regex.IsMatch(input);
+
         /// <summary>
         /// Tries to parse the <paramref name="input"/> to a <see cref="UpdateVersion"/>
         /// </summary>
-        /// <param name="input">Input string should be of format "major.minor.patch(-label)". The (-label) is optional</param>
+        /// <param name="input">Input string should be of format "(v)major.minor.patch(-label)". The (v) and (-label) are optional</param>
         /// <param name="version">The output parameter</param>
         /// <returns>True if succesfully parsed, false if failed</returns>
         public static bool TryParse(string input, out UpdateVersion version)
         {
+            if (input.StartsWith("v"))
+                input = input.Substring(1, input.Length - 2);
+
             var tokens = input.Split(CharSplitDot);
             version = new UpdateVersion();
 
