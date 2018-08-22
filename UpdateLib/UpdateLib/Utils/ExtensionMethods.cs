@@ -21,6 +21,8 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MatthiWare.UpdateLib.Utils
 {
@@ -78,6 +80,29 @@ namespace MatthiWare.UpdateLib.Utils
         {
             foreach (T item in collection)
                 action(item);
+        }
+
+        public static async Task ForEachAsync<T>(this IEnumerable<T> source, Func<T, Task> action, int maxDegreeOfParallelism, CancellationToken cancellation = default)
+        {
+            using (var semaphore = new SemaphoreSlim(maxDegreeOfParallelism, maxDegreeOfParallelism))
+            {
+                var throttledTasks = new List<Task>();
+
+                foreach (var task in source)
+                {
+                    await semaphore.WaitAsync(cancellation);
+
+                    throttledTasks.Add(Task.Run(async () => 
+                    {
+                        await action(task);
+
+                        semaphore.Release();
+
+                    }));
+                }
+
+                await Task.WhenAll(throttledTasks.ToArray());
+            }
         }
 
         [DebuggerStepThrough]
