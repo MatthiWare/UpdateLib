@@ -16,7 +16,9 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 using MatthiWare.UpdateLib.Common;
@@ -45,13 +47,20 @@ namespace MatthiWare.UpdateLib.Utils
 
             StringBuilder builder = new StringBuilder();
 
-            foreach (var s in url.Split(slash, backslash).SkipLast(1))
+            foreach (var s in url.Split(slash, backslash))
             {
                 builder.Append(s);
                 builder.Append(slash);
             }
 
             return builder.ToString();
+        }
+
+        private class Stack1
+        {
+            public string Key;
+            public DateTime StartDate;
+            public DateTime EndDate;
         }
 
         private static string GetPathPrefix()
@@ -64,7 +73,10 @@ namespace MatthiWare.UpdateLib.Utils
             //    default:
             //        return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             //}
+
             return "";
+
+
         }
 
         internal static byte[] CheckedReadBytes(this Stream stream, int size)

@@ -49,8 +49,7 @@ namespace MatthiWare.UpdateLib.Utils
 
         public void Parse() => Parse(Environment.GetCommandLineArgs());
 
-
-        private void Parse(string[] args)
+        public void Parse(string[] args)
         {
             if (string.IsNullOrEmpty(ParameterPrefix)) throw new ArgumentNullException(nameof(ParameterPrefix));
 
@@ -121,7 +120,7 @@ namespace MatthiWare.UpdateLib.Utils
 
         private void CheckAllMandatoryParamsFound()
         {
-            IList<Exception> exceptions = new List<Exception>();
+            var exceptions = new List<Exception>();
 
             m_params
                 .Select(kvp => kvp.Value)

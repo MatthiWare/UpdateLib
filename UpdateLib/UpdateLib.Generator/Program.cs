@@ -16,6 +16,8 @@
  */
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MatthiWare.UpdateLib.Generator
 {
@@ -27,11 +29,24 @@ namespace MatthiWare.UpdateLib.Generator
         [STAThread]
         static void Main()
         {
-            //Updater.Instance.ConfigureLogger((logger) => logger.Writers.Add(new ConsoleLogWriter()));
+            List<Stack1> Unavailability = new List<Stack1>
+{
+        new Stack1{  Key = "A", StartDate = new DateTime(2018,1,1), EndDate = new DateTime(2018,1,30) },
+        new Stack1{  Key = "B", StartDate = new DateTime(2018,1,2), EndDate = new DateTime(2018,1,30)},
+        new Stack1{  Key = "C", StartDate = new DateTime(2018,1,2), EndDate = new DateTime(2018,1,30)}
+};
 
-            //Application.EnableVisualStyles();
-            //Application.SetCompatibleTextRenderingDefault(false);
-            //Application.Run(new MainForm());
+            bool allUnique = Unavailability.Select(_ => new { _.StartDate, _.EndDate }).Distinct().Count() <= 1;
+
+            Console.WriteLine(allUnique);
+            Console.ReadKey();
+        }
+
+        public class Stack1
+        {
+            public string Key { get; set; }
+            public DateTime StartDate { get; set; }
+            public DateTime EndDate { get; set; }
         }
     }
 }
