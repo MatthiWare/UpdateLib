@@ -29,24 +29,23 @@ namespace UpdateLib.Tests.Util
     [TestFixture]
     public class CmdLineParserTest
     {
+        OptionsWrapper<UpdateLibOptions> optionsFactory = new OptionsWrapper<UpdateLibOptions>(
+                new UpdateLibOptions
+                {
+                    CommandLineArgumentPrefix = "--"
+                });
 
         CmdLineParser cmd;
 
         [SetUp]
         public void Setup()
         {
-            cmd = new CmdLineParser();
+            cmd = new CmdLineParser(optionsFactory);
         }
 
         [Test]
         public void GoodArgsAreAllParsedCorrectly()
         {
-            var optionsFactory = new OptionsWrapper<UpdateLibOptions>(
-                new UpdateLibOptions
-                {
-                    ParameterPrefix = "--"
-                });
-
             string[] args = {
                 @"C:\Dev\TestApp.exe",
                 "--silent",
@@ -64,109 +63,125 @@ namespace UpdateLib.Tests.Util
 
             int[] ints = { 5, 10, 15, 20 };
 
-            cmd.AddParameter<string>("silent", ParamMandatoryType.Required);
-            cmd.AddParameter("wait", ParamMandatoryType.Required, ParamValueType.Required, new StringToIntArgumentResolver());
-            cmd.AddParameter<string>("update", ParamMandatoryType.Required);
-            cmd.AddParameter("text", ParamMandatoryType.Required, ParamValueType.Required, new StringToStringArgumentResolver(optionsFactory));
-            cmd.AddParameter("ints", ParamMandatoryType.Required, ParamValueType.Required, new StringToMultipleIntsArgumentResolver());
+            cmd.AddParameter("silent", ParamMandatoryType.Required);
+            cmd.AddParameter("wait", ParamMandatoryType.Required, ParamValueType.Required, new IntArgumentResolver());
+            cmd.AddParameter("update", ParamMandatoryType.Required);
+            cmd.AddParameter("text", ParamMandatoryType.Required, ParamValueType.Required, new StringArgumentResolver(optionsFactory));
+            cmd.AddParameter("ints", ParamMandatoryType.Required, ParamValueType.Required, new MultipleIntArgumentResolver());
 
             cmd.Parse(args);
 
             Assert.IsTrue(cmd.Get("silent")?.IsFound ?? false);
             Assert.IsTrue(cmd.Get("wait")?.IsFound ?? false);
-            Assert.AreEqual(9999, cmd.Get("wait")?.Value ?? -1);
+            Assert.AreEqual(9999, cmd.Get<int>("wait")?.Value ?? -1);
             Assert.IsTrue(cmd.Get("update")?.IsFound ?? false);
             Assert.IsTrue(cmd.Get("text")?.IsFound ?? false);
-            Assert.AreEqual("this is my text message", cmd.Get("text")?.Value);
+            Assert.AreEqual("this is my text message", cmd.Get<string>("text")?.Value);
             Assert.IsTrue(cmd.Get("ints")?.IsFound ?? false);
-            Assert.AreEqual(ints, cmd.Get("ints")?.Value);
+            Assert.AreEqual(ints, cmd.Get<int[]>("ints")?.Value);
         }
 
         [Test]
         public void OptionalArgumentIsNotMandatory()
         {
-            //string[] args = {
-            //    @"C:\Dev\TestApp.exe",
-            //    "--silent"
-            //};
+            string[] args = {
+                @"C:\Dev\TestApp.exe",
+                "--silent"
+            };
 
-            //int[] ints = { 5, 10, 15, 20 };
+            cmd.AddParameter("wait");
 
-            //cmd.AddParameter("silent", ParamMandatoryType.Required, ParamValueType.None);
-            //cmd.AddParameter("wait", ParamMandatoryType.Optional, ParamValueType.Int);
+            cmd.Parse(args);
 
-            //cmd.Parse(args);
+            Assert.IsFalse(cmd.Get("wait").IsFound);
+        }
 
-            //Assert.IsTrue(cmd["silent"]?.IsFound);
-            //Assert.IsFalse(cmd["wait"]?.IsFound);
+        [Test]
+        public void OptionalValueTypeTest()
+        {
+            string[] args = {
+                @"C:\Dev\TestApp.exe",
+                "--wait",
+                "--otherParam"
+            };
+
+            cmd.AddParameter("wait", ParamMandatoryType.Required, ParamValueType.Optional, new IntArgumentResolver());
+            cmd.AddParameter("otherParam", ParamMandatoryType.Required, ParamValueType.Optional, new StringArgumentResolver(optionsFactory));
+
+            cmd.Parse(args);
+
+            Assert.IsTrue(cmd.Get("wait").IsFound);
+            Assert.AreEqual(default(int), cmd.Get<int>("wait").Value);
+
+            Assert.IsTrue(cmd.Get("otherParam").IsFound);
+            Assert.AreEqual(default(string), cmd.Get<string>("otherParam").Value);
         }
 
         [Test]
         public void TestOptionalParamValues()
         {
-            //string[] args = {
-            //    @"C:\Dev\TestApp.exe",
-            //    "--test",
-            //    "random",
-            //    "--test2",
-            //    "10"
-            //};
+            string[] args = {
+                @"C:\Dev\TestApp.exe",
+                "--test",
+                "random",
+                "--test2",
+                "10"
+            };
 
-            //cmd.AddParameter("test", ParamMandatoryType.Required, ParamValueType.OptionalInt);
-            //cmd.AddParameter("test2", ParamMandatoryType.Required, ParamValueType.OptionalInt);
+            cmd.AddParameter("test", ParamMandatoryType.Required, ParamValueType.Optional, new StringArgumentResolver(optionsFactory));
+            cmd.AddParameter("test2", ParamMandatoryType.Required, ParamValueType.Optional, new IntArgumentResolver());
 
-            //cmd.Parse(args);
+            cmd.Parse(args);
 
-            //Assert.IsTrue(cmd["test"].IsFound);
-            //Assert.IsTrue(cmd["test2"].IsFound);
-            //Assert.AreEqual(null, cmd["test"].Value);
-            //Assert.AreEqual(10, cmd["test2"].Value);
+            Assert.IsTrue(cmd.Get("test").IsFound);
+            Assert.IsTrue(cmd.Get("test2").IsFound);
+            Assert.AreEqual("random", cmd.Get<string>("test").Value);
+            Assert.AreEqual(10, cmd.Get<int>("test2").Value);
         }
 
         [Test]
         public void TestDoubleParse()
         {
-            //string[] args = {
-            //    @"C:\Dev\TestApp.exe",
-            //    "--test1",
-            //    "10",
-            //    "--test2"
-            //};
+            string[] args = {
+                @"C:\Dev\TestApp.exe",
+                "--test1",
+                "10",
+                "--test2"
+            };
 
-            //cmd.AddParameter("test1", ParamMandatoryType.Required, ParamValueType.Int);
-            //cmd.AddParameter("test2", ParamMandatoryType.Optional, ParamValueType.None);
+            cmd.AddParameter("test1", ParamMandatoryType.Required, ParamValueType.Required, new IntArgumentResolver());
+            cmd.AddParameter("test2", ParamMandatoryType.Optional, ParamValueType.None);
 
-            //cmd.Parse(args);
+            cmd.Parse(args);
 
-            //Assert.IsTrue(cmd["test1"].IsFound);
-            //Assert.AreEqual(10, cmd["test1"].Value);
-            //Assert.IsTrue(cmd["test2"].IsFound);
+            Assert.IsTrue(cmd.Get("test1").IsFound);
+            Assert.AreEqual(10, cmd.Get<int>("test1").Value);
+            Assert.IsTrue(cmd.Get("test2").IsFound);
 
-            //args[2] = "11";
+            args[2] = "11";
 
-            //Array.Resize(ref args, 3);
+            Array.Resize(ref args, 3);
 
-            //cmd.Parse(args);
+            cmd.Parse(args);
 
-            //Assert.IsTrue(cmd["test1"].IsFound);
-            //Assert.AreEqual(11, cmd["test1"].Value);
-            //Assert.IsFalse(cmd["test2"].IsFound);
+            Assert.IsTrue(cmd.Get("test1").IsFound);
+            Assert.AreEqual(11, cmd.Get<int>("test1").Value);
+            Assert.IsFalse(cmd.Get("test2").IsFound);
         }
 
         [Test]
         public void AddingFaultyParameterThrowsException()
         {
-            //cmd.ParameterPrefix = string.Empty;
-            //Assert.Catch<ArgumentNullException>(() => cmd.AddParameter(null));
-            //Assert.Catch<ArgumentException>(() => cmd.AddParameter("test 123"));
-            //Assert.Catch<ArgumentNullException>(() => cmd.Parse());
+            Assert.Catch<ArgumentNullException>(() => cmd.AddParameter(null));
+            Assert.Catch<ArgumentNullException>(() => cmd.AddParameter(""));
+            Assert.Catch<ArgumentException>(() => cmd.AddParameter("test 123"));
         }
 
         [Test]
         public void AddDuplicateParameterThrowsException()
         {
-            //cmd.AddParameter("silent", ParamMandatoryType.Required, ParamValueType.None);
-            //Assert.Catch<ArgumentException>(() => cmd.AddParameter("silent", ParamMandatoryType.Required, ParamValueType.None));
+            cmd.AddParameter("silent", ParamMandatoryType.Required, ParamValueType.None);
+            Assert.Catch<ArgumentException>(() => cmd.AddParameter("silent", ParamMandatoryType.Required, ParamValueType.None));
         }
 
         [TearDown]

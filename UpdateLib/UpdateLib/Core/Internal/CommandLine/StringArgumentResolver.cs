@@ -6,17 +6,15 @@ using Microsoft.Extensions.Options;
 
 namespace MatthiWare.UpdateLib.Core.Internal.CommandLine
 {
-    public class StringToStringArgumentResolver : ICommandLineArgumentResolver<string>
+    public class StringArgumentResolver : ICommandLineArgumentResolver<string>
     {
         private readonly UpdateLibOptions options;
 
-        public StringToStringArgumentResolver(IOptions<UpdateLibOptions> options)
-        {
-            this.options = options.Value;
-        }
+        public StringArgumentResolver(IOptions<UpdateLibOptions> options)
+            => this.options = options.Value;
 
         public bool CanResolve(ref string[] data, ref int index)
-            => !data[index].StartsWith(options.ParameterPrefix); // if it is not a parameter
+            => !data[index].StartsWith(options.CommandLineArgumentPrefix); // if it is not a parameter
 
 
         public string Resolve(ref string[] data, ref int index)

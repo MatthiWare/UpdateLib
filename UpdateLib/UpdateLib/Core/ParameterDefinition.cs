@@ -1,15 +1,44 @@
-﻿using MatthiWare.UpdateLib.Abstractions;
+﻿using System;
+using MatthiWare.UpdateLib.Abstractions;
 
 namespace MatthiWare.UpdateLib.Common
 {
+
+    public class ParameterDefinition : IParameterDefinition
+    {
+        public string Name { get; }
+
+        public ParamValueType ValueType { get; }
+
+        public ParamMandatoryType MandatoryType { get; }
+
+        public int Count { get; set; }
+
+        public bool IsFound => Count > 0;
+
+        public bool CanResolve(ref string[] args, ref int index) => false;
+
+        public ParameterDefinition(string paramName, ParamMandatoryType mandatoryType, ParamValueType valueType)
+        {
+            Name = paramName;
+            MandatoryType = mandatoryType;
+            ValueType = valueType;
+        }
+
+        public void Reset() => Count = 0;
+
+        public void Resolve(ref string[] args, ref int index) => throw new NotImplementedException();
+    }
+
     public class ParameterDefinition<T> : IParameterDefinition<T>
     {
-        public string Name { get; private set; }
-        public ParamMandatoryType MandatoryType { get; private set; }
+        public string Name { get; }
 
-        public ParamValueType ValueType { get; private set; }
+        public ParamMandatoryType MandatoryType { get; }
 
-        private ICommandLineArgumentResolver<T> m_valueResolver;
+        public ParamValueType ValueType { get; }
+
+        private readonly ICommandLineArgumentResolver<T> m_valueResolver;
 
         public T Value { get; set; }
 
@@ -17,16 +46,7 @@ namespace MatthiWare.UpdateLib.Common
 
         public bool IsFound => Count > 0;
 
-        object IParameterDefinition.Value => Value;
-
-        internal ParameterDefinition(string paramName, ParamMandatoryType mandatoryType, ParamValueType valueType)
-        {
-            Name = paramName;
-            MandatoryType = mandatoryType;
-            ValueType = valueType;
-        }
-
-        internal ParameterDefinition(string paramName, ParamMandatoryType mandatoryType, ParamValueType valueType, ICommandLineArgumentResolver<T> valueResolver)
+        public ParameterDefinition(string paramName, ParamMandatoryType mandatoryType, ParamValueType valueType, ICommandLineArgumentResolver<T> valueResolver)
         {
             Name = paramName;
             MandatoryType = mandatoryType;
@@ -40,7 +60,12 @@ namespace MatthiWare.UpdateLib.Common
             Count++;
         }
 
-        public bool CanResolve(ref string[] args, ref int index) => m_valueResolver.CanResolve(ref args, ref index);
+        public bool CanResolve(ref string[] args, ref int index)
+        {
+            if (index < 0 || index >= args.Length) return false;
+
+            return m_valueResolver.CanResolve(ref args, ref index);
+        }
 
         public void Reset()
         {

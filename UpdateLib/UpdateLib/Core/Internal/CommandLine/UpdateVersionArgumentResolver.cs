@@ -7,7 +7,7 @@ using MatthiWare.UpdateLib.Common;
 
 namespace MatthiWare.UpdateLib.Core.Internal.CommandLine
 {
-    internal class StringToUpdateVersionArgumentResolver : ICommandLineArgumentResolver<UpdateVersion>
+    internal class UpdateVersionArgumentResolver : ICommandLineArgumentResolver<UpdateVersion>
     {
         public bool CanResolve(ref string[] data, ref int index)
             => UpdateVersion.CanParse(data[index]);

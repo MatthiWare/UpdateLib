@@ -15,8 +15,7 @@ namespace MatthiWare.UpdateLib.Core.Internal
 
         public void Configure(UpdateLibOptions options)
         {
-            options.AllowUnsafeUrl = false;
-            options.ParameterPrefix = m_argumentPrefix;
+            options.CommandLineArgumentPrefix = m_argumentPrefix;
             options.RollbackArgumentName = m_rollback;
             options.UpdateSilentArgumentName = m_argUpdateSilent;
             options.WaitArgumentName = m_argWait;

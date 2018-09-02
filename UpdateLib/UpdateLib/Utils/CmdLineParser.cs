@@ -19,21 +19,34 @@ using System.Collections.Generic;
 using System.Linq;
 using MatthiWare.UpdateLib.Abstractions;
 using MatthiWare.UpdateLib.Common;
+using MatthiWare.UpdateLib.Core;
+using Microsoft.Extensions.Options;
 
 namespace MatthiWare.UpdateLib.Utils
 {
     public class CmdLineParser : ICommandLineParser
     {
         private SortedDictionary<string, IParameterDefinition> m_params = new SortedDictionary<string, IParameterDefinition>();
+        private readonly string m_paramPrefix;
 
-        public string ParameterPrefix { get; set; } = "--";
+        public CmdLineParser(IOptions<UpdateLibOptions> options)
+            => m_paramPrefix = options.Value.CommandLineArgumentPrefix;
 
-        public void AddParameter<T>(string paramName, ParamMandatoryType mandatoryType = ParamMandatoryType.Optional, ParamValueType valueType = ParamValueType.None)
-            => AddParameter<T>(paramName, mandatoryType, valueType, default);
+        public void AddParameter(string paramName, ParamMandatoryType mandatoryType = ParamMandatoryType.Optional, ParamValueType valueType = ParamValueType.None)
+        {
+            Guard.NotNullOrEmpty(paramName, nameof(paramName));
+
+            if (paramName.Contains(' ')) throw new ArgumentException("Parameter cannot contain spaces", nameof(paramName));
+            if (m_params.ContainsKey(paramName)) throw new ArgumentException("Key already exists", nameof(paramName));
+
+            var param = new ParameterDefinition(paramName, mandatoryType, valueType);
+            m_params.Add(paramName, param);
+        }
 
         public void AddParameter<T>(string paramName, ParamMandatoryType mandatoryType, ParamValueType valueType, ICommandLineArgumentResolver<T> resolver)
         {
-            if (string.IsNullOrEmpty(paramName)) throw new ArgumentNullException(nameof(paramName));
+            Guard.NotNullOrEmpty(paramName, nameof(paramName));
+
             if (paramName.Contains(' ')) throw new ArgumentException("Parameter cannot contain spaces", nameof(paramName));
             if (m_params.ContainsKey(paramName)) throw new ArgumentException("Key already exists", nameof(paramName));
 
@@ -51,7 +64,7 @@ namespace MatthiWare.UpdateLib.Utils
 
         public void Parse(string[] args)
         {
-            if (string.IsNullOrEmpty(ParameterPrefix)) throw new ArgumentNullException(nameof(ParameterPrefix));
+            if (string.IsNullOrEmpty(m_paramPrefix)) throw new ArgumentNullException(nameof(m_paramPrefix));
 
             m_params.ForEach(kvp => kvp.Value.Reset());
 
@@ -59,7 +72,7 @@ namespace MatthiWare.UpdateLib.Utils
             {
                 string data = args[i];
 
-                var def = m_params.Where(p => ParameterPrefix + p.Key == data).Select(p => p.Value).FirstOrDefault();
+                var def = m_params.Where(p => m_paramPrefix + p.Key == data).Select(p => p.Value).FirstOrDefault();
 
                 if (def == null)
                     continue;
@@ -83,39 +96,8 @@ namespace MatthiWare.UpdateLib.Utils
             if (succes)
                 param.Resolve(ref args, ref index);
 
-            //else if (param.ValueType == ParamValueType.Bool || param.ValueType == ParamValueType.OptionalBool)
-            //{
-            //    succes = bool.TryParse(data, out bool value);
-
-            //    if (succes)
-            //        param.Value = value;
-            //}
-            //else if (param.ValueType == ParamValueType.String || param.ValueType == ParamValueType.OptionalString)
-            //{
-            //    succes = !data.StartsWith(ParameterPrefix);
-
-            //    if (succes)
-            //        param.Value = data;
-            //}
-            //else if (param.ValueType == ParamValueType.MultipleInts)
-            //{
-            //    var values = new List<int>();
-
-            //    while (index < args.Length && int.TryParse(args[index], out int outValue))
-            //    {
-            //        values.Add(outValue);
-            //        index++;
-            //    }
-
-            //    succes = values.Count >= 2;
-
-            //    if (succes)
-            //        param.Value = values.ToArray();
-            //}
-
             if (!succes)
                 --index;
-
         }
 
         private void CheckAllMandatoryParamsFound()

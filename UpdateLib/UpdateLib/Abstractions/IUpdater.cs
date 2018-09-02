@@ -1,10 +1,11 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using MatthiWare.UpdateLib.Core;
 
 namespace MatthiWare.UpdateLib.Abstractions
 {
-    public interface IUpdater
+    public interface IUpdater : IDisposable
     {
         Task InitializeAsync(CancellationToken cancellation = default);
 

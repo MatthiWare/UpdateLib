@@ -10,7 +10,6 @@ namespace MatthiWare.UpdateLib.Abstractions
         string Name { get; }
         ParamValueType ValueType { get; }
         ParamMandatoryType MandatoryType { get; }
-        dynamic Value { get; }
         int Count { get; set; }
         bool IsFound { get; }
         void Reset();
@@ -20,6 +19,6 @@ namespace MatthiWare.UpdateLib.Abstractions
 
     public interface IParameterDefinition<T> : IParameterDefinition
     {
-        new T Value { get; }
+        T Value { get; }
     }
 }

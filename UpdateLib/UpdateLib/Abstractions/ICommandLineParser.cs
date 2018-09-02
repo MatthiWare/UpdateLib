@@ -7,7 +7,7 @@ namespace MatthiWare.UpdateLib.Abstractions
 {
     public interface ICommandLineParser
     {
-        void AddParameter<T>(string paramName, ParamMandatoryType mandatoryType = ParamMandatoryType.Optional, ParamValueType valueType = ParamValueType.None);
+        void AddParameter(string paramName, ParamMandatoryType mandatoryType = ParamMandatoryType.Optional, ParamValueType valueType = ParamValueType.None);
 
         void AddParameter<T>(string paramName, ParamMandatoryType mandatoryType, ParamValueType valueType, ICommandLineArgumentResolver<T> resolver);
 

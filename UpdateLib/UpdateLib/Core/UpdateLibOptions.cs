@@ -11,7 +11,6 @@ namespace MatthiWare.UpdateLib.Core
         public string WaitArgumentName { get; set; }
         public string RollbackArgumentName { get; set; }
         public string UpdateUrl { get; set; }
-        public string ParameterPrefix { get; set; }
-        public bool AllowUnsafeUrl { get; set; }
+        public string CommandLineArgumentPrefix { get; set; }
     }
 }

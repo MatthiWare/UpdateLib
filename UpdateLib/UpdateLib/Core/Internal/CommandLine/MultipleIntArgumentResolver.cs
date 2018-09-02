@@ -4,7 +4,7 @@ using MatthiWare.UpdateLib.Abstractions;
 
 namespace MatthiWare.UpdateLib.Core.Internal.CommandLine
 {
-    public class StringToMultipleIntsArgumentResolver : ICommandLineArgumentResolver<int[]>
+    public class MultipleIntArgumentResolver : ICommandLineArgumentResolver<int[]>
     {
         private IList<int> ints = new List<int>();
 

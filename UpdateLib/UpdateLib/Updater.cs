@@ -81,8 +81,8 @@ namespace MatthiWare.UpdateLib
             //CommandLine.AddParameter(m_rollback);
         }
 
-        public static UpdateBuilder GetBuilder()
-            => UpdateBuilder.CreateDefaultUpdateBuilder();
+        public static UpdaterBuilder GetBuilder()
+            => UpdaterBuilder.CreateDefaultUpdateBuilder();
 
         /// <summary>
         /// Initializes the updater
@@ -185,11 +185,11 @@ namespace MatthiWare.UpdateLib
 
             for (int i = 0; i < args.Count; i++)
             {
-                if (!update && args[i] == options.ParameterPrefix + options.UpdateArgumentName)
+                if (!update && args[i] == options.CommandLineArgumentPrefix + options.UpdateArgumentName)
                 {
                     args[i] = string.Empty;
                 }
-                else if (args[i] == options.ParameterPrefix + options.WaitArgumentName)
+                else if (args[i] == options.CommandLineArgumentPrefix + options.WaitArgumentName)
                 {
                     args[i] = string.Empty;
                     if (i + 1 < args.Count)
@@ -197,14 +197,14 @@ namespace MatthiWare.UpdateLib
                 }
             }
 
-            if (waitForPid && !args.Contains(options.ParameterPrefix + options.WaitArgumentName))
+            if (waitForPid && !args.Contains(options.CommandLineArgumentPrefix + options.WaitArgumentName))
             {
-                args.Add(options.ParameterPrefix + options.WaitArgumentName);
+                args.Add(options.CommandLineArgumentPrefix + options.WaitArgumentName);
                 args.Add(Process.GetCurrentProcess().Id.ToString());
             }
 
-            if (update && !args.Contains(options.ParameterPrefix + options.UpdateArgumentName))
-                args.Add(options.ParameterPrefix + options.UpdateArgumentName);
+            if (update && !args.Contains(options.CommandLineArgumentPrefix + options.UpdateArgumentName))
+                args.Add(options.CommandLineArgumentPrefix + options.UpdateArgumentName);
 
             string arguments = args.NotEmpty().Distinct().AppendAll(" ");
 
@@ -232,6 +232,11 @@ namespace MatthiWare.UpdateLib
 
             // we will never reach this part of the code
             return true;
+        }
+
+        public void Dispose()
+        {
+
         }
     }
 }
