@@ -15,38 +15,49 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+using McMaster.Extensions.CommandLineUtils;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.ComponentModel.DataAnnotations;
 
 namespace MatthiWare.UpdateLib.Generator
 {
-    static class Program
+    class Program
     {
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
-            List<Stack1> Unavailability = new List<Stack1>
-{
-        new Stack1{  Key = "A", StartDate = new DateTime(2018,1,1), EndDate = new DateTime(2018,1,30) },
-        new Stack1{  Key = "B", StartDate = new DateTime(2018,1,2), EndDate = new DateTime(2018,1,30)},
-        new Stack1{  Key = "C", StartDate = new DateTime(2018,1,2), EndDate = new DateTime(2018,1,30)}
-};
+            CommandLineApplication.Execute<Program>(args);
 
-            bool allUnique = Unavailability.Select(_ => new { _.StartDate, _.EndDate }).Distinct().Count() <= 1;
-
-            Console.WriteLine(allUnique);
+#if DEBUG
             Console.ReadKey();
+#endif
         }
 
-        public class Stack1
+        [Required]
+        [DirectoryExists]
+        [Option("--from <DIR>", Description = "Required. 'Old' program directory")]
+        private string PreviousVersionDir { get; }
+
+        [Required]
+        [DirectoryExists]
+        [Option("--to <DIR>", Description = "Required. 'new' program directory")]
+        private string CurrentVersionDirectory { get; }
+
+        [Required]
+        [DirectoryExists]
+        [Option("--output <DIR>", Description = "Required. Delta output directory")]
+        private string OutputDirectory { get; }
+
+        private async void OnExecuteAsync()
         {
-            public string Key { get; set; }
-            public DateTime StartDate { get; set; }
-            public DateTime EndDate { get; set; }
+            var patchBuilder = new PatchBuilder(PreviousVersionDir, CurrentVersionDirectory, OutputDirectory);
+
+            await patchBuilder.CreatePatch((progress) => Console.WriteLine($"Progress: {progress}"));
         }
+
+
     }
 }
