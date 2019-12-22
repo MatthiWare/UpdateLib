@@ -10,6 +10,9 @@
 # UpdateLib v0.4.4
 A .Net auto update library made in C#
 
+# Archived
+This repo has been archived. Development will continue in [MatthiWare/UpdateLib.Core](https://github.com/MatthiWare/UpdateLib.Core).
+
 ### Disclaimer 
 UpdateLib is currently <b>in development</b> and is <b>not</b> yet ready for use in production environment.
 UpdateLib should only be used for testing purposes untill the first stable release.
