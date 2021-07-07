@@ -1,195 +1,22 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{4394BE57-95E2-45B1-A968-1404B0590B35}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>MatthiWare.UpdateLib</RootNamespace>
-    <AssemblyName>UpdateLib</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
-    <DocumentationFile>
-    </DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationIcon>updater.ico</ApplicationIcon>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <Compile Remove="Extensions\**" />
+    <EmbeddedResource Remove="Extensions\**" />
+    <None Remove="Extensions\**" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Common\Enums.cs" />
-    <Compile Include="Common\ParameterDefinition.cs" />
-    <Compile Include="Controls\UpdaterControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Controls\UpdaterControl.Designer.cs">
-      <DependentUpon>UpdaterControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Encoders\IEncoder.cs" />
-    <Compile Include="Files\DirectoryEntry.cs" />
-    <Compile Include="Files\EntryBase.cs" />
-    <Compile Include="Files\HashCacheEntry.cs" />
-    <Compile Include="Files\HashCacheFile.cs" />
-    <Compile Include="Files\FileEntry.cs" />
-    <Compile Include="Files\PathVariableConverter.cs" />
-    <Compile Include="Files\RegistryKeyEntry.cs" />
-    <Compile Include="Files\UpdateFile.cs" />
-    <Compile Include="Logging\ILogger.cs" />
-    <Compile Include="Logging\ILogWriter.cs" />
-    <Compile Include="Logging\Logger.cs" />
-    <Compile Include="Logging\Writers\ConsoleLogWriter.cs" />
-    <Compile Include="Logging\Writers\FileLogWriter.cs" />
-    <Compile Include="Security\InvalidHashException.cs" />
-    <Compile Include="Security\PermissionUtil.cs" />
-    <Compile Include="Tasks\AsyncTaskFactory.cs" />
-    <Compile Include="Tasks\CheckForUpdatesCompletedEventArgs.cs" />
-    <Compile Include="Tasks\CheckForUpdatesTask.cs" />
-    <Compile Include="Tasks\CheckRequiredPrivilegesTask.cs" />
-    <Compile Include="Tasks\DownloadManager.cs" />
-    <Compile Include="Tasks\UpdatableTask.cs" />
-    <Compile Include="Tasks\UpdateFileProcessorTask.cs" />
-    <Compile Include="Security\HashUtil.cs" />
-    <Compile Include="Tasks\AsyncTask.cs" />
-    <Compile Include="Tasks\CheckForUpdatedItemsTask.cs" />
-    <Compile Include="Tasks\CleanUpTask.cs" />
-    <Compile Include="Tasks\DownloadTask.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Tasks\UpdateCacheTask.cs" />
-    <Compile Include="Tasks\UpdateRegistryTask.cs" />
-    <Compile Include="Tasks\WorkerScheduler.cs" />
-    <Compile Include="Threading\AtomicInteger.cs" />
-    <Compile Include="Threading\ConcurrentQueue.cs" />
-    <Compile Include="UI\Components\ChangelogPage.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="UI\Components\ChangelogPage.Designer.cs">
-      <DependentUpon>ChangelogPage.cs</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Components\FinishPage.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="UI\Components\FinishPage.Designer.cs">
-      <DependentUpon>FinishPage.cs</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Components\IntroPage.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="UI\Components\IntroPage.Designer.cs">
-      <DependentUpon>IntroPage.cs</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Components\UpdatePage.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="UI\Components\UpdatePage.Designer.cs">
-      <DependentUpon>UpdatePage.cs</DependentUpon>
-    </Compile>
-    <Compile Include="UI\IWizardPage.cs" />
-    <Compile Include="UI\MessageDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="UI\MessageDialog.Designer.cs">
-      <DependentUpon>MessageDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="UI\UIExtensions.cs" />
-    <Compile Include="UI\UpdaterForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="UI\UpdaterForm.Designer.cs">
-      <DependentUpon>UpdaterForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="UI\WizardPageCollection.cs" />
-    <Compile Include="Updater.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utils\CmdLineParser.cs" />
-    <Compile Include="Utils\ExtensionMethods.cs" />
-    <Compile Include="Utils\IOUtils.cs" />
-    <Compile Include="Utils\Lazy.cs" />
-    <Compile Include="Utils\NetworkUtils.cs" />
-    <Compile Include="Utils\RegistryHelper.cs" />
-    <Compile Include="Win32\NativeMethods.cs" />
+    <Compile Include="..\.shared\SharedAssemblyInfo.cs" Link="Properties\SharedAssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\status_working.png" />
-    <None Include="Resources\status_update.png" />
-    <None Include="Resources\status_warning.png" />
-    <None Include="Resources\project_16px.png" />
-    <Content Include="UpdaterControl.bmp" />
-    <None Include="Resources\status_info.png" />
-    <None Include="Resources\status_error.png" />
-    <None Include="Resources\status_download.png" />
-    <None Include="Resources\status_done.png" />
-    <Content Include="updater.ico" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="2.1.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Controls\UpdaterControl.resx">
-      <DependentUpon>UpdaterControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UI\Components\ChangelogPage.resx">
-      <DependentUpon>ChangelogPage.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UI\Components\FinishPage.resx">
-      <DependentUpon>FinishPage.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UI\Components\IntroPage.resx">
-      <DependentUpon>IntroPage.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UI\Components\UpdatePage.resx">
-      <DependentUpon>UpdatePage.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UI\MessageDialog.resx">
-      <DependentUpon>MessageDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UI\UpdaterForm.resx">
-      <DependentUpon>UpdaterForm.cs</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

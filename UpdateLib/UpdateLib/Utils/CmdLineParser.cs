@@ -1,5 +1,4 @@
-﻿/*  UpdateLib - .Net auto update library
- *  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
+﻿/*  Copyright (C) 2016 - MatthiWare (Matthias Beerens)
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as published
@@ -14,46 +13,58 @@
  *  You should have received a copy of the GNU Affero General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-using MatthiWare.UpdateLib.Common;
+
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
-using System.Text;
+using MatthiWare.UpdateLib.Abstractions;
+using MatthiWare.UpdateLib.Common;
+using MatthiWare.UpdateLib.Core;
+using Microsoft.Extensions.Options;
 
 namespace MatthiWare.UpdateLib.Utils
 {
-    public class CmdLineParser
+    public class CmdLineParser : ICommandLineParser
     {
-        private SortedDictionary<string, ParameterDefinition> m_params = new SortedDictionary<string, ParameterDefinition>();
+        private SortedDictionary<string, IParameterDefinition> m_params = new SortedDictionary<string, IParameterDefinition>();
+        private readonly string m_paramPrefix;
 
-        public string ParameterPrefix { get; set; } = "--";
+        public CmdLineParser(IOptions<UpdateLibOptions> options)
+            => m_paramPrefix = options.Value.CommandLineArgumentPrefix;
 
         public void AddParameter(string paramName, ParamMandatoryType mandatoryType = ParamMandatoryType.Optional, ParamValueType valueType = ParamValueType.None)
         {
-            if (string.IsNullOrEmpty(paramName)) throw new ArgumentNullException(nameof(paramName));
+            Guard.NotNullOrEmpty(paramName, nameof(paramName));
+
             if (paramName.Contains(' ')) throw new ArgumentException("Parameter cannot contain spaces", nameof(paramName));
             if (m_params.ContainsKey(paramName)) throw new ArgumentException("Key already exists", nameof(paramName));
-            
+
             var param = new ParameterDefinition(paramName, mandatoryType, valueType);
             m_params.Add(paramName, param);
         }
 
-        public ParameterDefinition this[string paramName]
+        public void AddParameter<T>(string paramName, ParamMandatoryType mandatoryType, ParamValueType valueType, ICommandLineArgumentResolver<T> resolver)
         {
-            get
-            {
-                return m_params.ContainsKey(paramName) ? m_params[paramName] : null;
-            }
+            Guard.NotNullOrEmpty(paramName, nameof(paramName));
+
+            if (paramName.Contains(' ')) throw new ArgumentException("Parameter cannot contain spaces", nameof(paramName));
+            if (m_params.ContainsKey(paramName)) throw new ArgumentException("Key already exists", nameof(paramName));
+
+            var param = new ParameterDefinition<T>(paramName, mandatoryType, valueType, resolver);
+            m_params.Add(paramName, param);
         }
+
+        public IParameterDefinition<T> Get<T>(string paramName)
+            => m_params.ContainsKey(paramName) ? m_params[paramName] as IParameterDefinition<T> : default;
+
+        public IParameterDefinition Get(string paramName)
+            => m_params.ContainsKey(paramName) ? m_params[paramName] : default;
 
         public void Parse() => Parse(Environment.GetCommandLineArgs());
 
-
         public void Parse(string[] args)
         {
-            if (string.IsNullOrEmpty(ParameterPrefix)) throw new ArgumentNullException(nameof(ParameterPrefix));
+            if (string.IsNullOrEmpty(m_paramPrefix)) throw new ArgumentNullException(nameof(m_paramPrefix));
 
             m_params.ForEach(kvp => kvp.Value.Reset());
 
@@ -61,7 +72,7 @@ namespace MatthiWare.UpdateLib.Utils
             {
                 string data = args[i];
 
-                var def = m_params.Where(p => ParameterPrefix + p.Key == data).Select(p => p.Value).FirstOrDefault();
+                var def = m_params.Where(p => m_paramPrefix + p.Key == data).Select(p => p.Value).FirstOrDefault();
 
                 if (def == null)
                     continue;
@@ -71,79 +82,36 @@ namespace MatthiWare.UpdateLib.Utils
                 if (def.ValueType == ParamValueType.None)
                     continue;
 
-                FindParameterValue(def, args, ref i);
+                FindParameterValue(def, ref args, ref i);
             }
 
             CheckAllMandatoryParamsFound();
         }
 
-        private void FindParameterValue(ParameterDefinition param, string[] args, ref int index)
+        private void FindParameterValue(IParameterDefinition param, ref string[] args, ref int index)
         {
-            string data = args[++index];
-            bool succes = true;
+            ++index;
+            bool succes = param.CanResolve(ref args, ref index);
 
-            if (param.ValueType == ParamValueType.Int || param.ValueType == ParamValueType.OptionalInt)
-            {
-                int value;
-                succes = int.TryParse(data, out value);
-
-                if (succes)
-                    param.Value = value;
-            }
-            else if (param.ValueType == ParamValueType.Bool || param.ValueType == ParamValueType.OptionalBool)
-            {
-                bool value;
-                succes = bool.TryParse(data, out value);
-
-                if (succes)
-                    param.Value = value;
-            }
-            else if (param.ValueType == ParamValueType.String || param.ValueType == ParamValueType.OptionalString)
-            {
-                succes = !data.StartsWith(ParameterPrefix);
-
-                if (succes)
-                    param.Value = data;
-            }
-            else if (param.ValueType == ParamValueType.MultipleInts)
-            {
-                List<int> values = new List<int>();
-                int outValue;
-
-                while (index < args.Length && int.TryParse(args[index], out outValue))
-                {
-                    values.Add(outValue);
-                    index++;
-                }
-
-                succes = values.Count >= 2;
-
-                if (succes)
-                    param.Value = values.ToArray();
-            }
+            if (succes)
+                param.Resolve(ref args, ref index);
 
             if (!succes)
-            {
                 --index;
-
-                if (param.ValueType != ParamValueType.OptionalBool &&
-                    param.ValueType != ParamValueType.OptionalInt &&
-                    param.ValueType != ParamValueType.OptionalString)
-                    param.Count = 0;
-            }
-
         }
 
         private void CheckAllMandatoryParamsFound()
         {
+            var exceptions = new List<Exception>();
+
             m_params
-                .Where(kvp => kvp.Value.MandatoryType == ParamMandatoryType.Required)
                 .Select(kvp => kvp.Value)
-                .ForEach(param =>
-                {
-                    if (!param.IsFound)
-                        throw new KeyNotFoundException($"Mandatory parameter '{param.ParameterName}' is missing");
-                });
+                .Where(param => param.MandatoryType == ParamMandatoryType.Required && !param.IsFound)
+                .ForEach(param => exceptions.Add(new KeyNotFoundException($"Mandatory parameter '{param.Name}' is missing")));
+
+            if (exceptions.Any())
+                throw new AggregateException("One or more mandatory parameters are missing", exceptions);
+
         }
     }
 

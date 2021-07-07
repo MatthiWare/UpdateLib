@@ -15,20 +15,21 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using MatthiWare.UpdateLib.Utils;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Xml.Serialization;
 using System.Linq;
+using System.Xml.Serialization;
+
+using MatthiWare.UpdateLib.Common;
+using MatthiWare.UpdateLib.Common.Abstraction;
+using MatthiWare.UpdateLib.Utils;
 
 namespace MatthiWare.UpdateLib.Files
 {
     [Serializable]
-    public class HashCacheFile
+    public class HashCacheFile : FileBase<HashCacheFile>
     {
-        public const string CACHE_FOLDER_NAME = "Cache";
-        public const string FILE_NAME = "HashCacheFile.xml";
+        public const string FILE_NAME = "Cache.xml";
 
         [XmlArray("Items")]
         [XmlArrayItem("Entry")]
@@ -52,81 +53,34 @@ namespace MatthiWare.UpdateLib.Files
             {
                 HashCacheEntry entry = Items.FirstOrDefault(f => f.FilePath == fullPath);
 
+                entry?.Recalculate();
+
                 if (entry == null)
                 {
                     entry = new HashCacheEntry(fullPath);
                     Items.Add(entry);
                 }
-                else
-                    entry.Recalculate();
 
-                Updater.Instance.Logger.Debug(nameof(HashCacheFile), nameof(AddOrUpdateEntry), $"Cache updated for file -> '{entry.FilePath}'");
+                //Updater.Instance.Logger.Debug(nameof(HashCacheFile), nameof(AddOrUpdateEntry), $"Cache updated for file -> '{entry.FilePath}'");
             }
         }
 
         #region Save/Load
-        private static string GetStoragePath()
-        {
-            string path = IOUtils.AppDataPath;
-
-            return $@"{path}\{CACHE_FOLDER_NAME}\{FILE_NAME}";
-        }
+        private static string GetStoragePath() => $@"{IOUtils.CachePath}\{FILE_NAME}";
 
         /// <summary>
         /// Loads the <see cref="HashCacheFile"/> from the default storage location 
         /// </summary>
         /// <returns>The loaded <see cref="HashCacheFile"/> or null if it doesn't exist </returns>
-        public static HashCacheFile Load()
-        {
-            return Load(GetStoragePath());
-        }
-
-        /// <summary>
-        /// Loads the <see cref="HashCacheFile"/> from the given storage location 
-        /// </summary>
-        /// <param name="path">The storage location</param>
-        /// <returns>The loaded <see cref="HashCacheFile"/> or null if it doesn't exist </returns>
-        public static HashCacheFile Load(string path)
-        {
-            if (!File.Exists(path))
-                return null;
-
-            using (Stream stream = File.Open(path, FileMode.Open, FileAccess.Read))
-            {
-                XmlSerializer serializer = new XmlSerializer(typeof(HashCacheFile));
-                return (HashCacheFile)serializer.Deserialize(stream);
-            }
-        }
+        public override HashCacheFile Load()
+            => Load(GetStoragePath());
 
         /// <summary>
         /// Saves the <see cref="HashCacheFile"/> in the default storage location 
         /// </summary>
-        public void Save()
-        {
-            Save(GetStoragePath());
-        }
+        public override void Save()
+            => Save(GetStoragePath());
 
-        /// <summary>
-        /// Saves the <see cref="HashCacheFile"/> in the given storage location 
-        /// </summary>
-        /// <param name="path">The storage location</param>
-        public void Save(string path)
-        {
-            FileInfo fi = new FileInfo(path);
-
-            if (!fi.Directory.Exists)
-                fi.Directory.Create();
-
-            if (fi.Exists)
-                fi.Delete();
-
-
-            using (Stream stream = fi.Open(FileMode.OpenOrCreate, FileAccess.Write))
-            {
-                XmlSerializer serializer = new XmlSerializer(typeof(HashCacheFile));
-                serializer.Serialize(stream, this);
-            }
-        }
         #endregion
 
     }

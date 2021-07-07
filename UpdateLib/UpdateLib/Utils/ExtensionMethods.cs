@@ -17,8 +17,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MatthiWare.UpdateLib.Utils
 {
@@ -39,71 +43,83 @@ namespace MatthiWare.UpdateLib.Utils
 
                 return builder.ToString();
             }
-
         }
+
+        public static IEnumerable<string> Replace(this IEnumerable<string> collection, string oldStr, string newStr)
+        {
+            foreach (var str in collection)
+                yield return str.Replace(oldStr, newStr);
+        }
+
+        [DebuggerStepThrough]
+        public static T MaxOrDefault<T, K>(this IEnumerable<T> collection, Func<T, K> resolve) where K : IComparable<K>
+        {
+            T max = default(T);
+
+            foreach (T other in collection)
+            {
+                if (max == null)
+                {
+                    max = other;
+                    continue;
+                }
+
+                if (resolve(other).CompareTo(resolve(max)) > 0)
+                    max = other;
+            }
+
+            return max;
+        }
+
+        public static string GetDescription(this Type type)
+            => type.GetCustomAttributes(typeof(DescriptionAttribute), false).Cast<DescriptionAttribute>().FirstOrDefault().Description ?? "No description available";
+
 
         [DebuggerStepThrough]
         public static void ForEach<T>(this IEnumerable<T> collection, Action<T> action)
         {
-            using (var enumerator = collection.GetEnumerator())
-                while (enumerator.MoveNext())
-                    action(enumerator.Current);
+            foreach (T item in collection)
+                action(item);
+        }
+
+        public static async Task ForEachAsync<T>(this IEnumerable<T> source, Func<T, Task> action, int maxDegreeOfParallelism, CancellationToken cancellation = default)
+        {
+            using (var semaphore = new SemaphoreSlim(maxDegreeOfParallelism, maxDegreeOfParallelism))
+            {
+                var throttledTasks = new List<Task>();
+
+                foreach (var task in source)
+                {
+                    await semaphore.WaitAsync(cancellation);
+
+                    throttledTasks.Add(Task.Run(async () => 
+                    {
+                        await action(task);
+
+                        semaphore.Release();
+
+                    }));
+                }
+
+                await Task.WhenAll(throttledTasks.ToArray());
+            }
         }
 
         [DebuggerStepThrough]
         public static IEnumerable<T> NotNull<T>(this IEnumerable<T> collection)
         {
-            using (var enumerator = collection.GetEnumerator())
-                while (enumerator.MoveNext())
-                    if (enumerator.Current != null)
-                        yield return enumerator.Current;
+            foreach (T item in collection)
+                if (item != null)
+                    yield return item;
 
         }
 
         [DebuggerStepThrough]
         public static IEnumerable<string> NotEmpty(this IEnumerable<string> collection)
         {
-            using (var enumerator = collection.GetEnumerator())
-                while (enumerator.MoveNext())
-                    if (!string.IsNullOrEmpty(enumerator.Current))
-                        yield return enumerator.Current;
-        }
-
-        /// <summary>
-        /// Skips n amount of the last elements
-        /// </summary>
-        /// <typeparam name="T">Any</typeparam>
-        /// <param name="source">The source collection</param>
-        /// <param name="count">The count of last elements to skip</param>
-        /// <returns><see cref="IEnumerable{T}"/> without the last <paramref name="count"/> elements.</returns>
-        [DebuggerStepThrough]
-        public static IEnumerable<T> SkipLast<T>(this IEnumerable<T> source, int count)
-        {
-            if (count == 0)
-            {
-                foreach (T item in source)
+            foreach (var item in collection)
+                if (!string.IsNullOrEmpty(item))
                     yield return item;
-
-                yield break;
-            }
-
-            int i = 0;
-            var buffer = new Queue<T>(count + 1);
-
-            using (var enumerator = source.GetEnumerator())
-            {
-                while (enumerator.MoveNext())
-                {
-                    if (i == count)
-                    {
-                        yield return buffer.Dequeue();
-                        i--;
-                    }
-
-                    buffer.Enqueue(enumerator.Current);
-                    i++;
-                }
-            }
         }
     }
 }

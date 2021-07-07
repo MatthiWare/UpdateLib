@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "UpdateLib.Generator": {
+      "commandName": "Project",
+      "commandLineArgs": "--from C:\\temp --to C:\\temp\\OUTPUT_TESTING --output C:\\temp\\Editor_CLI_2_XML_debug"
+    }
+  }
+}
